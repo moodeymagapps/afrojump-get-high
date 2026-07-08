@@ -77,14 +77,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "Afro Jump – Get High!" },
+      { name: "description", content: "Springe so hoch du kannst! Sammle Weed-Baggys, weiche der Polizei aus und besiege den Bosshubschrauber." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "Afro Jump – Get High!" },
+      { property: "og:description", content: "Springe so hoch du kannst! Sammle Weed-Baggys, weiche der Polizei aus und besiege den Bosshubschrauber." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Afro Jump – Get High!" },
+      { name: "twitter:description", content: "Springe so hoch du kannst! Sammle Weed-Baggys, weiche der Polizei aus und besiege den Bosshubschrauber." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/DnHvDE1ZincK9PSJvBa6H2UNNT63/social-images/social-1783519818732-f34af921cafa4627a7d503f5ff286c28~tplv-tnf8g33v4j-watermark-v2_MjU5OTY0Mzc3NjA0.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/DnHvDE1ZincK9PSJvBa6H2UNNT63/social-images/social-1783519818732-f34af921cafa4627a7d503f5ff286c28~tplv-tnf8g33v4j-watermark-v2_MjU5OTY0Mzc3NjA0.webp" },
     ],
     links: [
       {
