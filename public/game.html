@@ -8,26 +8,80 @@
   html,body{margin:0;padding:0;height:100%;background:#111;overflow:hidden;font-family:system-ui,sans-serif;color:#fff;touch-action:none;user-select:none;-webkit-user-select:none;}
   #wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;}
   canvas{background:#87ceeb;display:block;box-shadow:0 0 40px #000a;touch-action:none;}
-  #ui{position:absolute;top:8px;left:8px;right:8px;display:flex;justify-content:space-between;font-weight:700;text-shadow:1px 1px 2px #000;pointer-events:none;font-size:14px;}
+  #ui{position:absolute;top:8px;left:8px;right:8px;display:flex;justify-content:space-between;align-items:center;font-weight:700;text-shadow:1px 1px 2px #000;pointer-events:none;font-size:14px;gap:8px;}
+  #ui .stats{display:flex;flex-direction:column;gap:2px;}
+  #ui .right{display:flex;align-items:center;gap:8px;pointer-events:auto;}
+  #bags{color:#7cfc00;font-weight:700;text-shadow:1px 1px 2px #000;}
+  #pauseBtn{background:rgba(0,0,0,0.4);border:2px solid #fff;color:#fff;width:34px;height:34px;border-radius:8px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;}
+  #pauseBtn:active{transform:scale(.95);}
   #power{position:absolute;top:36px;left:8px;font-size:13px;font-weight:700;color:#ffd54a;text-shadow:1px 1px 2px #000;pointer-events:none;}
-  #over{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.6);}
-  #over h1{margin:0 0 10px;font-size:42px;color:#ff5252;text-shadow:2px 2px 0 #000;}
-  #over p{margin:4px 0;font-size:18px;}
-  #over button{margin-top:16px;padding:12px 24px;font-size:18px;border:none;border-radius:8px;background:#4caf50;color:#fff;font-weight:700;cursor:pointer;box-shadow:0 4px 0 #2e7d32;}
-  #over button:active{transform:translateY(2px);box-shadow:0 2px 0 #2e7d32;}
+  .overlay{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.65);padding:20px;box-sizing:border-box;}
+  .overlay h1{margin:0 0 6px;font-size:38px;text-shadow:2px 2px 0 #000;letter-spacing:1px;}
+  .overlay h2{margin:0 0 12px;font-size:22px;opacity:.9;}
+  .overlay p{margin:4px 0;font-size:16px;}
+  .overlay .btn{margin:6px 0;padding:12px 22px;font-size:17px;border:none;border-radius:10px;background:#4caf50;color:#fff;font-weight:700;cursor:pointer;box-shadow:0 4px 0 #2e7d32;min-width:200px;}
+  .overlay .btn:active{transform:translateY(2px);box-shadow:0 2px 0 #2e7d32;}
+  .overlay .btn.alt{background:#ffb300;box-shadow:0 4px 0 #b47a00;}
+  .overlay .btn.alt:active{box-shadow:0 2px 0 #b47a00;}
+  .overlay .btn.ghost{background:#455a64;box-shadow:0 4px 0 #263238;}
+  .overlay .btn.ghost:active{box-shadow:0 2px 0 #263238;}
+  #over h1{color:#ff5252;}
+  #menu h1{color:#7cfc00;font-size:44px;}
+  #menu .tag{font-size:14px;opacity:.85;margin-bottom:14px;}
+  #shop{overflow-y:auto;justify-content:flex-start;padding-top:20px;}
+  #shop .head{display:flex;justify-content:space-between;width:100%;max-width:360px;align-items:center;margin-bottom:12px;}
+  #shop h2{margin:0;color:#7cfc00;}
+  #shopClose{background:#455a64;border:none;color:#fff;padding:6px 12px;border-radius:6px;font-weight:700;cursor:pointer;}
+  .skinGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:360px;}
+  .skinCard{background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.15);border-radius:10px;padding:8px;display:flex;flex-direction:column;align-items:center;gap:4px;}
+  .skinCard.selected{border-color:#7cfc00;background:rgba(124,252,0,0.12);}
+  .skinCard canvas{background:linear-gradient(#87ceeb,#c9e9f6);border-radius:6px;width:80px;height:80px;box-shadow:none;}
+  .skinCard .name{font-size:13px;font-weight:700;}
+  .skinCard .price{font-size:12px;color:#7cfc00;}
+  .skinCard button{margin-top:2px;padding:5px 10px;font-size:12px;border:none;border-radius:6px;background:#4caf50;color:#fff;font-weight:700;cursor:pointer;width:100%;}
+  .skinCard button.owned{background:#455a64;}
+  .skinCard button.selected{background:#7cfc00;color:#111;}
+  .skinCard button:disabled{background:#8a4444;cursor:not-allowed;opacity:.6;}
   #hint{position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:12px;opacity:.7;pointer-events:none;}
 </style>
 </head>
 <body>
 <div id="wrap">
   <canvas id="c" width="400" height="700"></canvas>
-  <div id="ui"><div id="score">Höhe: 0m</div><div id="high">Best: 0m</div></div>
+  <div id="ui">
+    <div class="stats"><div id="score">Höhe: 0m</div><div id="high">Best: 0m</div></div>
+    <div class="right"><div id="bags">🌿 0</div><button id="pauseBtn" title="Pause">❚❚</button></div>
+  </div>
   <div id="power"></div>
-  <div id="over">
+  <div id="menu" class="overlay">
+    <h1>AFRO JUMP</h1>
+    <div class="tag">Doodle-Style Highscore Game</div>
+    <p id="menuHigh">Best: 0m</p>
+    <p id="menuBags">🌿 0 Baggys</p>
+    <button class="btn" id="menuPlay">▶ Spielen</button>
+    <button class="btn alt" id="menuShop">🛍 Shop</button>
+  </div>
+  <div id="pause" class="overlay">
+    <h1>PAUSE</h1>
+    <button class="btn" id="pauseResume">▶ Weiter</button>
+    <button class="btn alt" id="pauseShop">🛍 Shop</button>
+    <button class="btn ghost" id="pauseQuit">↺ Neustart</button>
+  </div>
+  <div id="shop" class="overlay">
+    <div class="head">
+      <h2>🛍 Skin-Shop</h2>
+      <div><span id="shopBags">🌿 0</span> &nbsp; <button id="shopClose">✕</button></div>
+    </div>
+    <div class="skinGrid" id="skinGrid"></div>
+  </div>
+  <div id="over" class="overlay">
     <h1>GAME OVER</h1>
     <p id="finalScore"></p>
     <p id="finalHigh"></p>
-    <button id="restart">Nochmal</button>
+    <p id="finalBags"></p>
+    <button class="btn" id="restart">↻ Nochmal</button>
+    <button class="btn alt" id="overShop">🛍 Shop</button>
+    <button class="btn ghost" id="overMenu">🏠 Menü</button>
   </div>
   <div id="hint">Links/Rechts: ← → oder A/D · Schießen: Leertaste / Tap oben · Mobile: Tap links/rechts</div>
 </div>
