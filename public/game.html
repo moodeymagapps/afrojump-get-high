@@ -688,48 +688,7 @@ function roundRect(x,y,w,h,r,fill,stroke){
 function drawPlayer(){
   const x=player.x,y=player.y-cameraY;
   ctx.save();ctx.translate(x,y);ctx.scale(player.facing,1);
-  // rainbow flash when invincible
-  let bodyCol='#5b3a1a';
-  if(player.invincible>0){
-    const hue=(performance.now()/4)%360;
-    bodyCol=`hsl(${hue},90%,55%)`;
-  }
-  // legs
-  ctx.fillStyle='#2d4373';ctx.strokeStyle='#111';ctx.lineWidth=2;
-  ctx.fillRect(-10,10,8,14);ctx.strokeRect(-10,10,8,14);
-  ctx.fillRect(2,10,8,14);ctx.strokeRect(2,10,8,14);
-  // shoes
-  ctx.fillStyle='#111';ctx.fillRect(-11,22,10,4);ctx.fillRect(1,22,10,4);
-  // body
-  ctx.fillStyle=player.invincible>0?bodyCol:'#e57373';
-  roundRect(-12,-8,24,20,4,true,true);
-  // arms
-  ctx.fillStyle=player.invincible>0?bodyCol:'#c68863';
-  ctx.fillRect(-16,-4,5,14);ctx.strokeRect(-16,-4,5,14);
-  ctx.fillRect(11,-4,5,14);ctx.strokeRect(11,-4,5,14);
-  // face
-  ctx.fillStyle='#5b3a1a';
-  ctx.beginPath();ctx.arc(0,-16,11,0,Math.PI*2);ctx.fill();ctx.stroke();
-  // afro
-  ctx.fillStyle='#2b1a0a';
-  ctx.beginPath();
-  ctx.arc(-8,-24,9,0,Math.PI*2);
-  ctx.arc(0,-30,10,0,Math.PI*2);
-  ctx.arc(8,-24,9,0,Math.PI*2);
-  ctx.arc(-12,-18,7,0,Math.PI*2);
-  ctx.arc(12,-18,7,0,Math.PI*2);
-  ctx.fill();ctx.stroke();
-  // eyes
-  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-3,-17,2.2,0,Math.PI*2);ctx.arc(4,-17,2.2,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#000';ctx.beginPath();ctx.arc(-2,-17,1.1,0,Math.PI*2);ctx.arc(5,-17,1.1,0,Math.PI*2);ctx.fill();
-  // mouth + joint
-  ctx.strokeStyle='#3a2010';ctx.lineWidth=1.4;
-  ctx.beginPath();ctx.moveTo(-2,-12);ctx.lineTo(4,-12);ctx.stroke();
-  // joint
-  ctx.fillStyle='#f5ecd0';ctx.fillRect(4,-13,10,2.5);
-  ctx.strokeStyle='#000';ctx.strokeRect(4,-13,10,2.5);
-  ctx.fillStyle='#ff6a00';ctx.fillRect(13.5,-13,2,2.5);
-  ctx.fillStyle='#ffd54a';ctx.fillRect(14,-12.5,1,1.5);
+  drawAfroCharacter(ctx,currentSkin(),player.invincible);
   ctx.restore();
 
   // smoke
@@ -745,6 +704,57 @@ function drawPlayer(){
     ctx.lineWidth=3;
     ctx.beginPath();ctx.arc(x,y-4,player.r+6,0,Math.PI*2);ctx.stroke();
   }
+}
+
+// Draws the player centered at (0,0) in local coords. Used by game and shop preview.
+function drawAfroCharacter(g,s,inv){
+  const rainbow=inv>0;
+  const bodyCol=rainbow?`hsl(${(performance.now()/4)%360},90%,55%)`:s.body;
+  const armCol=rainbow?bodyCol:s.arms;
+  // legs
+  g.fillStyle=s.pants;g.strokeStyle='#111';g.lineWidth=2;
+  g.fillRect(-10,10,8,14);g.strokeRect(-10,10,8,14);
+  g.fillRect(2,10,8,14);g.strokeRect(2,10,8,14);
+  // shoes
+  g.fillStyle='#111';g.fillRect(-11,22,10,4);g.fillRect(1,22,10,4);
+  // body
+  g.fillStyle=bodyCol;
+  roundRect2(g,-12,-8,24,20,4,true,true);
+  // arms
+  g.fillStyle=armCol;
+  g.fillRect(-16,-4,5,14);g.strokeRect(-16,-4,5,14);
+  g.fillRect(11,-4,5,14);g.strokeRect(11,-4,5,14);
+  // face
+  g.fillStyle=s.skin;
+  g.beginPath();g.arc(0,-16,11,0,Math.PI*2);g.fill();g.stroke();
+  // afro
+  g.fillStyle=s.afro;
+  g.beginPath();
+  g.arc(-8,-24,9,0,Math.PI*2);
+  g.arc(0,-30,10,0,Math.PI*2);
+  g.arc(8,-24,9,0,Math.PI*2);
+  g.arc(-12,-18,7,0,Math.PI*2);
+  g.arc(12,-18,7,0,Math.PI*2);
+  g.fill();g.stroke();
+  // eyes
+  g.fillStyle='#fff';g.beginPath();g.arc(-3,-17,2.2,0,Math.PI*2);g.arc(4,-17,2.2,0,Math.PI*2);g.fill();
+  g.fillStyle='#000';g.beginPath();g.arc(-2,-17,1.1,0,Math.PI*2);g.arc(5,-17,1.1,0,Math.PI*2);g.fill();
+  // mouth
+  g.strokeStyle='#3a2010';g.lineWidth=1.4;
+  g.beginPath();g.moveTo(-2,-12);g.lineTo(4,-12);g.stroke();
+  // joint
+  g.fillStyle=s.joint;g.fillRect(4,-13,10,2.5);
+  g.strokeStyle='#000';g.strokeRect(4,-13,10,2.5);
+  g.fillStyle='#ff6a00';g.fillRect(13.5,-13,2,2.5);
+  g.fillStyle='#ffd54a';g.fillRect(14,-12.5,1,1.5);
+}
+function roundRect2(g,x,y,w,h,r,fill,stroke){
+  g.beginPath();
+  g.moveTo(x+r,y);g.lineTo(x+w-r,y);g.quadraticCurveTo(x+w,y,x+w,y+r);
+  g.lineTo(x+w,y+h-r);g.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  g.lineTo(x+r,y+h);g.quadraticCurveTo(x,y+h,x,y+h-r);
+  g.lineTo(x,y+r);g.quadraticCurveTo(x,y,x+r,y);g.closePath();
+  if(fill)g.fill();if(stroke)g.stroke();
 }
 
 function drawCollectible(c){
