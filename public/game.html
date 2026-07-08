@@ -328,7 +328,7 @@ function update(dt){
     c.t+=dt;
     if(Math.hypot(player.x-c.x,player.y-c.y)<player.r+10){
       c.taken=true;
-      if(c.type==='bag'){bestY+=30;burst(c.x,c.y,'#7cfc00');}
+      if(c.type==='bag'){runBags+=1;totalBags+=1;bagsEl.textContent='🌿 '+totalBags;burst(c.x,c.y,'#7cfc00');}
       else if(c.type==='joint'){player.invincible=6;player.vy=-22;burst(c.x,c.y,'#ff69b4');}
     }
   }
@@ -426,12 +426,16 @@ function burst(x,y,color,n=14){
 function die(){
   if(gameOver)return;
   gameOver=true;
+  gameState='gameover';
   if(bestY>highScore){highScore=bestY;localStorage.setItem(HK,highScore);}
+  persistShop();
+  updateBagsUI();
   finalScore.textContent='Höhe: '+bestY+'m';
   finalHigh.textContent='Best: '+highScore+'m';
-  overEl.style.display='flex';
+  finalBags.textContent='Gesammelt: 🌿 '+runBags+' (Total: '+totalBags+')';
+  showOverlay('gameover');
 }
-document.getElementById('restart').onclick=()=>{reset();};
+document.getElementById('restart').onclick=()=>startGame();
 
 // ---------- RENDER ----------
 function biomeColors(m){
