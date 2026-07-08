@@ -192,6 +192,7 @@ addEventListener('keyup',e=>{
 let touchLeft=false,touchRight=false;
 function handleTouch(e,down){
   e.preventDefault();
+  if(gameState!=='playing'){touchLeft=touchRight=false;return;}
   touchLeft=touchRight=false;
   if(!down)return;
   const rect=cv.getBoundingClientRect();
@@ -208,6 +209,7 @@ cv.addEventListener('touchend',e=>handleTouch(e,false),{passive:false});
 cv.addEventListener('touchcancel',e=>handleTouch(e,false),{passive:false});
 // mouse
 cv.addEventListener('mousedown',e=>{
+  if(gameState!=='playing')return;
   const rect=cv.getBoundingClientRect();
   const x=(e.clientX-rect.left)/rect.width*W;
   const y=(e.clientY-rect.top)/rect.height*H;
@@ -216,14 +218,26 @@ cv.addEventListener('mousedown',e=>{
 });
 addEventListener('mouseup',()=>{touchLeft=touchRight=false;});
 
+// Menu buttons
+pauseBtn.onclick=()=>pauseGame();
+document.getElementById('menuPlay').onclick=()=>startGame();
+document.getElementById('menuShop').onclick=()=>openShop('menu');
+document.getElementById('pauseResume').onclick=()=>resumeGame();
+document.getElementById('pauseShop').onclick=()=>openShop('paused');
+document.getElementById('pauseQuit').onclick=()=>{reset();gameState='playing';showOverlay('playing');};
+document.getElementById('shopClose').onclick=()=>closeShop();
+document.getElementById('overShop').onclick=()=>openShop('gameover');
+document.getElementById('overMenu').onclick=()=>goMenu();
+
 // State
-let player,platforms,collectibles,enemies,projectiles,particles,smokeParticles,cameraY,bestY,scrollLocked,boss,bossTimer,nextBossScore,gameOver,rngSeed;
+let player,platforms,collectibles,enemies,projectiles,particles,smokeParticles,cameraY,bestY,scrollLocked,boss,bossTimer,nextBossScore,gameOver,rngSeed,runBags;
 
 function rand(a,b){return a+Math.random()*(b-a);}
 function reset(){
   player={x:W/2,y:H-100,vx:0,vy:-14,r:22,facing:1,invincible:0,shootCd:0,alive:true,bossShot:false};
   platforms=[];collectibles=[];enemies=[];projectiles=[];particles=[];smokeParticles=[];
   cameraY=0;bestY=0;scrollLocked=false;boss=null;nextBossScore=1500;gameOver=false;
+  runBags=0;
   // starting platform
   platforms.push({x:W/2-40,y:H-40,w:80,h:12,vx:0,type:'normal',dir:1,range:0,ox:W/2-40});
   let py=H-40;
@@ -231,7 +245,6 @@ function reset(){
     py-=rand(60,90);
     spawnPlatform(py);
   }
-  overEl.style.display='none';
 }
 function spawnPlatform(y){
   const w=rand(55,80);
