@@ -940,7 +940,7 @@ function render(){
 let last=performance.now();
 function loop(t){
   const dt=Math.min(0.033,(t-last)/1000);last=t;
-  update(dt);
+  if(gameState==='playing')update(dt);
   render();
   scoreEl.textContent='Höhe: '+bestY+'m';
   highEl.textContent='Best: '+Math.max(highScore,bestY)+'m';
@@ -948,6 +948,7 @@ function loop(t){
   requestAnimationFrame(loop);
 }
 reset();
+goMenu();
 requestAnimationFrame(loop);
 })();
 </script>
