@@ -8,26 +8,80 @@
   html,body{margin:0;padding:0;height:100%;background:#111;overflow:hidden;font-family:system-ui,sans-serif;color:#fff;touch-action:none;user-select:none;-webkit-user-select:none;}
   #wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;}
   canvas{background:#87ceeb;display:block;box-shadow:0 0 40px #000a;touch-action:none;}
-  #ui{position:absolute;top:8px;left:8px;right:8px;display:flex;justify-content:space-between;font-weight:700;text-shadow:1px 1px 2px #000;pointer-events:none;font-size:14px;}
+  #ui{position:absolute;top:8px;left:8px;right:8px;display:flex;justify-content:space-between;align-items:center;font-weight:700;text-shadow:1px 1px 2px #000;pointer-events:none;font-size:14px;gap:8px;}
+  #ui .stats{display:flex;flex-direction:column;gap:2px;}
+  #ui .right{display:flex;align-items:center;gap:8px;pointer-events:auto;}
+  #bags{color:#7cfc00;font-weight:700;text-shadow:1px 1px 2px #000;}
+  #pauseBtn{background:rgba(0,0,0,0.4);border:2px solid #fff;color:#fff;width:34px;height:34px;border-radius:8px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;}
+  #pauseBtn:active{transform:scale(.95);}
   #power{position:absolute;top:36px;left:8px;font-size:13px;font-weight:700;color:#ffd54a;text-shadow:1px 1px 2px #000;pointer-events:none;}
-  #over{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.6);}
-  #over h1{margin:0 0 10px;font-size:42px;color:#ff5252;text-shadow:2px 2px 0 #000;}
-  #over p{margin:4px 0;font-size:18px;}
-  #over button{margin-top:16px;padding:12px 24px;font-size:18px;border:none;border-radius:8px;background:#4caf50;color:#fff;font-weight:700;cursor:pointer;box-shadow:0 4px 0 #2e7d32;}
-  #over button:active{transform:translateY(2px);box-shadow:0 2px 0 #2e7d32;}
+  .overlay{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.65);padding:20px;box-sizing:border-box;}
+  .overlay h1{margin:0 0 6px;font-size:38px;text-shadow:2px 2px 0 #000;letter-spacing:1px;}
+  .overlay h2{margin:0 0 12px;font-size:22px;opacity:.9;}
+  .overlay p{margin:4px 0;font-size:16px;}
+  .overlay .btn{margin:6px 0;padding:12px 22px;font-size:17px;border:none;border-radius:10px;background:#4caf50;color:#fff;font-weight:700;cursor:pointer;box-shadow:0 4px 0 #2e7d32;min-width:200px;}
+  .overlay .btn:active{transform:translateY(2px);box-shadow:0 2px 0 #2e7d32;}
+  .overlay .btn.alt{background:#ffb300;box-shadow:0 4px 0 #b47a00;}
+  .overlay .btn.alt:active{box-shadow:0 2px 0 #b47a00;}
+  .overlay .btn.ghost{background:#455a64;box-shadow:0 4px 0 #263238;}
+  .overlay .btn.ghost:active{box-shadow:0 2px 0 #263238;}
+  #over h1{color:#ff5252;}
+  #menu h1{color:#7cfc00;font-size:44px;}
+  #menu .tag{font-size:14px;opacity:.85;margin-bottom:14px;}
+  #shop{overflow-y:auto;justify-content:flex-start;padding-top:20px;}
+  #shop .head{display:flex;justify-content:space-between;width:100%;max-width:360px;align-items:center;margin-bottom:12px;}
+  #shop h2{margin:0;color:#7cfc00;}
+  #shopClose{background:#455a64;border:none;color:#fff;padding:6px 12px;border-radius:6px;font-weight:700;cursor:pointer;}
+  .skinGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:360px;}
+  .skinCard{background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.15);border-radius:10px;padding:8px;display:flex;flex-direction:column;align-items:center;gap:4px;}
+  .skinCard.selected{border-color:#7cfc00;background:rgba(124,252,0,0.12);}
+  .skinCard canvas{background:linear-gradient(#87ceeb,#c9e9f6);border-radius:6px;width:80px;height:80px;box-shadow:none;}
+  .skinCard .name{font-size:13px;font-weight:700;}
+  .skinCard .price{font-size:12px;color:#7cfc00;}
+  .skinCard button{margin-top:2px;padding:5px 10px;font-size:12px;border:none;border-radius:6px;background:#4caf50;color:#fff;font-weight:700;cursor:pointer;width:100%;}
+  .skinCard button.owned{background:#455a64;}
+  .skinCard button.selected{background:#7cfc00;color:#111;}
+  .skinCard button:disabled{background:#8a4444;cursor:not-allowed;opacity:.6;}
   #hint{position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:12px;opacity:.7;pointer-events:none;}
 </style>
 </head>
 <body>
 <div id="wrap">
   <canvas id="c" width="400" height="700"></canvas>
-  <div id="ui"><div id="score">Höhe: 0m</div><div id="high">Best: 0m</div></div>
+  <div id="ui">
+    <div class="stats"><div id="score">Höhe: 0m</div><div id="high">Best: 0m</div></div>
+    <div class="right"><div id="bags">🌿 0</div><button id="pauseBtn" title="Pause">❚❚</button></div>
+  </div>
   <div id="power"></div>
-  <div id="over">
+  <div id="menu" class="overlay">
+    <h1>AFRO JUMP</h1>
+    <div class="tag">Doodle-Style Highscore Game</div>
+    <p id="menuHigh">Best: 0m</p>
+    <p id="menuBags">🌿 0 Baggys</p>
+    <button class="btn" id="menuPlay">▶ Spielen</button>
+    <button class="btn alt" id="menuShop">🛍 Shop</button>
+  </div>
+  <div id="pause" class="overlay">
+    <h1>PAUSE</h1>
+    <button class="btn" id="pauseResume">▶ Weiter</button>
+    <button class="btn alt" id="pauseShop">🛍 Shop</button>
+    <button class="btn ghost" id="pauseQuit">↺ Neustart</button>
+  </div>
+  <div id="shop" class="overlay">
+    <div class="head">
+      <h2>🛍 Skin-Shop</h2>
+      <div><span id="shopBags">🌿 0</span> &nbsp; <button id="shopClose">✕</button></div>
+    </div>
+    <div class="skinGrid" id="skinGrid"></div>
+  </div>
+  <div id="over" class="overlay">
     <h1>GAME OVER</h1>
     <p id="finalScore"></p>
     <p id="finalHigh"></p>
-    <button id="restart">Nochmal</button>
+    <p id="finalBags"></p>
+    <button class="btn" id="restart">↻ Nochmal</button>
+    <button class="btn alt" id="overShop">🛍 Shop</button>
+    <button class="btn ghost" id="overMenu">🏠 Menü</button>
   </div>
   <div id="hint">Links/Rechts: ← → oder A/D · Schießen: Leertaste / Tap oben · Mobile: Tap links/rechts</div>
 </div>
@@ -39,13 +93,93 @@ function fit(){const s=Math.min(window.innerWidth/W,window.innerHeight/H);cv.sty
 window.addEventListener('resize',fit);fit();
 
 const scoreEl=document.getElementById('score'),highEl=document.getElementById('high'),powerEl=document.getElementById('power');
-const overEl=document.getElementById('over'),finalScore=document.getElementById('finalScore'),finalHigh=document.getElementById('finalHigh');
-const HK='afroJumpHigh';let highScore=+localStorage.getItem(HK)||0;highEl.textContent='Best: '+highScore+'m';
+const overEl=document.getElementById('over'),finalScore=document.getElementById('finalScore'),finalHigh=document.getElementById('finalHigh'),finalBags=document.getElementById('finalBags');
+const menuEl=document.getElementById('menu'),pauseEl=document.getElementById('pause'),shopEl=document.getElementById('shop');
+const bagsEl=document.getElementById('bags'),menuHigh=document.getElementById('menuHigh'),menuBags=document.getElementById('menuBags'),shopBags=document.getElementById('shopBags'),skinGrid=document.getElementById('skinGrid');
+const pauseBtn=document.getElementById('pauseBtn');
+const HK='afroJumpHigh',BK='afroJumpBags',OK='afroJumpOwned',SK='afroJumpSkin';
+let highScore=+localStorage.getItem(HK)||0;
+let totalBags=+localStorage.getItem(BK)||0;
+let owned=JSON.parse(localStorage.getItem(OK)||'["classic"]');
+if(!owned.includes('classic'))owned.push('classic');
+let selectedSkin=localStorage.getItem(SK)||'classic';
+highEl.textContent='Best: '+highScore+'m';
+
+// Skins catalog
+const SKINS=[
+  {id:'classic',name:'Classic',price:0,afro:'#2b1a0a',skin:'#5b3a1a',body:'#e57373',arms:'#c68863',pants:'#2d4373',joint:'#f5ecd0'},
+  {id:'blonde', name:'Blondie',price:50, afro:'#f4d35e',skin:'#f5c890',body:'#4fc3f7',arms:'#3ba8d8',pants:'#263238',joint:'#f5ecd0'},
+  {id:'ginger', name:'Ginger', price:80, afro:'#c9531f',skin:'#f5c890',body:'#7cb342',arms:'#5e8f2a',pants:'#3e2723',joint:'#f5ecd0'},
+  {id:'punk',   name:'Punk',   price:120,afro:'#e91e63',skin:'#7b4a1a',body:'#111',   arms:'#333',   pants:'#c62828',joint:'#f5ecd0'},
+  {id:'ice',    name:'Ice',    price:180,afro:'#e0f7fa',skin:'#9fbdd8',body:'#0288d1',arms:'#01579b',pants:'#1a237e',joint:'#b3e5fc'},
+  {id:'gold',   name:'Golden', price:250,afro:'#ffd700',skin:'#8a5a1a',body:'#ffb300',arms:'#c68400',pants:'#4a2c00',joint:'#fff9c4'},
+  {id:'shadow', name:'Shadow', price:350,afro:'#111',   skin:'#3a3a3a',body:'#1a1a1a',arms:'#0a0a0a',pants:'#000',   joint:'#7c4dff'},
+  {id:'rasta',  name:'Rasta',  price:500,afro:'#2b1a0a',skin:'#5b3a1a',body:'#c62828',arms:'#2e7d32',pants:'#f9a825',joint:'#f5ecd0'},
+];
+function currentSkin(){return SKINS.find(s=>s.id===selectedSkin)||SKINS[0];}
+function persistShop(){localStorage.setItem(BK,totalBags);localStorage.setItem(OK,JSON.stringify(owned));localStorage.setItem(SK,selectedSkin);}
+function updateBagsUI(){bagsEl.textContent='🌿 '+totalBags;menuBags.textContent='🌿 '+totalBags+' Baggys';shopBags.textContent='🌿 '+totalBags;}
+
+// Game state machine
+let gameState='menu'; // 'menu' | 'playing' | 'paused' | 'shop' | 'gameover'
+let shopReturn='menu'; // where to return from shop
+function showOverlay(which){
+  menuEl.style.display=which==='menu'?'flex':'none';
+  pauseEl.style.display=which==='paused'?'flex':'none';
+  shopEl.style.display=which==='shop'?'flex':'none';
+  overEl.style.display=which==='gameover'?'flex':'none';
+  pauseBtn.style.display=which==='playing'?'flex':'none';
+}
+function goMenu(){gameState='menu';menuHigh.textContent='Best: '+highScore+'m';updateBagsUI();showOverlay('menu');}
+function startGame(){reset();gameState='playing';showOverlay('playing');}
+function pauseGame(){if(gameState!=='playing')return;gameState='paused';showOverlay('paused');}
+function resumeGame(){if(gameState!=='paused')return;gameState='playing';showOverlay('playing');last=performance.now();}
+function openShop(from){shopReturn=from;gameState='shop';renderShop();updateBagsUI();showOverlay('shop');}
+function closeShop(){
+  if(shopReturn==='paused'){gameState='paused';showOverlay('paused');}
+  else if(shopReturn==='gameover'){gameState='gameover';showOverlay('gameover');}
+  else goMenu();
+}
+
+function renderShop(){
+  skinGrid.innerHTML='';
+  for(const s of SKINS){
+    const card=document.createElement('div');
+    card.className='skinCard'+(s.id===selectedSkin?' selected':'');
+    const cvS=document.createElement('canvas');cvS.width=80;cvS.height=80;
+    drawSkinPreview(cvS.getContext('2d'),s);
+    card.appendChild(cvS);
+    const nm=document.createElement('div');nm.className='name';nm.textContent=s.name;card.appendChild(nm);
+    const pr=document.createElement('div');pr.className='price';pr.textContent=s.price===0?'Gratis':('🌿 '+s.price);card.appendChild(pr);
+    const btn=document.createElement('button');
+    const isOwned=owned.includes(s.id);
+    const isSel=s.id===selectedSkin;
+    if(isSel){btn.textContent='✓ Aktiv';btn.className='selected';btn.disabled=true;}
+    else if(isOwned){btn.textContent='Auswählen';btn.className='owned';btn.onclick=()=>{selectedSkin=s.id;persistShop();renderShop();};}
+    else{btn.textContent='Kaufen';btn.disabled=totalBags<s.price;btn.onclick=()=>{
+      if(totalBags<s.price)return;
+      totalBags-=s.price;owned.push(s.id);selectedSkin=s.id;persistShop();updateBagsUI();renderShop();
+    };}
+    card.appendChild(btn);
+    skinGrid.appendChild(card);
+  }
+}
+function drawSkinPreview(g,s){
+  g.clearRect(0,0,80,80);
+  g.save();g.translate(40,52);g.scale(1.2,1.2);
+  drawAfroCharacter(g,s,0);
+  g.restore();
+}
 
 // Input
 const keys={l:false,r:false};
 let shootRequested=false;
 addEventListener('keydown',e=>{
+  if(e.key==='Escape'||e.key==='p'||e.key==='P'){
+    if(gameState==='playing')pauseGame();
+    else if(gameState==='paused')resumeGame();
+    return;
+  }
   if(e.key==='ArrowLeft'||e.key==='a'||e.key==='A')keys.l=true;
   if(e.key==='ArrowRight'||e.key==='d'||e.key==='D')keys.r=true;
   if(e.key===' '){shootRequested=true;e.preventDefault();}
@@ -58,6 +192,7 @@ addEventListener('keyup',e=>{
 let touchLeft=false,touchRight=false;
 function handleTouch(e,down){
   e.preventDefault();
+  if(gameState!=='playing'){touchLeft=touchRight=false;return;}
   touchLeft=touchRight=false;
   if(!down)return;
   const rect=cv.getBoundingClientRect();
@@ -74,6 +209,7 @@ cv.addEventListener('touchend',e=>handleTouch(e,false),{passive:false});
 cv.addEventListener('touchcancel',e=>handleTouch(e,false),{passive:false});
 // mouse
 cv.addEventListener('mousedown',e=>{
+  if(gameState!=='playing')return;
   const rect=cv.getBoundingClientRect();
   const x=(e.clientX-rect.left)/rect.width*W;
   const y=(e.clientY-rect.top)/rect.height*H;
@@ -82,14 +218,26 @@ cv.addEventListener('mousedown',e=>{
 });
 addEventListener('mouseup',()=>{touchLeft=touchRight=false;});
 
+// Menu buttons
+pauseBtn.onclick=()=>pauseGame();
+document.getElementById('menuPlay').onclick=()=>startGame();
+document.getElementById('menuShop').onclick=()=>openShop('menu');
+document.getElementById('pauseResume').onclick=()=>resumeGame();
+document.getElementById('pauseShop').onclick=()=>openShop('paused');
+document.getElementById('pauseQuit').onclick=()=>{reset();gameState='playing';showOverlay('playing');};
+document.getElementById('shopClose').onclick=()=>closeShop();
+document.getElementById('overShop').onclick=()=>openShop('gameover');
+document.getElementById('overMenu').onclick=()=>goMenu();
+
 // State
-let player,platforms,collectibles,enemies,projectiles,particles,smokeParticles,cameraY,bestY,scrollLocked,boss,bossTimer,nextBossScore,gameOver,rngSeed;
+let player,platforms,collectibles,enemies,projectiles,particles,smokeParticles,cameraY,bestY,scrollLocked,boss,bossTimer,nextBossScore,gameOver,rngSeed,runBags;
 
 function rand(a,b){return a+Math.random()*(b-a);}
 function reset(){
   player={x:W/2,y:H-100,vx:0,vy:-14,r:22,facing:1,invincible:0,shootCd:0,alive:true,bossShot:false};
   platforms=[];collectibles=[];enemies=[];projectiles=[];particles=[];smokeParticles=[];
   cameraY=0;bestY=0;scrollLocked=false;boss=null;nextBossScore=1500;gameOver=false;
+  runBags=0;
   // starting platform
   platforms.push({x:W/2-40,y:H-40,w:80,h:12,vx:0,type:'normal',dir:1,range:0,ox:W/2-40});
   let py=H-40;
@@ -97,7 +245,6 @@ function reset(){
     py-=rand(60,90);
     spawnPlatform(py);
   }
-  overEl.style.display='none';
 }
 function spawnPlatform(y){
   const w=rand(55,80);
@@ -181,7 +328,7 @@ function update(dt){
     c.t+=dt;
     if(Math.hypot(player.x-c.x,player.y-c.y)<player.r+10){
       c.taken=true;
-      if(c.type==='bag'){bestY+=30;burst(c.x,c.y,'#7cfc00');}
+      if(c.type==='bag'){runBags+=1;totalBags+=1;bagsEl.textContent='🌿 '+totalBags;burst(c.x,c.y,'#7cfc00');}
       else if(c.type==='joint'){player.invincible=6;player.vy=-22;burst(c.x,c.y,'#ff69b4');}
     }
   }
@@ -279,12 +426,16 @@ function burst(x,y,color,n=14){
 function die(){
   if(gameOver)return;
   gameOver=true;
+  gameState='gameover';
   if(bestY>highScore){highScore=bestY;localStorage.setItem(HK,highScore);}
+  persistShop();
+  updateBagsUI();
   finalScore.textContent='Höhe: '+bestY+'m';
   finalHigh.textContent='Best: '+highScore+'m';
-  overEl.style.display='flex';
+  finalBags.textContent='Gesammelt: 🌿 '+runBags+' (Total: '+totalBags+')';
+  showOverlay('gameover');
 }
-document.getElementById('restart').onclick=()=>{reset();};
+document.getElementById('restart').onclick=()=>startGame();
 
 // ---------- RENDER ----------
 function biomeColors(m){
@@ -537,48 +688,7 @@ function roundRect(x,y,w,h,r,fill,stroke){
 function drawPlayer(){
   const x=player.x,y=player.y-cameraY;
   ctx.save();ctx.translate(x,y);ctx.scale(player.facing,1);
-  // rainbow flash when invincible
-  let bodyCol='#5b3a1a';
-  if(player.invincible>0){
-    const hue=(performance.now()/4)%360;
-    bodyCol=`hsl(${hue},90%,55%)`;
-  }
-  // legs
-  ctx.fillStyle='#2d4373';ctx.strokeStyle='#111';ctx.lineWidth=2;
-  ctx.fillRect(-10,10,8,14);ctx.strokeRect(-10,10,8,14);
-  ctx.fillRect(2,10,8,14);ctx.strokeRect(2,10,8,14);
-  // shoes
-  ctx.fillStyle='#111';ctx.fillRect(-11,22,10,4);ctx.fillRect(1,22,10,4);
-  // body
-  ctx.fillStyle=player.invincible>0?bodyCol:'#e57373';
-  roundRect(-12,-8,24,20,4,true,true);
-  // arms
-  ctx.fillStyle=player.invincible>0?bodyCol:'#c68863';
-  ctx.fillRect(-16,-4,5,14);ctx.strokeRect(-16,-4,5,14);
-  ctx.fillRect(11,-4,5,14);ctx.strokeRect(11,-4,5,14);
-  // face
-  ctx.fillStyle='#5b3a1a';
-  ctx.beginPath();ctx.arc(0,-16,11,0,Math.PI*2);ctx.fill();ctx.stroke();
-  // afro
-  ctx.fillStyle='#2b1a0a';
-  ctx.beginPath();
-  ctx.arc(-8,-24,9,0,Math.PI*2);
-  ctx.arc(0,-30,10,0,Math.PI*2);
-  ctx.arc(8,-24,9,0,Math.PI*2);
-  ctx.arc(-12,-18,7,0,Math.PI*2);
-  ctx.arc(12,-18,7,0,Math.PI*2);
-  ctx.fill();ctx.stroke();
-  // eyes
-  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-3,-17,2.2,0,Math.PI*2);ctx.arc(4,-17,2.2,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#000';ctx.beginPath();ctx.arc(-2,-17,1.1,0,Math.PI*2);ctx.arc(5,-17,1.1,0,Math.PI*2);ctx.fill();
-  // mouth + joint
-  ctx.strokeStyle='#3a2010';ctx.lineWidth=1.4;
-  ctx.beginPath();ctx.moveTo(-2,-12);ctx.lineTo(4,-12);ctx.stroke();
-  // joint
-  ctx.fillStyle='#f5ecd0';ctx.fillRect(4,-13,10,2.5);
-  ctx.strokeStyle='#000';ctx.strokeRect(4,-13,10,2.5);
-  ctx.fillStyle='#ff6a00';ctx.fillRect(13.5,-13,2,2.5);
-  ctx.fillStyle='#ffd54a';ctx.fillRect(14,-12.5,1,1.5);
+  drawAfroCharacter(ctx,currentSkin(),player.invincible);
   ctx.restore();
 
   // smoke
@@ -594,6 +704,57 @@ function drawPlayer(){
     ctx.lineWidth=3;
     ctx.beginPath();ctx.arc(x,y-4,player.r+6,0,Math.PI*2);ctx.stroke();
   }
+}
+
+// Draws the player centered at (0,0) in local coords. Used by game and shop preview.
+function drawAfroCharacter(g,s,inv){
+  const rainbow=inv>0;
+  const bodyCol=rainbow?`hsl(${(performance.now()/4)%360},90%,55%)`:s.body;
+  const armCol=rainbow?bodyCol:s.arms;
+  // legs
+  g.fillStyle=s.pants;g.strokeStyle='#111';g.lineWidth=2;
+  g.fillRect(-10,10,8,14);g.strokeRect(-10,10,8,14);
+  g.fillRect(2,10,8,14);g.strokeRect(2,10,8,14);
+  // shoes
+  g.fillStyle='#111';g.fillRect(-11,22,10,4);g.fillRect(1,22,10,4);
+  // body
+  g.fillStyle=bodyCol;
+  roundRect2(g,-12,-8,24,20,4,true,true);
+  // arms
+  g.fillStyle=armCol;
+  g.fillRect(-16,-4,5,14);g.strokeRect(-16,-4,5,14);
+  g.fillRect(11,-4,5,14);g.strokeRect(11,-4,5,14);
+  // face
+  g.fillStyle=s.skin;
+  g.beginPath();g.arc(0,-16,11,0,Math.PI*2);g.fill();g.stroke();
+  // afro
+  g.fillStyle=s.afro;
+  g.beginPath();
+  g.arc(-8,-24,9,0,Math.PI*2);
+  g.arc(0,-30,10,0,Math.PI*2);
+  g.arc(8,-24,9,0,Math.PI*2);
+  g.arc(-12,-18,7,0,Math.PI*2);
+  g.arc(12,-18,7,0,Math.PI*2);
+  g.fill();g.stroke();
+  // eyes
+  g.fillStyle='#fff';g.beginPath();g.arc(-3,-17,2.2,0,Math.PI*2);g.arc(4,-17,2.2,0,Math.PI*2);g.fill();
+  g.fillStyle='#000';g.beginPath();g.arc(-2,-17,1.1,0,Math.PI*2);g.arc(5,-17,1.1,0,Math.PI*2);g.fill();
+  // mouth
+  g.strokeStyle='#3a2010';g.lineWidth=1.4;
+  g.beginPath();g.moveTo(-2,-12);g.lineTo(4,-12);g.stroke();
+  // joint
+  g.fillStyle=s.joint;g.fillRect(4,-13,10,2.5);
+  g.strokeStyle='#000';g.strokeRect(4,-13,10,2.5);
+  g.fillStyle='#ff6a00';g.fillRect(13.5,-13,2,2.5);
+  g.fillStyle='#ffd54a';g.fillRect(14,-12.5,1,1.5);
+}
+function roundRect2(g,x,y,w,h,r,fill,stroke){
+  g.beginPath();
+  g.moveTo(x+r,y);g.lineTo(x+w-r,y);g.quadraticCurveTo(x+w,y,x+w,y+r);
+  g.lineTo(x+w,y+h-r);g.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  g.lineTo(x+r,y+h);g.quadraticCurveTo(x,y+h,x,y+h-r);
+  g.lineTo(x,y+r);g.quadraticCurveTo(x,y,x+r,y);g.closePath();
+  if(fill)g.fill();if(stroke)g.stroke();
 }
 
 function drawCollectible(c){
@@ -779,7 +940,7 @@ function render(){
 let last=performance.now();
 function loop(t){
   const dt=Math.min(0.033,(t-last)/1000);last=t;
-  update(dt);
+  if(gameState==='playing')update(dt);
   render();
   scoreEl.textContent='Höhe: '+bestY+'m';
   highEl.textContent='Best: '+Math.max(highScore,bestY)+'m';
@@ -787,6 +948,7 @@ function loop(t){
   requestAnimationFrame(loop);
 }
 reset();
+goMenu();
 requestAnimationFrame(loop);
 })();
 </script>
