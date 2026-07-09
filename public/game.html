@@ -713,6 +713,7 @@ function drawPlayer(){
 
 // Draws the player centered at (0,0) in local coords. Used by game and shop preview.
 function drawAfroCharacter(g,s,inv){
+  if(s.render){drawSkinAlt(g,s,inv);return;}
   const rainbow=inv>0;
   const bodyCol=rainbow?`hsl(${(performance.now()/4)%360},90%,55%)`:s.body;
   const armCol=rainbow?bodyCol:s.arms;
