@@ -119,6 +119,8 @@ const SKINS=[
   {id:'shadow', name:'Shadow', price:350,afro:'#111',   skin:'#3a3a3a',body:'#1a1a1a',arms:'#0a0a0a',pants:'#000',   joint:'#7c4dff'},
   {id:'alien',  name:'Alien',  price:400,render:'alien'},
   {id:'rasta',  name:'Rasta',  price:500,afro:'#2b1a0a',skin:'#5b3a1a',body:'#c62828',arms:'#2e7d32',pants:'#f9a825',joint:'#f5ecd0'},
+  {id:'revengebird',name:'Revengebird',price:600,render:'raven'},
+  {id:'fabi',   name:'Prinzessin Fabi',price:750,render:'fabi'},
 ];
 function currentSkin(){return SKINS.find(s=>s.id===selectedSkin)||SKINS[0];}
 function persistShop(){localStorage.setItem(BK,totalBags);localStorage.setItem(OK,JSON.stringify(owned));localStorage.setItem(SK,selectedSkin);}
@@ -894,6 +896,121 @@ function drawSkinAlt(g,s,inv){
     g.strokeStyle='#111';g.lineWidth=2;
     g.fillStyle='#f5ecd0';g.fillRect(4,-11,10,2.5);g.strokeRect(4,-11,10,2.5);
     g.fillStyle='#ff6a00';g.fillRect(13,-11,2,2.5);
+  } else if(s.render==='raven'){
+    // Revengebird — black raven in tracksuit
+    // legs (track pants — black with white stripes)
+    g.fillStyle='#111';g.fillRect(-9,10,7,14);g.strokeRect(-9,10,7,14);
+    g.fillRect(2,10,7,14);g.strokeRect(2,10,7,14);
+    g.fillStyle='#fff';g.fillRect(-6.5,10,1.5,14);g.fillRect(4.5,10,1.5,14);
+    // orange sneakers
+    g.fillStyle='#ff6a00';g.fillRect(-10,22,9,4);g.fillRect(1,22,9,4);
+    g.strokeStyle='#111';g.strokeRect(-10,22,9,4);g.strokeRect(1,22,9,4);
+    // tracksuit jacket (black with 3 white stripes on shoulder)
+    g.fillStyle=rainbow?`hsl(${(performance.now()/4)%360},80%,55%)`:'#0a0a0a';
+    roundRect2(g,-13,-8,26,20,5,true,true);
+    // zipper
+    g.strokeStyle='#666';g.lineWidth=1;
+    g.beginPath();g.moveTo(0,-8);g.lineTo(0,12);g.stroke();
+    // shoulder stripes
+    g.fillStyle='#fff';
+    g.fillRect(-17,-4,4,1.2);g.fillRect(-17,-1,4,1.2);g.fillRect(-17,2,4,1.2);
+    g.fillRect(13,-4,4,1.2);g.fillRect(13,-1,4,1.2);g.fillRect(13,2,4,1.2);
+    // wing-arms (feathered)
+    g.strokeStyle='#111';g.lineWidth=2;
+    g.fillStyle='#0a0a0a';g.fillRect(-17,-4,4,14);g.strokeRect(-17,-4,4,14);
+    g.fillRect(13,-4,4,14);g.strokeRect(13,-4,4,14);
+    // head — glossy black
+    g.fillStyle='#0a0a0a';g.beginPath();g.arc(0,-16,11,0,Math.PI*2);g.fill();g.stroke();
+    // purple sheen
+    g.fillStyle='rgba(120,60,180,0.35)';g.beginPath();g.arc(-3,-19,4,0,Math.PI*2);g.fill();
+    // beak (orange-yellow)
+    g.fillStyle='#f0b400';g.strokeStyle='#111';
+    g.beginPath();g.moveTo(8,-16);g.lineTo(20,-14);g.lineTo(8,-12);g.closePath();g.fill();g.stroke();
+    // angry eye (red glare)
+    g.fillStyle='#fff';g.beginPath();g.arc(2,-18,3,0,Math.PI*2);g.fill();g.stroke();
+    g.fillStyle='#c00';g.beginPath();g.arc(3,-18,1.8,0,Math.PI*2);g.fill();
+    // brow (revenge)
+    g.strokeStyle='#111';g.lineWidth=2;
+    g.beginPath();g.moveTo(-3,-22);g.lineTo(6,-19);g.stroke();
+    // gold chain
+    g.fillStyle='#ffd700';g.strokeStyle='#7a5a00';g.lineWidth=1;
+    g.beginPath();g.arc(0,-4,6,0.15*Math.PI,0.85*Math.PI);g.stroke();
+    g.beginPath();g.arc(0,2,2,0,Math.PI*2);g.fill();g.stroke();
+    // joint
+    g.strokeStyle='#111';g.lineWidth=2;
+    g.fillStyle='#f5ecd0';g.fillRect(9,-13,9,2.2);g.strokeRect(9,-13,9,2.2);
+    g.fillStyle='#ff6a00';g.fillRect(17,-13,2,2.2);
+  } else if(s.render==='fabi'){
+    // Prinzessin Fabi — kleines Mädchen in pinkem Prinzessinnenkleid mit Tiara
+    // shoes (schwarz)
+    g.fillStyle='#1a1a1a';g.fillRect(-9,22,7,4);g.fillRect(2,22,7,4);
+    g.strokeRect(-9,22,7,4);g.strokeRect(2,22,7,4);
+    // Kleid — trapezförmiger Rock in pink
+    g.fillStyle=rainbow?`hsl(${(performance.now()/4)%360},90%,60%)`:'#ec3d8a';
+    g.beginPath();
+    g.moveTo(-9,-2);g.lineTo(9,-2);g.lineTo(16,22);g.lineTo(-16,22);g.closePath();
+    g.fill();g.stroke();
+    // Rock-Highlights (goldene Ranken)
+    g.strokeStyle='#e6b800';g.lineWidth=0.8;
+    g.beginPath();g.moveTo(-6,4);g.quadraticCurveTo(0,8,6,4);
+    g.moveTo(-8,12);g.quadraticCurveTo(0,16,8,12);g.stroke();
+    // Mieder (dunkler pink mit gold trim)
+    g.strokeStyle='#111';g.lineWidth=2;
+    g.fillStyle='#c81f6d';
+    roundRect2(g,-9,-8,18,10,2,true,true);
+    g.strokeStyle='#e6b800';g.lineWidth=1;
+    g.beginPath();g.moveTo(-9,-8);g.lineTo(-9,2);g.moveTo(9,-8);g.lineTo(9,2);g.stroke();
+    // Puffärmel (weiß-pink)
+    g.strokeStyle='#111';g.lineWidth=2;
+    g.fillStyle='#ec3d8a';
+    g.beginPath();g.arc(-13,-6,5,0,Math.PI*2);g.fill();g.stroke();
+    g.beginPath();g.arc(13,-6,5,0,Math.PI*2);g.fill();g.stroke();
+    // Arme (Hautton)
+    g.fillStyle='#f5c890';
+    g.fillRect(-15,-2,4,10);g.strokeRect(-15,-2,4,10);
+    g.fillRect(11,-2,4,10);g.strokeRect(11,-2,4,10);
+    // weißer Kragen
+    g.fillStyle='#fff';
+    g.beginPath();g.moveTo(-11,-8);g.lineTo(-4,-6);g.lineTo(-9,-4);g.closePath();g.fill();g.stroke();
+    g.beginPath();g.moveTo(11,-8);g.lineTo(4,-6);g.lineTo(9,-4);g.closePath();g.fill();g.stroke();
+    // Kopf
+    g.fillStyle='#f5c890';g.beginPath();g.arc(0,-16,10,0,Math.PI*2);g.fill();g.stroke();
+    // blonde Haare (Locken seitlich)
+    g.fillStyle='#e8c15a';
+    g.beginPath();g.arc(-10,-14,4,0,Math.PI*2);g.arc(10,-14,4,0,Math.PI*2);
+    g.arc(-8,-19,4,0,Math.PI*2);g.arc(8,-19,4,0,Math.PI*2);g.fill();g.stroke();
+    // Pony
+    g.fillStyle='#e8c15a';
+    g.beginPath();g.moveTo(-8,-20);g.quadraticCurveTo(0,-14,8,-20);g.lineTo(6,-18);g.quadraticCurveTo(0,-12,-6,-18);g.closePath();g.fill();g.stroke();
+    // Tiara (silber mit lila Sternen)
+    g.strokeStyle='#111';g.lineWidth=1;
+    g.fillStyle='#e0e0e8';
+    g.beginPath();
+    g.moveTo(-8,-22);g.lineTo(-5,-26);g.lineTo(-2,-22);g.lineTo(0,-27);g.lineTo(2,-22);g.lineTo(5,-26);g.lineTo(8,-22);
+    g.lineTo(8,-21);g.lineTo(-8,-21);g.closePath();g.fill();g.stroke();
+    g.fillStyle='#a855f7';
+    g.beginPath();g.arc(-5,-25,1.2,0,Math.PI*2);g.arc(0,-25.5,1.4,0,Math.PI*2);g.arc(5,-25,1.2,0,Math.PI*2);g.fill();
+    // Gesicht
+    g.fillStyle='#111';
+    g.beginPath();g.arc(-3,-16,1.2,0,Math.PI*2);g.arc(3,-16,1.2,0,Math.PI*2);g.fill();
+    // rosa Wangen
+    g.fillStyle='rgba(236,61,138,0.35)';
+    g.beginPath();g.arc(-5,-13,1.6,0,Math.PI*2);g.arc(5,-13,1.6,0,Math.PI*2);g.fill();
+    // Lächeln
+    g.strokeStyle='#a02050';g.lineWidth=1.2;
+    g.beginPath();g.moveTo(-2,-12);g.quadraticCurveTo(0,-10,2,-12);g.stroke();
+    // Zauberstab statt Joint
+    g.strokeStyle='#c9a227';g.lineWidth=1.8;
+    g.beginPath();g.moveTo(14,4);g.lineTo(22,-4);g.stroke();
+    g.fillStyle='#ffe066';
+    g.beginPath();
+    for(let i=0;i<5;i++){
+      const a=-Math.PI/2+i*Math.PI*2/5;
+      const r=i%2?1.5:3.5;
+      const px=23+Math.cos(a)*r, py=-5+Math.sin(a)*r;
+      if(i===0)g.moveTo(px,py);else g.lineTo(px,py);
+    }
+    g.closePath();g.fill();g.strokeStyle='#c9a227';g.lineWidth=1;g.stroke();
   }
 }
 
@@ -1028,70 +1145,120 @@ function drawBoss(){
   const t=performance.now()/1000;
   ctx.save();
   if(boss.hitT>0)ctx.globalAlpha=0.55;
-  // --- Evil Bong ---
-  // base (wide bottom)
-  ctx.strokeStyle='#0a1a0a';ctx.lineWidth=2;
-  ctx.fillStyle='#2b6b3a';
-  ctx.beginPath();
-  ctx.ellipse(bx,y+bh/2-2,bw/2,14,0,0,Math.PI*2);
-  ctx.fill();ctx.stroke();
-  // main glass chamber
+  // --- Evil Bong (proper shape: round bulb chamber + tall neck + flared mouthpiece) ---
+  const bulbR = Math.min(bw*0.48, bh*0.32);
+  const bulbCY = y + bh/2 - bulbR - 4;         // center of round chamber
+  const neckW  = bw*0.28;                       // narrow neck
+  const neckTop= y - bh/2 + 22;                 // top of neck (mouthpiece base)
+  const mouthW = bw*0.42;                       // flared mouthpiece top
+  const mouthH = 14;
+
+  // glass silhouette (single path = clean bong outline)
+  ctx.strokeStyle='#0a1a0a';ctx.lineWidth=3;
   const grd=ctx.createLinearGradient(bx-bw/2,y,bx+bw/2,y);
-  grd.addColorStop(0,'#3fa856');grd.addColorStop(0.5,'#7fe89a');grd.addColorStop(1,'#2f8a44');
+  grd.addColorStop(0,'#2f8a44');grd.addColorStop(0.5,'#8ff0a8');grd.addColorStop(1,'#2b6b3a');
   ctx.fillStyle=grd;
-  roundRect(bx-bw/2+6,y-bh/2+6,bw-12,bh-6,18,true,true);
-  // bubbling water
-  ctx.fillStyle='rgba(60,180,90,0.55)';
-  ctx.fillRect(bx-bw/2+8,y+bh/2-16,bw-16,10);
-  for(let i=0;i<6;i++){
-    const bxb=bx-bw/2+12+((i*17+t*40)%(bw-24));
-    const byb=y+bh/2-8-((t*30+i*13)%20);
-    ctx.beginPath();ctx.arc(bxb,byb,1.5+Math.sin(t*3+i)*0.6,0,Math.PI*2);
-    ctx.fillStyle='rgba(255,255,255,0.7)';ctx.fill();
+  ctx.beginPath();
+  // start at left of mouthpiece top
+  ctx.moveTo(bx-mouthW/2, neckTop-mouthH);
+  ctx.lineTo(bx+mouthW/2, neckTop-mouthH);
+  // flare down to neck
+  ctx.lineTo(bx+neckW/2,  neckTop);
+  // neck down to shoulder of bulb
+  ctx.lineTo(bx+neckW/2,  bulbCY-bulbR*0.55);
+  // curve out to right side of bulb
+  ctx.quadraticCurveTo(bx+bulbR*1.15, bulbCY-bulbR*0.15, bx+bulbR, bulbCY+bulbR*0.15);
+  // bottom of bulb (half-circle)
+  ctx.arc(bx, bulbCY, bulbR, 0, Math.PI, false);
+  // up the left side
+  ctx.quadraticCurveTo(bx-bulbR*1.15, bulbCY-bulbR*0.15, bx-neckW/2, bulbCY-bulbR*0.55);
+  ctx.lineTo(bx-neckW/2, neckTop);
+  ctx.closePath();
+  ctx.fill();ctx.stroke();
+
+  // glass highlight
+  ctx.fillStyle='rgba(255,255,255,0.35)';
+  ctx.beginPath();ctx.ellipse(bx-bulbR*0.45, bulbCY-bulbR*0.2, bulbR*0.15, bulbR*0.5, -0.3, 0, Math.PI*2);ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,0.25)';
+  ctx.fillRect(bx-neckW/2+3, neckTop+4, 2, (bulbCY-bulbR*0.6)-neckTop-6);
+
+  // water level inside bulb
+  ctx.save();
+  ctx.beginPath();ctx.arc(bx, bulbCY, bulbR-3, 0, Math.PI*2);ctx.clip();
+  ctx.fillStyle='rgba(50,170,80,0.55)';
+  ctx.fillRect(bx-bulbR, bulbCY-2+Math.sin(t*2)*1, bulbR*2, bulbR+4);
+  // bubbles
+  for(let i=0;i<7;i++){
+    const phase=(t*0.6+i*0.17)%1;
+    const bxb=bx+Math.sin(i*1.7+t)*bulbR*0.55;
+    const byb=bulbCY+bulbR*0.6 - phase*(bulbR*1.1);
+    ctx.fillStyle='rgba(255,255,255,'+(0.85-phase*0.6)+')';
+    ctx.beginPath();ctx.arc(bxb,byb,1.6+Math.sin(t*3+i)*0.6,0,Math.PI*2);ctx.fill();
   }
-  // evil eyes
-  const blink=(performance.now()%2400<120)?0.15:1;
-  ctx.fillStyle='#fff';
-  ctx.beginPath();ctx.ellipse(bx-16,y-6,8,8*blink,0,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.ellipse(bx+16,y-6,8,8*blink,0,0,Math.PI*2);ctx.fill();
-  const eyeOff=Math.sin(t*2)*2;
-  ctx.fillStyle='#c00';
-  ctx.beginPath();ctx.arc(bx-16+eyeOff,y-6,4,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.arc(bx+16+eyeOff,y-6,4,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#000';
-  ctx.beginPath();ctx.arc(bx-16+eyeOff,y-6,1.8,0,Math.PI*2);ctx.fill();
-  ctx.beginPath();ctx.arc(bx+16+eyeOff,y-6,1.8,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+
+  // gold ring where neck meets bulb
+  ctx.fillStyle='#c9a227';ctx.strokeStyle='#0a1a0a';ctx.lineWidth=1.5;
+  ctx.fillRect(bx-neckW/2-3, bulbCY-bulbR*0.55, neckW+6, 4);
+  ctx.strokeRect(bx-neckW/2-3, bulbCY-bulbR*0.55, neckW+6, 4);
+  // gold ring at mouthpiece
+  ctx.fillStyle='#c9a227';
+  ctx.fillRect(bx-mouthW/2-1, neckTop-mouthH-2, mouthW+2, 3);
+  ctx.strokeRect(bx-mouthW/2-1, neckTop-mouthH-2, mouthW+2, 3);
+
+  // downstem + bowl (sticking out lower-right of bulb)
+  ctx.save();
+  ctx.translate(bx+bulbR*0.75, bulbCY+bulbR*0.15);
+  ctx.rotate(0.5);
+  ctx.fillStyle='rgba(180,230,190,0.7)';ctx.strokeStyle='#0a1a0a';ctx.lineWidth=2;
+  ctx.fillRect(0,-3,18,6);ctx.strokeRect(0,-3,18,6);
+  // bowl
+  ctx.beginPath();ctx.arc(22,0,7,0,Math.PI*2);
+  ctx.fillStyle='#3a2a12';ctx.fill();ctx.stroke();
+  // green bud in bowl
+  ctx.fillStyle='#4caf50';
+  ctx.beginPath();ctx.arc(21,-2,3,0,Math.PI*2);ctx.arc(24,-1,2.5,0,Math.PI*2);ctx.fill();
+  // glowing ember
+  ctx.fillStyle='#ff6a00';
+  ctx.beginPath();ctx.arc(22,-3,1.8+Math.sin(t*6)*0.7,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+
+  // evil face — on the bulb
+  const faceY = bulbCY - bulbR*0.15;
   // angry brows
   ctx.strokeStyle='#111';ctx.lineWidth=3;
-  ctx.beginPath();ctx.moveTo(bx-24,y-16);ctx.lineTo(bx-9,y-11);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(bx+24,y-16);ctx.lineTo(bx+9,y-11);ctx.stroke();
-  // fanged mouth
+  ctx.beginPath();ctx.moveTo(bx-bulbR*0.7, faceY-bulbR*0.35);ctx.lineTo(bx-bulbR*0.15, faceY-bulbR*0.15);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(bx+bulbR*0.7, faceY-bulbR*0.35);ctx.lineTo(bx+bulbR*0.15, faceY-bulbR*0.15);ctx.stroke();
+  // eye whites
+  const blink=(performance.now()%2400<120)?0.15:1;
+  ctx.fillStyle='#fff';
+  ctx.beginPath();ctx.ellipse(bx-bulbR*0.4, faceY, bulbR*0.22, bulbR*0.22*blink, 0, 0, Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.ellipse(bx+bulbR*0.4, faceY, bulbR*0.22, bulbR*0.22*blink, 0, 0, Math.PI*2);ctx.fill();
+  // red pupils tracking
+  const eyeOff=Math.sin(t*2)*3;
+  ctx.fillStyle='#c00';
+  ctx.beginPath();ctx.arc(bx-bulbR*0.4+eyeOff, faceY, bulbR*0.11, 0, Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(bx+bulbR*0.4+eyeOff, faceY, bulbR*0.11, 0, Math.PI*2);ctx.fill();
+  ctx.fillStyle='#000';
+  ctx.beginPath();ctx.arc(bx-bulbR*0.4+eyeOff, faceY, bulbR*0.05, 0, Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(bx+bulbR*0.4+eyeOff, faceY, bulbR*0.05, 0, Math.PI*2);ctx.fill();
+  // fanged mouth on the bulb
+  const mY = faceY + bulbR*0.35;
   ctx.fillStyle='#111';
   ctx.beginPath();
-  ctx.moveTo(bx-14,y+8);
-  ctx.quadraticCurveTo(bx,y+18+Math.sin(t*4)*2,bx+14,y+8);
-  ctx.lineTo(bx+10,y+8);ctx.lineTo(bx-10,y+8);ctx.closePath();ctx.fill();
+  ctx.moveTo(bx-bulbR*0.42, mY);
+  ctx.quadraticCurveTo(bx, mY+10+Math.sin(t*4)*2, bx+bulbR*0.42, mY);
+  ctx.closePath();ctx.fill();
   ctx.fillStyle='#fff';
-  ctx.beginPath();ctx.moveTo(bx-8,y+8);ctx.lineTo(bx-5,y+14);ctx.lineTo(bx-2,y+8);ctx.closePath();ctx.fill();
-  ctx.beginPath();ctx.moveTo(bx+2,y+8);ctx.lineTo(bx+5,y+14);ctx.lineTo(bx+8,y+8);ctx.closePath();ctx.fill();
-  // neck / mouthpiece
-  ctx.fillStyle='#3fa856';ctx.strokeStyle='#0a1a0a';ctx.lineWidth=2;
-  roundRect(bx-10,y-bh/2-14,20,14,4,true,true);
-  // ring
-  ctx.fillStyle='#c9a227';ctx.fillRect(bx-12,y-bh/2-4,24,3);
-  ctx.strokeRect(bx-12,y-bh/2-4,24,3);
-  // smoke plume above (animated)
+  ctx.beginPath();ctx.moveTo(bx-bulbR*0.22, mY);ctx.lineTo(bx-bulbR*0.13, mY+6);ctx.lineTo(bx-bulbR*0.04, mY);ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.moveTo(bx+bulbR*0.04, mY);ctx.lineTo(bx+bulbR*0.13, mY+6);ctx.lineTo(bx+bulbR*0.22, mY);ctx.closePath();ctx.fill();
+
+  // smoke plume above mouthpiece
   for(let i=0;i<5;i++){
-    const sy=y-bh/2-18-i*8-(t*20)%8;
-    ctx.fillStyle='rgba(200,220,210,'+(0.35-i*0.05)+')';
-    ctx.beginPath();ctx.arc(bx+Math.sin(t*2+i)*4,sy,6+i*1.5,0,Math.PI*2);ctx.fill();
+    const sy=neckTop-mouthH-10-i*9-(t*20)%9;
+    ctx.fillStyle='rgba(200,220,210,'+(0.4-i*0.06)+')';
+    ctx.beginPath();ctx.arc(bx+Math.sin(t*2+i)*4, sy, 5+i*1.6, 0, Math.PI*2);ctx.fill();
   }
-  // downstem/bowl at side
-  ctx.fillStyle='#2b6b3a';ctx.strokeStyle='#0a1a0a';
-  ctx.fillRect(bx+bw/2-4,y-4,14,4);ctx.strokeRect(bx+bw/2-4,y-4,14,4);
-  ctx.beginPath();ctx.arc(bx+bw/2+14,y+2,7,0,Math.PI*2);ctx.fillStyle='#5c3a1a';ctx.fill();ctx.stroke();
-  // glowing embers
-  ctx.fillStyle='#ff6a00';ctx.beginPath();ctx.arc(bx+bw/2+14,y-1,2.5+Math.sin(t*6)*0.8,0,Math.PI*2);ctx.fill();
   ctx.restore();
   // hp bar
   ctx.fillStyle='#000';ctx.fillRect(bx-40,y-bh/2-30,80,8);
