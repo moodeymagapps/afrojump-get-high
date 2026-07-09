@@ -763,6 +763,140 @@ function roundRect2(g,x,y,w,h,r,fill,stroke){
   if(fill)g.fill();if(stroke)g.stroke();
 }
 
+// Alternate character designs (dog, cat, robot, alien) — drawn centered at (0,0)
+function drawSkinAlt(g,s,inv){
+  const rainbow=inv>0;
+  g.strokeStyle='#111';g.lineWidth=2;
+  if(s.render==='dog'){
+    // legs
+    g.fillStyle='#5a3a1a';g.fillRect(-10,10,7,14);g.strokeRect(-10,10,7,14);
+    g.fillRect(3,10,7,14);g.strokeRect(3,10,7,14);
+    g.fillStyle='#111';g.fillRect(-11,22,9,4);g.fillRect(2,22,9,4);
+    // body — tan dog
+    g.fillStyle=rainbow?`hsl(${(performance.now()/4)%360},70%,55%)`:'#c8894a';
+    roundRect2(g,-13,-8,26,20,8,true,true);
+    // belly patch
+    g.fillStyle='#f4d9b0';roundRect2(g,-7,0,14,10,4,true,false);
+    // head
+    g.fillStyle='#c8894a';g.beginPath();g.arc(0,-16,12,0,Math.PI*2);g.fill();g.stroke();
+    // snout
+    g.fillStyle='#f4d9b0';g.beginPath();g.ellipse(0,-11,7,5,0,0,Math.PI*2);g.fill();g.stroke();
+    // nose
+    g.fillStyle='#111';g.beginPath();g.arc(0,-14,2,0,Math.PI*2);g.fill();
+    // floppy ears
+    g.fillStyle='#8a5a2a';
+    g.beginPath();g.ellipse(-11,-16,4,8,-0.3,0,Math.PI*2);g.fill();g.stroke();
+    g.beginPath();g.ellipse(11,-16,4,8,0.3,0,Math.PI*2);g.fill();g.stroke();
+    // eyes
+    g.fillStyle='#fff';g.beginPath();g.arc(-4,-18,2.2,0,Math.PI*2);g.arc(4,-18,2.2,0,Math.PI*2);g.fill();
+    g.fillStyle='#000';g.beginPath();g.arc(-3.5,-18,1.2,0,Math.PI*2);g.arc(4.5,-18,1.2,0,Math.PI*2);g.fill();
+    // tongue
+    g.fillStyle='#e57373';g.beginPath();g.ellipse(2,-8,2.5,3,0,0,Math.PI*2);g.fill();
+    // joint in mouth
+    g.fillStyle='#f5ecd0';g.fillRect(5,-10,9,2.2);g.strokeRect(5,-10,9,2.2);
+    g.fillStyle='#ff6a00';g.fillRect(13,-10,2,2.2);
+  } else if(s.render==='cat'){
+    g.fillStyle='#555';g.fillRect(-10,10,7,14);g.strokeRect(-10,10,7,14);
+    g.fillRect(3,10,7,14);g.strokeRect(3,10,7,14);
+    g.fillStyle='#111';g.fillRect(-11,22,9,4);g.fillRect(2,22,9,4);
+    // body (grey cat)
+    g.fillStyle=rainbow?`hsl(${(performance.now()/4)%360},70%,55%)`:'#6f6f78';
+    roundRect2(g,-12,-8,24,20,6,true,true);
+    g.fillStyle='#a8a8b0';roundRect2(g,-6,0,12,10,4,true,false);
+    // head
+    g.fillStyle='#6f6f78';g.beginPath();g.arc(0,-16,11,0,Math.PI*2);g.fill();g.stroke();
+    // pointy ears
+    g.fillStyle='#6f6f78';
+    g.beginPath();g.moveTo(-10,-20);g.lineTo(-6,-28);g.lineTo(-3,-20);g.closePath();g.fill();g.stroke();
+    g.beginPath();g.moveTo(10,-20);g.lineTo(6,-28);g.lineTo(3,-20);g.closePath();g.fill();g.stroke();
+    g.fillStyle='#e57373';
+    g.beginPath();g.moveTo(-8,-22);g.lineTo(-6,-26);g.lineTo(-4,-22);g.closePath();g.fill();
+    g.beginPath();g.moveTo(8,-22);g.lineTo(6,-26);g.lineTo(4,-22);g.closePath();g.fill();
+    // eyes (chill half-closed)
+    g.fillStyle='#c8ff64';g.beginPath();g.arc(-4,-16,2.4,0,Math.PI*2);g.arc(4,-16,2.4,0,Math.PI*2);g.fill();g.stroke();
+    g.fillStyle='#111';g.fillRect(-4.6,-16.5,1.2,3);g.fillRect(3.4,-16.5,1.2,3);
+    // nose
+    g.fillStyle='#e57373';g.beginPath();g.moveTo(-1.5,-13);g.lineTo(1.5,-13);g.lineTo(0,-11);g.closePath();g.fill();
+    // whiskers
+    g.strokeStyle='#fff';g.lineWidth=0.6;
+    g.beginPath();g.moveTo(-4,-11);g.lineTo(-11,-12);g.moveTo(-4,-10);g.lineTo(-11,-10);
+    g.moveTo(4,-11);g.lineTo(11,-12);g.moveTo(4,-10);g.lineTo(11,-10);g.stroke();
+    // joint
+    g.strokeStyle='#111';g.lineWidth=2;
+    g.fillStyle='#f5ecd0';g.fillRect(4,-10,9,2.2);g.strokeRect(4,-10,9,2.2);
+    g.fillStyle='#ff6a00';g.fillRect(12,-10,2,2.2);
+  } else if(s.render==='robot'){
+    // legs (metal)
+    g.fillStyle='#666';g.fillRect(-9,10,7,14);g.strokeRect(-9,10,7,14);
+    g.fillRect(2,10,7,14);g.strokeRect(2,10,7,14);
+    g.fillStyle='#222';g.fillRect(-10,22,9,4);g.fillRect(1,22,9,4);
+    // body — chrome box
+    const grd=g.createLinearGradient(-14,-8,14,12);
+    grd.addColorStop(0,'#b8bfc8');grd.addColorStop(0.5,'#eef1f4');grd.addColorStop(1,'#7d8791');
+    g.fillStyle=rainbow?`hsl(${(performance.now()/4)%360},80%,55%)`:grd;
+    roundRect2(g,-13,-8,26,20,3,true,true);
+    // chest LED (green)
+    g.fillStyle='#2ecc40';g.beginPath();g.arc(0,2,3,0,Math.PI*2);g.fill();g.stroke();
+    g.fillStyle='#7cfc00';g.beginPath();g.arc(-0.6,1.4,1.2,0,Math.PI*2);g.fill();
+    // arms (pistons)
+    g.fillStyle='#555';g.fillRect(-17,-4,4,12);g.strokeRect(-17,-4,4,12);
+    g.fillRect(13,-4,4,12);g.strokeRect(13,-4,4,12);
+    g.fillStyle='#333';g.fillRect(-18,7,6,4);g.fillRect(12,7,6,4);
+    // neck
+    g.fillStyle='#444';g.fillRect(-3,-10,6,4);
+    // head — square with rounded corners
+    g.fillStyle='#d0d6dc';roundRect2(g,-12,-26,24,18,4,true,true);
+    // antenna
+    g.strokeStyle='#111';g.lineWidth=2;
+    g.beginPath();g.moveTo(0,-26);g.lineTo(0,-32);g.stroke();
+    g.fillStyle='#ff2a2a';g.beginPath();g.arc(0,-33,2,0,Math.PI*2);g.fill();g.stroke();
+    // visor
+    g.fillStyle='#111';roundRect2(g,-9,-20,18,7,2,true,true);
+    g.fillStyle='#00e5ff';g.fillRect(-7,-19,4,3);g.fillRect(1,-19,4,3);
+    // grill mouth
+    g.strokeStyle='#111';g.lineWidth=1;
+    for(let i=-4;i<=4;i+=2){g.beginPath();g.moveTo(i,-11);g.lineTo(i,-9);g.stroke();}
+    // joint (LED-lit)
+    g.fillStyle='#f5ecd0';g.fillRect(4,-13,10,2.5);g.strokeRect(4,-13,10,2.5);
+    g.fillStyle='#00e5ff';g.fillRect(13,-13,2,2.5);
+  } else if(s.render==='alien'){
+    // legs
+    g.fillStyle='#4a148c';g.fillRect(-9,10,7,14);g.strokeRect(-9,10,7,14);
+    g.fillRect(2,10,7,14);g.strokeRect(2,10,7,14);
+    g.fillStyle='#111';g.fillRect(-10,22,9,4);g.fillRect(1,22,9,4);
+    // body — cosmic tee
+    g.fillStyle=rainbow?`hsl(${(performance.now()/4)%360},90%,55%)`:'#7c4dff';
+    roundRect2(g,-12,-8,24,20,5,true,true);
+    // stars on shirt
+    g.fillStyle='#fff';
+    g.beginPath();g.arc(-6,-2,1.1,0,Math.PI*2);g.arc(5,4,1.1,0,Math.PI*2);g.arc(0,8,1.1,0,Math.PI*2);g.fill();
+    // arms — green
+    g.fillStyle='#6fdc8c';g.fillRect(-16,-4,5,14);g.strokeRect(-16,-4,5,14);
+    g.fillRect(11,-4,5,14);g.strokeRect(11,-4,5,14);
+    // head — big green oval
+    g.fillStyle='#6fdc8c';g.beginPath();g.ellipse(0,-17,12,14,0,0,Math.PI*2);g.fill();g.stroke();
+    // huge black almond eyes
+    g.fillStyle='#000';
+    g.beginPath();g.ellipse(-5,-16,3,6,-0.3,0,Math.PI*2);g.fill();
+    g.beginPath();g.ellipse(5,-16,3,6,0.3,0,Math.PI*2);g.fill();
+    g.fillStyle='#fff';
+    g.beginPath();g.arc(-4.5,-17,0.9,0,Math.PI*2);g.arc(5.5,-17,0.9,0,Math.PI*2);g.fill();
+    // small smirk
+    g.strokeStyle='#0a3d1a';g.lineWidth=1.2;
+    g.beginPath();g.moveTo(-3,-9);g.quadraticCurveTo(0,-7,3,-9);g.stroke();
+    // antenna with orb
+    g.strokeStyle='#111';g.lineWidth=1.5;
+    g.beginPath();g.moveTo(-4,-29);g.lineTo(-6,-34);g.stroke();
+    g.beginPath();g.moveTo(4,-29);g.lineTo(6,-34);g.stroke();
+    g.fillStyle='#ff4dff';g.beginPath();g.arc(-6,-35,2,0,Math.PI*2);g.fill();g.stroke();
+    g.fillStyle='#4dffe8';g.beginPath();g.arc(6,-35,2,0,Math.PI*2);g.fill();g.stroke();
+    // joint
+    g.strokeStyle='#111';g.lineWidth=2;
+    g.fillStyle='#f5ecd0';g.fillRect(4,-11,10,2.5);g.strokeRect(4,-11,10,2.5);
+    g.fillStyle='#ff6a00';g.fillRect(13,-11,2,2.5);
+  }
+}
+
 function drawCollectible(c){
   const y=c.y-cameraY+Math.sin(c.t*4)*3;
   if(c.type==='bag'){
