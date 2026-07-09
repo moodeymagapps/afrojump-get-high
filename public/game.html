@@ -119,6 +119,8 @@ const SKINS=[
   {id:'shadow', name:'Shadow', price:350,afro:'#111',   skin:'#3a3a3a',body:'#1a1a1a',arms:'#0a0a0a',pants:'#000',   joint:'#7c4dff'},
   {id:'alien',  name:'Alien',  price:400,render:'alien'},
   {id:'rasta',  name:'Rasta',  price:500,afro:'#2b1a0a',skin:'#5b3a1a',body:'#c62828',arms:'#2e7d32',pants:'#f9a825',joint:'#f5ecd0'},
+  {id:'revengebird',name:'Revengebird',price:600,render:'raven'},
+  {id:'fabi',   name:'Prinzessin Fabi',price:750,render:'fabi'},
 ];
 function currentSkin(){return SKINS.find(s=>s.id===selectedSkin)||SKINS[0];}
 function persistShop(){localStorage.setItem(BK,totalBags);localStorage.setItem(OK,JSON.stringify(owned));localStorage.setItem(SK,selectedSkin);}
