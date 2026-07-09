@@ -896,6 +896,121 @@ function drawSkinAlt(g,s,inv){
     g.strokeStyle='#111';g.lineWidth=2;
     g.fillStyle='#f5ecd0';g.fillRect(4,-11,10,2.5);g.strokeRect(4,-11,10,2.5);
     g.fillStyle='#ff6a00';g.fillRect(13,-11,2,2.5);
+  } else if(s.render==='raven'){
+    // Revengebird — black raven in tracksuit
+    // legs (track pants — black with white stripes)
+    g.fillStyle='#111';g.fillRect(-9,10,7,14);g.strokeRect(-9,10,7,14);
+    g.fillRect(2,10,7,14);g.strokeRect(2,10,7,14);
+    g.fillStyle='#fff';g.fillRect(-6.5,10,1.5,14);g.fillRect(4.5,10,1.5,14);
+    // orange sneakers
+    g.fillStyle='#ff6a00';g.fillRect(-10,22,9,4);g.fillRect(1,22,9,4);
+    g.strokeStyle='#111';g.strokeRect(-10,22,9,4);g.strokeRect(1,22,9,4);
+    // tracksuit jacket (black with 3 white stripes on shoulder)
+    g.fillStyle=rainbow?`hsl(${(performance.now()/4)%360},80%,55%)`:'#0a0a0a';
+    roundRect2(g,-13,-8,26,20,5,true,true);
+    // zipper
+    g.strokeStyle='#666';g.lineWidth=1;
+    g.beginPath();g.moveTo(0,-8);g.lineTo(0,12);g.stroke();
+    // shoulder stripes
+    g.fillStyle='#fff';
+    g.fillRect(-17,-4,4,1.2);g.fillRect(-17,-1,4,1.2);g.fillRect(-17,2,4,1.2);
+    g.fillRect(13,-4,4,1.2);g.fillRect(13,-1,4,1.2);g.fillRect(13,2,4,1.2);
+    // wing-arms (feathered)
+    g.strokeStyle='#111';g.lineWidth=2;
+    g.fillStyle='#0a0a0a';g.fillRect(-17,-4,4,14);g.strokeRect(-17,-4,4,14);
+    g.fillRect(13,-4,4,14);g.strokeRect(13,-4,4,14);
+    // head — glossy black
+    g.fillStyle='#0a0a0a';g.beginPath();g.arc(0,-16,11,0,Math.PI*2);g.fill();g.stroke();
+    // purple sheen
+    g.fillStyle='rgba(120,60,180,0.35)';g.beginPath();g.arc(-3,-19,4,0,Math.PI*2);g.fill();
+    // beak (orange-yellow)
+    g.fillStyle='#f0b400';g.strokeStyle='#111';
+    g.beginPath();g.moveTo(8,-16);g.lineTo(20,-14);g.lineTo(8,-12);g.closePath();g.fill();g.stroke();
+    // angry eye (red glare)
+    g.fillStyle='#fff';g.beginPath();g.arc(2,-18,3,0,Math.PI*2);g.fill();g.stroke();
+    g.fillStyle='#c00';g.beginPath();g.arc(3,-18,1.8,0,Math.PI*2);g.fill();
+    // brow (revenge)
+    g.strokeStyle='#111';g.lineWidth=2;
+    g.beginPath();g.moveTo(-3,-22);g.lineTo(6,-19);g.stroke();
+    // gold chain
+    g.fillStyle='#ffd700';g.strokeStyle='#7a5a00';g.lineWidth=1;
+    g.beginPath();g.arc(0,-4,6,0.15*Math.PI,0.85*Math.PI);g.stroke();
+    g.beginPath();g.arc(0,2,2,0,Math.PI*2);g.fill();g.stroke();
+    // joint
+    g.strokeStyle='#111';g.lineWidth=2;
+    g.fillStyle='#f5ecd0';g.fillRect(9,-13,9,2.2);g.strokeRect(9,-13,9,2.2);
+    g.fillStyle='#ff6a00';g.fillRect(17,-13,2,2.2);
+  } else if(s.render==='fabi'){
+    // Prinzessin Fabi — kleines Mädchen in pinkem Prinzessinnenkleid mit Tiara
+    // shoes (schwarz)
+    g.fillStyle='#1a1a1a';g.fillRect(-9,22,7,4);g.fillRect(2,22,7,4);
+    g.strokeRect(-9,22,7,4);g.strokeRect(2,22,7,4);
+    // Kleid — trapezförmiger Rock in pink
+    g.fillStyle=rainbow?`hsl(${(performance.now()/4)%360},90%,60%)`:'#ec3d8a';
+    g.beginPath();
+    g.moveTo(-9,-2);g.lineTo(9,-2);g.lineTo(16,22);g.lineTo(-16,22);g.closePath();
+    g.fill();g.stroke();
+    // Rock-Highlights (goldene Ranken)
+    g.strokeStyle='#e6b800';g.lineWidth=0.8;
+    g.beginPath();g.moveTo(-6,4);g.quadraticCurveTo(0,8,6,4);
+    g.moveTo(-8,12);g.quadraticCurveTo(0,16,8,12);g.stroke();
+    // Mieder (dunkler pink mit gold trim)
+    g.strokeStyle='#111';g.lineWidth=2;
+    g.fillStyle='#c81f6d';
+    roundRect2(g,-9,-8,18,10,2,true,true);
+    g.strokeStyle='#e6b800';g.lineWidth=1;
+    g.beginPath();g.moveTo(-9,-8);g.lineTo(-9,2);g.moveTo(9,-8);g.lineTo(9,2);g.stroke();
+    // Puffärmel (weiß-pink)
+    g.strokeStyle='#111';g.lineWidth=2;
+    g.fillStyle='#ec3d8a';
+    g.beginPath();g.arc(-13,-6,5,0,Math.PI*2);g.fill();g.stroke();
+    g.beginPath();g.arc(13,-6,5,0,Math.PI*2);g.fill();g.stroke();
+    // Arme (Hautton)
+    g.fillStyle='#f5c890';
+    g.fillRect(-15,-2,4,10);g.strokeRect(-15,-2,4,10);
+    g.fillRect(11,-2,4,10);g.strokeRect(11,-2,4,10);
+    // weißer Kragen
+    g.fillStyle='#fff';
+    g.beginPath();g.moveTo(-11,-8);g.lineTo(-4,-6);g.lineTo(-9,-4);g.closePath();g.fill();g.stroke();
+    g.beginPath();g.moveTo(11,-8);g.lineTo(4,-6);g.lineTo(9,-4);g.closePath();g.fill();g.stroke();
+    // Kopf
+    g.fillStyle='#f5c890';g.beginPath();g.arc(0,-16,10,0,Math.PI*2);g.fill();g.stroke();
+    // blonde Haare (Locken seitlich)
+    g.fillStyle='#e8c15a';
+    g.beginPath();g.arc(-10,-14,4,0,Math.PI*2);g.arc(10,-14,4,0,Math.PI*2);
+    g.arc(-8,-19,4,0,Math.PI*2);g.arc(8,-19,4,0,Math.PI*2);g.fill();g.stroke();
+    // Pony
+    g.fillStyle='#e8c15a';
+    g.beginPath();g.moveTo(-8,-20);g.quadraticCurveTo(0,-14,8,-20);g.lineTo(6,-18);g.quadraticCurveTo(0,-12,-6,-18);g.closePath();g.fill();g.stroke();
+    // Tiara (silber mit lila Sternen)
+    g.strokeStyle='#111';g.lineWidth=1;
+    g.fillStyle='#e0e0e8';
+    g.beginPath();
+    g.moveTo(-8,-22);g.lineTo(-5,-26);g.lineTo(-2,-22);g.lineTo(0,-27);g.lineTo(2,-22);g.lineTo(5,-26);g.lineTo(8,-22);
+    g.lineTo(8,-21);g.lineTo(-8,-21);g.closePath();g.fill();g.stroke();
+    g.fillStyle='#a855f7';
+    g.beginPath();g.arc(-5,-25,1.2,0,Math.PI*2);g.arc(0,-25.5,1.4,0,Math.PI*2);g.arc(5,-25,1.2,0,Math.PI*2);g.fill();
+    // Gesicht
+    g.fillStyle='#111';
+    g.beginPath();g.arc(-3,-16,1.2,0,Math.PI*2);g.arc(3,-16,1.2,0,Math.PI*2);g.fill();
+    // rosa Wangen
+    g.fillStyle='rgba(236,61,138,0.35)';
+    g.beginPath();g.arc(-5,-13,1.6,0,Math.PI*2);g.arc(5,-13,1.6,0,Math.PI*2);g.fill();
+    // Lächeln
+    g.strokeStyle='#a02050';g.lineWidth=1.2;
+    g.beginPath();g.moveTo(-2,-12);g.quadraticCurveTo(0,-10,2,-12);g.stroke();
+    // Zauberstab statt Joint
+    g.strokeStyle='#c9a227';g.lineWidth=1.8;
+    g.beginPath();g.moveTo(14,4);g.lineTo(22,-4);g.stroke();
+    g.fillStyle='#ffe066';
+    g.beginPath();
+    for(let i=0;i<5;i++){
+      const a=-Math.PI/2+i*Math.PI*2/5;
+      const r=i%2?1.5:3.5;
+      const px=23+Math.cos(a)*r, py=-5+Math.sin(a)*r;
+      if(i===0)g.moveTo(px,py);else g.lineTo(px,py);
+    }
+    g.closePath();g.fill();g.strokeStyle='#c9a227';g.lineWidth=1;g.stroke();
   }
 }
 
