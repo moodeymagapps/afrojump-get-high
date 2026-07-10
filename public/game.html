@@ -14,6 +14,8 @@
   #bags{color:#7cfc00;font-weight:700;text-shadow:1px 1px 2px #000;}
   #pauseBtn{background:rgba(0,0,0,0.4);border:2px solid #fff;color:#fff;width:34px;height:34px;border-radius:8px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;}
   #pauseBtn:active{transform:scale(.95);}
+  #muteBtn{background:rgba(0,0,0,0.4);border:2px solid #fff;color:#fff;width:34px;height:34px;border-radius:8px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;pointer-events:auto;}
+  #muteBtn:active{transform:scale(.95);}
   #power{position:absolute;top:36px;left:8px;font-size:13px;font-weight:700;color:#ffd54a;text-shadow:1px 1px 2px #000;pointer-events:none;}
   .overlay{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.65);padding:20px;box-sizing:border-box;}
   .overlay h1{margin:0 0 6px;font-size:38px;text-shadow:2px 2px 0 #000;letter-spacing:1px;}
@@ -50,7 +52,7 @@
   <canvas id="c" width="400" height="700"></canvas>
   <div id="ui">
     <div class="stats"><div id="score">Höhe: 0m</div><div id="high">Best: 0m</div></div>
-    <div class="right"><div id="bags">🌿 0</div><button id="pauseBtn" title="Pause">❚❚</button></div>
+    <div class="right"><div id="bags">🌿 0</div><button id="muteBtn" title="Musik">🔊</button><button id="pauseBtn" title="Pause">❚❚</button></div>
   </div>
   <div id="power"></div>
   <div id="menu" class="overlay">
@@ -85,6 +87,7 @@
   </div>
   <div id="hint">Links/Rechts: ← → oder A/D · Schießen: Leertaste / Tap oben · Mobile: Tap links/rechts</div>
 </div>
+<audio id="bgm" src="/audio/afro_jump.mp3" loop preload="auto"></audio>
 <script>
 (()=>{
 const cv=document.getElementById('c'),ctx=cv.getContext('2d');
