@@ -1077,49 +1077,92 @@ function drawSkinAlt(g,s,inv){
     g.fillStyle='#f5ecd0';g.fillRect(4,-11,10,2.5);g.strokeRect(4,-11,10,2.5);
     g.fillStyle='#ff6a00';g.fillRect(13,-11,2,2.5);
   } else if(s.render==='raven'){
-    // Revengebird — black raven in tracksuit
-    // legs (track pants — black with white stripes)
-    g.fillStyle='#111';g.fillRect(-9,10,7,14);g.strokeRect(-9,10,7,14);
-    g.fillRect(2,10,7,14);g.strokeRect(2,10,7,14);
-    g.fillStyle='#fff';g.fillRect(-6.5,10,1.5,14);g.fillRect(4.5,10,1.5,14);
-    // orange sneakers
-    g.fillStyle='#ff6a00';g.fillRect(-10,22,9,4);g.fillRect(1,22,9,4);
-    g.strokeStyle='#111';g.strokeRect(-10,22,9,4);g.strokeRect(1,22,9,4);
-    // tracksuit jacket (black with 3 white stripes on shoulder)
-    g.fillStyle=rainbow?`hsl(${(performance.now()/4)%360},80%,55%)`:'#0a0a0a';
-    roundRect2(g,-13,-8,26,20,5,true,true);
-    // zipper
-    g.strokeStyle='#666';g.lineWidth=1;
-    g.beginPath();g.moveTo(0,-8);g.lineTo(0,12);g.stroke();
-    // shoulder stripes
-    g.fillStyle='#fff';
-    g.fillRect(-17,-4,4,1.2);g.fillRect(-17,-1,4,1.2);g.fillRect(-17,2,4,1.2);
-    g.fillRect(13,-4,4,1.2);g.fillRect(13,-1,4,1.2);g.fillRect(13,2,4,1.2);
-    // wing-arms (feathered)
-    g.strokeStyle='#111';g.lineWidth=2;
-    g.fillStyle='#0a0a0a';g.fillRect(-17,-4,4,14);g.strokeRect(-17,-4,4,14);
-    g.fillRect(13,-4,4,14);g.strokeRect(13,-4,4,14);
-    // head — glossy black
-    g.fillStyle='#0a0a0a';g.beginPath();g.arc(0,-16,11,0,Math.PI*2);g.fill();g.stroke();
-    // purple sheen
-    g.fillStyle='rgba(120,60,180,0.35)';g.beginPath();g.arc(-3,-19,4,0,Math.PI*2);g.fill();
-    // beak (orange-yellow)
-    g.fillStyle='#f0b400';g.strokeStyle='#111';
-    g.beginPath();g.moveTo(8,-16);g.lineTo(20,-14);g.lineTo(8,-12);g.closePath();g.fill();g.stroke();
-    // angry eye (red glare)
-    g.fillStyle='#fff';g.beginPath();g.arc(2,-18,3,0,Math.PI*2);g.fill();g.stroke();
-    g.fillStyle='#c00';g.beginPath();g.arc(3,-18,1.8,0,Math.PI*2);g.fill();
-    // brow (revenge)
-    g.strokeStyle='#111';g.lineWidth=2;
-    g.beginPath();g.moveTo(-3,-22);g.lineTo(6,-19);g.stroke();
+    // === Revengebird (Main Skin) — high-fidelity raven rapper in tracksuit ===
+    g.lineJoin='round';g.lineCap='round';
+    // Legs / track pants
+    const pg=g.createLinearGradient(0,10,0,24);
+    pg.addColorStop(0,'#1a1a1a');pg.addColorStop(1,'#000');
+    g.fillStyle=pg;g.strokeStyle='#111';g.lineWidth=2;
+    roundRect2(g,-10,10,8,14,3,true,true);roundRect2(g,2,10,8,14,3,true,true);
+    // violet racing stripe
+    g.fillStyle='#8a2be2';g.fillRect(-7,10,1.6,14);g.fillRect(3.4,10,1.6,14);
+    // sneakers (black w/ white sole & violet accent)
+    g.fillStyle='#0a0a0a';g.strokeStyle='#111';
+    roundRect2(g,-12,20,11,6,3,true,true);roundRect2(g,1,20,11,6,3,true,true);
+    g.fillStyle='#fff';g.fillRect(-12,24,11,2);g.fillRect(1,24,11,2);
+    g.fillStyle='#8a2be2';g.fillRect(-11,22,3,1);g.fillRect(9,22,3,1);
+    // Hoodie body — deep black with shading
+    const hg=g.createLinearGradient(-14,-10,14,12);
+    hg.addColorStop(0,'#222');hg.addColorStop(0.55,'#0d0d0d');hg.addColorStop(1,'#000');
+    g.fillStyle=rainbow?`hsl(${(performance.now()/4)%360},80%,45%)`:hg;g.strokeStyle='#111';g.lineWidth=2;
+    roundRect2(g,-14,-8,28,22,7,true,true);
+    // hoodie fold shadow
+    g.fillStyle='rgba(255,255,255,0.06)';g.fillRect(-12,-6,3,18);
+    // kangaroo pocket
+    g.strokeStyle='rgba(80,80,80,0.7)';g.lineWidth=1;
+    g.beginPath();g.moveTo(-9,4);g.quadraticCurveTo(0,8,9,4);g.stroke();
+    // wing-arms
+    g.fillStyle='#0a0a0a';g.strokeStyle='#111';g.lineWidth=2;
+    roundRect2(g,-18,-4,5,15,2,true,true);
+    roundRect2(g,13,-4,5,15,2,true,true);
+    // hand (right) holding mic
+    g.fillStyle='#0a0a0a';g.beginPath();g.arc(15.5,11,3,0,Math.PI*2);g.fill();g.stroke();
+    // Microphone
+    g.fillStyle='#222';g.strokeStyle='#111';
+    roundRect2(g,14,12,4,10,1,true,true);
+    g.fillStyle='#333';g.beginPath();g.arc(16,10,4,0,Math.PI*2);g.fill();g.stroke();
+    // mic grille lines
+    g.strokeStyle='#666';g.lineWidth=0.5;
+    for(let i=-3;i<=3;i+=1.5){g.beginPath();g.moveTo(13+i,7);g.lineTo(13+i,12);g.stroke();}
     // gold chain
-    g.fillStyle='#ffd700';g.strokeStyle='#7a5a00';g.lineWidth=1;
-    g.beginPath();g.arc(0,-4,6,0.15*Math.PI,0.85*Math.PI);g.stroke();
-    g.beginPath();g.arc(0,2,2,0,Math.PI*2);g.fill();g.stroke();
-    // joint
-    g.strokeStyle='#111';g.lineWidth=2;
-    g.fillStyle='#f5ecd0';g.fillRect(9,-13,9,2.2);g.strokeRect(9,-13,9,2.2);
-    g.fillStyle='#ff6a00';g.fillRect(17,-13,2,2.2);
+    g.fillStyle='#ffd700';g.strokeStyle='#8a6d00';g.lineWidth=0.8;
+    for(let i=0;i<12;i++){const a=Math.PI*0.15+i*Math.PI*0.7/11;g.beginPath();g.arc(Math.cos(a)*7,-4+Math.sin(a)*7,1.2,0,Math.PI*2);g.fill();g.stroke();}
+    // pendant (dollar/leaf)
+    g.fillStyle='#ffd700';g.strokeStyle='#8a6d00';g.lineWidth=1;
+    g.beginPath();g.moveTo(-4,4);g.lineTo(4,4);g.lineTo(0,12);g.closePath();g.fill();g.stroke();
+    g.fillStyle='#111';g.font='bold 6px sans-serif';g.textAlign='center';g.fillText('R',0,10);g.textAlign='left';
+    // Head — glossy black with feather texture
+    const headG=g.createRadialGradient(-4,-20,2,0,-16,13);
+    headG.addColorStop(0,'#3a2540');headG.addColorStop(0.6,'#0a0a0a');headG.addColorStop(1,'#000');
+    g.fillStyle=headG;g.strokeStyle='#111';g.lineWidth=2;
+    g.beginPath();g.arc(0,-16,12,0,Math.PI*2);g.fill();g.stroke();
+    // feather ruffle on top-back
+    g.fillStyle='#0a0a0a';g.beginPath();
+    g.moveTo(-11,-22);g.lineTo(-8,-28);g.lineTo(-4,-24);g.lineTo(-2,-30);g.lineTo(2,-25);g.lineTo(5,-29);g.lineTo(8,-24);g.lineTo(12,-20);
+    g.lineTo(-11,-18);g.closePath();g.fill();g.stroke();
+    // purple sheen on feathers
+    g.fillStyle='rgba(140,80,200,0.35)';
+    g.beginPath();g.ellipse(-3,-22,5,3,-0.4,0,Math.PI*2);g.fill();
+    // Snapback cap (backwards)
+    g.fillStyle='#0a0a0a';g.strokeStyle='#111';g.lineWidth=2;
+    // crown
+    g.beginPath();g.arc(0,-22,11,Math.PI*1.05,Math.PI*1.95);g.lineTo(11,-18);g.lineTo(-11,-18);g.closePath();g.fill();g.stroke();
+    // cap band
+    g.fillStyle='#111';g.fillRect(-11,-19,22,2);
+    // violet under-brim (backwards means brim on left)
+    g.fillStyle='#4a148c';
+    g.beginPath();g.moveTo(-11,-19);g.lineTo(-18,-16);g.lineTo(-11,-15);g.closePath();g.fill();g.stroke();
+    // violet logo on side
+    g.fillStyle='#8a2be2';g.beginPath();g.arc(6,-24,1.6,0,Math.PI*2);g.fill();
+    // Angry brows
+    g.strokeStyle='#000';g.lineWidth=2.4;
+    g.beginPath();g.moveTo(-7,-19);g.lineTo(-1,-17);g.stroke();
+    g.beginPath();g.moveTo(8,-19);g.lineTo(3,-17);g.stroke();
+    // Big square-ish eyes with violet iris
+    g.fillStyle='#fff';g.strokeStyle='#111';g.lineWidth=1.4;
+    g.beginPath();g.ellipse(-3,-14,3.2,3.2,0,0,Math.PI*2);g.fill();g.stroke();
+    g.beginPath();g.ellipse(5,-14,3.2,3.2,0,0,Math.PI*2);g.fill();g.stroke();
+    // violet iris + black pupil
+    g.fillStyle='#8a2be2';g.beginPath();g.arc(-3,-14,2.2,0,Math.PI*2);g.arc(5,-14,2.2,0,Math.PI*2);g.fill();
+    g.fillStyle='#111';g.beginPath();g.arc(-2.5,-14,1.2,0,Math.PI*2);g.arc(5.5,-14,1.2,0,Math.PI*2);g.fill();
+    g.fillStyle='#fff';g.beginPath();g.arc(-2,-14.6,0.5,0,Math.PI*2);g.arc(6,-14.6,0.5,0,Math.PI*2);g.fill();
+    // Yellow beak (with shading)
+    const bg=g.createLinearGradient(6,-12,20,-8);
+    bg.addColorStop(0,'#ffd54a');bg.addColorStop(1,'#c9910a');
+    g.fillStyle=bg;g.strokeStyle='#3a2a12';g.lineWidth=1.5;
+    g.beginPath();g.moveTo(7,-11);g.lineTo(19,-8);g.lineTo(7,-6);g.closePath();g.fill();g.stroke();
+    g.strokeStyle='#3a2a12';g.beginPath();g.moveTo(7,-8.5);g.lineTo(17,-8);g.stroke();
+    return;
   } else if(s.render==='fabi'){
     // Prinzessin Fabi — kleines Mädchen in pinkem Prinzessinnenkleid mit Tiara
     // shoes (schwarz)
