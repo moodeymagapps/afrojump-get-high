@@ -548,6 +548,22 @@ function update(dt){
 function burst(x,y,color,n=14){
   for(let i=0;i<n;i++)particles.push({x,y,vx:rand(-3,3),vy:rand(-4,1),life:0.8,color});
 }
+// Take damage during boss fight — spend a life, brief invincibility, don't game over unless out of lives
+function hurtPlayer(){
+  if(gameOver)return;
+  if(boss&&player.bossLives>0){
+    player.bossLives--;
+    player.invincible=Math.max(player.invincible,1.5);
+    player.hitFlash=0.4;
+    burst(player.x,player.y,'#ff5252',18);
+    addShake(8,0.3);
+    if(player.bossLives<=0){pushFloat(player.x,player.y-20,'LAST LIFE!','#ff5252');}
+    else pushFloat(player.x,player.y-20,'-1 ♥ ('+player.bossLives+' left)','#ff5252');
+    if(player.vy>0)player.vy=-8;
+    return;
+  }
+  die();
+}
 function die(){
   if(gameOver)return;
   gameOver=true;
@@ -558,6 +574,7 @@ function die(){
   setTimeout(()=>{timeScale=1;},450);
   if(bestY>highScore){highScore=bestY;localStorage.setItem(HK,highScore);}
   persistShop();
+  stopBossMusic();
   updateBagsUI();
   finalScore.textContent='Höhe: '+bestY+'m';
   finalHigh.textContent='Best: '+highScore+'m';
