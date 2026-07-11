@@ -537,6 +537,7 @@ function update(dt){
   // boss check
   if(!boss&&bestY>=nextBossScore){spawnBoss();}
   if(boss){
+    if(boss.spawnT>0)boss.spawnT-=dt;
     boss.x+=boss.vx;
     if(boss.x<60){boss.x=60;boss.vx*=-1;}
     if(boss.x>W-60){boss.x=W-60;boss.vx*=-1;}
@@ -557,24 +558,32 @@ function update(dt){
     if(player.invincible>0&&Math.abs(player.x-boss.x)<boss.w/2+player.r&&Math.abs(player.y-boss.y)<boss.h/2+player.r){
       boss.hp-=0.1;
     }
-    // boss body collision (fatal)
-    if(player.invincible<=0&&Math.abs(player.x-boss.x)<boss.w/2-8&&Math.abs(player.y-boss.y)<boss.h/2-4&&!(player.vy>0&&player.y<boss.y)){
-      die();
+    // body contact — costs one boss life (never instant-kill during reaction window)
+    if(boss.spawnT<=0&&player.invincible<=0&&Math.abs(player.x-boss.x)<boss.w/2-8&&Math.abs(player.y-boss.y)<boss.h/2-4&&!(player.vy>0&&player.y<boss.y)){
+      hurtPlayer();
     }
-    // boss shoots
-    boss.shootT-=dt;
-    if(boss.shootT<=0){
+    // boss shoots (only after reaction window)
+    if(boss.spawnT<=0){boss.shootT-=dt;}
+    if(boss.shootT<=0&&boss.spawnT<=0){
       boss.shootT=1.4;
       enemies.push({boss:true,x:boss.x,y:boss.y+boss.h/2,vx:0,vy:5,w:12,h:12,alive:true});
     }
-    if(boss.hp<=0){burst(boss.x,boss.y,'#ffdd00',50);addShake(10,0.5);pushFloat(boss.x,boss.y,'BOSS DOWN!','#ffdd00');boss=null;scrollLocked=false;nextBossScore+=1800;bestY+=100;player.vy=-14;}
+    if(boss.hp<=0){
+      burst(boss.x,boss.y,'#ffdd00',50);addShake(10,0.5);
+      pushFloat(boss.x,boss.y,'BOSS DOWN!','#ffdd00');
+      totalBags+=25;localStorage.setItem(BK,totalBags);updateBagsUI();
+      pushFloat(boss.x,boss.y+20,'+25 🌿','#7cfc00');
+      boss=null;scrollLocked=false;nextBossScore+=1800;bestY+=100;player.vy=-14;
+      player.bossLives=0;stopBossMusic();tryPlayMusic();
+    }
   }
   // boss projectiles
   for(const e of enemies){
     if(e.boss&&e.alive){
       e.y+=e.vy;
       if(Math.hypot(player.x-e.x,player.y-e.y)<player.r+6){
-        if(player.invincible>0){e.alive=false;}else die();
+        if(player.invincible>0){e.alive=false;}
+        else{e.alive=false;hurtPlayer();}
       }
       if(e.y>cameraY+H+40)e.alive=false;
     }
