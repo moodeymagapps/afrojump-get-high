@@ -375,14 +375,16 @@ document.getElementById('overMenu').onclick=()=>goMenu();
 // State
 let player,platforms,collectibles,enemies,projectiles,particles,smokeParticles,floatTexts,cameraY,bestY,scrollLocked,boss,bossTimer,nextBossScore,gameOver,rngSeed,runBags;
 let shake={t:0,mag:0},timeScale=1,deathT=0,bossIndex=0;
-const BOSS_TYPES=['evilbong','jointjerk','cbddrone','pipepusher'];
+const BOSS_TYPES=['kingbong','mightymarijuana','drgreenthumb','theplug','giantblunt','mutantbush'];
+const BOSS_NAMES={kingbong:'KING BONG',mightymarijuana:'MIGHTY MARIJUANA',drgreenthumb:'DR. GREENTHUMB',theplug:'THE PLUG',giantblunt:'GIANT BLUNT',mutantbush:'MUTANT BUSH'};
 
 function rand(a,b){return a+Math.random()*(b-a);}
 function reset(){
-  player={x:W/2,y:H-100,vx:0,vy:-14,r:22,facing:1,invincible:0,shootCd:0,alive:true,bossShot:false,squash:1,stretch:1,landedT:0};
+  player={x:W/2,y:H-100,vx:0,vy:-14,r:22,facing:1,invincible:0,shootCd:0,alive:true,bossShot:false,squash:1,stretch:1,landedT:0,bossLives:0,hitFlash:0};
   platforms=[];collectibles=[];enemies=[];projectiles=[];particles=[];smokeParticles=[];floatTexts=[];
   cameraY=0;bestY=0;scrollLocked=false;boss=null;nextBossScore=1500;gameOver=false;
   runBags=0;shake={t:0,mag:0};timeScale=1;deathT=0;
+  stopBossMusic();
   // starting platform
   platforms.push({x:W/2-40,y:H-40,w:80,h:12,vx:0,type:'normal',dir:1,range:0,ox:W/2-40,bounce:0,cracked:0});
   let py=H-40;
@@ -415,11 +417,17 @@ function spawnPlatform(y){
 
 function spawnBoss(){
   const kind=BOSS_TYPES[bossIndex%BOSS_TYPES.length];bossIndex++;
-  boss={kind,x:W/2,y:cameraY+80,w:120,h:60,hp:5,vx:2,shootT:0,alive:true,hitT:0,phase:0};
-  if(kind==='cbddrone'){boss.w=100;boss.h=48;boss.vx=2.6;}
-  if(kind==='pipepusher'){boss.w=90;boss.h=50;boss.vx=3.2;}
-  if(kind==='jointjerk'){boss.w=80;boss.h=110;boss.vx=1.6;}
+  boss={kind,x:W/2,y:cameraY+80,w:120,h:70,hp:5,vx:2,shootT:1.5,alive:true,hitT:0,phase:0,spawnT:1.0};
+  if(kind==='kingbong'){boss.w=120;boss.h=120;boss.vx=1.8;}
+  if(kind==='mightymarijuana'){boss.w=130;boss.h=110;boss.vx=1.4;}
+  if(kind==='drgreenthumb'){boss.w=110;boss.h=90;boss.vx=2.0;}
+  if(kind==='theplug'){boss.w=90;boss.h=110;boss.vx=2.4;}
+  if(kind==='giantblunt'){boss.w=80;boss.h=130;boss.vx=1.8;}
+  if(kind==='mutantbush'){boss.w=140;boss.h=90;boss.vx=1.6;}
   scrollLocked=true;
+  player.bossLives=3;player.invincible=Math.max(player.invincible,1.2);
+  pushFloat(W/2,cameraY+140,'BOSS! 3 ♥','#ff5252');
+  startBossMusic();
 }
 
 function pushFloat(x,y,txt,color){floatTexts.push({x,y,txt,color:color||'#fff',life:0.9});}
