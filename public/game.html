@@ -2537,8 +2537,20 @@ function render(){
   if(boss){
     ctx.fillStyle='rgba(255,0,0,.15)';ctx.fillRect(0,0,W,H);
     ctx.fillStyle='#fff';ctx.font='bold 22px sans-serif';ctx.textAlign='center';
-    const names={evilbong:'EVIL BONG',jointjerk:'JOINT JERK',cbddrone:'CBD DRONE',pipepusher:'PIPE PUSHER'};
-    ctx.fillText('BOSS: '+(names[boss.kind]||'BOSS'),W/2,40);ctx.textAlign='left';
+    ctx.strokeStyle='#000';ctx.lineWidth=4;ctx.strokeText('BOSS: '+(BOSS_NAMES[boss.kind]||'BOSS'),W/2,40);
+    ctx.fillText('BOSS: '+(BOSS_NAMES[boss.kind]||'BOSS'),W/2,40);
+    // Player boss lives (hearts)
+    ctx.font='bold 20px sans-serif';
+    const hearts='♥'.repeat(Math.max(0,player.bossLives));
+    ctx.strokeStyle='#000';ctx.lineWidth=4;ctx.strokeText(hearts,W/2,66);
+    ctx.fillStyle='#ff5252';ctx.fillText(hearts,W/2,66);
+    // Reaction window indicator
+    if(boss.spawnT>0){
+      ctx.fillStyle='rgba(255,213,74,'+(0.3+0.4*Math.abs(Math.sin(performance.now()/100)))+')';
+      ctx.font='bold 18px sans-serif';
+      ctx.fillText('READY!',W/2,H/2);
+    }
+    ctx.textAlign='left';
   }
   ctx.restore();
   // death fade
