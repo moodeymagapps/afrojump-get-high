@@ -2031,6 +2031,378 @@ function drawBossHP(bx,y,bh){
   ctx.fillStyle='#000';ctx.fillRect(bx-40,y-bh/2-30,80,8);
   ctx.fillStyle='#7cfc00';ctx.fillRect(bx-38,y-bh/2-28,76*Math.max(0,boss.hp)/5,4);
 }
+// --- New premium boss illustrations (cartoon/chibi, matches skin style) ---
+function bossOutline(fill,stroke){ctx.fillStyle=fill;ctx.strokeStyle=stroke||'#111';ctx.lineWidth=2.5;}
+function drawBossKingBong(bx,y,bw,bh,t){
+  // Giant royal bong: tall glass chamber, gold crown, cape, angry face
+  const bulbR=bw*0.42, cy=y+bh*0.18;
+  // Cape behind (red velvet)
+  ctx.fillStyle='#7a0d1a';ctx.strokeStyle='#111';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(bx-bw*0.55,y-bh*0.1);ctx.quadraticCurveTo(bx,y+bh*0.55,bx+bw*0.55,y-bh*0.1);
+  ctx.lineTo(bx+bw*0.4,y-bh*0.4);ctx.lineTo(bx-bw*0.4,y-bh*0.4);ctx.closePath();ctx.fill();ctx.stroke();
+  // white ermine trim with black spots
+  ctx.fillStyle='#f8f8f0';ctx.fillRect(bx-bw*0.42,y-bh*0.42,bw*0.84,7);ctx.strokeRect(bx-bw*0.42,y-bh*0.42,bw*0.84,7);
+  ctx.fillStyle='#111';for(let i=0;i<5;i++)ctx.fillRect(bx-bw*0.36+i*bw*0.18,y-bh*0.4,3,3);
+  // Bong chamber
+  const grd=ctx.createLinearGradient(bx-bulbR,0,bx+bulbR,0);
+  grd.addColorStop(0,'#2b6b3a');grd.addColorStop(0.5,'#8ff0a8');grd.addColorStop(1,'#1e5028');
+  ctx.fillStyle=grd;ctx.strokeStyle='#0a1a0a';ctx.lineWidth=3;
+  const neckW=bw*0.24, mouthW=bw*0.36, neckTop=y-bh*0.35;
+  ctx.beginPath();
+  ctx.moveTo(bx-mouthW/2,neckTop-6);ctx.lineTo(bx+mouthW/2,neckTop-6);
+  ctx.lineTo(bx+neckW/2,neckTop+2);ctx.lineTo(bx+neckW/2,cy-bulbR*0.55);
+  ctx.quadraticCurveTo(bx+bulbR*1.1,cy-bulbR*0.15,bx+bulbR,cy+bulbR*0.1);
+  ctx.arc(bx,cy,bulbR,0,Math.PI,false);
+  ctx.quadraticCurveTo(bx-bulbR*1.1,cy-bulbR*0.15,bx-neckW/2,cy-bulbR*0.55);
+  ctx.lineTo(bx-neckW/2,neckTop+2);ctx.closePath();ctx.fill();ctx.stroke();
+  // Water level & bubbles
+  ctx.save();ctx.beginPath();ctx.arc(bx,cy,bulbR-3,0,Math.PI*2);ctx.clip();
+  ctx.fillStyle='rgba(50,170,80,0.55)';ctx.fillRect(bx-bulbR,cy-2+Math.sin(t*2),bulbR*2,bulbR+6);
+  for(let i=0;i<8;i++){const ph=(t*0.6+i*0.12)%1;ctx.fillStyle='rgba(255,255,255,'+(0.8-ph*0.6)+')';ctx.beginPath();ctx.arc(bx+Math.sin(i*1.7+t)*bulbR*0.5,cy+bulbR*0.6-ph*bulbR*1.1,1.6,0,Math.PI*2);ctx.fill();}
+  ctx.restore();
+  // Glass highlight
+  ctx.fillStyle='rgba(255,255,255,0.35)';ctx.beginPath();ctx.ellipse(bx-bulbR*0.5,cy-bulbR*0.2,bulbR*0.13,bulbR*0.5,-0.3,0,Math.PI*2);ctx.fill();
+  // Gold rings
+  ctx.fillStyle='#ffd700';ctx.strokeStyle='#8a6d00';ctx.lineWidth=1.5;
+  ctx.fillRect(bx-neckW/2-3,cy-bulbR*0.55,neckW+6,5);ctx.strokeRect(bx-neckW/2-3,cy-bulbR*0.55,neckW+6,5);
+  ctx.fillRect(bx-mouthW/2-2,neckTop-8,mouthW+4,4);ctx.strokeRect(bx-mouthW/2-2,neckTop-8,mouthW+4,4);
+  // Downstem + bowl w/ ember
+  ctx.save();ctx.translate(bx+bulbR*0.75,cy+bulbR*0.15);ctx.rotate(0.5);
+  ctx.fillStyle='rgba(180,230,190,0.7)';ctx.strokeStyle='#0a1a0a';ctx.lineWidth=2;
+  ctx.fillRect(0,-3,20,6);ctx.strokeRect(0,-3,20,6);
+  ctx.beginPath();ctx.arc(24,0,7,0,Math.PI*2);ctx.fillStyle='#3a2a12';ctx.fill();ctx.stroke();
+  ctx.fillStyle='#4caf50';ctx.beginPath();ctx.arc(23,-2,3,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#ff6a00';ctx.beginPath();ctx.arc(24,-3,1.8+Math.sin(t*6)*0.6,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+  // Gold crown atop
+  const cxy=neckTop-14;
+  ctx.fillStyle='#ffd700';ctx.strokeStyle='#8a6d00';ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.moveTo(bx-mouthW/2-4,cxy+8);
+  ctx.lineTo(bx-mouthW/2-8,cxy-14);ctx.lineTo(bx-mouthW/4,cxy-2);
+  ctx.lineTo(bx-2,cxy-18);ctx.lineTo(bx+2,cxy-18);
+  ctx.lineTo(bx+mouthW/4,cxy-2);ctx.lineTo(bx+mouthW/2+8,cxy-14);
+  ctx.lineTo(bx+mouthW/2+4,cxy+8);ctx.closePath();ctx.fill();ctx.stroke();
+  ctx.fillStyle='#e91e63';[[-mouthW/4,cxy-14],[0,cxy-6],[mouthW/4,cxy-14]].forEach(p=>{ctx.beginPath();ctx.arc(p[0]+bx*0,p[0]+0,0,0,0);});
+  // gem inlays
+  ctx.fillStyle='#e91e63';ctx.beginPath();ctx.arc(bx-mouthW/2-6,cxy-8,2,0,Math.PI*2);ctx.arc(bx+mouthW/2+6,cxy-8,2,0,Math.PI*2);ctx.arc(bx,cxy-10,2.4,0,Math.PI*2);ctx.fill();
+  // Face on bulb
+  const fy=cy-bulbR*0.15;
+  ctx.strokeStyle='#111';ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(bx-bulbR*0.65,fy-bulbR*0.35);ctx.lineTo(bx-bulbR*0.15,fy-bulbR*0.15);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(bx+bulbR*0.65,fy-bulbR*0.35);ctx.lineTo(bx+bulbR*0.15,fy-bulbR*0.15);ctx.stroke();
+  ctx.fillStyle='#fff';const blink=(performance.now()%2600<120)?0.15:1;
+  ctx.beginPath();ctx.ellipse(bx-bulbR*0.38,fy,bulbR*0.2,bulbR*0.2*blink,0,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.ellipse(bx+bulbR*0.38,fy,bulbR*0.2,bulbR*0.2*blink,0,0,Math.PI*2);ctx.fill();
+  const eo=Math.sin(t*2)*3;ctx.fillStyle='#c00';
+  ctx.beginPath();ctx.arc(bx-bulbR*0.38+eo,fy,bulbR*0.1,0,Math.PI*2);ctx.arc(bx+bulbR*0.38+eo,fy,bulbR*0.1,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#000';ctx.beginPath();ctx.arc(bx-bulbR*0.38+eo,fy,bulbR*0.05,0,Math.PI*2);ctx.arc(bx+bulbR*0.38+eo,fy,bulbR*0.05,0,Math.PI*2);ctx.fill();
+  // Fanged mouth
+  const mY=fy+bulbR*0.35;ctx.fillStyle='#111';
+  ctx.beginPath();ctx.moveTo(bx-bulbR*0.42,mY);ctx.quadraticCurveTo(bx,mY+10+Math.sin(t*4)*2,bx+bulbR*0.42,mY);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#fff';
+  ctx.beginPath();ctx.moveTo(bx-bulbR*0.22,mY);ctx.lineTo(bx-bulbR*0.13,mY+6);ctx.lineTo(bx-bulbR*0.04,mY);ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.moveTo(bx+bulbR*0.04,mY);ctx.lineTo(bx+bulbR*0.13,mY+6);ctx.lineTo(bx+bulbR*0.22,mY);ctx.closePath();ctx.fill();
+  // Smoke
+  for(let i=0;i<5;i++){const sy=neckTop-14-i*10-(t*20)%10;ctx.fillStyle='rgba(200,220,210,'+(0.4-i*0.06)+')';ctx.beginPath();ctx.arc(bx+Math.sin(t*2+i)*5,sy-24,5+i*1.6,0,Math.PI*2);ctx.fill();}
+}
+function drawBossMighty(bx,y,bw,bh,t){
+  // Buff cannabis leaf man — a walking marijuana leaf with muscular arms
+  const r=Math.min(bw*0.42,bh*0.42);
+  // Legs
+  ctx.fillStyle='#1b5e20';ctx.strokeStyle='#0a2010';ctx.lineWidth=2.5;
+  ctx.fillRect(bx-14,y+bh*0.3,10,bh*0.2);ctx.strokeRect(bx-14,y+bh*0.3,10,bh*0.2);
+  ctx.fillRect(bx+4,y+bh*0.3,10,bh*0.2);ctx.strokeRect(bx+4,y+bh*0.3,10,bh*0.2);
+  ctx.fillStyle='#0a1005';ctx.fillRect(bx-16,y+bh*0.5-2,14,6);ctx.fillRect(bx+2,y+bh*0.5-2,14,6);
+  // Buff arms (green muscle) — swinging
+  const asw=Math.sin(t*3)*6;
+  ctx.fillStyle='#4caf50';ctx.strokeStyle='#0a2010';ctx.lineWidth=2.5;
+  ctx.beginPath();ctx.ellipse(bx-r-8+asw*0.3,y,10,16,-0.3+asw*0.02,0,Math.PI*2);ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.ellipse(bx+r+8-asw*0.3,y,10,16,0.3-asw*0.02,0,Math.PI*2);ctx.fill();ctx.stroke();
+  // Fists
+  ctx.fillStyle='#66bb6a';ctx.beginPath();ctx.arc(bx-r-10+asw*0.5,y+18,7,0,Math.PI*2);ctx.arc(bx+r+10-asw*0.5,y+18,7,0,Math.PI*2);ctx.fill();ctx.stroke();
+  // Cannabis leaf body (7 leaflets)
+  ctx.fillStyle='#2e7d32';ctx.strokeStyle='#0a2010';ctx.lineWidth=2.5;
+  const leaflets=[[0,-1.0,1.0],[-0.55,-0.5,0.85],[0.55,-0.5,0.85],[-0.85,0.1,0.7],[0.85,0.1,0.7],[-0.55,0.65,0.5],[0.55,0.65,0.5]];
+  for(const [ax,ay,sc] of leaflets){
+    const cx=bx+ax*r,cy=y+ay*r;
+    ctx.save();ctx.translate(cx,cy);ctx.rotate(Math.atan2(ay,ax));
+    ctx.beginPath();
+    ctx.moveTo(0,0);
+    for(let i=0;i<=10;i++){const p=i/10;const w=Math.sin(p*Math.PI)*8*sc;ctx.lineTo(p*r*sc,-w);}
+    for(let i=10;i>=0;i--){const p=i/10;const w=Math.sin(p*Math.PI)*8*sc;ctx.lineTo(p*r*sc,w);}
+    ctx.closePath();ctx.fill();ctx.stroke();
+    // vein
+    ctx.strokeStyle='#1b3a1a';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(r*sc,0);ctx.stroke();
+    ctx.strokeStyle='#0a2010';ctx.lineWidth=2.5;
+    ctx.restore();
+  }
+  // face in center leaflet
+  const fy=y-r*0.15;
+  // angry brows
+  ctx.strokeStyle='#111';ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(bx-14,fy-8);ctx.lineTo(bx-4,fy-4);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(bx+14,fy-8);ctx.lineTo(bx+4,fy-4);ctx.stroke();
+  // eyes
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(bx-7,fy,4,0,Math.PI*2);ctx.arc(bx+7,fy,4,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#111';ctx.stroke();
+  const eo=Math.sin(t*2)*1.5;ctx.fillStyle='#c00';ctx.beginPath();ctx.arc(bx-7+eo,fy,2,0,Math.PI*2);ctx.arc(bx+7+eo,fy,2,0,Math.PI*2);ctx.fill();
+  // fanged snarl
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(bx,fy+10,7,0,Math.PI);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.moveTo(bx-5,fy+10);ctx.lineTo(bx-2,fy+15);ctx.lineTo(bx,fy+10);ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.moveTo(bx,fy+10);ctx.lineTo(bx+2,fy+15);ctx.lineTo(bx+5,fy+10);ctx.closePath();ctx.fill();
+  // joint in mouth
+  ctx.fillStyle='#f5ecd0';ctx.strokeStyle='#111';ctx.lineWidth=1.5;
+  ctx.fillRect(bx+5,fy+8,14,3);ctx.strokeRect(bx+5,fy+8,14,3);
+  ctx.fillStyle='#ff6a00';ctx.fillRect(bx+18,fy+8,3,3);
+}
+function drawBossDrGreen(bx,y,bw,bh,t){
+  // Mad scientist: green wild hair, lab coat, giant syringe with THC serum
+  // Legs
+  ctx.fillStyle='#111';ctx.strokeStyle='#000';ctx.lineWidth=2;
+  ctx.fillRect(bx-12,y+bh*0.25,10,bh*0.2);ctx.strokeRect(bx-12,y+bh*0.25,10,bh*0.2);
+  ctx.fillRect(bx+2,y+bh*0.25,10,bh*0.2);ctx.strokeRect(bx+2,y+bh*0.25,10,bh*0.2);
+  ctx.fillStyle='#000';ctx.fillRect(bx-13,y+bh*0.45,12,5);ctx.fillRect(bx+1,y+bh*0.45,12,5);
+  // Lab coat body
+  const cg=ctx.createLinearGradient(bx-bw/2,y,bx+bw/2,y);
+  cg.addColorStop(0,'#e0e0e0');cg.addColorStop(0.5,'#fff');cg.addColorStop(1,'#b0b0b0');
+  ctx.fillStyle=cg;ctx.strokeStyle='#111';ctx.lineWidth=2.5;
+  ctx.beginPath();
+  ctx.moveTo(bx-bw*0.32,y-bh*0.05);ctx.lineTo(bx+bw*0.32,y-bh*0.05);
+  ctx.lineTo(bx+bw*0.42,y+bh*0.3);ctx.lineTo(bx-bw*0.42,y+bh*0.3);ctx.closePath();ctx.fill();ctx.stroke();
+  // coat lapels V
+  ctx.beginPath();ctx.moveTo(bx-bw*0.28,y-bh*0.05);ctx.lineTo(bx,y+bh*0.15);ctx.lineTo(bx+bw*0.28,y-bh*0.05);ctx.stroke();
+  // green tie
+  ctx.fillStyle='#2e7d32';ctx.beginPath();ctx.moveTo(bx-4,y-bh*0.05);ctx.lineTo(bx+4,y-bh*0.05);ctx.lineTo(bx+6,y+bh*0.18);ctx.lineTo(bx,y+bh*0.24);ctx.lineTo(bx-6,y+bh*0.18);ctx.closePath();ctx.fill();ctx.stroke();
+  // pocket w/ cannabis leaf logo
+  ctx.strokeStyle='#888';ctx.lineWidth=1;ctx.strokeRect(bx+bw*0.12,y+bh*0.05,bw*0.15,bh*0.1);
+  ctx.fillStyle='#4caf50';ctx.beginPath();ctx.arc(bx+bw*0.195,y+bh*0.1,4,0,Math.PI*2);ctx.fill();
+  // Arms — left holds syringe forward, right at side
+  ctx.fillStyle='#f5f5f5';ctx.strokeStyle='#111';ctx.lineWidth=2;
+  // right arm at side
+  ctx.beginPath();ctx.ellipse(bx+bw*0.4,y+bh*0.05,6,14,0.2,0,Math.PI*2);ctx.fill();ctx.stroke();
+  ctx.fillStyle='#e0b48a';ctx.beginPath();ctx.arc(bx+bw*0.44,y+bh*0.22,5,0,Math.PI*2);ctx.fill();ctx.stroke();
+  // left arm forward holding syringe
+  ctx.fillStyle='#f5f5f5';
+  ctx.beginPath();ctx.ellipse(bx-bw*0.35,y-bh*0.05,6,14,-0.3,0,Math.PI*2);ctx.fill();ctx.stroke();
+  ctx.fillStyle='#e0b48a';ctx.beginPath();ctx.arc(bx-bw*0.45,y-bh*0.2,5,0,Math.PI*2);ctx.fill();ctx.stroke();
+  // Syringe (big!)
+  const sxx=bx-bw*0.55,syy=y-bh*0.3;
+  ctx.save();ctx.translate(sxx,syy);ctx.rotate(-0.5+Math.sin(t*3)*0.1);
+  // barrel
+  ctx.fillStyle='rgba(200,255,220,0.7)';ctx.strokeStyle='#111';ctx.lineWidth=2;
+  ctx.fillRect(0,-6,32,12);ctx.strokeRect(0,-6,32,12);
+  // serum (glowing green)
+  const sg=ctx.createLinearGradient(2,0,30,0);sg.addColorStop(0,'#a8ff8a');sg.addColorStop(1,'#2e7d32');
+  ctx.fillStyle=sg;ctx.fillRect(2,-4,26,8);
+  // bubbles
+  ctx.fillStyle='rgba(255,255,255,0.7)';
+  for(let i=0;i<3;i++){ctx.beginPath();ctx.arc(5+((t*30+i*10)%22),Math.sin(t*4+i)*2,1.3,0,Math.PI*2);ctx.fill();}
+  // plunger
+  ctx.fillStyle='#c00';ctx.fillRect(-8,-8,8,16);ctx.strokeRect(-8,-8,8,16);
+  ctx.fillRect(-14,-4,6,8);ctx.strokeRect(-14,-4,6,8);
+  // needle
+  ctx.fillStyle='#888';ctx.fillRect(32,-1,14,2);ctx.strokeRect(32,-1,14,2);
+  // drip
+  ctx.fillStyle='#4caf50';ctx.beginPath();ctx.arc(48,1+Math.sin(t*8)*2,1.5,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+  // Head
+  const hy=y-bh*0.25;
+  ctx.fillStyle='#e0b48a';ctx.strokeStyle='#111';ctx.lineWidth=2;
+  ctx.beginPath();ctx.arc(bx,hy,15,0,Math.PI*2);ctx.fill();ctx.stroke();
+  // wild green hair
+  ctx.fillStyle='#4caf50';ctx.strokeStyle='#1b3a1a';ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.arc(bx-13,hy-8,8,0,Math.PI*2);ctx.arc(bx-6,hy-16,9,0,Math.PI*2);
+  ctx.arc(bx+3,hy-18,10,0,Math.PI*2);ctx.arc(bx+13,hy-10,8,0,Math.PI*2);
+  ctx.arc(bx-16,hy-2,6,0,Math.PI*2);ctx.arc(bx+16,hy-4,6,0,Math.PI*2);
+  ctx.fill();ctx.stroke();
+  // Goggles
+  ctx.fillStyle='#111';ctx.fillRect(bx-13,hy-4,26,2);
+  ctx.fillStyle='#88ffaa';ctx.strokeStyle='#111';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.arc(bx-6,hy-1,5,0,Math.PI*2);ctx.arc(bx+6,hy-1,5,0,Math.PI*2);ctx.fill();ctx.stroke();
+  // glowing reflection
+  ctx.fillStyle='rgba(255,255,255,0.7)';ctx.beginPath();ctx.arc(bx-7,hy-2,1.5,0,Math.PI*2);ctx.arc(bx+5,hy-2,1.5,0,Math.PI*2);ctx.fill();
+  // manic grin
+  ctx.fillStyle='#111';ctx.beginPath();ctx.arc(bx,hy+8,6,0,Math.PI);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#fff';ctx.fillRect(bx-5,hy+8,10,2);
+  // goatee
+  ctx.fillStyle='#4caf50';ctx.beginPath();ctx.moveTo(bx-3,hy+10);ctx.lineTo(bx+3,hy+10);ctx.lineTo(bx,hy+18);ctx.closePath();ctx.fill();ctx.stroke();
+}
+function drawBossPlug(bx,y,bw,bh,t){
+  // The Plug: shady dealer in oversized hoodie, gold chain, holding a huge weed bag
+  // Legs
+  ctx.fillStyle='#111';ctx.strokeStyle='#000';ctx.lineWidth=2;
+  ctx.fillRect(bx-11,y+bh*0.25,9,bh*0.2);ctx.strokeRect(bx-11,y+bh*0.25,9,bh*0.2);
+  ctx.fillRect(bx+2,y+bh*0.25,9,bh*0.2);ctx.strokeRect(bx+2,y+bh*0.25,9,bh*0.2);
+  // stripes
+  ctx.fillStyle='#8a2be2';ctx.fillRect(bx-8,y+bh*0.25,1.5,bh*0.2);ctx.fillRect(bx+4.5,y+bh*0.25,1.5,bh*0.2);
+  // sneakers
+  ctx.fillStyle='#0a0a0a';ctx.fillRect(bx-13,y+bh*0.44,12,6);ctx.fillRect(bx+1,y+bh*0.44,12,6);
+  ctx.fillStyle='#fff';ctx.fillRect(bx-13,y+bh*0.48,12,2);ctx.fillRect(bx+1,y+bh*0.48,12,2);
+  // Hoodie body (oversized)
+  const hg=ctx.createLinearGradient(bx-bw/2,y,bx+bw/2,y);
+  hg.addColorStop(0,'#222');hg.addColorStop(0.5,'#0a0a0a');hg.addColorStop(1,'#000');
+  ctx.fillStyle=hg;ctx.strokeStyle='#111';ctx.lineWidth=2.5;
+  ctx.beginPath();
+  ctx.moveTo(bx-bw*0.4,y-bh*0.05);ctx.lineTo(bx+bw*0.4,y-bh*0.05);
+  ctx.lineTo(bx+bw*0.44,y+bh*0.28);ctx.lineTo(bx-bw*0.44,y+bh*0.28);ctx.closePath();ctx.fill();ctx.stroke();
+  // kangaroo pocket
+  ctx.strokeStyle='rgba(80,80,80,0.7)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(bx-14,y+bh*0.1);ctx.quadraticCurveTo(bx,y+bh*0.18,bx+14,y+bh*0.1);ctx.stroke();
+  // Gold chain
+  ctx.fillStyle='#ffd700';ctx.strokeStyle='#8a6d00';ctx.lineWidth=0.8;
+  for(let i=0;i<14;i++){const a=Math.PI*0.15+i*Math.PI*0.7/13;ctx.beginPath();ctx.arc(bx+Math.cos(a)*12,y-bh*0.02+Math.sin(a)*12,1.6,0,Math.PI*2);ctx.fill();ctx.stroke();}
+  // Cash-stack pendant
+  ctx.fillStyle='#4caf50';ctx.strokeStyle='#1b3a1a';ctx.lineWidth=1;
+  ctx.fillRect(bx-6,y+bh*0.1,12,7);ctx.strokeRect(bx-6,y+bh*0.1,12,7);
+  ctx.fillStyle='#ffd700';ctx.font='bold 6px sans-serif';ctx.textAlign='center';ctx.fillText('$',bx,y+bh*0.15);ctx.textAlign='left';
+  // Left arm holding huge weed baggy forward
+  ctx.fillStyle='#0a0a0a';ctx.strokeStyle='#111';ctx.lineWidth=2;
+  ctx.beginPath();ctx.ellipse(bx-bw*0.42,y+bh*0.08,7,14,-0.4,0,Math.PI*2);ctx.fill();ctx.stroke();
+  // Baggy
+  const bgx=bx-bw*0.55,bgy=y+bh*0.22+Math.sin(t*3)*3;
+  ctx.fillStyle='#d0d8dd';ctx.strokeStyle='#111';ctx.lineWidth=1.5;
+  ctx.fillRect(bgx-9,bgy-14,18,4);ctx.strokeRect(bgx-9,bgy-14,18,4);
+  ctx.fillStyle='rgba(230,240,235,0.55)';
+  ctx.beginPath();ctx.moveTo(bgx-9,bgy-10);ctx.lineTo(bgx+9,bgy-10);ctx.lineTo(bgx+7,bgy+10);ctx.lineTo(bgx-7,bgy+10);ctx.closePath();ctx.fill();ctx.stroke();
+  // buds
+  for(const b of [[-3,-3],[3,-1],[-1,3],[4,4],[-4,4]]){ctx.fillStyle='#2f7a34';ctx.beginPath();ctx.arc(bgx+b[0],bgy+b[1],2,0,Math.PI*2);ctx.fill();ctx.fillStyle='#4fae4f';ctx.beginPath();ctx.arc(bgx+b[0]-0.5,bgy+b[1]-0.5,1,0,Math.PI*2);ctx.fill();}
+  // hand
+  ctx.fillStyle='#8a5a2a';ctx.beginPath();ctx.arc(bgx,bgy-10,4,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#111';ctx.stroke();
+  // right arm at side
+  ctx.fillStyle='#0a0a0a';ctx.beginPath();ctx.ellipse(bx+bw*0.42,y+bh*0.08,7,14,0.3,0,Math.PI*2);ctx.fill();ctx.stroke();
+  ctx.fillStyle='#8a5a2a';ctx.beginPath();ctx.arc(bx+bw*0.48,y+bh*0.22,5,0,Math.PI*2);ctx.fill();ctx.stroke();
+  // Head (dark skin) w/ hood over
+  const hy=y-bh*0.2;
+  ctx.fillStyle='#8a5a2a';ctx.strokeStyle='#111';ctx.lineWidth=2;
+  ctx.beginPath();ctx.arc(bx,hy,14,0,Math.PI*2);ctx.fill();ctx.stroke();
+  // Hood (arc above head)
+  ctx.fillStyle='#0a0a0a';ctx.strokeStyle='#111';ctx.lineWidth=2.5;
+  ctx.beginPath();
+  ctx.moveTo(bx-18,hy+2);
+  ctx.quadraticCurveTo(bx-22,hy-24,bx,hy-22);
+  ctx.quadraticCurveTo(bx+22,hy-24,bx+18,hy+2);
+  ctx.lineTo(bx+14,hy+2);
+  ctx.quadraticCurveTo(bx+16,hy-16,bx,hy-16);
+  ctx.quadraticCurveTo(bx-16,hy-16,bx-14,hy+2);
+  ctx.closePath();ctx.fill();ctx.stroke();
+  // shadowed upper face
+  ctx.fillStyle='rgba(0,0,0,0.55)';ctx.beginPath();ctx.arc(bx,hy-3,13,Math.PI,0);ctx.fill();
+  // Glowing eyes under hood
+  ctx.fillStyle='#ff2a2a';ctx.beginPath();ctx.arc(bx-5,hy-2,2.4,0,Math.PI*2);ctx.arc(bx+5,hy-2,2.4,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(bx-5,hy-2.5,0.7,0,Math.PI*2);ctx.arc(bx+5,hy-2.5,0.7,0,Math.PI*2);ctx.fill();
+  // Smirk
+  ctx.strokeStyle='#111';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(bx-4,hy+8);ctx.quadraticCurveTo(bx,hy+11,bx+4,hy+7);ctx.stroke();
+  // joint hanging from mouth
+  ctx.fillStyle='#f5ecd0';ctx.strokeStyle='#111';ctx.fillRect(bx+3,hy+8,10,2);ctx.strokeRect(bx+3,hy+8,10,2);
+  ctx.fillStyle='#ff6a00';ctx.fillRect(bx+12,hy+8,2,2);
+}
+function drawBossGiantBlunt(bx,y,bw,bh,t){
+  // A colossal blunt with face + arms — brown wrap, twisted tip, boxing gloves
+  const jw=bw*0.55,jh=bh*0.75;
+  // Legs
+  ctx.fillStyle='#3a2010';ctx.strokeStyle='#111';ctx.lineWidth=2;
+  ctx.fillRect(bx-10,y+jh/2-2,7,10);ctx.strokeRect(bx-10,y+jh/2-2,7,10);
+  ctx.fillRect(bx+3,y+jh/2-2,7,10);ctx.strokeRect(bx+3,y+jh/2-2,7,10);
+  ctx.fillStyle='#111';ctx.fillRect(bx-11,y+jh/2+6,9,4);ctx.fillRect(bx+2,y+jh/2+6,9,4);
+  // Body — brown blunt wrap
+  const jg=ctx.createLinearGradient(bx-jw/2,y,bx+jw/2,y);
+  jg.addColorStop(0,'#3a2010');jg.addColorStop(0.4,'#8a5a2a');jg.addColorStop(0.7,'#6a3a10');jg.addColorStop(1,'#2a1005');
+  ctx.fillStyle=jg;ctx.strokeStyle='#2a1005';ctx.lineWidth=2.5;
+  roundRect2(ctx,bx-jw/2,y-jh/2,jw,jh,8,true,true);
+  // wrap seams
+  ctx.strokeStyle='rgba(40,20,5,0.6)';ctx.lineWidth=1;
+  for(let i=-jh/2+8;i<jh/2-8;i+=10){ctx.beginPath();ctx.moveTo(bx-jw/2+2,y+i);ctx.lineTo(bx+jw/2-2,y+i);ctx.stroke();}
+  // Twisted tip
+  ctx.fillStyle='#3a2010';ctx.strokeStyle='#111';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(bx-6,y-jh/2);ctx.lineTo(bx-3,y-jh/2-14);ctx.lineTo(bx+3,y-jh/2-14);ctx.lineTo(bx+6,y-jh/2);ctx.closePath();ctx.fill();ctx.stroke();
+  // Burning ember
+  ctx.fillStyle='#2a0a05';ctx.beginPath();ctx.arc(bx,y-jh/2-15,3.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#ff6a00';ctx.beginPath();ctx.arc(bx,y-jh/2-15,2.5+Math.sin(t*6)*0.8,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#ffd54a';ctx.beginPath();ctx.arc(bx,y-jh/2-15,1.2+Math.sin(t*8)*0.4,0,Math.PI*2);ctx.fill();
+  // Smoke plume
+  for(let i=0;i<6;i++){ctx.fillStyle='rgba(220,220,220,'+(0.5-i*0.07)+')';ctx.beginPath();ctx.arc(bx+Math.sin(t*2+i)*5,y-jh/2-22-i*10-(t*20)%10,4+i*1.4,0,Math.PI*2);ctx.fill();}
+  // Boxing gloves
+  const asw=Math.sin(t*4)*6;
+  ctx.fillStyle='#c00';ctx.strokeStyle='#111';ctx.lineWidth=2;
+  ctx.beginPath();ctx.arc(bx-jw/2-10+asw,y+8,10,0,Math.PI*2);ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.arc(bx+jw/2+10-asw,y+8,10,0,Math.PI*2);ctx.fill();ctx.stroke();
+  ctx.fillStyle='#8a0000';ctx.beginPath();ctx.arc(bx-jw/2-10+asw,y+8,10,-0.3,Math.PI+0.3,false);ctx.fill();
+  // laces
+  ctx.strokeStyle='#fff';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(bx-jw/2-14+asw,y+8);ctx.lineTo(bx-jw/2-6+asw,y+8);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(bx+jw/2+6-asw,y+8);ctx.lineTo(bx+jw/2+14-asw,y+8);ctx.stroke();
+  // Angry face
+  ctx.strokeStyle='#111';ctx.lineWidth=2.5;
+  ctx.beginPath();ctx.moveTo(bx-10,y-8);ctx.lineTo(bx-2,y-4);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(bx+10,y-8);ctx.lineTo(bx+2,y-4);ctx.stroke();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(bx-6,y,3.5,0,Math.PI*2);ctx.arc(bx+6,y,3.5,0,Math.PI*2);ctx.fill();ctx.stroke();
+  const eo=Math.sin(t*2)*1.5;
+  ctx.fillStyle='#c00';ctx.beginPath();ctx.arc(bx-6+eo,y,1.8,0,Math.PI*2);ctx.arc(bx+6+eo,y,1.8,0,Math.PI*2);ctx.fill();
+  // Snarl w/ fangs
+  ctx.fillStyle='#111';ctx.beginPath();ctx.moveTo(bx-8,y+10);ctx.quadraticCurveTo(bx,y+18,bx+8,y+10);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.moveTo(bx-4,y+10);ctx.lineTo(bx-2,y+15);ctx.lineTo(bx,y+10);ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.moveTo(bx,y+10);ctx.lineTo(bx+2,y+15);ctx.lineTo(bx+4,y+10);ctx.closePath();ctx.fill();
+}
+function drawBossMutantBush(bx,y,bw,bh,t){
+  // Sprawling mutant cannabis bush — dome of leaves, tentacle vines, one big eye
+  const dw=bw*0.5,dh=bh*0.5;
+  // Pot base
+  ctx.fillStyle='#8a5a2a';ctx.strokeStyle='#3a2010';ctx.lineWidth=2.5;
+  ctx.beginPath();ctx.moveTo(bx-dw*0.7,y+dh*0.6);ctx.lineTo(bx+dw*0.7,y+dh*0.6);ctx.lineTo(bx+dw*0.85,y+dh);ctx.lineTo(bx-dw*0.85,y+dh);ctx.closePath();ctx.fill();ctx.stroke();
+  ctx.strokeStyle='#3a2010';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(bx-dw*0.7,y+dh*0.6);ctx.lineTo(bx+dw*0.7,y+dh*0.6);ctx.stroke();
+  // Vine tentacles (2)
+  ctx.strokeStyle='#1b5e20';ctx.lineWidth=6;
+  const tsw=Math.sin(t*2);
+  ctx.beginPath();
+  ctx.moveTo(bx-dw*0.6,y+dh*0.3);
+  ctx.quadraticCurveTo(bx-dw-10+tsw*8,y,bx-dw-16+tsw*12,y+dh*0.5);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(bx+dw*0.6,y+dh*0.3);
+  ctx.quadraticCurveTo(bx+dw+10-tsw*8,y,bx+dw+16-tsw*12,y+dh*0.5);
+  ctx.stroke();
+  // vine tip leaves
+  ctx.fillStyle='#2e7d32';ctx.strokeStyle='#1b3a1a';ctx.lineWidth=1.5;
+  for(const [tx,ty] of [[bx-dw-16+tsw*12,y+dh*0.5],[bx+dw+16-tsw*12,y+dh*0.5]]){
+    for(let i=0;i<3;i++){const a=(i-1)*0.7;ctx.beginPath();ctx.ellipse(tx+Math.cos(a)*7,ty+Math.sin(a)*7,5,2.5,a,0,Math.PI*2);ctx.fill();ctx.stroke();}
+  }
+  // Bush dome — clusters of cannabis leaves
+  const clusters=[[-dw*0.7,-dh*0.1,20],[-dw*0.35,-dh*0.55,24],[0,-dh*0.7,28],[dw*0.35,-dh*0.55,24],[dw*0.7,-dh*0.1,20],[-dw*0.15,-dh*0.15,22],[dw*0.2,-dh*0.2,22]];
+  for(const [cx,cy,sz] of clusters){
+    ctx.fillStyle='#2e7d32';ctx.strokeStyle='#1b3a1a';ctx.lineWidth=2;
+    // draw a cluster of pointed leaflets
+    for(let i=0;i<7;i++){
+      const a=-Math.PI/2+i*Math.PI*2/7;
+      const lx=bx+cx+Math.cos(a)*sz*0.3, ly=y+cy+Math.sin(a)*sz*0.3;
+      ctx.save();ctx.translate(lx,ly);ctx.rotate(a);
+      ctx.beginPath();ctx.ellipse(sz*0.4,0,sz*0.5,sz*0.15,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+      ctx.restore();
+    }
+    // center bud
+    ctx.fillStyle='#4fae4f';ctx.beginPath();ctx.arc(bx+cx,y+cy,sz*0.25,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#1b3a1a';ctx.stroke();
+  }
+  // trichome sparkles
+  ctx.fillStyle='rgba(255,255,255,0.6)';
+  for(let i=0;i<10;i++){const ang=i*0.9+t*0.5;ctx.beginPath();ctx.arc(bx+Math.cos(ang)*dw*0.4,y-dh*0.3+Math.sin(ang*1.3)*dh*0.3,1.2,0,Math.PI*2);ctx.fill();}
+  // ONE big cyclops eye
+  const ex=bx,ey=y-dh*0.15;
+  ctx.fillStyle='#fff';ctx.strokeStyle='#111';ctx.lineWidth=2;
+  ctx.beginPath();ctx.arc(ex,ey,11,0,Math.PI*2);ctx.fill();ctx.stroke();
+  // green iris
+  const eo=Math.sin(t*1.5)*4;
+  ctx.fillStyle='#4caf50';ctx.beginPath();ctx.arc(ex+eo,ey,7,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#000';ctx.beginPath();ctx.arc(ex+eo,ey,3,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(ex+eo-1,ey-1,1.2,0,Math.PI*2);ctx.fill();
+  // fanged mouth below eye
+  ctx.fillStyle='#111';ctx.beginPath();ctx.moveTo(ex-8,ey+15);ctx.quadraticCurveTo(ex,ey+24+Math.sin(t*4)*2,ex+8,ey+15);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#fff';
+  ctx.beginPath();ctx.moveTo(ex-4,ey+15);ctx.lineTo(ex-2,ey+21);ctx.lineTo(ex,ey+15);ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.moveTo(ex,ey+15);ctx.lineTo(ex+2,ey+21);ctx.lineTo(ex+4,ey+15);ctx.closePath();ctx.fill();
+}
 function drawBossJointJerk(bx,y,bw,bh,t){
   // Living joint with arms/legs — tall white cylinder with burnt tip
   const jw=bw*0.55,jh=bh*0.85;
