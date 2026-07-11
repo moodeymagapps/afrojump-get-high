@@ -240,8 +240,8 @@ function showOverlay(which){
 }
 function goMenu(){gameState='menu';menuHigh.textContent='Best: '+highScore+'m';updateBagsUI();showOverlay('menu');}
 function startGame(){reset();gameState='playing';showOverlay('playing');tryPlayMusic();}
-function pauseGame(){if(gameState!=='playing')return;gameState='paused';showOverlay('paused');}
-function resumeGame(){if(gameState!=='paused')return;gameState='playing';showOverlay('playing');last=performance.now();tryPlayMusic();}
+function pauseGame(){if(gameState!=='playing')return;gameState='paused';showOverlay('paused');stopMusic();stopBossMusic();}
+function resumeGame(){if(gameState!=='paused')return;gameState='playing';showOverlay('playing');last=performance.now();if(boss)startBossMusic();else tryPlayMusic();}
 function openShop(from){shopReturn=from;gameState='shop';renderShop();updateBagsUI();showOverlay('shop');}
 function closeShop(){
   if(shopReturn==='paused'){gameState='paused';showOverlay('paused');}
@@ -608,8 +608,13 @@ function update(dt){
   enemies=enemies.filter(e=>e.alive&&(e.boss||e.plat&&e.plat.y<cameraY+H+50));
   projectiles=projectiles.filter(pr=>pr.life>0&&pr.y>cameraY-20);
 
-  // fall off
-  if(player.y>cameraY+H+40)die();
+  // fall off — during boss fight this still spends a life instead of instant game over
+  if(player.y>cameraY+H+40){
+    if(boss&&player.bossLives>0){
+      hurtPlayer();
+      player.y=cameraY+H*0.4;player.vy=-16;player.x=W/2;
+    } else die();
+  }
 
   // smoke from joint
   if(Math.random()<0.5){
