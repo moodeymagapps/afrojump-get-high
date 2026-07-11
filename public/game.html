@@ -218,52 +218,87 @@ function drawSkinPreview(g,s){
   g.restore();
 }
 
-// Input
+// Input — key set tracks physical keys; per-touch tracking prevents lost fingers
 const keys={l:false,r:false};
 let shootRequested=false;
+function isLeftKey(k){return k==='ArrowLeft'||k==='a'||k==='A';}
+function isRightKey(k){return k==='ArrowRight'||k==='d'||k==='D';}
 addEventListener('keydown',e=>{
   if(e.key==='Escape'||e.key==='p'||e.key==='P'){
     if(gameState==='playing')pauseGame();
     else if(gameState==='paused')resumeGame();
-    return;
+    e.preventDefault();return;
   }
-  if(e.key==='ArrowLeft'||e.key==='a'||e.key==='A')keys.l=true;
-  if(e.key==='ArrowRight'||e.key==='d'||e.key==='D')keys.r=true;
-  if(e.key===' '){shootRequested=true;e.preventDefault();}
+  if(isLeftKey(e.key)){keys.l=true;e.preventDefault();}
+  else if(isRightKey(e.key)){keys.r=true;e.preventDefault();}
+  else if(e.key===' '||e.key==='ArrowUp'||e.key==='w'||e.key==='W'){
+    if(!e.repeat)shootRequested=true;e.preventDefault();
+  }
 });
 addEventListener('keyup',e=>{
-  if(e.key==='ArrowLeft'||e.key==='a'||e.key==='A')keys.l=false;
-  if(e.key==='ArrowRight'||e.key==='d'||e.key==='D')keys.r=false;
+  if(isLeftKey(e.key))keys.l=false;
+  else if(isRightKey(e.key))keys.r=false;
 });
-// touch
+// Clear held keys when window loses focus (fixes "stuck" direction bug)
+addEventListener('blur',()=>{keys.l=keys.r=false;activeTouches.clear();touchLeft=touchRight=false;});
+addEventListener('visibilitychange',()=>{if(document.hidden){keys.l=keys.r=false;activeTouches.clear();touchLeft=touchRight=false;if(gameState==='playing')pauseGame();}});
+
+// Per-touch tracking: one finger per side, plus tap-to-shoot in upper zone
 let touchLeft=false,touchRight=false;
-function handleTouch(e,down){
-  e.preventDefault();
-  if(gameState!=='playing'){touchLeft=touchRight=false;return;}
-  touchLeft=touchRight=false;
-  if(!down)return;
+const activeTouches=new Map(); // id -> 'l'|'r'|'shoot'
+function touchZone(t){
   const rect=cv.getBoundingClientRect();
-  for(const t of e.touches){
-    const x=(t.clientX-rect.left)/rect.width*W;
-    const y=(t.clientY-rect.top)/rect.height*H;
-    if(y<H*0.25){shootRequested=true;}
-    else if(x<W/2)touchLeft=true;else touchRight=true;
+  const x=(t.clientX-rect.left)/rect.width*W;
+  const y=(t.clientY-rect.top)/rect.height*H;
+  if(y<H*0.22)return 'shoot';
+  return x<W/2?'l':'r';
+}
+function refreshTouchDir(){
+  touchLeft=touchRight=false;
+  for(const z of activeTouches.values()){
+    if(z==='l')touchLeft=true;else if(z==='r')touchRight=true;
   }
 }
-cv.addEventListener('touchstart',e=>handleTouch(e,true),{passive:false});
-cv.addEventListener('touchmove',e=>handleTouch(e,true),{passive:false});
-cv.addEventListener('touchend',e=>handleTouch(e,false),{passive:false});
-cv.addEventListener('touchcancel',e=>handleTouch(e,false),{passive:false});
-// mouse
+cv.addEventListener('touchstart',e=>{
+  e.preventDefault();
+  if(gameState!=='playing')return;
+  for(const t of e.changedTouches){
+    const z=touchZone(t);
+    if(z==='shoot'){shootRequested=true;activeTouches.set(t.identifier,'shoot');}
+    else activeTouches.set(t.identifier,z);
+  }
+  refreshTouchDir();
+},{passive:false});
+cv.addEventListener('touchmove',e=>{
+  e.preventDefault();
+  if(gameState!=='playing')return;
+  for(const t of e.changedTouches){
+    if(!activeTouches.has(t.identifier))continue;
+    const z=touchZone(t);
+    if(z!=='shoot')activeTouches.set(t.identifier,z);
+  }
+  refreshTouchDir();
+},{passive:false});
+function endTouch(e){
+  e.preventDefault();
+  for(const t of e.changedTouches)activeTouches.delete(t.identifier);
+  refreshTouchDir();
+}
+cv.addEventListener('touchend',endTouch,{passive:false});
+cv.addEventListener('touchcancel',endTouch,{passive:false});
+// mouse (desktop testing)
+let mouseDownZone=null;
 cv.addEventListener('mousedown',e=>{
   if(gameState!=='playing')return;
-  const rect=cv.getBoundingClientRect();
-  const x=(e.clientX-rect.left)/rect.width*W;
-  const y=(e.clientY-rect.top)/rect.height*H;
-  if(y<H*0.25)shootRequested=true;
-  else if(x<W/2)touchLeft=true;else touchRight=true;
+  const z=touchZone(e);
+  if(z==='shoot')shootRequested=true;
+  else{mouseDownZone=z;if(z==='l')touchLeft=true;else touchRight=true;}
 });
-addEventListener('mouseup',()=>{touchLeft=touchRight=false;});
+addEventListener('mouseup',()=>{
+  if(mouseDownZone==='l')touchLeft=false;
+  if(mouseDownZone==='r')touchRight=false;
+  mouseDownZone=null;
+});
 
 // Menu buttons
 pauseBtn.onclick=()=>pauseGame();
