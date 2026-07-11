@@ -1906,9 +1906,9 @@ function drawBoss(){
   if(boss.hitT>0)ctx.globalAlpha=0.55;
   const idle=Math.sin(t*3)*3;
   ctx.translate(0,idle);
-  if(boss.kind==='jointjerk'){drawBossJointJerk(bx,y,bw,bh,t);ctx.restore();drawBossHP(bx,y,bh);return;}
-  if(boss.kind==='cbddrone'){drawBossCBDDrone(bx,y,bw,bh,t);ctx.restore();drawBossHP(bx,y,bh);return;}
-  if(boss.kind==='pipepusher'){drawBossPipePusher(bx,y,bw,bh,t);ctx.restore();drawBossHP(bx,y,bh);return;}
+  const drawers={kingbong:drawBossKingBong,mightymarijuana:drawBossMighty,drgreenthumb:drawBossDrGreen,theplug:drawBossPlug,giantblunt:drawBossGiantBlunt,mutantbush:drawBossMutantBush};
+  const fn=drawers[boss.kind];
+  if(fn){fn(bx,y,bw,bh,t);ctx.restore();drawBossHP(bx,y,bh);return;}
   // --- Evil Bong (proper shape: round bulb chamber + tall neck + flared mouthpiece) ---
   const bulbR = Math.min(bw*0.48, bh*0.32);
   const bulbCY = y + bh/2 - bulbR - 4;         // center of round chamber
