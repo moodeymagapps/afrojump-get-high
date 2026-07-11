@@ -521,6 +521,7 @@ function update(dt){
       c.taken=true;
       if(c.type==='bag'){runBags+=1;totalBags+=1;bagsEl.textContent='🌿 '+totalBags;burst(c.x,c.y,'#7cfc00',18);pushFloat(c.x,c.y-4,'+1 🌿','#7cfc00');}
       else if(c.type==='joint'){player.invincible=6;player.vy=-22;burst(c.x,c.y,'#ff69b4',24);pushFloat(c.x,c.y-4,'INVINCIBLE!','#ff69b4');}
+      if(c.type==='bag')localStorage.setItem(BK,totalBags);
     }
   }
 
