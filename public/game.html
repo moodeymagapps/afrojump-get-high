@@ -439,6 +439,7 @@ function update(dt){
     // player collision
     if(Math.abs(player.x-e.x)<e.w/2+player.r-6&&Math.abs(player.y-e.y-e.h/2)<e.h/2+player.r-6){
       if(player.invincible>0){e.alive=false;burst(e.x,e.y,'#ffcc00');}
+      else if(boss&&player.bossLives>0){e.alive=false;hurtPlayer();}
       else die();
     }
   }
