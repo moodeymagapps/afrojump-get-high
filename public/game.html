@@ -243,7 +243,6 @@ function loadSkinImage(src, bgKey){
   const entry={ready:false,canvas:null};
   skinImgCache[src]=entry;
   const img=new Image();
-  img.crossOrigin='anonymous';
   img.onload=()=>{
     try{
       const c=document.createElement('canvas');
@@ -256,7 +255,7 @@ function loadSkinImage(src, bgKey){
       // trim transparent margins
       entry.canvas=trimTransparent(c);
       entry.ready=true;
-    }catch(e){entry.canvas=null;entry.ready=true;}
+    }catch(e){console.warn('skin bg-removal failed',src,e);entry.canvas=null;entry.ready=true;}
   };
   img.onerror=()=>{entry.ready=true;};
   img.src=src;
@@ -271,7 +270,7 @@ function removeBackground(imageData, bgKey){
   for(const [x,y] of samples){const i=(y*width+x)*4;sR+=data[i];sG+=data[i+1];sB+=data[i+2];n++;}
   let kR=sR/n|0,kG=sG/n|0,kB=sB/n|0;
   if(bgKey==='white'){kR=kG=kB=255;}
-  const tol=70;
+  const tol=95;
   // flood-fill from all border pixels that match the key color
   const visited=new Uint8Array(width*height);
   const stack=[];
