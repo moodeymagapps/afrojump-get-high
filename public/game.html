@@ -335,9 +335,27 @@ function renderShop(){
   for(const s of SKINS){
     const card=document.createElement('div');
     card.className='skinCard'+(s.id===selectedSkin?' selected':'');
-    const cvS=document.createElement('canvas');cvS.width=80;cvS.height=80;
-    drawSkinPreview(cvS.getContext('2d'),s);
-    card.appendChild(cvS);
+    if(s.img){
+      const entry=loadSkinImage(s.img,s.bgKey);
+      const cvS=document.createElement('canvas');cvS.width=80;cvS.height=80;
+      const drawIt=()=>{
+        const g=cvS.getContext('2d');
+        g.imageSmoothingEnabled=false;
+        g.clearRect(0,0,80,80);
+        if(entry.canvas){
+          const im=entry.canvas;
+          const sc=Math.min(76/im.width,76/im.height);
+          const w=im.width*sc,h=im.height*sc;
+          g.drawImage(im,(80-w)/2,(80-h)/2,w,h);
+        }
+      };
+      if(entry.ready)drawIt();else{const t=setInterval(()=>{if(entry.ready){clearInterval(t);drawIt();}},60);}
+      card.appendChild(cvS);
+    }else{
+      const cvS=document.createElement('canvas');cvS.width=80;cvS.height=80;
+      drawSkinPreview(cvS.getContext('2d'),s);
+      card.appendChild(cvS);
+    }
     const nm=document.createElement('div');nm.className='name';nm.textContent=s.name;card.appendChild(nm);
     const pr=document.createElement('div');pr.className='price';pr.textContent=s.price===0?'Gratis':('🌿 '+s.price);card.appendChild(pr);
     const btn=document.createElement('button');
