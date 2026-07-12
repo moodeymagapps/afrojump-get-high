@@ -225,9 +225,86 @@ const SKINS=[
   {id:'cloudwalker',name:'Cloud Walker',price:720,render:'cloud'},
   {id:'stickyicky',name:'Sticky Icky',price:750,render:'sticky'},
   {id:'spacecadet',name:'Space Cadet',price:800,render:'astronaut'},
-  {id:'revengebird',name:'Revengebird',price:900,render:'raven'},
   {id:'fabi',   name:'Prinzessin Fabi',price:1000,render:'fabi'},
+  // ---- Community / photo-based pixel skins ----
+  {id:'ina',        name:'Ina',        price:250, img:'skins/ina.png',        anchorY:0.72},
+  {id:'sierrakidd', name:'Sierra Kidd', price:350, img:'skins/sierrakidd.jpg', anchorY:0.72},
+  {id:'danjo420',   name:'Danjo420',   price:400, img:'skins/danjo420.jpg',   anchorY:0.74},
+  {id:'fabienne',   name:'Fabienne',   price:500, img:'skins/fabienne.jpg',   anchorY:0.74},
+  {id:'moodey',     name:'Moodey',     price:800, img:'skins/moodey.jpg',     anchorY:0.72, bgKey:'white'},
+  {id:'revengebird',name:'RevengeBird',price:900, img:'skins/revengebird.png',anchorY:0.72},
+  {id:'kosak',      name:'Kosak',      price:700, img:'skins/kosak.png',      anchorY:0.72},
 ];
+
+// ---- Image skin loader with background removal (flood-fill from corners) ----
+const skinImgCache={};
+function loadSkinImage(src, bgKey){
+  if(skinImgCache[src])return skinImgCache[src];
+  const entry={ready:false,canvas:null};
+  skinImgCache[src]=entry;
+  const img=new Image();
+  img.crossOrigin='anonymous';
+  img.onload=()=>{
+    try{
+      const c=document.createElement('canvas');
+      c.width=img.naturalWidth;c.height=img.naturalHeight;
+      const g=c.getContext('2d');
+      g.drawImage(img,0,0);
+      const data=g.getImageData(0,0,c.width,c.height);
+      removeBackground(data, bgKey);
+      g.putImageData(data,0,0);
+      // trim transparent margins
+      entry.canvas=trimTransparent(c);
+      entry.ready=true;
+    }catch(e){entry.canvas=null;entry.ready=true;}
+  };
+  img.onerror=()=>{entry.ready=true;};
+  img.src=src;
+  return entry;
+}
+function colorDist(r,g,b,R,G,B){return Math.abs(r-R)+Math.abs(g-G)+Math.abs(b-B);}
+function removeBackground(imageData, bgKey){
+  const {data,width,height}=imageData;
+  // sample corner colors — average of the 4 corners
+  const samples=[[0,0],[width-1,0],[0,height-1],[width-1,height-1]];
+  let sR=0,sG=0,sB=0,n=0;
+  for(const [x,y] of samples){const i=(y*width+x)*4;sR+=data[i];sG+=data[i+1];sB+=data[i+2];n++;}
+  let kR=sR/n|0,kG=sG/n|0,kB=sB/n|0;
+  if(bgKey==='white'){kR=kG=kB=255;}
+  const tol=70;
+  // flood-fill from all border pixels that match the key color
+  const visited=new Uint8Array(width*height);
+  const stack=[];
+  const pushIfMatch=(x,y)=>{
+    if(x<0||y<0||x>=width||y>=height)return;
+    const idx=y*width+x;if(visited[idx])return;
+    const i=idx*4;
+    if(colorDist(data[i],data[i+1],data[i+2],kR,kG,kB)<=tol){stack.push(idx);visited[idx]=1;}
+  };
+  for(let x=0;x<width;x++){pushIfMatch(x,0);pushIfMatch(x,height-1);}
+  for(let y=0;y<height;y++){pushIfMatch(0,y);pushIfMatch(width-1,y);}
+  while(stack.length){
+    const idx=stack.pop();
+    const x=idx%width, y=(idx/width)|0;
+    const i=idx*4;data[i+3]=0;
+    pushIfMatch(x+1,y);pushIfMatch(x-1,y);pushIfMatch(x,y+1);pushIfMatch(x,y-1);
+  }
+}
+function trimTransparent(src){
+  const g=src.getContext('2d');
+  const {data,width,height}=g.getImageData(0,0,src.width,src.height);
+  let minX=width,minY=height,maxX=0,maxY=0,found=false;
+  for(let y=0;y<height;y++)for(let x=0;x<width;x++){
+    if(data[(y*width+x)*4+3]>16){found=true;if(x<minX)minX=x;if(y<minY)minY=y;if(x>maxX)maxX=x;if(y>maxY)maxY=y;}
+  }
+  if(!found)return src;
+  const w=maxX-minX+1,h=maxY-minY+1;
+  const c=document.createElement('canvas');c.width=w;c.height=h;
+  c.getContext('2d').drawImage(src,minX,minY,w,h,0,0,w,h);
+  return c;
+}
+// Preload the image skins right away
+for(const s of SKINS)if(s.img)loadSkinImage(s.img,s.bgKey);
 function currentSkin(){return SKINS.find(s=>s.id===selectedSkin)||SKINS[0];}
 function persistShop(){localStorage.setItem(BK,totalBags);localStorage.setItem(OK,JSON.stringify(owned));localStorage.setItem(SK,selectedSkin);}
 function updateBagsUI(){bagsEl.textContent='🌿 '+totalBags;menuBags.textContent='🌿 '+totalBags+' Baggys';shopBags.textContent='🌿 '+totalBags;}
