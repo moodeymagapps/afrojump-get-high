@@ -1086,6 +1086,31 @@ function drawPlayer(){
 }
 
 // Draws the player centered at (0,0) in local coords. Used by game and shop preview.
+function drawImageSkin(g,s,inv){
+  const entry=loadSkinImage(s.img,s.bgKey);
+  if(!entry.canvas)return;
+  const im=entry.canvas;
+  // Target render height ~54px (matches vector character silhouette)
+  const targetH=54;
+  const sc=targetH/im.height;
+  const w=im.width*sc, h=im.height*sc;
+  const anchor=s.anchorY||0.72; // vertical anchor within the image (feet ≈ 0.95)
+  const dx=-w/2;
+  const dy=-h*anchor;
+  g.save();
+  g.imageSmoothingEnabled=false;
+  if(inv>0){
+    // subtle rainbow tint via composite
+    g.drawImage(im,dx,dy,w,h);
+    g.globalCompositeOperation='source-atop';
+    g.fillStyle='hsla('+((performance.now()/2)%360)+',90%,60%,0.35)';
+    g.fillRect(dx,dy,w,h);
+  }else{
+    g.drawImage(im,dx,dy,w,h);
+  }
+  g.restore();
+}
+
 function drawAfroCharacter(g,s,inv){
   if(s.img){drawImageSkin(g,s,inv);return;}
   if(s.render){drawSkinAlt(g,s,inv);return;}
