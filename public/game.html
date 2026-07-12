@@ -4,47 +4,51 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
 <title>Afro Jump</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 <style>
-  html,body{margin:0;padding:0;height:100%;background:#111;overflow:hidden;font-family:system-ui,sans-serif;color:#fff;touch-action:none;user-select:none;-webkit-user-select:none;}
+  html,body{margin:0;padding:0;height:100%;background:#0a0a0a;overflow:hidden;font-family:'VT323',monospace;color:#fff;touch-action:none;user-select:none;-webkit-user-select:none;image-rendering:pixelated;}
   #wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;}
-  canvas{background:#87ceeb;display:block;box-shadow:0 0 40px #000a;touch-action:none;}
-  #ui{position:absolute;top:8px;left:8px;right:8px;display:flex;justify-content:space-between;align-items:center;font-weight:700;text-shadow:1px 1px 2px #000;pointer-events:none;font-size:14px;gap:8px;}
+  canvas{background:#87ceeb;display:block;box-shadow:0 0 40px #000a, 0 0 0 4px #2b1a0a, 0 0 0 8px #7cfc00;touch-action:none;image-rendering:pixelated;}
+  #ui{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;align-items:flex-start;font-family:'Press Start 2P',monospace;text-shadow:2px 2px 0 #000;pointer-events:none;font-size:10px;gap:8px;}
   #ui .stats{display:flex;flex-direction:column;gap:2px;}
   #ui .right{display:flex;align-items:center;gap:8px;pointer-events:auto;}
-  #bags{color:#7cfc00;font-weight:700;text-shadow:1px 1px 2px #000;}
-  #pauseBtn{background:rgba(0,0,0,0.4);border:2px solid #fff;color:#fff;width:34px;height:34px;border-radius:8px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;}
-  #pauseBtn:active{transform:scale(.95);}
-  #muteBtn{background:rgba(0,0,0,0.4);border:2px solid #fff;color:#fff;width:34px;height:34px;border-radius:8px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;pointer-events:auto;}
-  #muteBtn:active{transform:scale(.95);}
-  #power{position:absolute;top:36px;left:8px;font-size:13px;font-weight:700;color:#ffd54a;text-shadow:1px 1px 2px #000;pointer-events:none;}
-  .overlay{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.65);padding:20px;box-sizing:border-box;}
-  .overlay h1{margin:0 0 6px;font-size:38px;text-shadow:2px 2px 0 #000;letter-spacing:1px;}
-  .overlay h2{margin:0 0 12px;font-size:22px;opacity:.9;}
-  .overlay p{margin:4px 0;font-size:16px;}
-  .overlay .btn{margin:6px 0;padding:12px 22px;font-size:17px;border:none;border-radius:10px;background:#4caf50;color:#fff;font-weight:700;cursor:pointer;box-shadow:0 4px 0 #2e7d32;min-width:200px;}
-  .overlay .btn:active{transform:translateY(2px);box-shadow:0 2px 0 #2e7d32;}
-  .overlay .btn.alt{background:#ffb300;box-shadow:0 4px 0 #b47a00;}
-  .overlay .btn.alt:active{box-shadow:0 2px 0 #b47a00;}
-  .overlay .btn.ghost{background:#455a64;box-shadow:0 4px 0 #263238;}
-  .overlay .btn.ghost:active{box-shadow:0 2px 0 #263238;}
+  #bags{color:#7cfc00;}
+  .pxBtn{background:#2b1a0a;border:none;color:#fff;width:38px;height:38px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;font-family:'Press Start 2P',monospace;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #7cfc00, 0 3px 0 #000;image-rendering:pixelated;}
+  .pxBtn:active{transform:translateY(2px);box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #7cfc00, 0 1px 0 #000;}
+  #pauseBtn,#muteBtn{background:#2b1a0a;border:none;color:#fff;width:38px;height:38px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #7cfc00, 0 3px 0 #000;pointer-events:auto;image-rendering:pixelated;}
+  #pauseBtn:active,#muteBtn:active{transform:translateY(2px);box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #7cfc00, 0 1px 0 #000;}
+  #power{position:absolute;top:60px;left:12px;font-size:11px;font-family:'Press Start 2P',monospace;color:#ffd54a;text-shadow:2px 2px 0 #000;pointer-events:none;}
+  .overlay{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(rgba(10,8,20,.88),rgba(10,8,20,.94));padding:20px;box-sizing:border-box;font-family:'VT323',monospace;}
+  .overlay h1{margin:0 0 10px;font-size:26px;font-family:'Press Start 2P',monospace;text-shadow:3px 3px 0 #000, 6px 6px 0 rgba(124,252,0,.35);letter-spacing:2px;}
+  .overlay h2{margin:0 0 12px;font-size:18px;font-family:'Press Start 2P',monospace;opacity:.9;}
+  .overlay p{margin:4px 0;font-size:20px;letter-spacing:1px;}
+  .overlay .btn{margin:6px 0;padding:14px 22px;font-size:13px;font-family:'Press Start 2P',monospace;letter-spacing:1px;border:none;background:#4caf50;color:#fff;cursor:pointer;min-width:220px;box-shadow:inset -3px -3px 0 #1b5e20, inset 3px 3px 0 #a5d6a7, 0 5px 0 #1b5e20, 0 8px 12px rgba(0,0,0,.4);image-rendering:pixelated;}
+  .overlay .btn:active{transform:translateY(3px);box-shadow:inset -3px -3px 0 #1b5e20, inset 3px 3px 0 #a5d6a7, 0 2px 0 #1b5e20;}
+  .overlay .btn.alt{background:#ffb300;box-shadow:inset -3px -3px 0 #b47a00, inset 3px 3px 0 #ffe082, 0 5px 0 #b47a00, 0 8px 12px rgba(0,0,0,.4);}
+  .overlay .btn.alt:active{box-shadow:inset -3px -3px 0 #b47a00, inset 3px 3px 0 #ffe082, 0 2px 0 #b47a00;}
+  .overlay .btn.ghost{background:#455a64;box-shadow:inset -3px -3px 0 #263238, inset 3px 3px 0 #90a4ae, 0 5px 0 #263238, 0 8px 12px rgba(0,0,0,.4);}
+  .overlay .btn.ghost:active{box-shadow:inset -3px -3px 0 #263238, inset 3px 3px 0 #90a4ae, 0 2px 0 #263238;}
   #over h1{color:#ff5252;}
-  #menu h1{color:#7cfc00;font-size:44px;}
-  #menu .tag{font-size:14px;opacity:.85;margin-bottom:14px;}
+  #menu h1{color:#7cfc00;font-size:30px;}
+  #menu .tag{font-family:'Press Start 2P',monospace;font-size:9px;opacity:.75;margin-bottom:16px;letter-spacing:1px;color:#ffd54a;}
   #shop{overflow-y:auto;justify-content:flex-start;padding-top:20px;}
   #shop .head{display:flex;justify-content:space-between;width:100%;max-width:360px;align-items:center;margin-bottom:12px;}
-  #shop h2{margin:0;color:#7cfc00;}
-  #shopClose{background:#455a64;border:none;color:#fff;padding:6px 12px;border-radius:6px;font-weight:700;cursor:pointer;}
-  .skinGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:360px;}
-  .skinCard{background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.15);border-radius:10px;padding:8px;display:flex;flex-direction:column;align-items:center;gap:4px;}
-  .skinCard.selected{border-color:#7cfc00;background:rgba(124,252,0,0.12);}
-  .skinCard canvas{background:linear-gradient(#87ceeb,#c9e9f6);border-radius:6px;width:80px;height:80px;box-shadow:none;}
-  .skinCard .name{font-size:13px;font-weight:700;}
-  .skinCard .price{font-size:12px;color:#7cfc00;}
-  .skinCard button{margin-top:2px;padding:5px 10px;font-size:12px;border:none;border-radius:6px;background:#4caf50;color:#fff;font-weight:700;cursor:pointer;width:100%;}
-  .skinCard button.owned{background:#455a64;}
-  .skinCard button.selected{background:#7cfc00;color:#111;}
-  .skinCard button:disabled{background:#8a4444;cursor:not-allowed;opacity:.6;}
-  #hint{position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:12px;opacity:.7;pointer-events:none;}
+  #shop h2{margin:0;color:#7cfc00;font-family:'Press Start 2P',monospace;font-size:14px;text-shadow:2px 2px 0 #000;}
+  #shopBags{font-family:'Press Start 2P',monospace;font-size:11px;color:#7cfc00;}
+  #shopClose{background:#c62828;border:none;color:#fff;padding:8px 12px;font-family:'Press Start 2P',monospace;font-size:11px;cursor:pointer;box-shadow:inset -2px -2px 0 #7f1010, inset 2px 2px 0 #ff8a80, 0 3px 0 #7f1010;}
+  .skinGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:360px;padding-bottom:20px;}
+  .skinCard{background:#1b1230;border:none;padding:8px;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #4a2c73;image-rendering:pixelated;}
+  .skinCard.selected{background:#0d3d00;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #7cfc00, 0 0 12px rgba(124,252,0,.5);}
+  .skinCard canvas,.skinCard .thumb{background:linear-gradient(#87ceeb,#c9e9f6);width:80px;height:80px;box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 rgba(255,255,255,.4);image-rendering:pixelated;object-fit:contain;}
+  .skinCard .name{font-family:'Press Start 2P',monospace;font-size:8px;text-align:center;line-height:1.4;min-height:22px;letter-spacing:.5px;}
+  .skinCard .price{font-family:'Press Start 2P',monospace;font-size:9px;color:#7cfc00;}
+  .skinCard button{margin-top:2px;padding:6px 8px;font-family:'Press Start 2P',monospace;font-size:8px;letter-spacing:.5px;border:none;background:#4caf50;color:#fff;cursor:pointer;width:100%;box-shadow:inset -2px -2px 0 #1b5e20, inset 2px 2px 0 #a5d6a7, 0 2px 0 #1b5e20;}
+  .skinCard button.owned{background:#455a64;box-shadow:inset -2px -2px 0 #263238, inset 2px 2px 0 #90a4ae, 0 2px 0 #263238;}
+  .skinCard button.selected{background:#7cfc00;color:#111;box-shadow:inset -2px -2px 0 #3d7d00, inset 2px 2px 0 #d4ffb3, 0 2px 0 #3d7d00;}
+  .skinCard button:disabled{background:#4a1414;color:#c99;cursor:not-allowed;box-shadow:inset -2px -2px 0 #200, inset 2px 2px 0 #7a2a2a, 0 2px 0 #200;}
+  #hint{position:absolute;bottom:12px;left:0;right:0;text-align:center;font-size:14px;opacity:.6;pointer-events:none;font-family:'VT323',monospace;letter-spacing:1px;}
 </style>
 </head>
 <body>
@@ -221,9 +225,86 @@ const SKINS=[
   {id:'cloudwalker',name:'Cloud Walker',price:720,render:'cloud'},
   {id:'stickyicky',name:'Sticky Icky',price:750,render:'sticky'},
   {id:'spacecadet',name:'Space Cadet',price:800,render:'astronaut'},
-  {id:'revengebird',name:'Revengebird',price:900,render:'raven'},
   {id:'fabi',   name:'Prinzessin Fabi',price:1000,render:'fabi'},
+  // ---- Community / photo-based pixel skins ----
+  {id:'ina',        name:'Ina',        price:250, img:'skins/ina.png',        anchorY:0.72},
+  {id:'sierrakidd', name:'Sierra Kidd', price:350, img:'skins/sierrakidd.jpg', anchorY:0.72},
+  {id:'danjo420',   name:'Danjo420',   price:400, img:'skins/danjo420.jpg',   anchorY:0.74},
+  {id:'fabienne',   name:'Fabienne',   price:500, img:'skins/fabienne.jpg',   anchorY:0.74},
+  {id:'moodey',     name:'Moodey',     price:800, img:'skins/moodey.jpg',     anchorY:0.72, bgKey:'white'},
+  {id:'revengebird',name:'RevengeBird',price:900, img:'skins/revengebird.png',anchorY:0.72},
+  {id:'kosak',      name:'Kosak',      price:700, img:'skins/kosak.png',      anchorY:0.72},
 ];
+
+// ---- Image skin loader with background removal (flood-fill from corners) ----
+const skinImgCache={};
+function loadSkinImage(src, bgKey){
+  if(skinImgCache[src])return skinImgCache[src];
+  const entry={ready:false,canvas:null};
+  skinImgCache[src]=entry;
+  const img=new Image();
+  img.crossOrigin='anonymous';
+  img.onload=()=>{
+    try{
+      const c=document.createElement('canvas');
+      c.width=img.naturalWidth;c.height=img.naturalHeight;
+      const g=c.getContext('2d');
+      g.drawImage(img,0,0);
+      const data=g.getImageData(0,0,c.width,c.height);
+      removeBackground(data, bgKey);
+      g.putImageData(data,0,0);
+      // trim transparent margins
+      entry.canvas=trimTransparent(c);
+      entry.ready=true;
+    }catch(e){entry.canvas=null;entry.ready=true;}
+  };
+  img.onerror=()=>{entry.ready=true;};
+  img.src=src;
+  return entry;
+}
+function colorDist(r,g,b,R,G,B){return Math.abs(r-R)+Math.abs(g-G)+Math.abs(b-B);}
+function removeBackground(imageData, bgKey){
+  const {data,width,height}=imageData;
+  // sample corner colors — average of the 4 corners
+  const samples=[[0,0],[width-1,0],[0,height-1],[width-1,height-1]];
+  let sR=0,sG=0,sB=0,n=0;
+  for(const [x,y] of samples){const i=(y*width+x)*4;sR+=data[i];sG+=data[i+1];sB+=data[i+2];n++;}
+  let kR=sR/n|0,kG=sG/n|0,kB=sB/n|0;
+  if(bgKey==='white'){kR=kG=kB=255;}
+  const tol=70;
+  // flood-fill from all border pixels that match the key color
+  const visited=new Uint8Array(width*height);
+  const stack=[];
+  const pushIfMatch=(x,y)=>{
+    if(x<0||y<0||x>=width||y>=height)return;
+    const idx=y*width+x;if(visited[idx])return;
+    const i=idx*4;
+    if(colorDist(data[i],data[i+1],data[i+2],kR,kG,kB)<=tol){stack.push(idx);visited[idx]=1;}
+  };
+  for(let x=0;x<width;x++){pushIfMatch(x,0);pushIfMatch(x,height-1);}
+  for(let y=0;y<height;y++){pushIfMatch(0,y);pushIfMatch(width-1,y);}
+  while(stack.length){
+    const idx=stack.pop();
+    const x=idx%width, y=(idx/width)|0;
+    const i=idx*4;data[i+3]=0;
+    pushIfMatch(x+1,y);pushIfMatch(x-1,y);pushIfMatch(x,y+1);pushIfMatch(x,y-1);
+  }
+}
+function trimTransparent(src){
+  const g=src.getContext('2d');
+  const {data,width,height}=g.getImageData(0,0,src.width,src.height);
+  let minX=width,minY=height,maxX=0,maxY=0,found=false;
+  for(let y=0;y<height;y++)for(let x=0;x<width;x++){
+    if(data[(y*width+x)*4+3]>16){found=true;if(x<minX)minX=x;if(y<minY)minY=y;if(x>maxX)maxX=x;if(y>maxY)maxY=y;}
+  }
+  if(!found)return src;
+  const w=maxX-minX+1,h=maxY-minY+1;
+  const c=document.createElement('canvas');c.width=w;c.height=h;
+  c.getContext('2d').drawImage(src,minX,minY,w,h,0,0,w,h);
+  return c;
+}
+// Preload the image skins right away
+for(const s of SKINS)if(s.img)loadSkinImage(s.img,s.bgKey);
 function currentSkin(){return SKINS.find(s=>s.id===selectedSkin)||SKINS[0];}
 function persistShop(){localStorage.setItem(BK,totalBags);localStorage.setItem(OK,JSON.stringify(owned));localStorage.setItem(SK,selectedSkin);}
 function updateBagsUI(){bagsEl.textContent='🌿 '+totalBags;menuBags.textContent='🌿 '+totalBags+' Baggys';shopBags.textContent='🌿 '+totalBags;}
@@ -254,9 +335,27 @@ function renderShop(){
   for(const s of SKINS){
     const card=document.createElement('div');
     card.className='skinCard'+(s.id===selectedSkin?' selected':'');
-    const cvS=document.createElement('canvas');cvS.width=80;cvS.height=80;
-    drawSkinPreview(cvS.getContext('2d'),s);
-    card.appendChild(cvS);
+    if(s.img){
+      const entry=loadSkinImage(s.img,s.bgKey);
+      const cvS=document.createElement('canvas');cvS.width=80;cvS.height=80;
+      const drawIt=()=>{
+        const g=cvS.getContext('2d');
+        g.imageSmoothingEnabled=false;
+        g.clearRect(0,0,80,80);
+        if(entry.canvas){
+          const im=entry.canvas;
+          const sc=Math.min(76/im.width,76/im.height);
+          const w=im.width*sc,h=im.height*sc;
+          g.drawImage(im,(80-w)/2,(80-h)/2,w,h);
+        }
+      };
+      if(entry.ready)drawIt();else{const t=setInterval(()=>{if(entry.ready){clearInterval(t);drawIt();}},60);}
+      card.appendChild(cvS);
+    }else{
+      const cvS=document.createElement('canvas');cvS.width=80;cvS.height=80;
+      drawSkinPreview(cvS.getContext('2d'),s);
+      card.appendChild(cvS);
+    }
     const nm=document.createElement('div');nm.className='name';nm.textContent=s.name;card.appendChild(nm);
     const pr=document.createElement('div');pr.className='price';pr.textContent=s.price===0?'Gratis':('🌿 '+s.price);card.appendChild(pr);
     const btn=document.createElement('button');
@@ -987,7 +1086,33 @@ function drawPlayer(){
 }
 
 // Draws the player centered at (0,0) in local coords. Used by game and shop preview.
+function drawImageSkin(g,s,inv){
+  const entry=loadSkinImage(s.img,s.bgKey);
+  if(!entry.canvas)return;
+  const im=entry.canvas;
+  // Target render height ~54px (matches vector character silhouette)
+  const targetH=54;
+  const sc=targetH/im.height;
+  const w=im.width*sc, h=im.height*sc;
+  const anchor=s.anchorY||0.72; // vertical anchor within the image (feet ≈ 0.95)
+  const dx=-w/2;
+  const dy=-h*anchor;
+  g.save();
+  g.imageSmoothingEnabled=false;
+  if(inv>0){
+    // subtle rainbow tint via composite
+    g.drawImage(im,dx,dy,w,h);
+    g.globalCompositeOperation='source-atop';
+    g.fillStyle='hsla('+((performance.now()/2)%360)+',90%,60%,0.35)';
+    g.fillRect(dx,dy,w,h);
+  }else{
+    g.drawImage(im,dx,dy,w,h);
+  }
+  g.restore();
+}
+
 function drawAfroCharacter(g,s,inv){
+  if(s.img){drawImageSkin(g,s,inv);return;}
   if(s.render){drawSkinAlt(g,s,inv);return;}
   const rainbow=inv>0;
   const bodyCol=rainbow?`hsl(${(performance.now()/4)%360},90%,55%)`:s.body;
