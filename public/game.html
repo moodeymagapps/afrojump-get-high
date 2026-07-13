@@ -534,7 +534,7 @@ const BOSS_NAMES={kingbong:'KING BONG',mightymarijuana:'MIGHTY MARIJUANA',drgree
 
 function rand(a,b){return a+Math.random()*(b-a);}
 function reset(){
-  player={x:W/2,y:H-100,vx:0,vy:-14,r:22,facing:1,invincible:0,shootCd:0,alive:true,bossShot:false,squash:1,stretch:1,landedT:0,bossLives:0,hitFlash:0};
+  player={x:W/2,y:H-100,vx:0,vy:-14,r:22,facing:1,invincible:0,shootCd:0,alive:true,bossShot:false,squash:1,stretch:1,landedT:0,bossLives:0,hitFlash:0,jetpackT:0,gunT:0};
   platforms=[];collectibles=[];enemies=[];projectiles=[];particles=[];smokeParticles=[];floatTexts=[];
   cameraY=0;bestY=0;scrollLocked=false;boss=null;nextBossScore=1500;gameOver=false;
   runBags=0;shake={t:0,mag:0};timeScale=1;deathT=0;
@@ -561,7 +561,9 @@ function spawnPlatform(y){
   platforms.push(p);
   // collectible
   const r=Math.random();
-  if(r<0.10){collectibles.push({x:x+w/2,y:y-22,type:'joint',t:0,taken:false});}
+  if(meters>80&&r<0.006){collectibles.push({x:x+w/2,y:y-24,type:'jetpack',t:0,taken:false});}
+  else if(meters>40&&r<0.022){collectibles.push({x:x+w/2,y:y-22,type:'gun',t:0,taken:false});}
+  else if(r<0.10){collectibles.push({x:x+w/2,y:y-22,type:'joint',t:0,taken:false});}
   else if(r<0.28){collectibles.push({x:x+w/2,y:y-18,type:'bag',t:0,taken:false});}
   // enemy
   if(meters>20&&Math.random()<0.10&&w>60){
