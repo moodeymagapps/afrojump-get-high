@@ -752,6 +752,7 @@ function update(dt){
       pushFloat(boss.x,boss.y+20,'+25 🌿','#7cfc00');
       boss=null;scrollLocked=false;nextBossScore+=1800;bestY+=100;player.vy=-14;
       player.bossLives=0;stopBossMusic();tryPlayMusic();
+      questProgress('boss',1);
     }
   }
   // boss projectiles
