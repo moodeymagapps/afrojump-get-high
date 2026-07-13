@@ -2810,9 +2810,220 @@ function loop(t){
   render();
   scoreEl.textContent='Höhe: '+bestY+'m';
   highEl.textContent='Best: '+Math.max(highScore,bestY)+'m';
-  powerEl.textContent=player&&player.invincible>0?('★ INVINCIBLE '+player.invincible.toFixed(1)+'s'):'';
+  {
+    let parts=[];
+    if(player){
+      if(player.invincible>0)parts.push('★ INVINCIBLE '+player.invincible.toFixed(1)+'s');
+      if(player.jetpackT>0)parts.push('🚀 JETPACK '+player.jetpackT.toFixed(1)+'s');
+      if(player.gunT>0)parts.push('🔫 GUN '+player.gunT.toFixed(1)+'s');
+    }
+    powerEl.textContent=parts.join('  ');
+    fireBtn.classList.toggle('on', !!(player && player.gunT>0 && gameState==='playing'));
+  }
+  // quest live tracking
+  if(gameState==='playing'){
+    if(bestY>questSessionHeight){questProgress('height',bestY-questSessionHeight);questSessionHeight=bestY;}
+  }
   requestAnimationFrame(loop);
 }
+
+// ---------- Fire button, Account, Daily, Quests, Cloud Sync ----------
+const fireBtn=document.getElementById('fireBtn');
+const accountEl=document.getElementById('account');
+let questSessionHeight=0;
+function fireTap(e){e.preventDefault();e.stopPropagation();if(gameState==='playing')shootRequested=true;}
+fireBtn.addEventListener('touchstart',fireTap,{passive:false});
+fireBtn.addEventListener('mousedown',fireTap);
+
+// Menu extras
+document.getElementById('menuDaily').onclick=()=>openAccount();
+document.getElementById('menuAccount').onclick=()=>openAccount();
+document.getElementById('accountClose').onclick=()=>{accountEl.style.display='none';goMenu();};
+function openAccount(){gameState='menu';showOverlay('menu');menuEl.style.display='none';accountEl.style.display='flex';refreshAccountUI();refreshDailyUI();refreshQuestUI();}
+
+// -------- Daily rewards --------
+const DKL='afroJumpDailyLast',DKS='afroJumpDailyStreak';
+function todayKey(){const d=new Date();return d.getUTCFullYear()+'-'+(d.getUTCMonth()+1)+'-'+d.getUTCDate();}
+function daysBetween(a,b){return Math.round((new Date(b)-new Date(a))/86400000);}
+function refreshDailyUI(){
+  const last=localStorage.getItem(DKL);
+  const streak=+localStorage.getItem(DKS)||0;
+  const info=document.getElementById('dailyInfo');
+  const btn=document.getElementById('dailyClaim');
+  const claimed=(last===todayKey());
+  const reward=5+Math.min(streak,10)*2;
+  info.innerHTML='Streak: <b style="color:#7cfc00">'+streak+' Tag(e)</b><br>Heutige Belohnung: <b style="color:#7cfc00">🌿 '+reward+'</b>'+(claimed?'<br><span style="color:#ffd54a">Heute schon abgeholt ✓</span>':'');
+  btn.disabled=claimed;btn.textContent=claimed?'✓ Abgeholt':('Abholen (+🌿 '+reward+')');
+}
+document.getElementById('dailyClaim').onclick=()=>{
+  const last=localStorage.getItem(DKL); if(last===todayKey())return;
+  let streak=+localStorage.getItem(DKS)||0;
+  if(last){const g=daysBetween(last,todayKey());streak=(g===1)?streak+1:1;} else streak=1;
+  const reward=5+Math.min(streak-1,10)*2;
+  totalBags+=reward;localStorage.setItem(BK,totalBags);
+  localStorage.setItem(DKL,todayKey());localStorage.setItem(DKS,String(streak));
+  updateBagsUI();refreshDailyUI();cloudSyncSoon();
+};
+
+// -------- Daily quests --------
+const QK='afroJumpQuests';
+const QUEST_POOL=[
+  {id:'bags10',type:'bags',goal:10,reward:8,label:'Sammle 🌿 10 Baggys'},
+  {id:'bags25',type:'bags',goal:25,reward:20,label:'Sammle 🌿 25 Baggys'},
+  {id:'bags50',type:'bags',goal:50,reward:45,label:'Sammle 🌿 50 Baggys'},
+  {id:'h100',type:'height',goal:100,reward:10,label:'Erreiche 100m Höhe'},
+  {id:'h300',type:'height',goal:300,reward:25,label:'Erreiche 300m Höhe'},
+  {id:'h600',type:'height',goal:600,reward:60,label:'Erreiche 600m Höhe'},
+  {id:'boss1',type:'boss',goal:1,reward:30,label:'Besiege 1 Boss'},
+  {id:'boss3',type:'boss',goal:3,reward:80,label:'Besiege 3 Bosse'},
+];
+function seededPick(seedStr,arr,n){
+  let h=0;for(let i=0;i<seedStr.length;i++)h=(h*31+seedStr.charCodeAt(i))|0;
+  const out=[],pool=arr.slice();
+  for(let i=0;i<n&&pool.length;i++){h=(h*1103515245+12345)|0;const idx=Math.abs(h)%pool.length;out.push(pool.splice(idx,1)[0]);}
+  return out;
+}
+function loadQuests(){
+  try{const q=JSON.parse(localStorage.getItem(QK)||'null');
+    if(q&&q.day===todayKey())return q;
+  }catch(_){}
+  const picks=seededPick(todayKey(),QUEST_POOL,3);
+  const q={day:todayKey(),items:picks.map(p=>({...p,progress:0,claimed:false}))};
+  localStorage.setItem(QK,JSON.stringify(q));return q;
+}
+function saveQuests(q){localStorage.setItem(QK,JSON.stringify(q));}
+let quests=loadQuests();
+function questProgress(type,amount){
+  if(quests.day!==todayKey())quests=loadQuests();
+  let changed=false;
+  for(const it of quests.items){
+    if(it.type===type&&!it.claimed&&it.progress<it.goal){
+      it.progress=Math.min(it.goal,it.progress+amount);changed=true;
+    }
+  }
+  if(changed){saveQuests(quests);refreshQuestUI();cloudSyncSoon();}
+}
+function refreshQuestUI(){
+  if(quests.day!==todayKey())quests=loadQuests();
+  const el=document.getElementById('questList');el.innerHTML='';
+  for(const it of quests.items){
+    const done=it.progress>=it.goal;
+    const row=document.createElement('div');row.className='quest'+(it.claimed?' done':'');
+    const pct=Math.min(100,(it.progress/it.goal)*100);
+    row.innerHTML='<span style="flex:0 0 auto;font-size:13px;">'+it.label+'</span><span class="bar"><span style="width:'+pct+'%"></span></span>';
+    const btn=document.createElement('button');btn.className='btn';btn.style.minWidth='0';btn.style.padding='6px 8px';btn.style.fontSize='9px';
+    if(it.claimed){btn.textContent='✓';btn.disabled=true;}
+    else if(done){btn.textContent='+🌿'+it.reward;btn.onclick=()=>{it.claimed=true;totalBags+=it.reward;localStorage.setItem(BK,totalBags);saveQuests(quests);updateBagsUI();refreshQuestUI();cloudSyncSoon();};}
+    else{btn.textContent=it.progress+'/'+it.goal;btn.disabled=true;btn.style.background='#455a64';}
+    row.appendChild(btn);el.appendChild(row);
+  }
+}
+
+// -------- Cloud auth & sync --------
+let sb=null,sbUser=null,sbProfile=null;
+function initSupabase(){
+  try{
+    const url=(window && (window.SUPABASE_URL||'https://xtdgceaenmnqsqpjyfnh.supabase.co'));
+    const key='sb_publishable_9J09FWMmBR72oj08yv7qdg_ORmGFCm7';
+    if(window.supabase&&window.supabase.createClient){
+      sb=window.supabase.createClient(url,key,{auth:{persistSession:true,storage:localStorage,storageKey:'afroJumpSb'}});
+      sb.auth.getSession().then(({data})=>{sbUser=data.session?.user||null;if(sbUser){loadCloudSave();}refreshAccountUI();});
+      sb.auth.onAuthStateChange((_e,session)=>{sbUser=session?.user||null;refreshAccountUI();if(sbUser)loadCloudSave();});
+    }
+  }catch(err){console.warn('supabase init failed',err);}
+}
+initSupabase();
+
+function refreshAccountUI(){
+  const s=document.getElementById('menuAcctStatus');
+  const authCard=document.getElementById('authCard');
+  const userCard=document.getElementById('userCard');
+  if(sbUser){
+    const name=(sbProfile&&sbProfile.display_name)||sbUser.email||'Spieler';
+    s.textContent='👤 '+name;
+    authCard.style.display='none';userCard.style.display='block';
+    document.getElementById('userInfo').innerHTML='Name: <b style="color:#7cfc00">'+escHtml(name)+'</b><br>E-Mail: '+escHtml(sbUser.email||'-');
+  }else{
+    s.textContent='Kein Account – Fortschritt lokal';
+    authCard.style.display='block';userCard.style.display='none';
+  }
+}
+function escHtml(x){return String(x).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]);}
+function setAuthMsg(t,ok){const m=document.getElementById('authMsg');m.textContent=t;m.style.color=ok?'#7cfc00':'#ff8a80';}
+function setSyncMsg(t,ok){const m=document.getElementById('syncMsg');m.textContent=t;m.style.color=ok?'#7cfc00':'#ff8a80';}
+
+document.getElementById('authSignup').onclick=async()=>{
+  if(!sb){setAuthMsg('Cloud nicht verfügbar');return;}
+  const email=document.getElementById('authEmail').value.trim();
+  const pass=document.getElementById('authPass').value;
+  const name=document.getElementById('authName').value.trim()||email.split('@')[0];
+  if(!email||pass.length<6){setAuthMsg('E-Mail + Passwort (min. 6)');return;}
+  setAuthMsg('Registriere…',true);
+  const {data,error}=await sb.auth.signUp({email,password:pass,options:{data:{display_name:name}}});
+  if(error){setAuthMsg(error.message);return;}
+  sbUser=data.user||data.session?.user||null;
+  sbProfile={display_name:name};
+  if(sbUser){await pushCloudSave(name);setAuthMsg('Willkommen, '+name+'!',true);}
+  else setAuthMsg('Bitte E-Mail bestätigen',true);
+  refreshAccountUI();
+};
+document.getElementById('authLogin').onclick=async()=>{
+  if(!sb){setAuthMsg('Cloud nicht verfügbar');return;}
+  const email=document.getElementById('authEmail').value.trim();
+  const pass=document.getElementById('authPass').value;
+  if(!email||!pass){setAuthMsg('E-Mail + Passwort');return;}
+  setAuthMsg('Login…',true);
+  const {error}=await sb.auth.signInWithPassword({email,password:pass});
+  if(error){setAuthMsg(error.message);return;}
+  setAuthMsg('Eingeloggt',true);
+};
+document.getElementById('authLogout').onclick=async()=>{if(sb){await sb.auth.signOut();sbProfile=null;refreshAccountUI();}};
+document.getElementById('authSync').onclick=async()=>{setSyncMsg('Sync…',true);await pushCloudSave();setSyncMsg('Gespeichert ✓',true);};
+
+async function loadCloudSave(){
+  if(!sb||!sbUser)return;
+  const {data,error}=await sb.from('player_saves').select('*').eq('user_id',sbUser.id).maybeSingle();
+  if(error){console.warn(error);return;}
+  if(data){
+    sbProfile={display_name:data.display_name};
+    const d=data.data||{};
+    // merge: take max bags, union skins, keep highest highScore, streak/daily most recent
+    if(typeof d.totalBags==='number')totalBags=Math.max(totalBags,d.totalBags);
+    if(typeof d.highScore==='number')highScore=Math.max(highScore,d.highScore);
+    if(Array.isArray(d.owned))owned=Array.from(new Set([...owned,...d.owned]));
+    if(d.selectedSkin&&owned.includes(d.selectedSkin))selectedSkin=d.selectedSkin;
+    if(d.dailyLast){
+      const localLast=localStorage.getItem(DKL);
+      if(!localLast||new Date(d.dailyLast)>new Date(localLast)){
+        localStorage.setItem(DKL,d.dailyLast);
+        if(typeof d.dailyStreak==='number')localStorage.setItem(DKS,String(d.dailyStreak));
+      }
+    }
+    if(d.quests&&d.quests.day===todayKey())quests=d.quests;
+    localStorage.setItem(HK,highScore);localStorage.setItem(BK,totalBags);
+    localStorage.setItem(OK,JSON.stringify(owned));localStorage.setItem(SK,selectedSkin);
+    saveQuests(quests);
+    updateBagsUI();refreshAccountUI();refreshDailyUI();refreshQuestUI();
+  }else{await pushCloudSave();}
+}
+async function pushCloudSave(nameOverride){
+  if(!sb||!sbUser)return;
+  const payload={
+    user_id:sbUser.id,
+    display_name:nameOverride||(sbProfile&&sbProfile.display_name)||sbUser.email,
+    data:{totalBags,highScore,owned,selectedSkin,dailyLast:localStorage.getItem(DKL),dailyStreak:+localStorage.getItem(DKS)||0,quests},
+    updated_at:new Date().toISOString(),
+  };
+  const {error}=await sb.from('player_saves').upsert(payload,{onConflict:'user_id'});
+  if(error)console.warn(error);
+}
+let cloudSyncT=null;
+function cloudSyncSoon(){if(!sb||!sbUser)return;clearTimeout(cloudSyncT);cloudSyncT=setTimeout(pushCloudSave,1500);}
+
+// Auto-sync total bags occasionally
+const origPersistShop=persistShop;
+persistShop=function(){origPersistShop();cloudSyncSoon();};
+
 reset();
 goMenu();
 requestAnimationFrame(loop);
