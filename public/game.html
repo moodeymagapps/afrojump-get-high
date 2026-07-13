@@ -615,6 +615,17 @@ function update(dt){
     player.invincible-=dt;
     if(player.vy>0)player.vy=Math.max(player.vy,-2);
   }
+  // jetpack — strong sustained lift
+  if(player.jetpackT>0){
+    player.jetpackT-=dt;
+    player.vy=Math.min(player.vy,-11);
+    // exhaust particles
+    if(Math.random()<0.9){
+      particles.push({x:player.x-6+rand(-2,2),y:player.y+16,vx:rand(-.6,.6),vy:rand(2,4),life:0.5,color:'#ff8a00'});
+      particles.push({x:player.x+6+rand(-2,2),y:player.y+16,vx:rand(-.6,.6),vy:rand(2,4),life:0.5,color:'#ffd54a'});
+    }
+  }
+  if(player.gunT>0)player.gunT-=dt;
   player.y+=player.vy;
 
   // squash/stretch — stretch when rising fast, squash briefly after landing
@@ -677,18 +688,28 @@ function update(dt){
       c.taken=true;
       if(c.type==='bag'){runBags+=1;totalBags+=1;bagsEl.textContent='🌿 '+totalBags;burst(c.x,c.y,'#7cfc00',18);pushFloat(c.x,c.y-4,'+1 🌿','#7cfc00');}
       else if(c.type==='joint'){player.invincible=6;player.vy=-22;burst(c.x,c.y,'#ff69b4',24);pushFloat(c.x,c.y-4,'INVINCIBLE!','#ff69b4');}
-      if(c.type==='bag')localStorage.setItem(BK,totalBags);
+      else if(c.type==='jetpack'){player.jetpackT=3.0;player.vy=-14;burst(c.x,c.y,'#ff8a00',30);pushFloat(c.x,c.y-4,'JETPACK!','#ff8a00');}
+      else if(c.type==='gun'){player.gunT=8.0;burst(c.x,c.y,'#e0e0e0',22);pushFloat(c.x,c.y-4,'GUN 8s!','#e0e0e0');}
+      if(c.type==='bag'){localStorage.setItem(BK,totalBags);questProgress('bags',1);}
     }
   }
 
   // projectiles
   if(shootRequested&&player.shootCd<=0){
-    projectiles.push({x:player.x,y:player.y-10,vy:-9,life:2});
-    player.shootCd=0.4;
+    if(player.gunT>0){
+      // gun power-up: triple spread, faster fire
+      projectiles.push({x:player.x-3,y:player.y-10,vx:-1.5,vy:-10,life:2});
+      projectiles.push({x:player.x,  y:player.y-12,vx:0,   vy:-11,life:2});
+      projectiles.push({x:player.x+3,y:player.y-10,vx:1.5, vy:-10,life:2});
+      player.shootCd=0.15;
+    }else{
+      projectiles.push({x:player.x,y:player.y-10,vx:0,vy:-9,life:2});
+      player.shootCd=0.4;
+    }
   }
   shootRequested=false;
   player.shootCd-=dt;
-  for(const pr of projectiles){pr.y+=pr.vy;pr.life-=dt;}
+  for(const pr of projectiles){pr.x+=(pr.vx||0);pr.y+=pr.vy;pr.life-=dt;}
 
   // boss check
   if(!boss&&bestY>=nextBossScore){spawnBoss();}
