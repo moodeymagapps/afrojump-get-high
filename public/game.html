@@ -3530,6 +3530,10 @@ async function loadCloudSave(){
     if(typeof d.highScore==='number')highScore=Math.max(highScore,d.highScore);
     if(Array.isArray(d.owned))owned=Array.from(new Set([...owned,...d.owned]));
     if(d.selectedSkin&&owned.includes(d.selectedSkin))selectedSkin=d.selectedSkin;
+    if(Array.isArray(d.ownedWeapons))ownedWeapons=Array.from(new Set([...ownedWeapons,...d.ownedWeapons]));
+    if(Array.isArray(d.ownedJoints))ownedJoints=Array.from(new Set([...ownedJoints,...d.ownedJoints]));
+    if(d.selectedWeapon&&ownedWeapons.includes(d.selectedWeapon))selectedWeapon=d.selectedWeapon;
+    if(d.selectedJoint&&ownedJoints.includes(d.selectedJoint))selectedJoint=d.selectedJoint;
     if(d.dailyLast){
       const localLast=localStorage.getItem(DKL);
       if(!localLast||new Date(d.dailyLast)>new Date(localLast)){
@@ -3546,6 +3550,8 @@ async function loadCloudSave(){
     }
     localStorage.setItem(HK,highScore);localStorage.setItem(BK,totalBags);
     localStorage.setItem(OK,JSON.stringify(owned));localStorage.setItem(SK,selectedSkin);
+    localStorage.setItem(OWK,JSON.stringify(ownedWeapons));localStorage.setItem(OJK,JSON.stringify(ownedJoints));
+    localStorage.setItem(WK,selectedWeapon);localStorage.setItem(JK,selectedJoint);
     saveQuests(quests);
     updateBagsUI();refreshAccountUI();refreshDailyUI();refreshQuestUI();
   }else{await pushCloudSave();}
@@ -3555,7 +3561,7 @@ async function pushCloudSave(nameOverride){
   const payload={
     user_id:sbUser.id,
     display_name:nameOverride||(sbProfile&&sbProfile.display_name)||sbUser.email,
-    data:{totalBags,highScore,owned,selectedSkin,dailyLast:localStorage.getItem(DKL),dailyStreak:+localStorage.getItem(DKS)||0,quests,missions:missionData},
+    data:{totalBags,highScore,owned,selectedSkin,ownedWeapons,ownedJoints,selectedWeapon,selectedJoint,dailyLast:localStorage.getItem(DKL),dailyStreak:+localStorage.getItem(DKS)||0,quests,missions:missionData},
     updated_at:new Date().toISOString(),
   };
   const {error}=await sb.from('player_saves').upsert(payload,{onConflict:'user_id'});
