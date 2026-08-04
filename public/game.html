@@ -3118,6 +3118,159 @@ function cloudSyncSoon(){if(!sb||!sbUser)return;clearTimeout(cloudSyncT);cloudSy
 const origPersistShop=persistShop;
 persistShop=function(){origPersistShop();cloudSyncSoon();};
 
+// ================= MISSIONEN (langfristige Ziele) =================
+const MSK='afroJumpMissions';
+const MISSIONS=[
+  {id:'m_bags100', type:'bags',   goal:100,  reward:40,  label:'Sammle 100 Baggys'},
+  {id:'m_bags500', type:'bags',   goal:500,  reward:150, label:'Sammle 500 Baggys'},
+  {id:'m_bags2k',  type:'bags',   goal:2000, reward:500, label:'Sammle 2000 Baggys'},
+  {id:'m_h500',    type:'height', goal:500,  reward:50,  label:'Erreiche 500m in einem Run'},
+  {id:'m_h1500',   type:'height', goal:1500, reward:120, label:'Erreiche 1500m in einem Run'},
+  {id:'m_h3000',   type:'height', goal:3000, reward:300, label:'Erreiche 3000m in einem Run'},
+  {id:'m_kill10',  type:'kills',  goal:10,   reward:40,  label:'Zerstöre 10 Gegner'},
+  {id:'m_kill50',  type:'kills',  goal:50,   reward:120, label:'Zerstöre 50 Gegner'},
+  {id:'m_kill200', type:'kills',  goal:200,  reward:400, label:'Zerstöre 200 Gegner'},
+  {id:'m_boss1',   type:'boss',   goal:1,    reward:60,  label:'Besiege deinen 1. Boss'},
+  {id:'m_boss5',   type:'boss',   goal:5,    reward:180, label:'Besiege 5 Bosse'},
+  {id:'m_boss15',  type:'boss',   goal:15,   reward:500, label:'Besiege 15 Bosse'},
+  {id:'m_runs25',  type:'runs',   goal:25,   reward:80,  label:'Spiele 25 Runden'},
+  {id:'m_duelwin', type:'duelwin',goal:1,    reward:150, label:'Gewinne ein 1v1 Duell'},
+  {id:'m_duelwin5',type:'duelwin',goal:5,    reward:400, label:'Gewinne 5 Duelle'},
+];
+function loadMissions(){
+  try{const m=JSON.parse(localStorage.getItem(MSK)||'null');if(m&&m.stats&&m.claimed)return m;}catch(_){}
+  return {stats:{bags:0,height:0,kills:0,boss:0,runs:0,duelwin:0},claimed:{}};
+}
+let missionData=loadMissions();
+function saveMissions(){localStorage.setItem(MSK,JSON.stringify(missionData));}
+function missionProgress(type,amount){
+  const s=missionData.stats;
+  if(typeof s[type]!=='number')s[type]=0;
+  if(type==='height')s.height=Math.max(s.height,amount);
+  else s[type]+=amount;
+  saveMissions();
+  const el=document.getElementById('missionList');
+  if(el&&el.offsetParent!==null)refreshMissionUI();
+  cloudSyncSoon();
+}
+function refreshMissionUI(){
+  const el=document.getElementById('missionList');if(!el)return;
+  el.innerHTML='';
+  const s=missionData.stats;
+  for(const m of MISSIONS){
+    const prog=Math.min(m.goal,s[m.type]||0);
+    const done=prog>=m.goal, claimed=!!missionData.claimed[m.id];
+    const row=document.createElement('div');row.className='quest'+(claimed?' done':'');
+    row.innerHTML='<span style="flex:0 0 auto;font-size:13px;">'+m.label+'</span><span class="bar"><span style="width:'+((prog/m.goal)*100)+'%"></span></span>';
+    const btn=document.createElement('button');btn.className='btn';btn.style.minWidth='0';btn.style.padding='6px 8px';btn.style.fontSize='9px';
+    if(claimed){btn.textContent='✓';btn.disabled=true;}
+    else if(done){btn.textContent='+🌿'+m.reward;btn.onclick=()=>{missionData.claimed[m.id]=true;totalBags+=m.reward;localStorage.setItem(BK,totalBags);saveMissions();updateBagsUI();refreshMissionUI();cloudSyncSoon();};}
+    else{btn.textContent=prog+'/'+m.goal;btn.disabled=true;btn.style.background='#455a64';}
+    row.appendChild(btn);el.appendChild(row);
+  }
+}
+
+// ================= 1v1 DUELL (Link-Einladung, Supabase Realtime) =================
+const duel={active:false,code:null,seed:null,role:null,channel:null,ready:false,
+  myBest:0,oppBest:0,oppDead:false,oppY:null,oppX:W/2,finished:false,oppName:'Gegner'};
+const duelEl=document.getElementById('duel');
+const duelBox=document.getElementById('duelBox');
+const duelCopyBtn=document.getElementById('duelCopy');
+function duelSay(html){duelBox.innerHTML=html;}
+function duelSeedFromCode(code){let h=2166136261;for(let i=0;i<code.length;i++){h^=code.charCodeAt(i);h=Math.imul(h,16777619);}return h|0;}
+function duelLink(code){const u=new URL(window.location.href);u.searchParams.set('duel',code);return u.toString();}
+function myDuelName(){return (sbProfile&&sbProfile.display_name)||(sbUser&&sbUser.email)||'Spieler';}
+function openDuel(){gameState='menu';showOverlay('duel');duelEl.style.display='flex';
+  if(!duel.code)duelSay('Erstelle einen Raum und schicke den Link an einen Freund. Sobald er beitritt, startet das Duell.');}
+function closeDuel(){duelLeave();showOverlay('menu');goMenu();}
+function duelLeave(){
+  if(duel.channel){try{duel.channel.unsubscribe();}catch(_){ }}
+  duel.channel=null;duel.active=false;duel.code=null;duel.seed=null;duel.ready=false;
+  duelCopyBtn.style.display='none';
+}
+function randCode(){const a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<6;i++)s+=a[Math.floor(Math.random()*a.length)];return s;}
+
+async function duelJoin(code,role){
+  if(!sb){duelSay('<span style="color:#ff8a80">Online-Duell nicht verfügbar (keine Verbindung).</span>');return;}
+  duelLeave();
+  duel.code=code;duel.role=role;duel.seed=duelSeedFromCode(code);
+  const ch=sb.channel('afrojump-duel-'+code,{config:{broadcast:{self:false}}});
+  duel.channel=ch;
+  ch.on('broadcast',{event:'hello'},({payload})=>{
+    duel.oppName=payload.name||'Gegner';
+    if(role==='host'){ch.send({type:'broadcast',event:'hello',payload:{name:myDuelName()}});}
+    if(!duel.ready){duel.ready=true;duelStart();}
+  });
+  ch.on('broadcast',{event:'state'},({payload})=>{
+    duel.oppBest=Math.max(duel.oppBest,payload.b||0);
+    duel.oppY=payload.y;duel.oppX=payload.x;
+  });
+  ch.on('broadcast',{event:'end'},({payload})=>{
+    duel.oppBest=Math.max(duel.oppBest,payload.b||0);
+    duel.oppDead=true;duelCheckResult();
+  });
+  ch.subscribe((status)=>{
+    if(status==='SUBSCRIBED'){
+      duelSay('Raum <b style="color:#7cfc00">'+code+'</b><br>'+(role==='host'?'Warte auf Gegner…':'Verbinde mit Host…'));
+      ch.send({type:'broadcast',event:'hello',payload:{name:myDuelName()}});
+    }
+  });
+}
+function duelStart(){
+  duel.active=true;duel.finished=false;duel.oppDead=false;duel.oppBest=0;duel.oppY=null;
+  duelSay('Gegner gefunden: <b style="color:#7cfc00">'+escHtml(duel.oppName)+'</b> – GO!');
+  duelEl.style.display='none';
+  document.getElementById('duelResult').textContent='';
+  setTimeout(()=>{startGame();},400);
+}
+function duelSendState(){
+  if(!duel.active||!duel.channel||gameState!=='playing')return;
+  duel.channel.send({type:'broadcast',event:'state',payload:{y:player.y,x:player.x,b:bestY}});
+}
+function duelSendEnd(){
+  duel.myBest=Math.max(duel.myBest,bestY);
+  if(duel.channel)duel.channel.send({type:'broadcast',event:'end',payload:{b:duel.myBest}});
+  duelCheckResult();
+}
+function duelCheckResult(){
+  if(!duel.active||duel.finished)return;
+  if(gameState!=='gameover'||!duel.oppDead)return;
+  duel.finished=true;
+  const res=document.getElementById('duelResult');
+  if(duel.myBest>duel.oppBest){
+    res.textContent='🏆 DU GEWINNST! '+duel.myBest+'m vs '+duel.oppBest+'m';
+    totalBags+=50;localStorage.setItem(BK,totalBags);updateBagsUI();
+    missionProgress('duelwin',1);
+  }else if(duel.myBest<duel.oppBest){
+    res.textContent='💀 Verloren: '+duel.myBest+'m vs '+duel.oppBest+'m';
+  }else{
+    res.textContent='🤝 Unentschieden bei '+duel.myBest+'m';
+  }
+}
+let duelTick=0;
+setInterval(()=>{if(duel.active&&gameState==='playing'){duel.myBest=Math.max(duel.myBest,bestY);duelSendState();}},120);
+
+document.getElementById('menuDuel').onclick=()=>openDuel();
+document.getElementById('duelClose').onclick=()=>closeDuel();
+document.getElementById('duelCreate').onclick=()=>{
+  const code=randCode();
+  duelJoin(code,'host');
+  duelCopyBtn.style.display='block';
+  duelCopyBtn.onclick=()=>{
+    const link=duelLink(code);
+    if(navigator.clipboard)navigator.clipboard.writeText(link).catch(()=>{});
+    duelSay('Raum <b style="color:#7cfc00">'+code+'</b><br>Link kopiert:<br><span style="font-size:13px;word-break:break-all">'+escHtml(link)+'</span><br>Warte auf Gegner…');
+  };
+};
+// Auto-join when opened through an invite link
+(()=>{
+  const p=new URLSearchParams(window.location.search);
+  const code=p.get('duel');
+  if(code&&/^[A-Z0-9]{4,8}$/.test(code)){
+    setTimeout(()=>{openDuel();duelJoin(code,'guest');},600);
+  }
+})();
+
 reset();
 goMenu();
 requestAnimationFrame(loop);
