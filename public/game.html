@@ -447,17 +447,28 @@ const WEAPON_SKINS=[
   {id:'w_alien',  name:'Alien Kush Ray',rarity:'legendary',core:'#b9f6ca',ring:'#00c853',shape:'laser'},
 ];
 // ---- Joint-Skins (nur aus Loot-Tütchen) ----
+// dev = Form des Konsum-Gegenstands: joint | blunt | bong | vape | pipe | brownie | cookie | pill | gummy | dab | hookah | cigar
 const JOINT_SKINS=[
-  {id:'j_default',name:'Classic Joint', rarity:'common',   free:true, paper:'#f5ecd0',tip:'#ff6a00',smoke:'#eeeeee'},
-  {id:'j_brown',  name:'Blunt Wrap',    rarity:'common',   paper:'#8d6e63',tip:'#ff8a00',smoke:'#d7ccc8'},
-  {id:'j_slim',   name:'Slim King',     rarity:'common',   paper:'#fff8e1',tip:'#ff5252',smoke:'#f5f5f5'},
-  {id:'j_green',  name:'Green Paper',   rarity:'rare',     paper:'#a5d6a7',tip:'#ff6a00',smoke:'#c8e6c9'},
-  {id:'j_pink',   name:'Cotton Candy',  rarity:'rare',     paper:'#f8bbd0',tip:'#ff4081',smoke:'#fce4ec'},
-  {id:'j_ice',    name:'Menthol Ice',   rarity:'rare',     paper:'#b3e5fc',tip:'#40c4ff',smoke:'#e1f5fe'},
-  {id:'j_purple', name:'Purple Cone',   rarity:'epic',     paper:'#ce93d8',tip:'#7c4dff',smoke:'#ede7f6'},
-  {id:'j_black',  name:'Blackout',      rarity:'epic',     paper:'#212121',tip:'#ff1744',smoke:'#616161'},
-  {id:'j_gold',   name:'24K Joint',     rarity:'legendary',paper:'#ffd700',tip:'#fff176',smoke:'#fff9c4'},
-  {id:'j_rainbow',name:'Rainbow Spliff',rarity:'legendary',paper:'RAINBOW',tip:'#ffffff',smoke:'#ffffff'},
+  {id:'j_default',name:'Classic Joint', rarity:'common',   free:true, dev:'joint', paper:'#f5ecd0',tip:'#ff6a00',smoke:'#eeeeee'},
+  {id:'j_brown',  name:'Blunt Wrap',    rarity:'common',   dev:'blunt', paper:'#8d6e63',tip:'#ff8a00',smoke:'#d7ccc8'},
+  {id:'j_slim',   name:'Slim King',     rarity:'common',   dev:'joint', paper:'#fff8e1',tip:'#ff5252',smoke:'#f5f5f5'},
+  {id:'j_pipe',   name:'Apfel-Pfeife',  rarity:'common',   dev:'pipe',  paper:'#8bc34a',tip:'#ff7043',smoke:'#dcedc8'},
+  {id:'j_green',  name:'Green Paper',   rarity:'rare',     dev:'joint', paper:'#a5d6a7',tip:'#ff6a00',smoke:'#c8e6c9'},
+  {id:'j_pink',   name:'Cotton Candy',  rarity:'rare',     dev:'joint', paper:'#f8bbd0',tip:'#ff4081',smoke:'#fce4ec'},
+  {id:'j_ice',    name:'Menthol Ice',   rarity:'rare',     dev:'joint', paper:'#b3e5fc',tip:'#40c4ff',smoke:'#e1f5fe'},
+  {id:'j_vape',   name:'Vaporizer',     rarity:'rare',     dev:'vape',  paper:'#37474f',tip:'#00e5ff',smoke:'#b2ebf2'},
+  {id:'j_brownie',name:'Space Brownie', rarity:'rare',     dev:'brownie',paper:'#5d4037',tip:'#8d6e63',smoke:'#d7ccc8'},
+  {id:'j_cookie', name:'Weed Cookie',   rarity:'rare',     dev:'cookie', paper:'#d7a86e',tip:'#4e342e',smoke:'#f0e0c0'},
+  {id:'j_purple', name:'Purple Cone',   rarity:'epic',     dev:'joint', paper:'#ce93d8',tip:'#7c4dff',smoke:'#ede7f6'},
+  {id:'j_black',  name:'Blackout',      rarity:'epic',     dev:'blunt', paper:'#212121',tip:'#ff1744',smoke:'#616161'},
+  {id:'j_bong',   name:'Glas-Bong',     rarity:'epic',     dev:'bong',  paper:'#8ee6c8',tip:'#ff6a00',smoke:'#e0f7fa'},
+  {id:'j_pill',   name:'Bunte Pille',   rarity:'epic',     dev:'pill',  paper:'RAINBOW',tip:'#ffffff',smoke:'#f8bbd0'},
+  {id:'j_gummy',  name:'THC-Gummibär',  rarity:'epic',     dev:'gummy', paper:'#ff5252',tip:'#ffeb3b',smoke:'#ffcdd2'},
+  {id:'j_hookah', name:'Shisha',        rarity:'epic',     dev:'hookah',paper:'#ffca28',tip:'#ff7043',smoke:'#fff3c4'},
+  {id:'j_dab',    name:'Dab-Rig',       rarity:'legendary',dev:'dab',   paper:'#b388ff',tip:'#ff1744',smoke:'#ede7f6'},
+  {id:'j_cigar',  name:'Kush-Zigarre',  rarity:'legendary',dev:'cigar', paper:'#4e342e',tip:'#ff6a00',smoke:'#efebe9'},
+  {id:'j_gold',   name:'24K Joint',     rarity:'legendary',dev:'joint', paper:'#ffd700',tip:'#fff176',smoke:'#fff9c4'},
+  {id:'j_rainbow',name:'Rainbow Spliff',rarity:'legendary',dev:'joint', paper:'RAINBOW',tip:'#ffffff',smoke:'#ffffff'},
 ];
 // ---- Loot-Tütchen ----
 const LOOT_BOXES=[
