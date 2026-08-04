@@ -839,7 +839,15 @@ const keys={l:false,r:false};
 let shootRequested=false;
 function isLeftKey(k){return k==='ArrowLeft'||k==='a'||k==='A';}
 function isRightKey(k){return k==='ArrowRight'||k==='d'||k==='D';}
+// Never swallow keys while the player types in a form field (login, duel code, …)
+function isTypingTarget(el){
+  if(!el)return false;
+  const t=(el.tagName||'').toUpperCase();
+  return t==='INPUT'||t==='TEXTAREA'||t==='SELECT'||el.isContentEditable===true;
+}
 addEventListener('keydown',e=>{
+  if(isTypingTarget(e.target))return;
+  if(gameState!=='playing'&&gameState!=='paused')return;
   if(e.key==='Escape'||e.key==='p'||e.key==='P'){
     if(gameState==='playing')pauseGame();
     else if(gameState==='paused')resumeGame();
@@ -852,6 +860,7 @@ addEventListener('keydown',e=>{
   }
 });
 addEventListener('keyup',e=>{
+  if(isTypingTarget(e.target))return;
   if(isLeftKey(e.key))keys.l=false;
   else if(isRightKey(e.key))keys.r=false;
 });
