@@ -595,6 +595,18 @@ function spawnBoss(){
   if(kind==='giantblunt'){boss.w=80;boss.h=130;boss.vx=1.8;}
   if(kind==='mutantbush'){boss.w=140;boss.h=90;boss.vx=1.6;}
   scrollLocked=true;
+  // --- Boss arena: clear everything above the boss so the player can never
+  // get stuck on a platform out of reach and build a fair fighting floor ---
+  const arenaTop=boss.y+boss.h/2+70;
+  platforms=platforms.filter(p=>p.y>arenaTop);
+  collectibles=collectibles.filter(c=>c.y>arenaTop);
+  enemies=enemies.filter(e=>e.boss||!e.plat||e.plat.y>arenaTop);
+  const floorY=cameraY+H-90;
+  const arena=[[40,floorY],[W/2-40,floorY-110],[W-120,floorY-40],[30,floorY-190],[W-110,floorY-210]];
+  for(const [ax,ay] of arena){
+    platforms.push({x:ax,y:ay,w:80,h:12,vx:0,type:'normal',dir:1,range:0,ox:ax,bounce:0,cracked:0,springT:0});
+  }
+  platforms.sort((a,b)=>b.y-a.y);
   player.bossLives=3;player.invincible=Math.max(player.invincible,1.2);
   pushFloat(W/2,cameraY+140,'BOSS! 3 ♥','#ff5252');
   startBossMusic();
