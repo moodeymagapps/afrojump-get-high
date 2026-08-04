@@ -239,7 +239,7 @@ bgm.volume=0.55;
 function updateMuteUI(){muteBtn.textContent=muted?'🔇':'🔊';}
 function tryPlayMusic(){if(!muted){bgm.play().catch(()=>{});}}
 function stopMusic(){try{bgm.pause();}catch(e){}}
-muteBtn.onclick=(e)=>{e.stopPropagation();muted=!muted;localStorage.setItem(MK,muted?'1':'0');updateMuteUI();if(muted){stopMusic();stopBossMusic();}else{if(boss)startBossMusic();else tryPlayMusic();}};
+muteBtn.onclick=(e)=>{e.stopPropagation();muted=!muted;localStorage.setItem(MK,muted?'1':'0');updateMuteUI();if(muted){stopMusic();stopBossMusic();}else{if(!boss)tryPlayMusic();}};
 updateMuteUI();
 // ---------- Procedural Boss Music (WebAudio synth — no file needed) ----------
 let audioCtx=null,bossMusicNodes=null;
