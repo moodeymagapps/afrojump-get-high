@@ -3725,7 +3725,6 @@ async function loadCloudSave(){
     else{
       // Account hat das Geschenk noch nie erhalten -> jetzt gutschreiben
       applyStarterGrant(true);
-      pushFloat&&null;
       setTimeout(()=>{try{updateBagsUI();pushCloudSave();}catch(e){}},200);
     }
     if(typeof d.highScore==='number')highScore=Math.max(highScore,d.highScore);
