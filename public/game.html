@@ -984,7 +984,13 @@ const duel={active:false,code:null,seed:null,role:null,channel:null,ready:false,
   oppOffline:false,lastSeen:0};
 let shake={t:0,mag:0},timeScale=1,deathT=0,bossIndex=0;
 let killCombo=0,comboT=0,runKills=0;
-const BOSS_TYPES=['kingbong','mightymarijuana','drgreenthumb','theplug','giantblunt','mutantbush'];
+const BOSS_TYPES=['budboss','kingblunt','drgreenthumb','theplug','giantblunt','mutantbush'];
+// Bild-Bosse (Pixel-Art) – Namen + Untertitel wie auf den Artworks
+const BOSS_IMAGES={
+  budboss:{src:'/__l5e/assets-v1/23cd3ead-a14b-4f58-a46e-ff04ea7ee915/budboss.png',bg:'white',name:'BUD BOSS',sub:'Der Lord der Blüten'},
+  kingblunt:{src:'/__l5e/assets-v1/bf2f4cc9-c9e3-4980-932a-3ed2711b60f2/kingblunt.png',bg:'white',name:'KING BLUNT',sub:'Der gekrönte Joint'}
+};
+const BOSS_NAMES={budboss:'BUD BOSS',kingblunt:'KING BLUNT',drgreenthumb:'DR. GREENTHUMB',theplug:'THE PLUG',giantblunt:'GIANT BLUNT',mutantbush:'MUTANT BUSH'};
 const BOSS_NAMES={kingbong:'KING BONG',mightymarijuana:'MIGHTY MARIJUANA',drgreenthumb:'DR. GREENTHUMB',theplug:'THE PLUG',giantblunt:'GIANT BLUNT',mutantbush:'MUTANT BUSH'};
 
 // Seedable RNG — in duel mode both players generate the identical map
