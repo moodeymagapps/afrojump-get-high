@@ -608,6 +608,7 @@ function spawnBoss(){
   }
   platforms.sort((a,b)=>b.y-a.y);
   player.bossLives=3;player.invincible=Math.max(player.invincible,1.2);
+  if(player.y<arenaTop){player.y=arenaTop+60;player.vy=2;}
   pushFloat(W/2,cameraY+140,'BOSS! 3 ♥','#ff5252');
   startBossMusic();
 }
