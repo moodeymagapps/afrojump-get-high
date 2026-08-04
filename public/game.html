@@ -523,6 +523,7 @@ function pauseGame(){if(gameState!=='playing')return;gameState='paused';showOver
 function resumeGame(){if(gameState!=='paused')return;gameState='playing';showOverlay('playing');last=performance.now();if(boss)startBossMusic();else tryPlayMusic();}
 function openShop(from){shopReturn=from;gameState='shop';renderShop();updateBagsUI();showOverlay('shop');}
 function closeShop(){
+  if(typeof openBoxEl!=='undefined'&&openBoxEl){openBoxEl.style.display='none';boxAnim=null;}
   if(shopReturn==='paused'){gameState='paused';showOverlay('paused');}
   else if(shopReturn==='gameover'){gameState='gameover';showOverlay('gameover');}
   else goMenu();
