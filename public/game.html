@@ -1239,10 +1239,10 @@ function update(dt){
     c.t+=dt;
     if(Math.hypot(player.x-c.x,player.y-c.y)<player.r+10){
       c.taken=true;
-      if(c.type==='bag'){const gain=2;runBags+=gain;totalBags+=gain;bagsEl.textContent='🌿 '+totalBags;burst(c.x,c.y,'#7cfc00',18);pushFloat(c.x,c.y-4,'+'+gain+' 🌿','#7cfc00');}
-      else if(c.type==='joint'){player.invincible=6;player.vy=-22;burst(c.x,c.y,'#ff69b4',24);pushFloat(c.x,c.y-4,'INVINCIBLE!','#ff69b4');}
+      if(c.type==='bag'){const gain=2;runBags+=gain;totalBags+=gain;bagsEl.textContent='🌿 '+totalBags;burst(c.x,c.y,'#7cfc00',18);pushFloat(c.x,c.y-4,'+'+gain+' 🌿','#7cfc00');sfx('pickup');}
+      else if(c.type==='joint'){player.invincible=6;player.invSrc='power';player.vy=-22;burst(c.x,c.y,'#ff69b4',24);pushFloat(c.x,c.y-4,'INVINCIBLE!','#ff69b4');sfx('pickup');}
       else if(c.type==='jetpack'){player.jetpackT=3.0;player.vy=-14;burst(c.x,c.y,'#ff8a00',30);pushFloat(c.x,c.y-4,'JETPACK!','#ff8a00');}
-      else if(c.type==='gun'){player.gunT=5.0;burst(c.x,c.y,'#e0e0e0',22);pushFloat(c.x,c.y-4,'GUN 5s!','#e0e0e0');}
+      else if(c.type==='gun'){player.gunT=5.0;burst(c.x,c.y,'#e0e0e0',22);pushFloat(c.x,c.y-4,'GUN 5s!','#e0e0e0');sfx('pickup');}
       // gun fires instantly upward on pickup and then keeps auto-firing
       if(c.type==='gun'){player.shootCd=0;shootRequested=true;}
       if(c.type==='bag'){localStorage.setItem(BK,totalBags);questProgress('bags',2);missionProgress('bags',2);}
