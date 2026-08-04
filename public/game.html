@@ -923,6 +923,9 @@ document.getElementById('pauseResume').onclick=()=>resumeGame();
 document.getElementById('pauseShop').onclick=()=>openShop('paused');
 document.getElementById('pauseQuit').onclick=()=>{reset();gameState='playing';showOverlay('playing');};
 document.getElementById('shopClose').onclick=()=>closeShop();
+for(const b of document.querySelectorAll('#shopTabs button')){
+  b.onclick=()=>{shopTab=b.dataset.tab;renderShop();};
+}
 document.getElementById('overShop').onclick=()=>openShop('gameover');
 document.getElementById('overMenu').onclick=()=>goMenu();
 
