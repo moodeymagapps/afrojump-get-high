@@ -357,13 +357,14 @@ const LOOT_ONLY_SKINS=new Set(['dankninja','ganjascientist','puffpilot','thcalie
 // Rebalanced price curve: cheap entry skins, real long-term goals at the top
 (function rebalanceEconomy(){
   const tiers=[0,120,220,350,500,700,950,1300,1700,2200,2800];
-  const buyable=SKINS.filter(s=>!LOOT_ONLY_SKINS.has(s.id)).sort((a,b)=>a.price-b.price);
+  const buyable=SKINS.filter(s=>!LOOT_ONLY_SKINS.has(s.id)&&!s.community).sort((a,b)=>a.price-b.price);
   buyable.forEach((s,i)=>{
     const t=Math.round((i/Math.max(1,buyable.length-1))*(tiers.length-1));
     s.price=tiers[t];
   });
   for(const s of SKINS){
     if(LOOT_ONLY_SKINS.has(s.id)){s.lootOnly=true;s.price=null;}
+    if(s.community)continue; // keep hand-tuned price & rarity
     // rarity derived from value
     const p=s.lootOnly?2400:s.price;
     s.rarity=p>=1700?'legendary':p>=700?'epic':p>=220?'rare':'common';
