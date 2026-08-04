@@ -1021,6 +1021,13 @@ function pushFloat(x,y,txt,color){floatTexts.push({x,y,txt,color:color||'#fff',l
 function addShake(mag,dur){shake.mag=Math.max(shake.mag,mag);shake.t=Math.max(shake.t,dur);}
 
 function update(dt){
+  // Duell-Countdown: beide Spieler starten synchron
+  if(duel.active&&duel.countdown>0){
+    duel.countdown-=dt;
+    for(const pa of particles){pa.x+=pa.vx;pa.y+=pa.vy;pa.vy+=0.15;pa.life-=dt;}
+    particles=particles.filter(p=>p.life>0);
+    return;
+  }
   if(gameOver){
     deathT+=dt;
     // slow-mo particle physics only, no gameplay
