@@ -1873,11 +1873,70 @@ function drawAfroCharacter(g,s,inv){
   // mouth
   g.strokeStyle='#3a2010';g.lineWidth=1.4;
   g.beginPath();g.moveTo(-2,-12);g.quadraticCurveTo(1,-10,4,-12);g.stroke();
-  // joint
-  g.fillStyle=s.joint;g.fillRect(4,-13,10,2.5);
-  g.strokeStyle='#000';g.strokeRect(4,-13,10,2.5);
-  g.fillStyle=s.jointTip||'#ff6a00';g.fillRect(13.5,-13,2,2.5);
-  g.fillStyle='#ffd54a';g.fillRect(14,-12.5,1,1.5);
+  // Konsum-Gegenstand (Joint / Bong / Brownie / Pille / ...)
+  drawDevice(g,s);
+}
+
+// Zeichnet den ausgerüsteten Konsum-Gegenstand am Mund (Pixel-Look)
+function drawDevice(g,s){
+  const col=s.joint||'#f5ecd0', tip=s.jointTip||'#ff6a00', dev=s.dev||'joint';
+  const px=(x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(x,y,w,h);};
+  g.strokeStyle='#000';g.lineWidth=1;
+  if(dev==='joint'||dev==='blunt'||dev==='cigar'){
+    const len=dev==='joint'?10:dev==='blunt'?9:8, th=dev==='cigar'?4:dev==='blunt'?3.4:2.5;
+    px(4,-13,len,th,col);g.strokeRect(4,-13,len,th);
+    px(4+len-0.5,-13,2,th,tip);
+    px(4+len,-12.6,1,th*0.5,'#ffd54a');
+    if(dev==='cigar'){px(5,-13,2.5,th,shade(col,-0.3));}
+  }else if(dev==='pipe'){
+    px(3,-12.5,7,2,shade(col,-0.2));g.strokeRect(3,-12.5,7,2);
+    px(10,-16,4,5,col);g.strokeRect(10,-16,4,5);
+    px(10.5,-16.5,3,1.5,'#4caf50');
+    px(11.5,-17.5,1,1,tip);
+  }else if(dev==='bong'){
+    px(9,-11,7,6,'rgba(190,255,235,0.55)');g.strokeRect(9,-11,7,6);   // Kammer
+    px(11,-9,3,3,'#7fdcc0');                                          // Wasser
+    px(11.5,-20,2.5,9,'rgba(200,255,245,0.6)');g.strokeRect(11.5,-20,2.5,9); // Rohr
+    px(10.5,-21.5,4.5,2,shade(col,-0.1));g.strokeRect(10.5,-21.5,4.5,2);     // Mundstück
+    px(4,-9,6,1.6,shade(col,-0.2));                                   // Chillum zum Mund
+    px(15,-22.5,1.5,1.5,tip);
+  }else if(dev==='vape'){
+    px(4,-13.5,11,3.5,col);g.strokeRect(4,-13.5,11,3.5);
+    px(12.5,-13,2,2.5,tip);
+    px(6,-12.8,1.5,1.5,'#00e5ff');
+  }else if(dev==='dab'){
+    px(9,-11,7,6,'rgba(220,200,255,0.6)');g.strokeRect(9,-11,7,6);
+    px(11.5,-19,2.5,8,'rgba(230,215,255,0.65)');g.strokeRect(11.5,-19,2.5,8);
+    px(15,-19,4,2,col);g.strokeRect(15,-19,4,2);
+    px(18,-20,2,2,tip);
+    px(4,-9,6,1.6,shade(col,-0.2));
+  }else if(dev==='hookah'){
+    px(10,-10,7,7,col);g.strokeRect(10,-10,7,7);
+    px(12.5,-19,2,9,shade(col,-0.25));g.strokeRect(12.5,-19,2,9);
+    px(11,-21,5.5,2.5,shade(col,-0.1));g.strokeRect(11,-21,5.5,2.5);
+    px(12.5,-22,2.5,1.5,tip);
+    g.strokeStyle='#000';g.beginPath();g.moveTo(5,-10);g.quadraticCurveTo(7,-4,10,-6);g.stroke();
+  }else if(dev==='brownie'){
+    px(5,-15,10,6,col);g.strokeRect(5,-15,10,6);
+    px(5,-15,10,2,shade(col,0.18));
+    px(7,-13,1.5,1.5,'#2e7d32');px(11,-12,1.5,1.5,'#43a047');
+  }else if(dev==='cookie'){
+    g.fillStyle=col;g.beginPath();g.arc(10,-12,5,0,Math.PI*2);g.fill();g.stroke();
+    px(8,-14,1.5,1.5,'#3e2723');px(11,-11,1.5,1.5,'#2e7d32');px(9.5,-9.5,1.5,1.5,'#4e342e');
+  }else if(dev==='pill'){
+    px(4,-14,6,5,col==='#f5ecd0'?'#ff5252':col);g.strokeRect(4,-14,6,5);
+    px(10,-14,6,5,'#fafafa');g.strokeRect(10,-14,6,5);
+    px(11,-13.4,2,1.4,'rgba(255,255,255,0.9)');
+  }else if(dev==='gummy'){
+    g.fillStyle=col;
+    g.beginPath();g.arc(10,-15,2.4,0,Math.PI*2);g.fill();g.stroke();      // Kopf
+    px(7.5,-13,5,6,col);g.strokeRect(7.5,-13,5,6);                        // Körper
+    px(5.5,-12,2,2,col);px(12.5,-12,2,2,col);                             // Arme
+    px(9,-14.6,0.8,0.8,'#000');px(10.6,-14.6,0.8,0.8,'#000');
+    px(8,-12.5,1.2,1.2,tip);
+  }else{
+    px(4,-13,10,2.5,col);g.strokeRect(4,-13,10,2.5);px(13.5,-13,2,2.5,tip);
+  }
 }
 
 // utility: darken/lighten a hex color by amount (-1..1)
