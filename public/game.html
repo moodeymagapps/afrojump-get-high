@@ -530,6 +530,7 @@ document.getElementById('overMenu').onclick=()=>goMenu();
 // State
 let player,platforms,collectibles,enemies,projectiles,particles,smokeParticles,floatTexts,cameraY,bestY,scrollLocked,boss,bossTimer,nextBossScore,gameOver,rngSeed,runBags;
 let shake={t:0,mag:0},timeScale=1,deathT=0,bossIndex=0;
+let killCombo=0,comboT=0,runKills=0;
 const BOSS_TYPES=['kingbong','mightymarijuana','drgreenthumb','theplug','giantblunt','mutantbush'];
 const BOSS_NAMES={kingbong:'KING BONG',mightymarijuana:'MIGHTY MARIJUANA',drgreenthumb:'DR. GREENTHUMB',theplug:'THE PLUG',giantblunt:'GIANT BLUNT',mutantbush:'MUTANT BUSH'};
 
