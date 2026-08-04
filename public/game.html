@@ -302,6 +302,34 @@ function stopBossMusic(){
   setTimeout(()=>{try{bass.stop();lead.stop();master.disconnect();}catch(e){}},400);
   bossMusicNodes=null;
 }
+// ---------- SFX (kurze WebAudio-Blips – kein Boss-Loop mehr) ----------
+function sfx(kind){
+  if(muted)return;
+  const ac=ensureAudio();if(!ac)return;
+  if(ac.state==='suspended')ac.resume().catch(()=>{});
+  const t=ac.currentTime;
+  const P={
+    tele:   {type:'square',  f0:900, f1:1200, dur:0.10, vol:0.10},
+    shoot:  {type:'square',  f0:520, f1:180,  dur:0.12, vol:0.10},
+    hit:    {type:'triangle',f0:220, f1:90,   dur:0.16, vol:0.16},
+    stomp:  {type:'square',  f0:180, f1:520,  dur:0.14, vol:0.16},
+    hurt:   {type:'sawtooth',f0:320, f1:70,   dur:0.30, vol:0.18},
+    bossdie:{type:'sawtooth',f0:90,  f1:600,  dur:0.60, vol:0.20},
+    pickup: {type:'triangle',f0:660, f1:1320, dur:0.10, vol:0.10},
+    boss:   {type:'sawtooth',f0:70,  f1:40,   dur:0.80, vol:0.20},
+  }[kind];
+  if(!P)return;
+  try{
+    const o=ac.createOscillator(),g=ac.createGain();
+    o.type=P.type;
+    o.frequency.setValueAtTime(P.f0,t);
+    o.frequency.exponentialRampToValueAtTime(Math.max(20,P.f1),t+P.dur);
+    g.gain.setValueAtTime(P.vol,t);
+    g.gain.exponentialRampToValueAtTime(0.0008,t+P.dur);
+    o.connect(g).connect(ac.destination);
+    o.start(t);o.stop(t+P.dur+0.02);
+  }catch(e){}
+}
 // Autostart music on first user interaction (browser policy)
 function firstInteract(){ensureAudio();if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume().catch(()=>{});if(!boss)tryPlayMusic();window.removeEventListener('pointerdown',firstInteract);window.removeEventListener('keydown',firstInteract);}
 window.addEventListener('pointerdown',firstInteract,{once:true});
