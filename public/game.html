@@ -534,8 +534,9 @@ function rarBadge(rarity){
   const el=document.createElement('div');el.className='rar';el.style.color=r.color;el.textContent=r.name;
   return el;
 }
-function drawWeaponPreview(g,w){
-  g.clearRect(0,0,80,80);g.save();g.translate(40,40);g.scale(2.2,2.2);
+function drawWeaponPreview(g,w,noClear){
+  if(!noClear)g.clearRect(0,0,80,80);
+  g.save();g.translate(40,40);g.scale(2.2,2.2);
   const core=w.core==='RAINBOW'?rainbowCol(3):w.core, ring=w.ring==='RAINBOW'?rainbowCol(2):w.ring;
   g.shadowColor=ring;g.shadowBlur=6;
   if(w.shape==='laser'){g.fillStyle=ring;g.fillRect(-2,-12,4,20);g.fillStyle=core;g.fillRect(-1,-10,2,16);}
@@ -549,8 +550,9 @@ function drawWeaponPreview(g,w){
   else{g.strokeStyle=ring;g.lineWidth=3;g.beginPath();g.arc(0,0,7,0,Math.PI*2);g.stroke();g.strokeStyle=core;g.beginPath();g.arc(0,0,3,0,Math.PI*2);g.stroke();}
   g.restore();
 }
-function drawJointPreview(g,j){
-  g.clearRect(0,0,80,80);g.save();g.translate(18,46);g.rotate(-0.35);g.scale(2.4,2.4);
+function drawJointPreview(g,j,noClear){
+  if(!noClear)g.clearRect(0,0,80,80);
+  g.save();g.translate(18,46);g.rotate(-0.35);g.scale(2.4,2.4);
   const paper=j.paper==='RAINBOW'?rainbowCol(5):j.paper;
   g.fillStyle=paper;g.strokeStyle='#000';g.lineWidth=1;
   g.fillRect(0,-2,18,4);g.strokeRect(0,-2,18,4);
