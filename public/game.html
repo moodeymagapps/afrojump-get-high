@@ -1486,7 +1486,7 @@ function drawAfroCharacter(g,s,inv){
   // joint
   g.fillStyle=s.joint;g.fillRect(4,-13,10,2.5);
   g.strokeStyle='#000';g.strokeRect(4,-13,10,2.5);
-  g.fillStyle='#ff6a00';g.fillRect(13.5,-13,2,2.5);
+  g.fillStyle=s.jointTip||'#ff6a00';g.fillRect(13.5,-13,2,2.5);
   g.fillStyle='#ffd54a';g.fillRect(14,-12.5,1,1.5);
 }
 
