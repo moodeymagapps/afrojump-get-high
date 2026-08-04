@@ -83,6 +83,7 @@
     <button class="btn" id="menuPlay">▶ Spielen</button>
     <button class="btn alt" id="menuShop">🛍 Shop</button>
     <button class="btn alt" id="menuDaily">🎁 Täglich &amp; Aufgaben</button>
+    <button class="btn alt" id="menuDuel">⚔ 1v1 Duell (Link)</button>
     <button class="btn ghost" id="menuAccount">👤 Account</button>
     <p id="menuAcctStatus" style="font-size:14px;opacity:.7;margin-top:4px;letter-spacing:1px;"></p>
   </div>
@@ -107,6 +108,7 @@
     <button class="btn" id="restart">↻ Nochmal</button>
     <button class="btn alt" id="overShop">🛍 Shop</button>
     <button class="btn ghost" id="overMenu">🏠 Menü</button>
+    <p id="duelResult" style="color:#ffd54a;font-size:18px;"></p>
   </div>
   <div id="hint">Links/Rechts: ← → oder A/D · Schießen: Leertaste / Tap oben · Mobile: Tap links/rechts</div>
   <button id="fireBtn" title="Feuer">🔫</button>
@@ -144,6 +146,18 @@
       <h3>📋 Tagesaufgaben</h3>
       <div id="questList"></div>
     </div>
+    <div class="card">
+      <h3>🏆 Missionen</h3>
+      <div id="missionList"></div>
+    </div>
+  </div>
+  <div id="duel" class="overlay">
+    <h1>1v1 DUELL</h1>
+    <p style="font-size:16px;max-width:320px;text-align:center;">Gleiche Map, zwei Spieler. Wer höher kommt, gewinnt!</p>
+    <div id="duelBox" style="width:100%;max-width:340px;background:#1b1230;padding:12px;margin:8px 0;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #4a2c73;font-family:'VT323',monospace;font-size:16px;letter-spacing:1px;">Bereit.</div>
+    <button class="btn" id="duelCreate">⚔ Raum erstellen</button>
+    <button class="btn alt" id="duelCopy" style="display:none;">🔗 Link kopieren</button>
+    <button class="btn ghost" id="duelClose">🏠 Zurück</button>
   </div>
 </div>
 <audio id="bgm" src="/audio/afro_jump.mp3" loop preload="auto"></audio>
@@ -290,6 +304,7 @@ const SKINS=[
   {id:'moodey',     name:'Moodey',     price:800, img:'skins/moodey.jpg',     anchorY:0.72, bgKey:'white'},
   {id:'revengebird',name:'RevengeBird',price:900, img:'skins/revengebird.png',anchorY:0.72},
   {id:'kosak',      name:'Kosak',      price:700, img:'skins/kosak.png',      anchorY:0.72},
+  {id:'yannic',     name:'Yannic',     price:750, img:'skins/yannic.jpg',     anchorY:0.72},
 ];
 
 // ---- Image skin loader with background removal (flood-fill from corners) ----
@@ -372,6 +387,9 @@ function showOverlay(which){
   pauseEl.style.display=which==='paused'?'flex':'none';
   shopEl.style.display=which==='shop'?'flex':'none';
   overEl.style.display=which==='gameover'?'flex':'none';
+  const dEl=document.getElementById('duel'),aEl=document.getElementById('account');
+  if(dEl&&which!=='duel')dEl.style.display='none';
+  if(aEl&&which!=='account')aEl.style.display='none';
   pauseBtn.style.display=which==='playing'?'flex':'none';
 }
 function goMenu(){gameState='menu';menuHigh.textContent='Best: '+highScore+'m';updateBagsUI();showOverlay('menu');}
@@ -529,15 +547,29 @@ document.getElementById('overMenu').onclick=()=>goMenu();
 // State
 let player,platforms,collectibles,enemies,projectiles,particles,smokeParticles,floatTexts,cameraY,bestY,scrollLocked,boss,bossTimer,nextBossScore,gameOver,rngSeed,runBags;
 let shake={t:0,mag:0},timeScale=1,deathT=0,bossIndex=0;
+let killCombo=0,comboT=0,runKills=0;
 const BOSS_TYPES=['kingbong','mightymarijuana','drgreenthumb','theplug','giantblunt','mutantbush'];
 const BOSS_NAMES={kingbong:'KING BONG',mightymarijuana:'MIGHTY MARIJUANA',drgreenthumb:'DR. GREENTHUMB',theplug:'THE PLUG',giantblunt:'GIANT BLUNT',mutantbush:'MUTANT BUSH'};
 
-function rand(a,b){return a+Math.random()*(b-a);}
+// Seedable RNG — in duel mode both players generate the identical map
+let prngState=null;
+function rnd(){
+  if(prngState===null)return Math.random();
+  prngState=(prngState+0x6D2B79F5)|0;
+  let t=prngState;
+  t=Math.imul(t^(t>>>15),t|1);
+  t^=t+Math.imul(t^(t>>>7),t|61);
+  return ((t^(t>>>14))>>>0)/4294967296;
+}
+function rand(a,b){return a+rnd()*(b-a);}
 function reset(){
+  prngState=(duel.active&&duel.seed!==null)?duel.seed|0:null;
   player={x:W/2,y:H-100,vx:0,vy:-14,r:22,facing:1,invincible:0,shootCd:0,alive:true,bossShot:false,squash:1,stretch:1,landedT:0,bossLives:0,hitFlash:0,jetpackT:0,gunT:0};
   platforms=[];collectibles=[];enemies=[];projectiles=[];particles=[];smokeParticles=[];floatTexts=[];
   cameraY=0;bestY=0;scrollLocked=false;boss=null;nextBossScore=1500;gameOver=false;
   runBags=0;shake={t:0,mag:0};timeScale=1;deathT=0;
+  killCombo=0;comboT=0;runKills=0;bossIndex=0;
+  duel.myBest=0;duel.oppBest=0;duel.oppDead=false;duel.oppY=null;duel.oppX=W/2;duel.finished=false;
   stopBossMusic();
   // starting platform
   platforms.push({x:W/2-40,y:H-40,w:80,h:12,vx:0,type:'normal',dir:1,range:0,ox:W/2-40,bounce:0,cracked:0});
@@ -552,22 +584,22 @@ function spawnPlatform(y){
   const x=rand(10,W-10-w);
   const meters=Math.max(0,Math.floor(-y/10));
   let type='normal';
-  const r0=Math.random();
+  const r0=rnd();
   if(meters>60&&r0<0.10)type='brittle';
   else if(meters>40&&r0<0.20)type='spring';
   else if(meters>30&&r0<0.45)type='moving';
-  const p={x:x,y:y,w:w,h:12,vx:0,type,dir:Math.random()<.5?-1:1,range:0,ox:x,bounce:0,cracked:0,springT:0};
+  const p={x:x,y:y,w:w,h:12,vx:0,type,dir:rnd()<.5?-1:1,range:0,ox:x,bounce:0,cracked:0,springT:0};
   if(type==='moving'){p.range=rand(40,80);p.vx=rand(0.6,1.4);}
   platforms.push(p);
   // collectible
-  const r=Math.random();
+  const r=rnd();
   if(meters>80&&r<0.006){collectibles.push({x:x+w/2,y:y-24,type:'jetpack',t:0,taken:false});}
   else if(meters>40&&r<0.022){collectibles.push({x:x+w/2,y:y-22,type:'gun',t:0,taken:false});}
   else if(r<0.10){collectibles.push({x:x+w/2,y:y-22,type:'joint',t:0,taken:false});}
   else if(r<0.28){collectibles.push({x:x+w/2,y:y-18,type:'bag',t:0,taken:false});}
   // enemy
-  if(meters>20&&Math.random()<0.10&&w>60){
-    enemies.push({x:x+w/2,y:y-18,w:34,h:18,vx:1.2*(Math.random()<.5?-1:1),plat:p,type:Math.random()<.5?'car':'cop',alive:true});
+  if(meters>20&&rnd()<0.10&&w>60){
+    enemies.push({x:x+w/2,y:y-18,w:34,h:18,vx:1.2*(rnd()<.5?-1:1),plat:p,type:rnd()<.5?'car':'cop',alive:true});
   }
 }
 
@@ -581,7 +613,20 @@ function spawnBoss(){
   if(kind==='giantblunt'){boss.w=80;boss.h=130;boss.vx=1.8;}
   if(kind==='mutantbush'){boss.w=140;boss.h=90;boss.vx=1.6;}
   scrollLocked=true;
+  // --- Boss arena: clear everything above the boss so the player can never
+  // get stuck on a platform out of reach and build a fair fighting floor ---
+  const arenaTop=boss.y+boss.h/2+70;
+  platforms=platforms.filter(p=>p.y>arenaTop);
+  collectibles=collectibles.filter(c=>c.y>arenaTop);
+  enemies=enemies.filter(e=>e.boss||!e.plat||e.plat.y>arenaTop);
+  const floorY=cameraY+H-90;
+  const arena=[[40,floorY],[W/2-40,floorY-110],[W-120,floorY-40],[30,floorY-190],[W-110,floorY-210]];
+  for(const [ax,ay] of arena){
+    platforms.push({x:ax,y:ay,w:80,h:12,vx:0,type:'normal',dir:1,range:0,ox:ax,bounce:0,cracked:0,springT:0});
+  }
+  platforms.sort((a,b)=>b.y-a.y);
   player.bossLives=3;player.invincible=Math.max(player.invincible,1.2);
+  if(player.y<arenaTop){player.y=arenaTop+60;player.vy=2;}
   pushFloat(W/2,cameraY+140,'BOSS! 3 ♥','#ff5252');
   startBossMusic();
 }
@@ -690,11 +735,15 @@ function update(dt){
       else if(c.type==='joint'){player.invincible=6;player.vy=-22;burst(c.x,c.y,'#ff69b4',24);pushFloat(c.x,c.y-4,'INVINCIBLE!','#ff69b4');}
       else if(c.type==='jetpack'){player.jetpackT=3.0;player.vy=-14;burst(c.x,c.y,'#ff8a00',30);pushFloat(c.x,c.y-4,'JETPACK!','#ff8a00');}
       else if(c.type==='gun'){player.gunT=8.0;burst(c.x,c.y,'#e0e0e0',22);pushFloat(c.x,c.y-4,'GUN 8s!','#e0e0e0');}
+      // gun fires instantly upward on pickup and then keeps auto-firing
+      if(c.type==='gun'){player.shootCd=0;shootRequested=true;}
       if(c.type==='bag'){localStorage.setItem(BK,totalBags);questProgress('bags',1);}
+      if(c.type==='bag')missionProgress('bags',1);
     }
   }
 
   // projectiles
+  if(player.gunT>0)shootRequested=true; // auto-fire while the gun is active
   if(shootRequested&&player.shootCd<=0){
     if(player.gunT>0){
       // gun power-up: triple spread, faster fire
@@ -710,6 +759,30 @@ function update(dt){
   shootRequested=false;
   player.shootCd-=dt;
   for(const pr of projectiles){pr.x+=(pr.vx||0);pr.y+=pr.vy;pr.life-=dt;}
+
+  // projectiles vs enemies — one hit always destroys a normal enemy
+  for(const pr of projectiles){
+    if(pr.life<=0)continue;
+    for(const e of enemies){
+      if(!e.alive||e.boss||!e.plat)continue;
+      if(Math.abs(pr.x-e.x)<e.w/2+6&&Math.abs(pr.y-(e.y+e.h/2))<e.h/2+8){
+        pr.life=0;e.alive=false;
+        burst(e.x,e.y,'#ffcc00',20);addShake(3,0.12);
+        registerKill(e.x,e.y);
+        break;
+      }
+    }
+  }
+  // shoot down boss orbs too
+  for(const pr of projectiles){
+    if(pr.life<=0)continue;
+    for(const e of enemies){
+      if(!e.alive||!e.boss)continue;
+      if(Math.hypot(pr.x-e.x,pr.y-e.y)<14){pr.life=0;e.alive=false;burst(e.x,e.y,'#ffffff',10);break;}
+    }
+  }
+  comboT=Math.max(0,comboT-dt);
+  if(comboT<=0)killCombo=0;
 
   // boss check
   if(!boss&&bestY>=nextBossScore){spawnBoss();}
@@ -753,6 +826,7 @@ function update(dt){
       boss=null;scrollLocked=false;nextBossScore+=1800;bestY+=100;player.vy=-14;
       player.bossLives=0;stopBossMusic();tryPlayMusic();
       questProgress('boss',1);
+      missionProgress('boss',1);
     }
   }
   // boss projectiles
@@ -777,11 +851,16 @@ function update(dt){
 
   // recycle platforms
   const topY=cameraY-100;
-  while(platforms[platforms.length-1].y>topY-20){
-    const y=platforms[platforms.length-1].y-rand(60,90);
-    spawnPlatform(y);
+  if(!boss){
+    while(platforms.length&&platforms[platforms.length-1].y>topY-20){
+      const y=platforms[platforms.length-1].y-rand(60,90);
+      spawnPlatform(y);
+    }
   }
   platforms=platforms.filter(p=>p.y<cameraY+H+50);
+  if(!platforms.length){
+    platforms.push({x:W/2-40,y:cameraY+H-60,w:80,h:12,vx:0,type:'normal',dir:1,range:0,ox:W/2-40,bounce:0,cracked:0,springT:0});
+  }
   collectibles=collectibles.filter(c=>!c.taken&&c.y<cameraY+H+50);
   enemies=enemies.filter(e=>e.alive&&(e.boss||e.plat&&e.plat.y<cameraY+H+50));
   projectiles=projectiles.filter(pr=>pr.life>0&&pr.y>cameraY-20);
@@ -809,6 +888,20 @@ function update(dt){
 
 function burst(x,y,color,n=14){
   for(let i=0;i<n;i++)particles.push({x,y,vx:rand(-3,3),vy:rand(-4,1),life:0.8,color});
+}
+// Kill feedback: combo chain gives bonus baggys and juicy text
+function registerKill(x,y){
+  runKills++;
+  killCombo++;comboT=2.2;
+  missionProgress('kills',1);
+  if(killCombo>=2){
+    const bonus=Math.min(5,killCombo-1);
+    totalBags+=bonus;runBags+=bonus;localStorage.setItem(BK,totalBags);
+    bagsEl.textContent='🌿 '+totalBags;
+    pushFloat(x,y-16,'COMBO x'+killCombo+' +🌿'+bonus,'#ffd54a');
+  }else{
+    pushFloat(x,y-16,'BUSTED!','#ffcc00');
+  }
 }
 // Take damage during boss fight — spend a life, brief invincibility, don't game over unless out of lives
 function hurtPlayer(){
@@ -841,6 +934,9 @@ function die(){
   finalScore.textContent='Höhe: '+bestY+'m';
   finalHigh.textContent='Best: '+highScore+'m';
   finalBags.textContent='Gesammelt: 🌿 '+runBags+' (Total: '+totalBags+')';
+  missionProgress('runs',1);
+  missionProgress('height',bestY);
+  if(duel.active)duelSendEnd();
   setTimeout(()=>showOverlay('gameover'),500);
 }
 document.getElementById('restart').onclick=()=>startGame();
@@ -2755,6 +2851,17 @@ function render(){
   for(const p of platforms)drawPlatform(p);
   for(const c of collectibles)if(!c.taken)drawCollectible(c);
   for(const e of enemies)drawEnemy(e);
+  // duel: opponent ghost on the shared map
+  if(duel.active&&duel.oppY!==null){
+    const gy=duel.oppY-cameraY;
+    ctx.save();ctx.globalAlpha=0.45;
+    ctx.fillStyle='#7c4dff';
+    ctx.beginPath();ctx.arc(duel.oppX,gy,20,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='#e1bee7';ctx.lineWidth=2;ctx.stroke();
+    ctx.globalAlpha=0.9;ctx.fillStyle='#fff';ctx.font="10px 'Press Start 2P', monospace";ctx.textAlign='center';
+    ctx.fillText('👻 '+(duel.oppName||'Gegner').slice(0,8),duel.oppX,gy-28);
+    ctx.restore();
+  }
   for(const pr of projectiles){
     ctx.strokeStyle='rgba(240,240,240,.9)';ctx.lineWidth=3;
     ctx.beginPath();ctx.arc(pr.x,pr.y-cameraY,7,0,Math.PI*2);ctx.stroke();
@@ -2816,6 +2923,8 @@ function loop(t){
       if(player.invincible>0)parts.push('★ INVINCIBLE '+player.invincible.toFixed(1)+'s');
       if(player.jetpackT>0)parts.push('🚀 JETPACK '+player.jetpackT.toFixed(1)+'s');
       if(player.gunT>0)parts.push('🔫 GUN '+player.gunT.toFixed(1)+'s');
+      if(killCombo>1)parts.push('🔥 COMBO x'+killCombo);
+      if(duel.active)parts.push('⚔ '+(duel.oppName||'Gegner')+': '+duel.oppBest+'m');
     }
     powerEl.textContent=parts.join('  ');
     fireBtn.classList.toggle('on', !!(player && player.gunT>0 && gameState==='playing'));
@@ -2839,7 +2948,7 @@ fireBtn.addEventListener('mousedown',fireTap);
 document.getElementById('menuDaily').onclick=()=>openAccount();
 document.getElementById('menuAccount').onclick=()=>openAccount();
 document.getElementById('accountClose').onclick=()=>{accountEl.style.display='none';goMenu();};
-function openAccount(){gameState='menu';showOverlay('menu');menuEl.style.display='none';accountEl.style.display='flex';refreshAccountUI();refreshDailyUI();refreshQuestUI();}
+function openAccount(){gameState='menu';showOverlay('menu');menuEl.style.display='none';accountEl.style.display='flex';refreshAccountUI();refreshDailyUI();refreshQuestUI();refreshMissionUI();}
 
 // -------- Daily rewards --------
 const DKL='afroJumpDailyLast',DKS='afroJumpDailyStreak';
@@ -3000,6 +3109,12 @@ async function loadCloudSave(){
       }
     }
     if(d.quests&&d.quests.day===todayKey())quests=d.quests;
+    if(d.missions&&d.missions.stats){
+      const s=missionData.stats,o=d.missions.stats;
+      for(const k in s)if(typeof o[k]==='number')s[k]=Math.max(s[k],o[k]);
+      missionData.claimed=Object.assign({},d.missions.claimed||{},missionData.claimed);
+      saveMissions();
+    }
     localStorage.setItem(HK,highScore);localStorage.setItem(BK,totalBags);
     localStorage.setItem(OK,JSON.stringify(owned));localStorage.setItem(SK,selectedSkin);
     saveQuests(quests);
@@ -3011,7 +3126,7 @@ async function pushCloudSave(nameOverride){
   const payload={
     user_id:sbUser.id,
     display_name:nameOverride||(sbProfile&&sbProfile.display_name)||sbUser.email,
-    data:{totalBags,highScore,owned,selectedSkin,dailyLast:localStorage.getItem(DKL),dailyStreak:+localStorage.getItem(DKS)||0,quests},
+    data:{totalBags,highScore,owned,selectedSkin,dailyLast:localStorage.getItem(DKL),dailyStreak:+localStorage.getItem(DKS)||0,quests,missions:missionData},
     updated_at:new Date().toISOString(),
   };
   const {error}=await sb.from('player_saves').upsert(payload,{onConflict:'user_id'});
@@ -3023,6 +3138,159 @@ function cloudSyncSoon(){if(!sb||!sbUser)return;clearTimeout(cloudSyncT);cloudSy
 // Auto-sync total bags occasionally
 const origPersistShop=persistShop;
 persistShop=function(){origPersistShop();cloudSyncSoon();};
+
+// ================= MISSIONEN (langfristige Ziele) =================
+const MSK='afroJumpMissions';
+const MISSIONS=[
+  {id:'m_bags100', type:'bags',   goal:100,  reward:40,  label:'Sammle 100 Baggys'},
+  {id:'m_bags500', type:'bags',   goal:500,  reward:150, label:'Sammle 500 Baggys'},
+  {id:'m_bags2k',  type:'bags',   goal:2000, reward:500, label:'Sammle 2000 Baggys'},
+  {id:'m_h500',    type:'height', goal:500,  reward:50,  label:'Erreiche 500m in einem Run'},
+  {id:'m_h1500',   type:'height', goal:1500, reward:120, label:'Erreiche 1500m in einem Run'},
+  {id:'m_h3000',   type:'height', goal:3000, reward:300, label:'Erreiche 3000m in einem Run'},
+  {id:'m_kill10',  type:'kills',  goal:10,   reward:40,  label:'Zerstöre 10 Gegner'},
+  {id:'m_kill50',  type:'kills',  goal:50,   reward:120, label:'Zerstöre 50 Gegner'},
+  {id:'m_kill200', type:'kills',  goal:200,  reward:400, label:'Zerstöre 200 Gegner'},
+  {id:'m_boss1',   type:'boss',   goal:1,    reward:60,  label:'Besiege deinen 1. Boss'},
+  {id:'m_boss5',   type:'boss',   goal:5,    reward:180, label:'Besiege 5 Bosse'},
+  {id:'m_boss15',  type:'boss',   goal:15,   reward:500, label:'Besiege 15 Bosse'},
+  {id:'m_runs25',  type:'runs',   goal:25,   reward:80,  label:'Spiele 25 Runden'},
+  {id:'m_duelwin', type:'duelwin',goal:1,    reward:150, label:'Gewinne ein 1v1 Duell'},
+  {id:'m_duelwin5',type:'duelwin',goal:5,    reward:400, label:'Gewinne 5 Duelle'},
+];
+function loadMissions(){
+  try{const m=JSON.parse(localStorage.getItem(MSK)||'null');if(m&&m.stats&&m.claimed)return m;}catch(_){}
+  return {stats:{bags:0,height:0,kills:0,boss:0,runs:0,duelwin:0},claimed:{}};
+}
+let missionData=loadMissions();
+function saveMissions(){localStorage.setItem(MSK,JSON.stringify(missionData));}
+function missionProgress(type,amount){
+  const s=missionData.stats;
+  if(typeof s[type]!=='number')s[type]=0;
+  if(type==='height')s.height=Math.max(s.height,amount);
+  else s[type]+=amount;
+  saveMissions();
+  const el=document.getElementById('missionList');
+  if(el&&el.offsetParent!==null)refreshMissionUI();
+  cloudSyncSoon();
+}
+function refreshMissionUI(){
+  const el=document.getElementById('missionList');if(!el)return;
+  el.innerHTML='';
+  const s=missionData.stats;
+  for(const m of MISSIONS){
+    const prog=Math.min(m.goal,s[m.type]||0);
+    const done=prog>=m.goal, claimed=!!missionData.claimed[m.id];
+    const row=document.createElement('div');row.className='quest'+(claimed?' done':'');
+    row.innerHTML='<span style="flex:0 0 auto;font-size:13px;">'+m.label+'</span><span class="bar"><span style="width:'+((prog/m.goal)*100)+'%"></span></span>';
+    const btn=document.createElement('button');btn.className='btn';btn.style.minWidth='0';btn.style.padding='6px 8px';btn.style.fontSize='9px';
+    if(claimed){btn.textContent='✓';btn.disabled=true;}
+    else if(done){btn.textContent='+🌿'+m.reward;btn.onclick=()=>{missionData.claimed[m.id]=true;totalBags+=m.reward;localStorage.setItem(BK,totalBags);saveMissions();updateBagsUI();refreshMissionUI();cloudSyncSoon();};}
+    else{btn.textContent=prog+'/'+m.goal;btn.disabled=true;btn.style.background='#455a64';}
+    row.appendChild(btn);el.appendChild(row);
+  }
+}
+
+// ================= 1v1 DUELL (Link-Einladung, Supabase Realtime) =================
+const duel={active:false,code:null,seed:null,role:null,channel:null,ready:false,
+  myBest:0,oppBest:0,oppDead:false,oppY:null,oppX:W/2,finished:false,oppName:'Gegner'};
+const duelEl=document.getElementById('duel');
+const duelBox=document.getElementById('duelBox');
+const duelCopyBtn=document.getElementById('duelCopy');
+function duelSay(html){duelBox.innerHTML=html;}
+function duelSeedFromCode(code){let h=2166136261;for(let i=0;i<code.length;i++){h^=code.charCodeAt(i);h=Math.imul(h,16777619);}return h|0;}
+function duelLink(code){const u=new URL(window.location.href);u.searchParams.set('duel',code);return u.toString();}
+function myDuelName(){return (sbProfile&&sbProfile.display_name)||(sbUser&&sbUser.email)||'Spieler';}
+function openDuel(){gameState='menu';showOverlay('duel');duelEl.style.display='flex';
+  if(!duel.code)duelSay('Erstelle einen Raum und schicke den Link an einen Freund. Sobald er beitritt, startet das Duell.');}
+function closeDuel(){duelLeave();showOverlay('menu');goMenu();}
+function duelLeave(){
+  if(duel.channel){try{duel.channel.unsubscribe();}catch(_){ }}
+  duel.channel=null;duel.active=false;duel.code=null;duel.seed=null;duel.ready=false;
+  duelCopyBtn.style.display='none';
+}
+function randCode(){const a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<6;i++)s+=a[Math.floor(Math.random()*a.length)];return s;}
+
+async function duelJoin(code,role){
+  if(!sb){duelSay('<span style="color:#ff8a80">Online-Duell nicht verfügbar (keine Verbindung).</span>');return;}
+  duelLeave();
+  duel.code=code;duel.role=role;duel.seed=duelSeedFromCode(code);
+  const ch=sb.channel('afrojump-duel-'+code,{config:{broadcast:{self:false}}});
+  duel.channel=ch;
+  ch.on('broadcast',{event:'hello'},({payload})=>{
+    duel.oppName=payload.name||'Gegner';
+    if(role==='host'){ch.send({type:'broadcast',event:'hello',payload:{name:myDuelName()}});}
+    if(!duel.ready){duel.ready=true;duelStart();}
+  });
+  ch.on('broadcast',{event:'state'},({payload})=>{
+    duel.oppBest=Math.max(duel.oppBest,payload.b||0);
+    duel.oppY=payload.y;duel.oppX=payload.x;
+  });
+  ch.on('broadcast',{event:'end'},({payload})=>{
+    duel.oppBest=Math.max(duel.oppBest,payload.b||0);
+    duel.oppDead=true;duelCheckResult();
+  });
+  ch.subscribe((status)=>{
+    if(status==='SUBSCRIBED'){
+      duelSay('Raum <b style="color:#7cfc00">'+code+'</b><br>'+(role==='host'?'Warte auf Gegner…':'Verbinde mit Host…'));
+      ch.send({type:'broadcast',event:'hello',payload:{name:myDuelName()}});
+    }
+  });
+}
+function duelStart(){
+  duel.active=true;duel.finished=false;duel.oppDead=false;duel.oppBest=0;duel.oppY=null;
+  duelSay('Gegner gefunden: <b style="color:#7cfc00">'+escHtml(duel.oppName)+'</b> – GO!');
+  duelEl.style.display='none';
+  document.getElementById('duelResult').textContent='';
+  setTimeout(()=>{startGame();},400);
+}
+function duelSendState(){
+  if(!duel.active||!duel.channel||gameState!=='playing')return;
+  duel.channel.send({type:'broadcast',event:'state',payload:{y:player.y,x:player.x,b:bestY}});
+}
+function duelSendEnd(){
+  duel.myBest=Math.max(duel.myBest,bestY);
+  if(duel.channel)duel.channel.send({type:'broadcast',event:'end',payload:{b:duel.myBest}});
+  duelCheckResult();
+}
+function duelCheckResult(){
+  if(!duel.active||duel.finished)return;
+  if(gameState!=='gameover'||!duel.oppDead)return;
+  duel.finished=true;
+  const res=document.getElementById('duelResult');
+  if(duel.myBest>duel.oppBest){
+    res.textContent='🏆 DU GEWINNST! '+duel.myBest+'m vs '+duel.oppBest+'m';
+    totalBags+=50;localStorage.setItem(BK,totalBags);updateBagsUI();
+    missionProgress('duelwin',1);
+  }else if(duel.myBest<duel.oppBest){
+    res.textContent='💀 Verloren: '+duel.myBest+'m vs '+duel.oppBest+'m';
+  }else{
+    res.textContent='🤝 Unentschieden bei '+duel.myBest+'m';
+  }
+}
+let duelTick=0;
+setInterval(()=>{if(duel.active&&gameState==='playing'){duel.myBest=Math.max(duel.myBest,bestY);duelSendState();}},120);
+
+document.getElementById('menuDuel').onclick=()=>openDuel();
+document.getElementById('duelClose').onclick=()=>closeDuel();
+document.getElementById('duelCreate').onclick=()=>{
+  const code=randCode();
+  duelJoin(code,'host');
+  duelCopyBtn.style.display='block';
+  duelCopyBtn.onclick=()=>{
+    const link=duelLink(code);
+    if(navigator.clipboard)navigator.clipboard.writeText(link).catch(()=>{});
+    duelSay('Raum <b style="color:#7cfc00">'+code+'</b><br>Link kopiert:<br><span style="font-size:13px;word-break:break-all">'+escHtml(link)+'</span><br>Warte auf Gegner…');
+  };
+};
+// Auto-join when opened through an invite link
+(()=>{
+  const p=new URLSearchParams(window.location.search);
+  const code=p.get('duel');
+  if(code&&/^[A-Z0-9]{4,8}$/.test(code)){
+    setTimeout(()=>{openDuel();duelJoin(code,'guest');},600);
+  }
+})();
 
 reset();
 goMenu();
