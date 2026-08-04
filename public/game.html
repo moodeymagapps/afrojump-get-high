@@ -1159,6 +1159,9 @@ function update(dt){
     }
   }
 
+  // purge destroyed brittle platforms (no ghost graphics left behind)
+  if(platforms.some(p=>p.dead))platforms=platforms.filter(p=>!p.dead);
+
   // enemies patrol
   for(const e of enemies){
     if(!e.alive)continue;
@@ -1184,7 +1187,7 @@ function update(dt){
       if(c.type==='bag'){const gain=2;runBags+=gain;totalBags+=gain;bagsEl.textContent='🌿 '+totalBags;burst(c.x,c.y,'#7cfc00',18);pushFloat(c.x,c.y-4,'+'+gain+' 🌿','#7cfc00');}
       else if(c.type==='joint'){player.invincible=6;player.vy=-22;burst(c.x,c.y,'#ff69b4',24);pushFloat(c.x,c.y-4,'INVINCIBLE!','#ff69b4');}
       else if(c.type==='jetpack'){player.jetpackT=3.0;player.vy=-14;burst(c.x,c.y,'#ff8a00',30);pushFloat(c.x,c.y-4,'JETPACK!','#ff8a00');}
-      else if(c.type==='gun'){player.gunT=8.0;burst(c.x,c.y,'#e0e0e0',22);pushFloat(c.x,c.y-4,'GUN 8s!','#e0e0e0');}
+      else if(c.type==='gun'){player.gunT=5.0;burst(c.x,c.y,'#e0e0e0',22);pushFloat(c.x,c.y-4,'GUN 5s!','#e0e0e0');}
       // gun fires instantly upward on pickup and then keeps auto-firing
       if(c.type==='gun'){player.shootCd=0;shootRequested=true;}
       if(c.type==='bag'){localStorage.setItem(BK,totalBags);questProgress('bags',2);missionProgress('bags',2);}
@@ -1196,10 +1199,9 @@ function update(dt){
   if(player.gunT>0){
     shootRequested=true; // auto-fire while the gun is active
     if(player.shootCd<=0){
-      projectiles.push({x:player.x-3,y:player.y-10,vx:-1.5,vy:-10,life:2});
-      projectiles.push({x:player.x,  y:player.y-12,vx:0,   vy:-11,life:2});
-      projectiles.push({x:player.x+3,y:player.y-10,vx:1.5, vy:-10,life:2});
-      player.shootCd=0.15;
+      // straight up, always
+      projectiles.push({x:player.x,y:player.y-12,vx:0,vy:-12,life:2});
+      player.shootCd=0.12;
     }
   }else if(shootRequested){
     if(player.noGunT===undefined||player.noGunT<=0){
