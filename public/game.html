@@ -724,7 +724,7 @@ const boxLabel=document.getElementById('boxLabel');
 const boxSub=document.getElementById('boxSub');
 const boxAgain=document.getElementById('boxAgain');
 const boxDone=document.getElementById('boxDone');
-let boxAnim=null;
+let boxAnim=null,boxLoopRunning=false;
 function openLootBox(box){
   if(totalBags<box.price)return;
   totalBags-=box.price;
@@ -755,10 +755,10 @@ function startBoxAnim(box,res,sub){
   boxAnim={t:0,box,res,sub,revealed:false,particles:[]};
   boxAgain.onclick=()=>{ if(totalBags<box.price){boxSub.textContent='Nicht genug Baggys!';return;} openLootBox(box); };
   boxDone.onclick=()=>{boxAnim=null;openBoxEl.style.display='none';renderShop();updateBagsUI();};
-  if(!boxAnim._raf)requestAnimationFrame(boxLoop);
+  if(!boxLoopRunning){boxLoopRunning=true;requestAnimationFrame(boxLoop);}
 }
 function boxLoop(ts){
-  if(!boxAnim){return;}
+  if(!boxAnim){boxLoopRunning=false;return;}
   if(!boxAnim.lastTs)boxAnim.lastTs=ts;
   const dt=Math.min(0.05,(ts-boxAnim.lastTs)/1000);boxAnim.lastTs=ts;
   boxAnim.t+=dt;
@@ -811,9 +811,9 @@ function boxLoop(ts){
     if(it.kind==='skin'){
       bctx.save();bctx.translate(0,20);drawAfroCharacter(bctx,it.ref,0);bctx.restore();
     }else if(it.kind==='weapon'){
-      bctx.save();bctx.translate(-20,-20);drawWeaponPreview(bctx,it.ref);bctx.restore();
+      bctx.save();bctx.translate(-20,-20);drawWeaponPreview(bctx,it.ref,true);bctx.restore();
     }else{
-      bctx.save();bctx.translate(-20,-20);drawJointPreview(bctx,it.ref);bctx.restore();
+      bctx.save();bctx.translate(-20,-20);drawJointPreview(bctx,it.ref,true);bctx.restore();
     }
     bctx.restore();
   }
