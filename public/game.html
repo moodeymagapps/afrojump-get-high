@@ -2923,6 +2923,8 @@ function loop(t){
       if(player.invincible>0)parts.push('★ INVINCIBLE '+player.invincible.toFixed(1)+'s');
       if(player.jetpackT>0)parts.push('🚀 JETPACK '+player.jetpackT.toFixed(1)+'s');
       if(player.gunT>0)parts.push('🔫 GUN '+player.gunT.toFixed(1)+'s');
+      if(killCombo>1)parts.push('🔥 COMBO x'+killCombo);
+      if(duel.active)parts.push('⚔ '+(duel.oppName||'Gegner')+': '+duel.oppBest+'m');
     }
     powerEl.textContent=parts.join('  ');
     fireBtn.classList.toggle('on', !!(player && player.gunT>0 && gameState==='playing'));
