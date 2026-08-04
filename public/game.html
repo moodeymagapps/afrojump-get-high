@@ -565,6 +565,7 @@ function drawJointPreview(g,j){
 function makeCard(){const c=document.createElement('div');c.className='skinCard';return c;}
 function renderShop(){
   skinGrid.innerHTML='';
+  skinGrid.style.gridTemplateColumns=shopTab==='boxes'?'1fr':'1fr 1fr';
   for(const b of document.querySelectorAll('#shopTabs button'))b.classList.toggle('on',b.dataset.tab===shopTab);
   if(shopTab==='boxes')return renderBoxes();
   if(shopTab==='weapons')return renderLootTab(WEAPON_SKINS,ownedWeapons,'weapon');
