@@ -1077,6 +1077,8 @@ function spawnBoss(){
   startBossMusic();
 }
 
+
+window.__dbg={forceBoss(){nextBossScore=0;bestY=Math.max(bestY,1);},get boss(){return boss;},killBoss(){if(boss)boss.hp=0;},get player(){return player;}};
 function pushFloat(x,y,txt,color){floatTexts.push({x,y,txt,color:color||'#fff',life:0.9});}
 function addShake(mag,dur){shake.mag=Math.max(shake.mag,mag);shake.t=Math.max(shake.t,dur);}
 
