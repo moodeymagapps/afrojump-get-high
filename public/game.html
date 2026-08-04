@@ -686,6 +686,144 @@ function renderBoxes(){
     skinGrid.appendChild(card);
   }
 }
+
+// ---- Loot-Ziehung + Öffnungs-Animation ----
+function lootPool(rarity){
+  const out=[];
+  for(const s of SKINS)if(s.rarity===rarity)out.push({kind:'skin',id:s.id,name:s.name,rarity,ref:s});
+  for(const w of WEAPON_SKINS)if(w.rarity===rarity&&!w.free)out.push({kind:'weapon',id:w.id,name:w.name+' (Waffe)',rarity,ref:w});
+  for(const j of JOINT_SKINS)if(j.rarity===rarity&&!j.free)out.push({kind:'joint',id:j.id,name:j.name+' (Joint)',rarity,ref:j});
+  return out;
+}
+function rollRarity(odds){
+  let r=Math.random(),acc=0;
+  for(const k of ['legendary','epic','rare','common']){
+    acc+=odds[k]||0;
+    if(r<acc)return k;
+  }
+  return 'common';
+}
+function rollLoot(box){
+  let rarity=rollRarity(box.odds);
+  let pool=lootPool(rarity);
+  if(!pool.length){rarity='common';pool=lootPool('common');}
+  // prefer items the player does not own yet (feels fair, still can dupe)
+  const isOwnedItem=(it)=>it.kind==='skin'?owned.includes(it.id):it.kind==='weapon'?ownedWeapons.includes(it.id):ownedJoints.includes(it.id);
+  const fresh=pool.filter(it=>!isOwnedItem(it));
+  const src=fresh.length?fresh:pool;
+  const item=src[Math.floor(Math.random()*src.length)];
+  const dupe=isOwnedItem(item);
+  return {item,dupe,rarity};
+}
+const openBoxEl=document.getElementById('openBox');
+const boxCanvas=document.getElementById('boxCanvas');
+const bctx=boxCanvas.getContext('2d');
+const boxLabel=document.getElementById('boxLabel');
+const boxSub=document.getElementById('boxSub');
+const boxAgain=document.getElementById('boxAgain');
+const boxDone=document.getElementById('boxDone');
+let boxAnim=null;
+function openLootBox(box){
+  if(totalBags<box.price)return;
+  totalBags-=box.price;
+  const res=rollLoot(box);
+  // grant
+  let sub='';
+  if(res.dupe){
+    const refund=RARITY[res.rarity].refund;
+    totalBags+=refund;
+    sub='Doppelt! +🌿 '+refund+' zurück';
+  }else{
+    if(res.item.kind==='skin'){owned.push(res.item.id);}
+    else if(res.item.kind==='weapon'){ownedWeapons.push(res.item.id);}
+    else{ownedJoints.push(res.item.id);}
+    sub='NEU freigeschaltet!';
+  }
+  localStorage.setItem(BK,totalBags);
+  localStorage.setItem(OK,JSON.stringify(owned));
+  persistLoot();
+  updateBagsUI();
+  startBoxAnim(box,res,sub);
+}
+function startBoxAnim(box,res,sub){
+  openBoxEl.style.display='flex';
+  boxAgain.style.display='none';boxDone.style.display='none';
+  boxLabel.textContent=box.name+' …';boxLabel.style.color='#fff';
+  boxSub.textContent='';
+  boxAnim={t:0,box,res,sub,revealed:false,particles:[]};
+  boxAgain.onclick=()=>{ if(totalBags<box.price){boxSub.textContent='Nicht genug Baggys!';return;} openLootBox(box); };
+  boxDone.onclick=()=>{boxAnim=null;openBoxEl.style.display='none';renderShop();updateBagsUI();};
+  if(!boxAnim._raf)requestAnimationFrame(boxLoop);
+}
+function boxLoop(ts){
+  if(!boxAnim){return;}
+  if(!boxAnim.lastTs)boxAnim.lastTs=ts;
+  const dt=Math.min(0.05,(ts-boxAnim.lastTs)/1000);boxAnim.lastTs=ts;
+  boxAnim.t+=dt;
+  const t=boxAnim.t,a=boxAnim;
+  const rar=RARITY[a.res.rarity];
+  bctx.clearRect(0,0,300,300);
+  if(t<1.2){
+    // shake phase
+    const sh=Math.sin(t*40)*(2+t*6);
+    drawBaggy(bctx,150,150,2.2,a.box.bag,0,sh);
+    boxLabel.textContent=a.box.name+' …';
+  }else if(t<1.9){
+    const p=(t-1.2)/0.7;
+    drawBaggy(bctx,150,150-p*20,2.2,a.box.bag,p,Math.sin(t*30)*2*(1-p));
+    // flash
+    bctx.fillStyle='rgba(255,255,255,'+(p*0.55)+')';bctx.fillRect(0,0,300,300);
+    boxLabel.textContent='ÖFFNET…';
+  }else{
+    if(!a.revealed){
+      a.revealed=true;
+      for(let i=0;i<40;i++){
+        const ang=Math.random()*Math.PI*2,sp=40+Math.random()*160;
+        a.particles.push({x:150,y:150,vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp,life:1.2,c:Math.random()<0.5?rar.color:'#ffffff'});
+      }
+      boxLabel.textContent=rar.name+' – '+a.res.item.name;
+      boxLabel.style.color=rar.color;
+      boxSub.textContent=a.sub;
+      boxAgain.style.display='block';boxDone.style.display='block';
+    }
+    // rarity rays
+    const rt=t-1.9;
+    bctx.save();bctx.translate(150,150);bctx.rotate(rt*0.6);
+    bctx.globalAlpha=0.22;
+    for(let i=0;i<12;i++){
+      bctx.rotate(Math.PI*2/12);
+      bctx.fillStyle=rar.color;
+      bctx.beginPath();bctx.moveTo(0,0);bctx.lineTo(150,-14);bctx.lineTo(150,14);bctx.closePath();bctx.fill();
+    }
+    bctx.restore();
+    // glow disc
+    const gr=bctx.createRadialGradient(150,150,4,150,150,90);
+    gr.addColorStop(0,rar.color);gr.addColorStop(1,'rgba(0,0,0,0)');
+    bctx.globalAlpha=0.35;bctx.fillStyle=gr;bctx.beginPath();bctx.arc(150,150,90,0,Math.PI*2);bctx.fill();bctx.globalAlpha=1;
+    // item preview, popping in
+    const pop=Math.min(1,rt*4), bob=Math.sin(rt*3)*4;
+    bctx.save();bctx.translate(150,150+bob);
+    const sc=(0.6+pop*0.9)*2.0;
+    bctx.scale(sc,sc);
+    const it=a.res.item;
+    if(it.kind==='skin'){
+      bctx.save();bctx.translate(0,20);drawAfroCharacter(bctx,it.ref,0);bctx.restore();
+    }else if(it.kind==='weapon'){
+      bctx.save();bctx.translate(-20,-20);drawWeaponPreview(bctx,it.ref);bctx.restore();
+    }else{
+      bctx.save();bctx.translate(-20,-20);drawJointPreview(bctx,it.ref);bctx.restore();
+    }
+    bctx.restore();
+  }
+  // particles
+  for(const p of a.particles){
+    p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=200*dt;p.life-=dt;
+    if(p.life>0){bctx.globalAlpha=Math.max(0,p.life);bctx.fillStyle=p.c;bctx.fillRect(p.x-2,p.y-2,4,4);}
+  }
+  bctx.globalAlpha=1;
+  a.particles=a.particles.filter(p=>p.life>0);
+  requestAnimationFrame(boxLoop);
+}
 function drawSkinPreview(g,s){
   g.clearRect(0,0,80,80);
   g.save();g.translate(40,52);g.scale(1.2,1.2);
