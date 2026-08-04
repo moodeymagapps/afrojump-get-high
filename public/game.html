@@ -1369,6 +1369,7 @@ function die(){
   finalBags.textContent='Gesammelt: 🌿 '+runBags+' (Total: '+totalBags+')';
   missionProgress('runs',1);
   missionProgress('height',bestY);
+  try{submitScore();}catch(_){}
   if(duel.active)duelSendEnd();
   setTimeout(()=>showOverlay('gameover'),500);
 }
