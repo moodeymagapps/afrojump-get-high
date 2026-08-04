@@ -3670,62 +3670,107 @@ function refreshMissionUI(){
   }
 }
 
-// ================= 1v1 DUELL (Link-Einladung, Supabase Realtime) =================
-const duel={active:false,code:null,seed:null,role:null,channel:null,ready:false,
-  myBest:0,oppBest:0,oppDead:false,oppY:null,oppX:W/2,finished:false,oppName:'Gegner'};
+// ================= 1v1 DUELL v2 (Link/Code, Realtime, Countdown, Revanche) =================
 const duelEl=document.getElementById('duel');
 const duelBox=document.getElementById('duelBox');
 const duelCopyBtn=document.getElementById('duelCopy');
+const duelRematchBtn=document.getElementById('duelRematch');
 function duelSay(html){duelBox.innerHTML=html;}
 function duelSeedFromCode(code){let h=2166136261;for(let i=0;i<code.length;i++){h^=code.charCodeAt(i);h=Math.imul(h,16777619);}return h|0;}
 function duelLink(code){const u=new URL(window.location.href);u.searchParams.set('duel',code);return u.toString();}
-function myDuelName(){return (sbProfile&&sbProfile.display_name)||(sbUser&&sbUser.email)||'Spieler';}
-function openDuel(){gameState='menu';showOverlay('duel');duelEl.style.display='flex';
-  if(!duel.code)duelSay('Erstelle einen Raum und schicke den Link an einen Freund. Sobald er beitritt, startet das Duell.');}
+function myDuelName(){return (sbProfile&&sbProfile.display_name)||(sbUser&&sbUser.email&&String(sbUser.email).split('@')[0])||'Spieler';}
+function duelResetRound(){
+  duel.finished=false;duel.oppDead=false;duel.oppBest=0;duel.myBest=0;
+  duel.oppY=null;duel.oppX=W/2;duel.oppFacing=1;
+  duel.myRematch=false;duel.oppRematch=false;duel.oppOffline=false;
+  duel.lastSeen=Date.now();
+}
+function openDuel(){
+  gameState='menu';showOverlay('duel');duelEl.style.display='flex';
+  duelRematchBtn.style.display=(duel.active&&duel.code)?'block':'none';
+  if(!duel.code)duelSay('Erstelle einen Raum und teile den Link/Code. Sobald dein Gegner drin ist, geht es los – gleiche Map, gleiche Chancen.');
+}
 function closeDuel(){duelLeave();showOverlay('menu');goMenu();}
 function duelLeave(){
-  if(duel.channel){try{duel.channel.unsubscribe();}catch(_){ }}
-  duel.channel=null;duel.active=false;duel.code=null;duel.seed=null;duel.ready=false;
-  duelCopyBtn.style.display='none';
+  if(duel.channel){try{duel.channel.send({type:'broadcast',event:'bye',payload:{}});}catch(_){}
+    try{duel.channel.unsubscribe();}catch(_){}}
+  duel.channel=null;duel.active=false;duel.code=null;duel.seed=null;duel.ready=false;duel.round=0;
+  duelResetRound();
+  duelCopyBtn.style.display='none';duelRematchBtn.style.display='none';
 }
 function randCode(){const a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<6;i++)s+=a[Math.floor(Math.random()*a.length)];return s;}
 
 async function duelJoin(code,role){
   if(!sb){duelSay('<span style="color:#ff8a80">Online-Duell nicht verfügbar (keine Verbindung).</span>');return;}
   duelLeave();
-  duel.code=code;duel.role=role;duel.seed=duelSeedFromCode(code);
+  duel.code=code;duel.role=role;duel.round=0;duel.seed=duelSeedFromCode(code);
+  duelResetRound();
   const ch=sb.channel('afrojump-duel-'+code,{config:{broadcast:{self:false}}});
   duel.channel=ch;
+  let helloReplied=false;
   ch.on('broadcast',{event:'hello'},({payload})=>{
     duel.oppName=payload.name||'Gegner';
-    if(role==='host'){ch.send({type:'broadcast',event:'hello',payload:{name:myDuelName()}});}
+    duel.oppSkin=payload.skin||'classic';
+    duel.lastSeen=Date.now();
+    if(!helloReplied){helloReplied=true;ch.send({type:'broadcast',event:'hello',payload:{name:myDuelName(),skin:selectedSkin}});}
     if(!duel.ready){duel.ready=true;duelStart();}
   });
   ch.on('broadcast',{event:'state'},({payload})=>{
     duel.oppBest=Math.max(duel.oppBest,payload.b||0);
-    duel.oppY=payload.y;duel.oppX=payload.x;
+    duel.oppY=payload.y;duel.oppX=payload.x;duel.oppFacing=payload.f||1;
+    duel.lastSeen=Date.now();duel.oppOffline=false;
   });
   ch.on('broadcast',{event:'end'},({payload})=>{
     duel.oppBest=Math.max(duel.oppBest,payload.b||0);
-    duel.oppDead=true;duelCheckResult();
+    duel.oppDead=true;duel.lastSeen=Date.now();duelCheckResult();
+  });
+  ch.on('broadcast',{event:'rematch'},()=>{
+    duel.oppRematch=true;duel.lastSeen=Date.now();
+    duelSay('Gegner will Revanche!');
+    duelTryRematch();
+  });
+  ch.on('broadcast',{event:'bye'},()=>{
+    duel.oppOffline=true;
+    duelSay('<span style="color:#ff8a80">Gegner hat das Duell verlassen.</span>');
   });
   ch.subscribe((status)=>{
     if(status==='SUBSCRIBED'){
       duelSay('Raum <b style="color:#7cfc00">'+code+'</b><br>'+(role==='host'?'Warte auf Gegner…':'Verbinde mit Host…'));
-      ch.send({type:'broadcast',event:'hello',payload:{name:myDuelName()}});
+      ch.send({type:'broadcast',event:'hello',payload:{name:myDuelName(),skin:selectedSkin}});
+    }else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'){
+      duelSay('<span style="color:#ff8a80">Verbindungsfehler. Bitte nochmal versuchen.</span>');
     }
   });
 }
 function duelStart(){
-  duel.active=true;duel.finished=false;duel.oppDead=false;duel.oppBest=0;duel.oppY=null;
-  duelSay('Gegner gefunden: <b style="color:#7cfc00">'+escHtml(duel.oppName)+'</b> – GO!');
+  duel.active=true;
+  duelResetRound();
+  duel.seed=duelSeedFromCode(duel.code+':'+duel.round);
+  duelSay('Gegner: <b style="color:#7cfc00">'+escHtml(duel.oppName)+'</b> – GO!');
   duelEl.style.display='none';
   document.getElementById('duelResult').textContent='';
-  setTimeout(()=>{startGame();},400);
+  duelGameOverBtn.style.display='none';
+  setTimeout(()=>{startGame();duel.countdown=3.2;},350);
+}
+function duelRequestRematch(){
+  if(!duel.channel||!duel.code)return;
+  duel.myRematch=true;
+  duel.channel.send({type:'broadcast',event:'rematch',payload:{}});
+  duelSay('Revanche angefragt – warte auf Gegner…');
+  duelGameOverBtn.textContent='⏳ Warte auf Gegner…';
+  duelGameOverBtn.disabled=true;
+  duelTryRematch();
+}
+function duelTryRematch(){
+  if(duel.myRematch&&duel.oppRematch){
+    duel.round=(duel.round||0)+1;
+    duelGameOverBtn.disabled=false;duelGameOverBtn.textContent='⚔ Revanche';
+    duelStart();
+  }
 }
 function duelSendState(){
-  if(!duel.active||!duel.channel||gameState!=='playing')return;
-  duel.channel.send({type:'broadcast',event:'state',payload:{y:player.y,x:player.x,b:bestY}});
+  if(!duel.active||!duel.channel||gameState!=='playing'||!player)return;
+  duel.channel.send({type:'broadcast',event:'state',payload:{y:player.y,x:player.x,b:bestY,f:player.facing}});
 }
 function duelSendEnd(){
   duel.myBest=Math.max(duel.myBest,bestY);
@@ -3734,24 +3779,50 @@ function duelSendEnd(){
 }
 function duelCheckResult(){
   if(!duel.active||duel.finished)return;
-  if(gameState!=='gameover'||!duel.oppDead)return;
+  if(gameState!=='gameover')return;
+  if(!duel.oppDead&&!duel.oppOffline)return;
   duel.finished=true;
   const res=document.getElementById('duelResult');
-  if(duel.myBest>duel.oppBest){
+  const win=duel.oppOffline&&!duel.oppDead ? true : duel.myBest>duel.oppBest;
+  if(win){
     res.textContent='🏆 DU GEWINNST! '+duel.myBest+'m vs '+duel.oppBest+'m';
-    totalBags+=50;localStorage.setItem(BK,totalBags);updateBagsUI();
+    const bonus=150;
+    totalBags+=bonus;localStorage.setItem(BK,totalBags);updateBagsUI();
+    res.textContent+='  (+🌿'+bonus+')';
     missionProgress('duelwin',1);
   }else if(duel.myBest<duel.oppBest){
     res.textContent='💀 Verloren: '+duel.myBest+'m vs '+duel.oppBest+'m';
   }else{
     res.textContent='🤝 Unentschieden bei '+duel.myBest+'m';
+    totalBags+=40;localStorage.setItem(BK,totalBags);updateBagsUI();
   }
+  duelGameOverBtn.style.display='block';
 }
-let duelTick=0;
-setInterval(()=>{if(duel.active&&gameState==='playing'){duel.myBest=Math.max(duel.myBest,bestY);duelSendState();}},120);
+// Rematch button inside the game-over overlay (duel only)
+const duelGameOverBtn=document.createElement('button');
+duelGameOverBtn.className='btn alt';duelGameOverBtn.textContent='⚔ Revanche';
+duelGameOverBtn.style.display='none';
+duelGameOverBtn.onclick=()=>duelRequestRematch();
+overEl.insertBefore(duelGameOverBtn,document.getElementById('duelResult'));
+
+setInterval(()=>{
+  if(duel.active&&gameState==='playing'){duel.myBest=Math.max(duel.myBest,bestY);duelSendState();}
+  // watchdog: opponent silent for too long
+  if(duel.active&&duel.ready&&!duel.oppDead&&duel.lastSeen&&Date.now()-duel.lastSeen>9000){
+    duel.oppOffline=true;
+    if(gameState==='gameover')duelCheckResult();
+  }
+},120);
 
 document.getElementById('menuDuel').onclick=()=>openDuel();
 document.getElementById('duelClose').onclick=()=>closeDuel();
+duelRematchBtn.onclick=()=>duelRequestRematch();
+document.getElementById('duelJoinBtn').onclick=()=>{
+  const el=document.getElementById('duelCode');
+  const code=(el.value||'').trim().toUpperCase();
+  if(!/^[A-Z0-9]{4,8}$/.test(code)){duelSay('<span style="color:#ff8a80">Bitte gültigen Code eingeben.</span>');return;}
+  duelJoin(code,'guest');
+};
 document.getElementById('duelCreate').onclick=()=>{
   const code=randCode();
   duelJoin(code,'host');
