@@ -738,6 +738,7 @@ function update(dt){
       // gun fires instantly upward on pickup and then keeps auto-firing
       if(c.type==='gun'){player.shootCd=0;shootRequested=true;}
       if(c.type==='bag'){localStorage.setItem(BK,totalBags);questProgress('bags',1);}
+      if(c.type==='bag')missionProgress('bags',1);
     }
   }
 
@@ -825,6 +826,7 @@ function update(dt){
       boss=null;scrollLocked=false;nextBossScore+=1800;bestY+=100;player.vy=-14;
       player.bossLives=0;stopBossMusic();tryPlayMusic();
       questProgress('boss',1);
+      missionProgress('boss',1);
     }
   }
   // boss projectiles
@@ -2933,7 +2935,7 @@ fireBtn.addEventListener('mousedown',fireTap);
 document.getElementById('menuDaily').onclick=()=>openAccount();
 document.getElementById('menuAccount').onclick=()=>openAccount();
 document.getElementById('accountClose').onclick=()=>{accountEl.style.display='none';goMenu();};
-function openAccount(){gameState='menu';showOverlay('menu');menuEl.style.display='none';accountEl.style.display='flex';refreshAccountUI();refreshDailyUI();refreshQuestUI();}
+function openAccount(){gameState='menu';showOverlay('menu');menuEl.style.display='none';accountEl.style.display='flex';refreshAccountUI();refreshDailyUI();refreshQuestUI();refreshMissionUI();}
 
 // -------- Daily rewards --------
 const DKL='afroJumpDailyLast',DKS='afroJumpDailyStreak';
@@ -3105,7 +3107,7 @@ async function pushCloudSave(nameOverride){
   const payload={
     user_id:sbUser.id,
     display_name:nameOverride||(sbProfile&&sbProfile.display_name)||sbUser.email,
-    data:{totalBags,highScore,owned,selectedSkin,dailyLast:localStorage.getItem(DKL),dailyStreak:+localStorage.getItem(DKS)||0,quests},
+    data:{totalBags,highScore,owned,selectedSkin,dailyLast:localStorage.getItem(DKL),dailyStreak:+localStorage.getItem(DKS)||0,quests,missions:missionData},
     updated_at:new Date().toISOString(),
   };
   const {error}=await sb.from('player_saves').upsert(payload,{onConflict:'user_id'});
