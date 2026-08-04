@@ -233,6 +233,7 @@ const pauseBtn=document.getElementById('pauseBtn');
 const muteBtn=document.getElementById('muteBtn');
 const bgm=document.getElementById('bgm');
 const HK='afroJumpHigh',BK='afroJumpBags',OK='afroJumpOwned',SK='afroJumpSkin',MK='afroJumpMute';
+const GK='afroJumpGrant2k';
 let muted=localStorage.getItem(MK)==='1';
 bgm.volume=0.55;
 function updateMuteUI(){muteBtn.textContent=muted?'🔇':'🔊';}
@@ -308,6 +309,17 @@ window.addEventListener('keydown',firstInteract,{once:true});
 
 let highScore=+localStorage.getItem(HK)||0;
 let totalBags=+localStorage.getItem(BK)||0;
+// One-time starter gift: every player (new and existing) gets 2000 🌿
+let grant2000=localStorage.getItem(GK)==='1';
+function applyStarterGrant(){
+  if(grant2000)return false;
+  totalBags+=2000;
+  grant2000=true;
+  localStorage.setItem(GK,'1');
+  localStorage.setItem(BK,totalBags);
+  return true;
+}
+applyStarterGrant();
 let owned=JSON.parse(localStorage.getItem(OK)||'["classic"]');
 if(!owned.includes('classic'))owned.push('classic');
 let selectedSkin=localStorage.getItem(SK)||'classic';
@@ -393,7 +405,7 @@ const LOOT_ONLY_SKINS=new Set(['dankninja','ganjascientist','puffpilot','thcalie
 
 // ---- Waffen-Skins (nur aus Loot-Tütchen) ----
 const WEAPON_SKINS=[
-  {id:'w_default',name:'Standard',      rarity:'common',   free:true, core:'#ffffff',ring:'rgba(240,240,240,.9)',shape:'ring'},
+  {id:'w_default',name:'Standard',      rarity:'common',   free:true, core:'#fffde7',ring:'#8d8d8d',shape:'bullet'},
   {id:'w_seed',   name:'Seed Shot',     rarity:'common',   core:'#c5a25a',ring:'#7a5c2a',shape:'seed'},
   {id:'w_bud',    name:'Bud Blaster',   rarity:'common',   core:'#7cfc00',ring:'#2e7d32',shape:'bud'},
   {id:'w_smoke',  name:'Smoke Puff',    rarity:'rare',     core:'#e0e0e0',ring:'#9e9e9e',shape:'smoke'},
@@ -1125,7 +1137,7 @@ function update(dt){
   // collision with platforms (only when falling)
   if(player.vy>0){
     for(const p of platforms){
-      if(p.type==='brittle'&&p.cracked>=2)continue;
+      if(p.dead)continue;
       if(player.x>p.x-8&&player.x<p.x+p.w+8){
         if(player.y+player.r>=p.y&&player.y+player.r<=p.y+p.h+player.vy+2){
           player.y=p.y-player.r;
@@ -1134,11 +1146,21 @@ function update(dt){
           p.bounce=1;
           player.landedT=0.15;
           player.squash=1.35;player.stretch=0.75;
-          if(p.type==='brittle'){p.cracked++;if(p.cracked>=2){burst(p.x+p.w/2,p.y+6,'#8a5a2a',12);}}
+          if(p.type==='brittle'){
+            p.cracked++;
+            if(p.cracked>=2){
+              burst(p.x+p.w/2,p.y+6,'#8a5a2a',16);
+              p.dead=true; // remove it visually + physically
+              for(const en of enemies)if(en.plat===p){en.alive=false;en.plat=null;}
+            }
+          }
         }
       }
     }
   }
+
+  // purge destroyed brittle platforms (no ghost graphics left behind)
+  if(platforms.some(p=>p.dead))platforms=platforms.filter(p=>!p.dead);
 
   // enemies patrol
   for(const e of enemies){
@@ -1165,7 +1187,7 @@ function update(dt){
       if(c.type==='bag'){const gain=2;runBags+=gain;totalBags+=gain;bagsEl.textContent='🌿 '+totalBags;burst(c.x,c.y,'#7cfc00',18);pushFloat(c.x,c.y-4,'+'+gain+' 🌿','#7cfc00');}
       else if(c.type==='joint'){player.invincible=6;player.vy=-22;burst(c.x,c.y,'#ff69b4',24);pushFloat(c.x,c.y-4,'INVINCIBLE!','#ff69b4');}
       else if(c.type==='jetpack'){player.jetpackT=3.0;player.vy=-14;burst(c.x,c.y,'#ff8a00',30);pushFloat(c.x,c.y-4,'JETPACK!','#ff8a00');}
-      else if(c.type==='gun'){player.gunT=8.0;burst(c.x,c.y,'#e0e0e0',22);pushFloat(c.x,c.y-4,'GUN 8s!','#e0e0e0');}
+      else if(c.type==='gun'){player.gunT=5.0;burst(c.x,c.y,'#e0e0e0',22);pushFloat(c.x,c.y-4,'GUN 5s!','#e0e0e0');}
       // gun fires instantly upward on pickup and then keeps auto-firing
       if(c.type==='gun'){player.shootCd=0;shootRequested=true;}
       if(c.type==='bag'){localStorage.setItem(BK,totalBags);questProgress('bags',2);missionProgress('bags',2);}
@@ -1177,10 +1199,9 @@ function update(dt){
   if(player.gunT>0){
     shootRequested=true; // auto-fire while the gun is active
     if(player.shootCd<=0){
-      projectiles.push({x:player.x-3,y:player.y-10,vx:-1.5,vy:-10,life:2});
-      projectiles.push({x:player.x,  y:player.y-12,vx:0,   vy:-11,life:2});
-      projectiles.push({x:player.x+3,y:player.y-10,vx:1.5, vy:-10,life:2});
-      player.shootCd=0.15;
+      // straight up, always
+      projectiles.push({x:player.x,y:player.y-12,vx:0,vy:-12,life:2});
+      player.shootCd=0.12;
     }
   }else if(shootRequested){
     if(player.noGunT===undefined||player.noGunT<=0){
@@ -3371,10 +3392,12 @@ function render(){
         for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,r=i%2?3:8;const px=Math.cos(a)*r,py2=Math.sin(a)*r;i?ctx.lineTo(px,py2):ctx.moveTo(px,py2);}
         ctx.closePath();ctx.fill();ctx.stroke();
       }else{
-        ctx.strokeStyle=wc.ring;ctx.lineWidth=3;
-        ctx.beginPath();ctx.arc(0,0,7,0,Math.PI*2);ctx.stroke();
-        ctx.strokeStyle=wc.core;
-        ctx.beginPath();ctx.arc(0,0,3,0,Math.PI*2);ctx.stroke();
+        // simple small bullet
+        ctx.shadowBlur=4;
+        ctx.fillStyle=wc.ring;
+        ctx.beginPath();ctx.arc(0,0,3.2,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle=wc.core;
+        ctx.beginPath();ctx.arc(0,-0.6,1.7,0,Math.PI*2);ctx.fill();
       }
       ctx.restore();
     }
@@ -3610,6 +3633,9 @@ async function loadCloudSave(){
     const d=data.data||{};
     // merge: take max bags, union skins, keep highest highScore, streak/daily most recent
     if(typeof d.totalBags==='number')totalBags=Math.max(totalBags,d.totalBags);
+    // starter gift also applies to cloud saves made before the gift existed
+    if(d.grant2000)grant2000=true,localStorage.setItem(GK,'1');
+    else applyStarterGrant();
     if(typeof d.highScore==='number')highScore=Math.max(highScore,d.highScore);
     if(Array.isArray(d.owned))owned=Array.from(new Set([...owned,...d.owned]));
     if(d.selectedSkin&&owned.includes(d.selectedSkin))selectedSkin=d.selectedSkin;
@@ -3644,7 +3670,7 @@ async function pushCloudSave(nameOverride){
   const payload={
     user_id:sbUser.id,
     display_name:nameOverride||(sbProfile&&sbProfile.display_name)||sbUser.email,
-    data:{totalBags,highScore,owned,selectedSkin,ownedWeapons,ownedJoints,selectedWeapon,selectedJoint,dailyLast:localStorage.getItem(DKL),dailyStreak:+localStorage.getItem(DKS)||0,quests,missions:missionData},
+    data:{totalBags,highScore,owned,selectedSkin,ownedWeapons,ownedJoints,selectedWeapon,selectedJoint,grant2000,dailyLast:localStorage.getItem(DKL),dailyStreak:+localStorage.getItem(DKS)||0,quests,missions:missionData},
     updated_at:new Date().toISOString(),
   };
   const {error}=await sb.from('player_saves').upsert(payload,{onConflict:'user_id'});
