@@ -870,6 +870,20 @@ function update(dt){
 function burst(x,y,color,n=14){
   for(let i=0;i<n;i++)particles.push({x,y,vx:rand(-3,3),vy:rand(-4,1),life:0.8,color});
 }
+// Kill feedback: combo chain gives bonus baggys and juicy text
+function registerKill(x,y){
+  runKills++;
+  killCombo++;comboT=2.2;
+  missionProgress('kills',1);
+  if(killCombo>=2){
+    const bonus=Math.min(5,killCombo-1);
+    totalBags+=bonus;runBags+=bonus;localStorage.setItem(BK,totalBags);
+    bagsEl.textContent='🌿 '+totalBags;
+    pushFloat(x,y-16,'COMBO x'+killCombo+' +🌿'+bonus,'#ffd54a');
+  }else{
+    pushFloat(x,y-16,'BUSTED!','#ffcc00');
+  }
+}
 // Take damage during boss fight — spend a life, brief invincibility, don't game over unless out of lives
 function hurtPlayer(){
   if(gameOver)return;
