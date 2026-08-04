@@ -339,8 +339,8 @@ let highScore=+localStorage.getItem(HK)||0;
 let totalBags=+localStorage.getItem(BK)||0;
 // One-time starter gift: every player (new and existing) gets 2000 🌿
 let grant2000=localStorage.getItem(GK)==='1';
-function applyStarterGrant(){
-  if(grant2000)return false;
+function applyStarterGrant(force){
+  if(grant2000&&!force)return false;
   totalBags+=2000;
   grant2000=true;
   localStorage.setItem(GK,'1');
