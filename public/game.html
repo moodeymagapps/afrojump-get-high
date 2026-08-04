@@ -1156,6 +1156,7 @@ function update(dt){
   player.vy+=0.35;
   if(player.invincible>0){
     player.invincible-=dt;
+    if(player.invincible<=0)player.invSrc=null;
     if(player.vy>0)player.vy=Math.max(player.vy,-2);
   }
   // jetpack — strong sustained lift
