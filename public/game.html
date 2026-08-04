@@ -48,6 +48,24 @@
   .skinCard button.owned{background:#455a64;box-shadow:inset -2px -2px 0 #263238, inset 2px 2px 0 #90a4ae, 0 2px 0 #263238;}
   .skinCard button.selected{background:#7cfc00;color:#111;box-shadow:inset -2px -2px 0 #3d7d00, inset 2px 2px 0 #d4ffb3, 0 2px 0 #3d7d00;}
   .skinCard button:disabled{background:#4a1414;color:#c99;cursor:not-allowed;box-shadow:inset -2px -2px 0 #200, inset 2px 2px 0 #7a2a2a, 0 2px 0 #200;}
+  .tabs{display:flex;gap:6px;width:100%;max-width:360px;margin-bottom:10px;flex-wrap:wrap;}
+  .tabs button{flex:1;min-width:70px;padding:8px 4px;font-family:'Press Start 2P',monospace;font-size:8px;border:none;background:#2b1a0a;color:#bbb;cursor:pointer;box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #4a2c73;letter-spacing:.5px;}
+  .tabs button.on{background:#0d3d00;color:#7cfc00;box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #7cfc00;}
+  .skinCard .rar{font-family:'Press Start 2P',monospace;font-size:7px;letter-spacing:.5px;}
+  .boxCard{background:#1b1230;padding:10px;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #4a2c73;}
+  .boxCard canvas{background:#120c22;width:96px;height:96px;image-rendering:pixelated;}
+  .boxCard .bname{font-family:'Press Start 2P',monospace;font-size:8px;text-align:center;line-height:1.5;}
+  .boxCard .odds{font-family:'VT323',monospace;font-size:14px;opacity:.85;text-align:center;line-height:1.25;}
+  .boxCard button{width:100%;padding:8px;border:none;font-family:'Press Start 2P',monospace;font-size:8px;background:#ffb300;color:#111;cursor:pointer;box-shadow:inset -2px -2px 0 #b47a00, inset 2px 2px 0 #ffe082, 0 2px 0 #b47a00;}
+  .boxCard button:disabled{background:#4a1414;color:#c99;cursor:not-allowed;box-shadow:inset -2px -2px 0 #200, inset 2px 2px 0 #7a2a2a;}
+  #openBox{background:linear-gradient(rgba(6,4,12,.96),rgba(6,4,12,.99));}
+  #openBox canvas{background:transparent;box-shadow:none;image-rendering:pixelated;}
+  #boxLabel{font-family:'Press Start 2P',monospace;font-size:11px;letter-spacing:1px;min-height:20px;text-align:center;text-shadow:2px 2px 0 #000;}
+  #boxSub{font-family:'VT323',monospace;font-size:18px;letter-spacing:1px;min-height:22px;opacity:.9;}
+  #duelJoinRow{display:flex;gap:6px;width:100%;max-width:340px;margin:6px 0;}
+  #duelCode{flex:1;padding:10px;background:#0a0518;border:2px solid #4a2c73;color:#fff;font-family:'Press Start 2P',monospace;font-size:11px;text-transform:uppercase;box-sizing:border-box;letter-spacing:2px;}
+  #duelCode:focus{outline:none;border-color:#7cfc00;}
+  #duelJoinBtn{padding:10px 12px;border:none;background:#4caf50;color:#fff;font-family:'Press Start 2P',monospace;font-size:9px;cursor:pointer;box-shadow:inset -2px -2px 0 #1b5e20, inset 2px 2px 0 #a5d6a7, 0 3px 0 #1b5e20;}
   #hint{position:absolute;bottom:12px;left:0;right:0;text-align:center;font-size:14px;opacity:.6;pointer-events:none;font-family:'VT323',monospace;letter-spacing:1px;}
   #fireBtn{position:absolute;bottom:60px;left:50%;transform:translateX(-50%);width:78px;height:78px;border-radius:50%;background:#c62828;border:none;color:#fff;font-size:30px;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:inset -4px -4px 0 #7f1010, inset 4px 4px 0 #ff8a80, 0 5px 0 #7f1010, 0 0 20px rgba(255,80,80,.6);z-index:5;font-family:'Press Start 2P',monospace;user-select:none;-webkit-tap-highlight-color:transparent;}
   #fireBtn:active{transform:translateX(-50%) translateY(3px);box-shadow:inset -4px -4px 0 #7f1010, inset 4px 4px 0 #ff8a80, 0 2px 0 #7f1010;}
@@ -95,10 +113,23 @@
   </div>
   <div id="shop" class="overlay">
     <div class="head">
-      <h2>🛍 Skin-Shop</h2>
+      <h2>🛍 Shop</h2>
       <div><span id="shopBags">🌿 0</span> &nbsp; <button id="shopClose">✕</button></div>
     </div>
+    <div class="tabs" id="shopTabs">
+      <button data-tab="skins" class="on">🧑 SKINS</button>
+      <button data-tab="boxes">🎒 TÜTCHEN</button>
+      <button data-tab="weapons">🔫 WAFFEN</button>
+      <button data-tab="joints">🚬 JOINTS</button>
+    </div>
     <div class="skinGrid" id="skinGrid"></div>
+  </div>
+  <div id="openBox" class="overlay">
+    <div id="boxLabel">TÜTCHEN ÖFFNEN…</div>
+    <canvas id="boxCanvas" width="300" height="300"></canvas>
+    <div id="boxSub"></div>
+    <button class="btn" id="boxAgain" style="display:none;">🎒 Nochmal öffnen</button>
+    <button class="btn ghost" id="boxDone" style="display:none;">✓ Weiter</button>
   </div>
   <div id="over" class="overlay">
     <h1>GAME OVER</h1>
@@ -110,7 +141,7 @@
     <button class="btn ghost" id="overMenu">🏠 Menü</button>
     <p id="duelResult" style="color:#ffd54a;font-size:18px;"></p>
   </div>
-  <div id="hint">Links/Rechts: ← → oder A/D · Schießen: Leertaste / Tap oben · Mobile: Tap links/rechts</div>
+  <div id="hint">← → / A D bewegen · Schießen nur mit aufgesammelter Waffe 🔫 · Mobile: Tap links/rechts</div>
   <button id="fireBtn" title="Feuer">🔫</button>
   <div id="account" class="overlay">
     <div class="head" style="display:flex;justify-content:space-between;width:100%;max-width:360px;align-items:center;margin-bottom:12px;">
@@ -157,6 +188,11 @@
     <div id="duelBox" style="width:100%;max-width:340px;background:#1b1230;padding:12px;margin:8px 0;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #4a2c73;font-family:'VT323',monospace;font-size:16px;letter-spacing:1px;">Bereit.</div>
     <button class="btn" id="duelCreate">⚔ Raum erstellen</button>
     <button class="btn alt" id="duelCopy" style="display:none;">🔗 Link kopieren</button>
+    <div id="duelJoinRow">
+      <input id="duelCode" maxlength="8" placeholder="CODE" autocomplete="off" />
+      <button id="duelJoinBtn">BEITRETEN</button>
+    </div>
+    <button class="btn alt" id="duelRematch" style="display:none;">↻ Revanche</button>
     <button class="btn ghost" id="duelClose">🏠 Zurück</button>
   </div>
 </div>
@@ -307,6 +343,89 @@ const SKINS=[
   {id:'yannic',     name:'Yannic',     price:750, img:'skins/yannic.jpg',     anchorY:0.72},
 ];
 
+// ================= ÖKONOMIE, RARITÄTEN & LOOT =================
+// Rarity colors/labels used by shop cards and the loot animation
+const RARITY={
+  common:   {name:'STREET',   color:'#9ccc65', refund:40},
+  rare:     {name:'DANK',     color:'#4fc3f7', refund:120},
+  epic:     {name:'FIRE OG',  color:'#ba68c8', refund:300},
+  legendary:{name:'TOP SHELF',color:'#ffd54a', refund:800},
+};
+// These character skins are loot-box exclusive (no purchase possible)
+const LOOT_ONLY_SKINS=new Set(['dankninja','ganjascientist','puffpilot','thcalien','bonghead','rollingpaper','cloudwalker','spacecadet','chroniccowboy','kushking','rainbowhigh','fabi']);
+// Rebalanced price curve: cheap entry skins, real long-term goals at the top
+(function rebalanceEconomy(){
+  const tiers=[0,120,220,350,500,700,950,1300,1700,2200,2800];
+  const buyable=SKINS.filter(s=>!LOOT_ONLY_SKINS.has(s.id)).sort((a,b)=>a.price-b.price);
+  buyable.forEach((s,i)=>{
+    const t=Math.round((i/Math.max(1,buyable.length-1))*(tiers.length-1));
+    s.price=tiers[t];
+  });
+  for(const s of SKINS){
+    if(LOOT_ONLY_SKINS.has(s.id)){s.lootOnly=true;s.price=null;}
+    // rarity derived from value
+    const p=s.lootOnly?2400:s.price;
+    s.rarity=p>=1700?'legendary':p>=700?'epic':p>=220?'rare':'common';
+  }
+})();
+
+// ---- Waffen-Skins (nur aus Loot-Tütchen) ----
+const WEAPON_SKINS=[
+  {id:'w_default',name:'Standard',      rarity:'common',   free:true, core:'#ffffff',ring:'rgba(240,240,240,.9)',shape:'ring'},
+  {id:'w_seed',   name:'Seed Shot',     rarity:'common',   core:'#c5a25a',ring:'#7a5c2a',shape:'seed'},
+  {id:'w_bud',    name:'Bud Blaster',   rarity:'common',   core:'#7cfc00',ring:'#2e7d32',shape:'bud'},
+  {id:'w_smoke',  name:'Smoke Puff',    rarity:'rare',     core:'#e0e0e0',ring:'#9e9e9e',shape:'smoke'},
+  {id:'w_bong',   name:'Bong Bubble',   rarity:'rare',     core:'#b3e5fc',ring:'#0288d1',shape:'bubble'},
+  {id:'w_lighter',name:'Feuerzeug',     rarity:'rare',     core:'#ffd54a',ring:'#ff6a00',shape:'flame'},
+  {id:'w_purple', name:'Purple Haze',   rarity:'epic',     core:'#e1bee7',ring:'#7c4dff',shape:'star'},
+  {id:'w_laser',  name:'Space Laser',   rarity:'epic',     core:'#ffffff',ring:'#00e5ff',shape:'laser'},
+  {id:'w_skunk',  name:'Skunk Bomb',    rarity:'epic',     core:'#c5e1a5',ring:'#33691e',shape:'bomb'},
+  {id:'w_gold',   name:'Golden Nug',    rarity:'legendary',core:'#fff59d',ring:'#ffb300',shape:'bud'},
+  {id:'w_rainbow',name:'Rainbow Blast', rarity:'legendary',core:'RAINBOW',ring:'RAINBOW',shape:'star'},
+  {id:'w_alien',  name:'Alien Kush Ray',rarity:'legendary',core:'#b9f6ca',ring:'#00c853',shape:'laser'},
+];
+// ---- Joint-Skins (nur aus Loot-Tütchen) ----
+const JOINT_SKINS=[
+  {id:'j_default',name:'Classic Joint', rarity:'common',   free:true, paper:'#f5ecd0',tip:'#ff6a00',smoke:'#eeeeee'},
+  {id:'j_brown',  name:'Blunt Wrap',    rarity:'common',   paper:'#8d6e63',tip:'#ff8a00',smoke:'#d7ccc8'},
+  {id:'j_slim',   name:'Slim King',     rarity:'common',   paper:'#fff8e1',tip:'#ff5252',smoke:'#f5f5f5'},
+  {id:'j_green',  name:'Green Paper',   rarity:'rare',     paper:'#a5d6a7',tip:'#ff6a00',smoke:'#c8e6c9'},
+  {id:'j_pink',   name:'Cotton Candy',  rarity:'rare',     paper:'#f8bbd0',tip:'#ff4081',smoke:'#fce4ec'},
+  {id:'j_ice',    name:'Menthol Ice',   rarity:'rare',     paper:'#b3e5fc',tip:'#40c4ff',smoke:'#e1f5fe'},
+  {id:'j_purple', name:'Purple Cone',   rarity:'epic',     paper:'#ce93d8',tip:'#7c4dff',smoke:'#ede7f6'},
+  {id:'j_black',  name:'Blackout',      rarity:'epic',     paper:'#212121',tip:'#ff1744',smoke:'#616161'},
+  {id:'j_gold',   name:'24K Joint',     rarity:'legendary',paper:'#ffd700',tip:'#fff176',smoke:'#fff9c4'},
+  {id:'j_rainbow',name:'Rainbow Spliff',rarity:'legendary',paper:'RAINBOW',tip:'#ffffff',smoke:'#ffffff'},
+];
+// ---- Loot-Tütchen ----
+const LOOT_BOXES=[
+  {id:'gram', name:'GRAMM-TÜTCHEN', price:150,  bag:'#9ccc65', odds:{common:0.70,rare:0.25,epic:0.045,legendary:0.005}},
+  {id:'zip',  name:'ZIP-BEUTEL',    price:450,  bag:'#4fc3f7', odds:{common:0.40,rare:0.42,epic:0.15, legendary:0.03}},
+  {id:'pound',name:'PFUND-PAKET',   price:1200, bag:'#ffd54a', odds:{common:0.10,rare:0.35,epic:0.40, legendary:0.15}},
+];
+// Loot inventory
+const WK='afroJumpWeapon',JK='afroJumpJoint',OWK='afroJumpOwnedW',OJK='afroJumpOwnedJ';
+function loadList(key,def){try{const a=JSON.parse(localStorage.getItem(key)||'null');if(Array.isArray(a))return Array.from(new Set([...def,...a]));}catch(_){}return def.slice();}
+let ownedWeapons=loadList(OWK,['w_default']);
+let ownedJoints=loadList(OJK,['j_default']);
+let selectedWeapon=localStorage.getItem(WK)||'w_default';
+let selectedJoint=localStorage.getItem(JK)||'j_default';
+function persistLoot(){
+  localStorage.setItem(OWK,JSON.stringify(ownedWeapons));
+  localStorage.setItem(OJK,JSON.stringify(ownedJoints));
+  localStorage.setItem(WK,selectedWeapon);
+  localStorage.setItem(JK,selectedJoint);
+  localStorage.setItem(BK,totalBags);
+  if(typeof cloudSyncSoon==='function')cloudSyncSoon();
+}
+function currentWeapon(){return WEAPON_SKINS.find(w=>w.id===selectedWeapon)||WEAPON_SKINS[0];}
+function currentJoint(){return JOINT_SKINS.find(j=>j.id===selectedJoint)||JOINT_SKINS[0];}
+function rainbowCol(speed){return 'hsl('+((performance.now()/(speed||4))%360)+',90%,60%)';}
+function weaponColors(){
+  const w=currentWeapon();
+  return {core:w.core==='RAINBOW'?rainbowCol(3):w.core, ring:w.ring==='RAINBOW'?rainbowCol(2):w.ring, shape:w.shape};
+}
+
 // ---- Image skin loader with background removal (flood-fill from corners) ----
 const skinImgCache={};
 function loadSkinImage(src, bgKey){
@@ -375,7 +494,13 @@ function trimTransparent(src){
 }
 // Preload the image skins right away
 for(const s of SKINS)if(s.img)loadSkinImage(s.img,s.bgKey);
-function currentSkin(){return SKINS.find(s=>s.id===selectedSkin)||SKINS[0];}
+function currentSkin(){
+  const base=SKINS.find(s=>s.id===selectedSkin)||SKINS[0];
+  const j=currentJoint();
+  if(j.id==='j_default')return base;
+  // equipped joint skin recolors the joint of every character skin
+  return Object.assign({},base,{joint:j.paper==='RAINBOW'?rainbowCol(5):j.paper,jointTip:j.tip});
+}
 function persistShop(){localStorage.setItem(BK,totalBags);localStorage.setItem(OK,JSON.stringify(owned));localStorage.setItem(SK,selectedSkin);}
 function updateBagsUI(){bagsEl.textContent='🌿 '+totalBags;menuBags.textContent='🌿 '+totalBags+' Baggys';shopBags.textContent='🌿 '+totalBags;}
 
@@ -398,14 +523,58 @@ function pauseGame(){if(gameState!=='playing')return;gameState='paused';showOver
 function resumeGame(){if(gameState!=='paused')return;gameState='playing';showOverlay('playing');last=performance.now();if(boss)startBossMusic();else tryPlayMusic();}
 function openShop(from){shopReturn=from;gameState='shop';renderShop();updateBagsUI();showOverlay('shop');}
 function closeShop(){
+  if(typeof openBoxEl!=='undefined'&&openBoxEl){openBoxEl.style.display='none';boxAnim=null;}
   if(shopReturn==='paused'){gameState='paused';showOverlay('paused');}
   else if(shopReturn==='gameover'){gameState='gameover';showOverlay('gameover');}
   else goMenu();
 }
 
+let shopTab='skins';
+function rarBadge(rarity){
+  const r=RARITY[rarity]||RARITY.common;
+  const el=document.createElement('div');el.className='rar';el.style.color=r.color;el.textContent=r.name;
+  return el;
+}
+function drawWeaponPreview(g,w,noClear){
+  if(!noClear)g.clearRect(0,0,80,80);
+  g.save();g.translate(40,40);g.scale(2.2,2.2);
+  const core=w.core==='RAINBOW'?rainbowCol(3):w.core, ring=w.ring==='RAINBOW'?rainbowCol(2):w.ring;
+  g.shadowColor=ring;g.shadowBlur=6;
+  if(w.shape==='laser'){g.fillStyle=ring;g.fillRect(-2,-12,4,20);g.fillStyle=core;g.fillRect(-1,-10,2,16);}
+  else if(w.shape==='seed'){g.fillStyle=core;g.beginPath();g.ellipse(0,0,3.5,5.5,0,0,Math.PI*2);g.fill();g.strokeStyle=ring;g.lineWidth=1.2;g.stroke();}
+  else if(w.shape==='bud'){g.fillStyle=ring;g.beginPath();g.arc(0,0,6,0,Math.PI*2);g.fill();g.fillStyle=core;for(let i=0;i<5;i++){const a=i*Math.PI*2/5;g.beginPath();g.arc(Math.cos(a)*3,Math.sin(a)*3,2.2,0,Math.PI*2);g.fill();}}
+  else if(w.shape==='bubble'){g.fillStyle='rgba(255,255,255,.25)';g.beginPath();g.arc(0,0,7,0,Math.PI*2);g.fill();g.strokeStyle=ring;g.lineWidth=2;g.stroke();g.fillStyle=core;g.beginPath();g.arc(-2,-2,2,0,Math.PI*2);g.fill();}
+  else if(w.shape==='smoke'){g.fillStyle=core;g.beginPath();g.arc(-3,1,4,0,Math.PI*2);g.arc(2,-2,5,0,Math.PI*2);g.arc(4,3,3,0,Math.PI*2);g.fill();}
+  else if(w.shape==='flame'){g.fillStyle=ring;g.beginPath();g.moveTo(0,-10);g.lineTo(5,4);g.lineTo(-5,4);g.closePath();g.fill();g.fillStyle=core;g.beginPath();g.moveTo(0,-5);g.lineTo(2.5,4);g.lineTo(-2.5,4);g.closePath();g.fill();}
+  else if(w.shape==='bomb'){g.fillStyle=ring;g.beginPath();g.arc(0,0,6,0,Math.PI*2);g.fill();g.fillStyle=core;g.beginPath();g.arc(0,0,3,0,Math.PI*2);g.fill();}
+  else if(w.shape==='star'){g.fillStyle=core;g.strokeStyle=ring;g.lineWidth=1.2;g.beginPath();for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,r=i%2?3:8;const px=Math.cos(a)*r,py=Math.sin(a)*r;i?g.lineTo(px,py):g.moveTo(px,py);}g.closePath();g.fill();g.stroke();}
+  else{g.strokeStyle=ring;g.lineWidth=3;g.beginPath();g.arc(0,0,7,0,Math.PI*2);g.stroke();g.strokeStyle=core;g.beginPath();g.arc(0,0,3,0,Math.PI*2);g.stroke();}
+  g.restore();
+}
+function drawJointPreview(g,j,noClear){
+  if(!noClear)g.clearRect(0,0,80,80);
+  g.save();g.translate(18,46);g.rotate(-0.35);g.scale(2.4,2.4);
+  const paper=j.paper==='RAINBOW'?rainbowCol(5):j.paper;
+  g.fillStyle=paper;g.strokeStyle='#000';g.lineWidth=1;
+  g.fillRect(0,-2,18,4);g.strokeRect(0,-2,18,4);
+  g.fillStyle=j.tip;g.fillRect(18,-2,3,4);
+  g.fillStyle='rgba(255,255,255,.5)';g.fillRect(2,-1.6,12,0.8);
+  g.restore();
+  // smoke puffs
+  g.globalAlpha=.7;g.fillStyle=j.smoke||'#eee';
+  g.beginPath();g.arc(64,34,6,0,Math.PI*2);g.arc(56,22,5,0,Math.PI*2);g.arc(48,13,4,0,Math.PI*2);g.fill();
+  g.globalAlpha=1;
+}
+function makeCard(){const c=document.createElement('div');c.className='skinCard';return c;}
 function renderShop(){
   skinGrid.innerHTML='';
-  for(const s of SKINS){
+  skinGrid.style.gridTemplateColumns=shopTab==='boxes'?'1fr':'1fr 1fr';
+  for(const b of document.querySelectorAll('#shopTabs button'))b.classList.toggle('on',b.dataset.tab===shopTab);
+  if(shopTab==='boxes')return renderBoxes();
+  if(shopTab==='weapons')return renderLootTab(WEAPON_SKINS,ownedWeapons,'weapon');
+  if(shopTab==='joints')return renderLootTab(JOINT_SKINS,ownedJoints,'joint');
+  const list=SKINS.filter(s=>!s.lootOnly||owned.includes(s.id));
+  for(const s of list){
     const card=document.createElement('div');
     card.className='skinCard'+(s.id===selectedSkin?' selected':'');
     if(s.img){
@@ -430,7 +599,9 @@ function renderShop(){
       card.appendChild(cvS);
     }
     const nm=document.createElement('div');nm.className='name';nm.textContent=s.name;card.appendChild(nm);
-    const pr=document.createElement('div');pr.className='price';pr.textContent=s.price===0?'Gratis':('🌿 '+s.price);card.appendChild(pr);
+    card.appendChild(rarBadge(s.rarity));
+    const pr=document.createElement('div');pr.className='price';
+    pr.textContent=s.lootOnly?'🎒 Loot':(s.price===0?'Gratis':('🌿 '+s.price));card.appendChild(pr);
     const btn=document.createElement('button');
     const isOwned=owned.includes(s.id);
     const isSel=s.id===selectedSkin;
@@ -443,6 +614,218 @@ function renderShop(){
     card.appendChild(btn);
     skinGrid.appendChild(card);
   }
+}
+
+// ---- Waffen/Joint Tabs (Loot-Inhalte) ----
+function renderLootTab(catalog,ownedList,kind){
+  for(const it of catalog){
+    const card=makeCard();
+    const isOwned=ownedList.includes(it.id);
+    const isSel=kind==='weapon'?selectedWeapon===it.id:selectedJoint===it.id;
+    if(isSel)card.classList.add('selected');
+    const cv=document.createElement('canvas');cv.width=80;cv.height=80;
+    const g=cv.getContext('2d');
+    if(kind==='weapon')drawWeaponPreview(g,it);else drawJointPreview(g,it);
+    if(!isOwned){cv.style.filter='grayscale(1) brightness(.5)';}
+    card.appendChild(cv);
+    const nm=document.createElement('div');nm.className='name';nm.textContent=it.name;card.appendChild(nm);
+    card.appendChild(rarBadge(it.rarity));
+    const pr=document.createElement('div');pr.className='price';pr.textContent=it.free?'Gratis':'🎒 Nur Loot';card.appendChild(pr);
+    const btn=document.createElement('button');
+    if(isSel){btn.textContent='✓ Aktiv';btn.className='selected';btn.disabled=true;}
+    else if(isOwned){btn.textContent='Auswählen';btn.className='owned';btn.onclick=()=>{
+      if(kind==='weapon')selectedWeapon=it.id;else selectedJoint=it.id;
+      persistLoot();renderShop();
+    };}
+    else{btn.textContent='🔒 Tütchen';btn.disabled=true;}
+    card.appendChild(btn);
+    skinGrid.appendChild(card);
+  }
+}
+
+// ---- Loot-Tütchen Tab ----
+function drawBaggy(g,cx,cy,scale,col,openAmt,shake){
+  // simple plastic ziplock baggy with weed inside
+  g.save();g.translate(cx+(shake||0),cy);g.scale(scale,scale);
+  g.lineJoin='round';
+  const open=openAmt||0;
+  // bag body
+  g.fillStyle='rgba(255,255,255,0.16)';g.strokeStyle='rgba(255,255,255,0.75)';g.lineWidth=2;
+  g.beginPath();g.moveTo(-26,-30);g.lineTo(26,-30);g.lineTo(24,36);g.lineTo(-24,36);g.closePath();g.fill();g.stroke();
+  // weed buds inside
+  g.fillStyle=col;
+  const buds=[[-10,14,8],[8,18,7],[0,4,9],[-14,-2,6],[13,2,6]];
+  for(const [bx,by,br] of buds){
+    g.beginPath();g.arc(bx,by,br,0,Math.PI*2);g.fill();
+  }
+  g.fillStyle='rgba(255,255,255,0.25)';
+  for(const [bx,by,br] of buds){g.beginPath();g.arc(bx-br*0.3,by-br*0.35,br*0.32,0,Math.PI*2);g.fill();}
+  // zip lips — open upward with openAmt
+  g.strokeStyle='#e0e0e0';g.lineWidth=3;
+  g.beginPath();g.moveTo(-26,-30);g.lineTo(-6-open*8,-32-open*10);g.stroke();
+  g.beginPath();g.moveTo(26,-30);g.lineTo(6+open*8,-32-open*10);g.stroke();
+  // label sticker
+  g.fillStyle='rgba(255,255,255,0.85)';g.fillRect(-12,-26,24,8);
+  g.fillStyle='#2e7d32';g.font='bold 7px monospace';g.textAlign='center';g.fillText('420',0,-20);
+  g.restore();
+}
+function renderBoxes(){
+  skinGrid.style.gridTemplateColumns='1fr';
+  for(const b of LOOT_BOXES){
+    const card=document.createElement('div');card.className='boxCard';
+    const cv=document.createElement('canvas');cv.width=96;cv.height=96;
+    const g=cv.getContext('2d');
+    g.clearRect(0,0,96,96);drawBaggy(g,48,44,1.05,b.bag,0,0);
+    card.appendChild(cv);
+    const nm=document.createElement('div');nm.className='bname';nm.textContent=b.name;card.appendChild(nm);
+    const od=document.createElement('div');od.className='odds';
+    od.innerHTML=Object.entries(b.odds).map(([r,p])=>'<span style="color:'+RARITY[r].color+'">'+RARITY[r].name+' '+(p*100).toFixed(p<0.05?1:0)+'%</span>').join(' · ');
+    card.appendChild(od);
+    const btn=document.createElement('button');
+    btn.textContent='ÖFFNEN – 🌿 '+b.price;
+    btn.disabled=totalBags<b.price;
+    btn.onclick=()=>openLootBox(b);
+    card.appendChild(btn);
+    skinGrid.appendChild(card);
+  }
+}
+
+// ---- Loot-Ziehung + Öffnungs-Animation ----
+function lootPool(rarity){
+  const out=[];
+  for(const s of SKINS)if(s.rarity===rarity)out.push({kind:'skin',id:s.id,name:s.name,rarity,ref:s});
+  for(const w of WEAPON_SKINS)if(w.rarity===rarity&&!w.free)out.push({kind:'weapon',id:w.id,name:w.name+' (Waffe)',rarity,ref:w});
+  for(const j of JOINT_SKINS)if(j.rarity===rarity&&!j.free)out.push({kind:'joint',id:j.id,name:j.name+' (Joint)',rarity,ref:j});
+  return out;
+}
+function rollRarity(odds){
+  let r=Math.random(),acc=0;
+  for(const k of ['legendary','epic','rare','common']){
+    acc+=odds[k]||0;
+    if(r<acc)return k;
+  }
+  return 'common';
+}
+function rollLoot(box){
+  let rarity=rollRarity(box.odds);
+  let pool=lootPool(rarity);
+  if(!pool.length){rarity='common';pool=lootPool('common');}
+  // prefer items the player does not own yet (feels fair, still can dupe)
+  const isOwnedItem=(it)=>it.kind==='skin'?owned.includes(it.id):it.kind==='weapon'?ownedWeapons.includes(it.id):ownedJoints.includes(it.id);
+  const fresh=pool.filter(it=>!isOwnedItem(it));
+  const src=fresh.length?fresh:pool;
+  const item=src[Math.floor(Math.random()*src.length)];
+  const dupe=isOwnedItem(item);
+  return {item,dupe,rarity};
+}
+const openBoxEl=document.getElementById('openBox');
+const boxCanvas=document.getElementById('boxCanvas');
+const bctx=boxCanvas.getContext('2d');
+const boxLabel=document.getElementById('boxLabel');
+const boxSub=document.getElementById('boxSub');
+const boxAgain=document.getElementById('boxAgain');
+const boxDone=document.getElementById('boxDone');
+let boxAnim=null,boxLoopRunning=false;
+function openLootBox(box){
+  if(totalBags<box.price)return;
+  totalBags-=box.price;
+  const res=rollLoot(box);
+  // grant
+  let sub='';
+  if(res.dupe){
+    const refund=RARITY[res.rarity].refund;
+    totalBags+=refund;
+    sub='Doppelt! +🌿 '+refund+' zurück';
+  }else{
+    if(res.item.kind==='skin'){owned.push(res.item.id);}
+    else if(res.item.kind==='weapon'){ownedWeapons.push(res.item.id);}
+    else{ownedJoints.push(res.item.id);}
+    sub='NEU freigeschaltet!';
+  }
+  localStorage.setItem(BK,totalBags);
+  localStorage.setItem(OK,JSON.stringify(owned));
+  persistLoot();
+  updateBagsUI();
+  startBoxAnim(box,res,sub);
+}
+function startBoxAnim(box,res,sub){
+  openBoxEl.style.display='flex';
+  boxAgain.style.display='none';boxDone.style.display='none';
+  boxLabel.textContent=box.name+' …';boxLabel.style.color='#fff';
+  boxSub.textContent='';
+  boxAnim={t:0,box,res,sub,revealed:false,particles:[]};
+  boxAgain.onclick=()=>{ if(totalBags<box.price){boxSub.textContent='Nicht genug Baggys!';return;} openLootBox(box); };
+  boxDone.onclick=()=>{boxAnim=null;openBoxEl.style.display='none';renderShop();updateBagsUI();};
+  if(!boxLoopRunning){boxLoopRunning=true;requestAnimationFrame(boxLoop);}
+}
+function boxLoop(ts){
+  if(!boxAnim){boxLoopRunning=false;return;}
+  if(!boxAnim.lastTs)boxAnim.lastTs=ts;
+  const dt=Math.min(0.05,(ts-boxAnim.lastTs)/1000);boxAnim.lastTs=ts;
+  boxAnim.t+=dt;
+  const t=boxAnim.t,a=boxAnim;
+  const rar=RARITY[a.res.rarity];
+  bctx.clearRect(0,0,300,300);
+  if(t<1.2){
+    // shake phase
+    const sh=Math.sin(t*40)*(2+t*6);
+    drawBaggy(bctx,150,150,2.2,a.box.bag,0,sh);
+    boxLabel.textContent=a.box.name+' …';
+  }else if(t<1.9){
+    const p=(t-1.2)/0.7;
+    drawBaggy(bctx,150,150-p*20,2.2,a.box.bag,p,Math.sin(t*30)*2*(1-p));
+    // flash
+    bctx.fillStyle='rgba(255,255,255,'+(p*0.55)+')';bctx.fillRect(0,0,300,300);
+    boxLabel.textContent='ÖFFNET…';
+  }else{
+    if(!a.revealed){
+      a.revealed=true;
+      for(let i=0;i<40;i++){
+        const ang=Math.random()*Math.PI*2,sp=40+Math.random()*160;
+        a.particles.push({x:150,y:150,vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp,life:1.2,c:Math.random()<0.5?rar.color:'#ffffff'});
+      }
+      boxLabel.textContent=rar.name+' – '+a.res.item.name;
+      boxLabel.style.color=rar.color;
+      boxSub.textContent=a.sub;
+      boxAgain.style.display='block';boxDone.style.display='block';
+    }
+    // rarity rays
+    const rt=t-1.9;
+    bctx.save();bctx.translate(150,150);bctx.rotate(rt*0.6);
+    bctx.globalAlpha=0.22;
+    for(let i=0;i<12;i++){
+      bctx.rotate(Math.PI*2/12);
+      bctx.fillStyle=rar.color;
+      bctx.beginPath();bctx.moveTo(0,0);bctx.lineTo(150,-14);bctx.lineTo(150,14);bctx.closePath();bctx.fill();
+    }
+    bctx.restore();
+    // glow disc
+    const gr=bctx.createRadialGradient(150,150,4,150,150,90);
+    gr.addColorStop(0,rar.color);gr.addColorStop(1,'rgba(0,0,0,0)');
+    bctx.globalAlpha=0.35;bctx.fillStyle=gr;bctx.beginPath();bctx.arc(150,150,90,0,Math.PI*2);bctx.fill();bctx.globalAlpha=1;
+    // item preview, popping in
+    const pop=Math.min(1,rt*4), bob=Math.sin(rt*3)*4;
+    bctx.save();bctx.translate(150,150+bob);
+    const sc=(0.6+pop*0.9)*2.0;
+    bctx.scale(sc,sc);
+    const it=a.res.item;
+    if(it.kind==='skin'){
+      bctx.save();bctx.translate(0,20);drawAfroCharacter(bctx,it.ref,0);bctx.restore();
+    }else if(it.kind==='weapon'){
+      bctx.save();bctx.translate(-20,-20);drawWeaponPreview(bctx,it.ref,true);bctx.restore();
+    }else{
+      bctx.save();bctx.translate(-20,-20);drawJointPreview(bctx,it.ref,true);bctx.restore();
+    }
+    bctx.restore();
+  }
+  // particles
+  for(const p of a.particles){
+    p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=200*dt;p.life-=dt;
+    if(p.life>0){bctx.globalAlpha=Math.max(0,p.life);bctx.fillStyle=p.c;bctx.fillRect(p.x-2,p.y-2,4,4);}
+  }
+  bctx.globalAlpha=1;
+  a.particles=a.particles.filter(p=>p.life>0);
+  requestAnimationFrame(boxLoop);
 }
 function drawSkinPreview(g,s){
   g.clearRect(0,0,80,80);
@@ -541,11 +924,19 @@ document.getElementById('pauseResume').onclick=()=>resumeGame();
 document.getElementById('pauseShop').onclick=()=>openShop('paused');
 document.getElementById('pauseQuit').onclick=()=>{reset();gameState='playing';showOverlay('playing');};
 document.getElementById('shopClose').onclick=()=>closeShop();
+for(const b of document.querySelectorAll('#shopTabs button')){
+  b.onclick=()=>{shopTab=b.dataset.tab;renderShop();};
+}
 document.getElementById('overShop').onclick=()=>openShop('gameover');
 document.getElementById('overMenu').onclick=()=>goMenu();
 
 // State
 let player,platforms,collectibles,enemies,projectiles,particles,smokeParticles,floatTexts,cameraY,bestY,scrollLocked,boss,bossTimer,nextBossScore,gameOver,rngSeed,runBags;
+// duel state (1v1 online)
+const duel={active:false,code:null,seed:null,role:null,channel:null,ready:false,round:0,
+  myBest:0,oppBest:0,oppDead:false,oppY:null,oppX:W/2,oppFacing:1,oppSkin:'classic',
+  finished:false,oppName:'Gegner',countdown:0,myRematch:false,oppRematch:false,
+  oppOffline:false,lastSeen:0};
 let shake={t:0,mag:0},timeScale=1,deathT=0,bossIndex=0;
 let killCombo=0,comboT=0,runKills=0;
 const BOSS_TYPES=['kingbong','mightymarijuana','drgreenthumb','theplug','giantblunt','mutantbush'];
@@ -635,6 +1026,13 @@ function pushFloat(x,y,txt,color){floatTexts.push({x,y,txt,color:color||'#fff',l
 function addShake(mag,dur){shake.mag=Math.max(shake.mag,mag);shake.t=Math.max(shake.t,dur);}
 
 function update(dt){
+  // Duell-Countdown: beide Spieler starten synchron
+  if(duel.active&&duel.countdown>0){
+    duel.countdown-=dt;
+    for(const pa of particles){pa.x+=pa.vx;pa.y+=pa.vy;pa.vy+=0.15;pa.life-=dt;}
+    particles=particles.filter(p=>p.life>0);
+    return;
+  }
   if(gameOver){
     deathT+=dt;
     // slow-mo particle physics only, no gameplay
@@ -731,31 +1129,33 @@ function update(dt){
     c.t+=dt;
     if(Math.hypot(player.x-c.x,player.y-c.y)<player.r+10){
       c.taken=true;
-      if(c.type==='bag'){runBags+=1;totalBags+=1;bagsEl.textContent='🌿 '+totalBags;burst(c.x,c.y,'#7cfc00',18);pushFloat(c.x,c.y-4,'+1 🌿','#7cfc00');}
+      if(c.type==='bag'){const gain=2;runBags+=gain;totalBags+=gain;bagsEl.textContent='🌿 '+totalBags;burst(c.x,c.y,'#7cfc00',18);pushFloat(c.x,c.y-4,'+'+gain+' 🌿','#7cfc00');}
       else if(c.type==='joint'){player.invincible=6;player.vy=-22;burst(c.x,c.y,'#ff69b4',24);pushFloat(c.x,c.y-4,'INVINCIBLE!','#ff69b4');}
       else if(c.type==='jetpack'){player.jetpackT=3.0;player.vy=-14;burst(c.x,c.y,'#ff8a00',30);pushFloat(c.x,c.y-4,'JETPACK!','#ff8a00');}
       else if(c.type==='gun'){player.gunT=8.0;burst(c.x,c.y,'#e0e0e0',22);pushFloat(c.x,c.y-4,'GUN 8s!','#e0e0e0');}
       // gun fires instantly upward on pickup and then keeps auto-firing
       if(c.type==='gun'){player.shootCd=0;shootRequested=true;}
-      if(c.type==='bag'){localStorage.setItem(BK,totalBags);questProgress('bags',1);}
-      if(c.type==='bag')missionProgress('bags',1);
+      if(c.type==='bag'){localStorage.setItem(BK,totalBags);questProgress('bags',2);missionProgress('bags',2);}
     }
   }
 
   // projectiles
-  if(player.gunT>0)shootRequested=true; // auto-fire while the gun is active
-  if(shootRequested&&player.shootCd<=0){
-    if(player.gunT>0){
-      // gun power-up: triple spread, faster fire
+  // Schießen ist NUR mit aufgesammelter Waffe möglich
+  if(player.gunT>0){
+    shootRequested=true; // auto-fire while the gun is active
+    if(player.shootCd<=0){
       projectiles.push({x:player.x-3,y:player.y-10,vx:-1.5,vy:-10,life:2});
       projectiles.push({x:player.x,  y:player.y-12,vx:0,   vy:-11,life:2});
       projectiles.push({x:player.x+3,y:player.y-10,vx:1.5, vy:-10,life:2});
       player.shootCd=0.15;
-    }else{
-      projectiles.push({x:player.x,y:player.y-10,vx:0,vy:-9,life:2});
-      player.shootCd=0.4;
+    }
+  }else if(shootRequested){
+    if(player.noGunT===undefined||player.noGunT<=0){
+      pushFloat(player.x,player.y-26,'KEINE WAFFE!','#ff8a80');
+      player.noGunT=1.2;
     }
   }
+  if(player.noGunT>0)player.noGunT-=dt;
   shootRequested=false;
   player.shootCd-=dt;
   for(const pr of projectiles){pr.x+=(pr.vx||0);pr.y+=pr.vy;pr.life-=dt;}
@@ -1248,7 +1648,7 @@ function drawPlayer(){
   // smoke
   for(const s of smokeParticles){
     ctx.globalAlpha=Math.max(0,s.life/1.2)*0.7;
-    ctx.fillStyle='#eee';
+    ctx.fillStyle=currentJoint().smoke||'#eee';
     ctx.beginPath();ctx.arc(s.x,s.y-cameraY,s.r,0,Math.PI*2);ctx.fill();
   }
   ctx.globalAlpha=1;
@@ -1361,7 +1761,7 @@ function drawAfroCharacter(g,s,inv){
   // joint
   g.fillStyle=s.joint;g.fillRect(4,-13,10,2.5);
   g.strokeStyle='#000';g.strokeRect(4,-13,10,2.5);
-  g.fillStyle='#ff6a00';g.fillRect(13.5,-13,2,2.5);
+  g.fillStyle=s.jointTip||'#ff6a00';g.fillRect(13.5,-13,2,2.5);
   g.fillStyle='#ffd54a';g.fillRect(14,-12.5,1,1.5);
 }
 
@@ -2854,18 +3254,96 @@ function render(){
   // duel: opponent ghost on the shared map
   if(duel.active&&duel.oppY!==null){
     const gy=duel.oppY-cameraY;
-    ctx.save();ctx.globalAlpha=0.45;
-    ctx.fillStyle='#7c4dff';
-    ctx.beginPath();ctx.arc(duel.oppX,gy,20,0,Math.PI*2);ctx.fill();
-    ctx.strokeStyle='#e1bee7';ctx.lineWidth=2;ctx.stroke();
-    ctx.globalAlpha=0.9;ctx.fillStyle='#fff';ctx.font="10px 'Press Start 2P', monospace";ctx.textAlign='center';
-    ctx.fillText('👻 '+(duel.oppName||'Gegner').slice(0,8),duel.oppX,gy-28);
+    const onScreen=gy>-40&&gy<H+40;
+    const oppSkin=SKINS.find(s=>s.id===duel.oppSkin)||SKINS[0];
+    ctx.save();
+    if(onScreen){
+      // ghost of the real opponent character
+      ctx.globalAlpha=duel.oppDead?0.25:0.55;
+      ctx.save();ctx.translate(duel.oppX,gy);ctx.scale(duel.oppFacing||1,1);
+      drawAfroCharacter(ctx,oppSkin,0);
+      ctx.restore();
+      ctx.globalAlpha=0.28;ctx.fillStyle='#7c4dff';
+      ctx.beginPath();ctx.ellipse(duel.oppX,gy+22,16,5,0,0,Math.PI*2);ctx.fill();
+      ctx.globalAlpha=0.95;ctx.fillStyle=duel.oppDead?'#ff8a80':'#e1bee7';
+      ctx.font="8px 'Press Start 2P', monospace";ctx.textAlign='center';
+      ctx.fillText((duel.oppDead?'💀 ':'👻 ')+(duel.oppName||'Gegner').slice(0,10),duel.oppX,gy-34);
+    }else{
+      // off-screen arrow showing where the rival is
+      const above=gy<0;
+      const ay=above?18:H-18;
+      ctx.globalAlpha=0.85;ctx.fillStyle='#e1bee7';
+      ctx.beginPath();
+      if(above){ctx.moveTo(duel.oppX,ay-10);ctx.lineTo(duel.oppX-8,ay+4);ctx.lineTo(duel.oppX+8,ay+4);}
+      else{ctx.moveTo(duel.oppX,ay+10);ctx.lineTo(duel.oppX-8,ay-4);ctx.lineTo(duel.oppX+8,ay-4);}
+      ctx.closePath();ctx.fill();
+      ctx.fillStyle='#fff';ctx.font="8px 'Press Start 2P', monospace";ctx.textAlign='center';
+      ctx.fillText(duel.oppBest+'m',duel.oppX,above?ay+16:ay-12);
+    }
     ctx.restore();
   }
-  for(const pr of projectiles){
-    ctx.strokeStyle='rgba(240,240,240,.9)';ctx.lineWidth=3;
-    ctx.beginPath();ctx.arc(pr.x,pr.y-cameraY,7,0,Math.PI*2);ctx.stroke();
-    ctx.beginPath();ctx.arc(pr.x,pr.y-cameraY,3,0,Math.PI*2);ctx.stroke();
+  // duel: lead indicator + countdown
+  if(duel.active){
+    const lead=(duel.myBest||bestY)-duel.oppBest;
+    ctx.save();
+    ctx.font="9px 'Press Start 2P', monospace";ctx.textAlign='center';
+    ctx.fillStyle=lead>=0?'#7cfc00':'#ff8a80';
+    ctx.fillText((lead>=0?'▲ FÜHRUNG +':'▼ ZURÜCK ')+Math.abs(lead)+'m',W/2,40);
+    if(duel.countdown>0){
+      ctx.fillStyle='rgba(0,0,0,.55)';ctx.fillRect(0,0,W,H);
+      const n=Math.ceil(duel.countdown);
+      ctx.fillStyle='#7cfc00';ctx.font="42px 'Press Start 2P', monospace";
+      ctx.fillText(n>0?String(n):'GO!',W/2,H/2);
+      ctx.fillStyle='#fff';ctx.font="10px 'Press Start 2P', monospace";
+      ctx.fillText('VS '+(duel.oppName||'Gegner').slice(0,12),W/2,H/2+40);
+    }
+    ctx.restore();
+  }
+  {
+    const wc=weaponColors();
+    for(const pr of projectiles){
+      const py=pr.y-cameraY;
+      ctx.save();
+      ctx.translate(pr.x,py);
+      ctx.shadowColor=wc.ring;ctx.shadowBlur=8;
+      if(wc.shape==='laser'){
+        ctx.fillStyle=wc.ring;ctx.fillRect(-2,-12,4,20);
+        ctx.fillStyle=wc.core;ctx.fillRect(-1,-10,2,16);
+      }else if(wc.shape==='seed'){
+        ctx.fillStyle=wc.core;ctx.beginPath();ctx.ellipse(0,0,3.5,5.5,0,0,Math.PI*2);ctx.fill();
+        ctx.strokeStyle=wc.ring;ctx.lineWidth=1.5;ctx.stroke();
+      }else if(wc.shape==='bud'){
+        ctx.fillStyle=wc.ring;ctx.beginPath();ctx.arc(0,0,6,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle=wc.core;
+        for(let i=0;i<5;i++){const a=i*Math.PI*2/5+pr.life*4;ctx.beginPath();ctx.arc(Math.cos(a)*3,Math.sin(a)*3,2.2,0,Math.PI*2);ctx.fill();}
+      }else if(wc.shape==='bubble'){
+        ctx.fillStyle='rgba(255,255,255,0.25)';ctx.beginPath();ctx.arc(0,0,7,0,Math.PI*2);ctx.fill();
+        ctx.strokeStyle=wc.ring;ctx.lineWidth=2;ctx.stroke();
+        ctx.fillStyle=wc.core;ctx.beginPath();ctx.arc(-2,-2,2,0,Math.PI*2);ctx.fill();
+      }else if(wc.shape==='smoke'){
+        ctx.globalAlpha=0.85;ctx.fillStyle=wc.core;
+        ctx.beginPath();ctx.arc(-3,1,4,0,Math.PI*2);ctx.arc(2,-2,5,0,Math.PI*2);ctx.arc(4,3,3,0,Math.PI*2);ctx.fill();
+        ctx.globalAlpha=1;
+      }else if(wc.shape==='flame'){
+        ctx.fillStyle=wc.ring;ctx.beginPath();ctx.moveTo(0,-10);ctx.lineTo(5,4);ctx.lineTo(-5,4);ctx.closePath();ctx.fill();
+        ctx.fillStyle=wc.core;ctx.beginPath();ctx.moveTo(0,-5);ctx.lineTo(2.5,4);ctx.lineTo(-2.5,4);ctx.closePath();ctx.fill();
+      }else if(wc.shape==='bomb'){
+        ctx.fillStyle=wc.ring;ctx.beginPath();ctx.arc(0,0,6,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle=wc.core;ctx.beginPath();ctx.arc(0,0,3,0,Math.PI*2);ctx.fill();
+        ctx.strokeStyle=wc.core;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(0,-6);ctx.lineTo(3,-11);ctx.stroke();
+      }else if(wc.shape==='star'){
+        ctx.fillStyle=wc.core;ctx.strokeStyle=wc.ring;ctx.lineWidth=1.5;
+        ctx.beginPath();
+        for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,r=i%2?3:8;const px=Math.cos(a)*r,py2=Math.sin(a)*r;i?ctx.lineTo(px,py2):ctx.moveTo(px,py2);}
+        ctx.closePath();ctx.fill();ctx.stroke();
+      }else{
+        ctx.strokeStyle=wc.ring;ctx.lineWidth=3;
+        ctx.beginPath();ctx.arc(0,0,7,0,Math.PI*2);ctx.stroke();
+        ctx.strokeStyle=wc.core;
+        ctx.beginPath();ctx.arc(0,0,3,0,Math.PI*2);ctx.stroke();
+      }
+      ctx.restore();
+    }
   }
   drawBoss();
   drawPlayer();
@@ -3101,6 +3579,10 @@ async function loadCloudSave(){
     if(typeof d.highScore==='number')highScore=Math.max(highScore,d.highScore);
     if(Array.isArray(d.owned))owned=Array.from(new Set([...owned,...d.owned]));
     if(d.selectedSkin&&owned.includes(d.selectedSkin))selectedSkin=d.selectedSkin;
+    if(Array.isArray(d.ownedWeapons))ownedWeapons=Array.from(new Set([...ownedWeapons,...d.ownedWeapons]));
+    if(Array.isArray(d.ownedJoints))ownedJoints=Array.from(new Set([...ownedJoints,...d.ownedJoints]));
+    if(d.selectedWeapon&&ownedWeapons.includes(d.selectedWeapon))selectedWeapon=d.selectedWeapon;
+    if(d.selectedJoint&&ownedJoints.includes(d.selectedJoint))selectedJoint=d.selectedJoint;
     if(d.dailyLast){
       const localLast=localStorage.getItem(DKL);
       if(!localLast||new Date(d.dailyLast)>new Date(localLast)){
@@ -3117,6 +3599,8 @@ async function loadCloudSave(){
     }
     localStorage.setItem(HK,highScore);localStorage.setItem(BK,totalBags);
     localStorage.setItem(OK,JSON.stringify(owned));localStorage.setItem(SK,selectedSkin);
+    localStorage.setItem(OWK,JSON.stringify(ownedWeapons));localStorage.setItem(OJK,JSON.stringify(ownedJoints));
+    localStorage.setItem(WK,selectedWeapon);localStorage.setItem(JK,selectedJoint);
     saveQuests(quests);
     updateBagsUI();refreshAccountUI();refreshDailyUI();refreshQuestUI();
   }else{await pushCloudSave();}
@@ -3126,7 +3610,7 @@ async function pushCloudSave(nameOverride){
   const payload={
     user_id:sbUser.id,
     display_name:nameOverride||(sbProfile&&sbProfile.display_name)||sbUser.email,
-    data:{totalBags,highScore,owned,selectedSkin,dailyLast:localStorage.getItem(DKL),dailyStreak:+localStorage.getItem(DKS)||0,quests,missions:missionData},
+    data:{totalBags,highScore,owned,selectedSkin,ownedWeapons,ownedJoints,selectedWeapon,selectedJoint,dailyLast:localStorage.getItem(DKL),dailyStreak:+localStorage.getItem(DKS)||0,quests,missions:missionData},
     updated_at:new Date().toISOString(),
   };
   const {error}=await sb.from('player_saves').upsert(payload,{onConflict:'user_id'});
@@ -3191,62 +3675,107 @@ function refreshMissionUI(){
   }
 }
 
-// ================= 1v1 DUELL (Link-Einladung, Supabase Realtime) =================
-const duel={active:false,code:null,seed:null,role:null,channel:null,ready:false,
-  myBest:0,oppBest:0,oppDead:false,oppY:null,oppX:W/2,finished:false,oppName:'Gegner'};
+// ================= 1v1 DUELL v2 (Link/Code, Realtime, Countdown, Revanche) =================
 const duelEl=document.getElementById('duel');
 const duelBox=document.getElementById('duelBox');
 const duelCopyBtn=document.getElementById('duelCopy');
+const duelRematchBtn=document.getElementById('duelRematch');
 function duelSay(html){duelBox.innerHTML=html;}
 function duelSeedFromCode(code){let h=2166136261;for(let i=0;i<code.length;i++){h^=code.charCodeAt(i);h=Math.imul(h,16777619);}return h|0;}
 function duelLink(code){const u=new URL(window.location.href);u.searchParams.set('duel',code);return u.toString();}
-function myDuelName(){return (sbProfile&&sbProfile.display_name)||(sbUser&&sbUser.email)||'Spieler';}
-function openDuel(){gameState='menu';showOverlay('duel');duelEl.style.display='flex';
-  if(!duel.code)duelSay('Erstelle einen Raum und schicke den Link an einen Freund. Sobald er beitritt, startet das Duell.');}
+function myDuelName(){return (sbProfile&&sbProfile.display_name)||(sbUser&&sbUser.email&&String(sbUser.email).split('@')[0])||'Spieler';}
+function duelResetRound(){
+  duel.finished=false;duel.oppDead=false;duel.oppBest=0;duel.myBest=0;
+  duel.oppY=null;duel.oppX=W/2;duel.oppFacing=1;
+  duel.myRematch=false;duel.oppRematch=false;duel.oppOffline=false;
+  duel.lastSeen=Date.now();
+}
+function openDuel(){
+  gameState='menu';showOverlay('duel');duelEl.style.display='flex';
+  duelRematchBtn.style.display=(duel.active&&duel.code)?'block':'none';
+  if(!duel.code)duelSay('Erstelle einen Raum und teile den Link/Code. Sobald dein Gegner drin ist, geht es los – gleiche Map, gleiche Chancen.');
+}
 function closeDuel(){duelLeave();showOverlay('menu');goMenu();}
 function duelLeave(){
-  if(duel.channel){try{duel.channel.unsubscribe();}catch(_){ }}
-  duel.channel=null;duel.active=false;duel.code=null;duel.seed=null;duel.ready=false;
-  duelCopyBtn.style.display='none';
+  if(duel.channel){try{duel.channel.send({type:'broadcast',event:'bye',payload:{}});}catch(_){}
+    try{duel.channel.unsubscribe();}catch(_){}}
+  duel.channel=null;duel.active=false;duel.code=null;duel.seed=null;duel.ready=false;duel.round=0;
+  duelResetRound();
+  duelCopyBtn.style.display='none';duelRematchBtn.style.display='none';
 }
 function randCode(){const a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<6;i++)s+=a[Math.floor(Math.random()*a.length)];return s;}
 
 async function duelJoin(code,role){
   if(!sb){duelSay('<span style="color:#ff8a80">Online-Duell nicht verfügbar (keine Verbindung).</span>');return;}
   duelLeave();
-  duel.code=code;duel.role=role;duel.seed=duelSeedFromCode(code);
+  duel.code=code;duel.role=role;duel.round=0;duel.seed=duelSeedFromCode(code);
+  duelResetRound();
   const ch=sb.channel('afrojump-duel-'+code,{config:{broadcast:{self:false}}});
   duel.channel=ch;
+  let helloReplied=false;
   ch.on('broadcast',{event:'hello'},({payload})=>{
     duel.oppName=payload.name||'Gegner';
-    if(role==='host'){ch.send({type:'broadcast',event:'hello',payload:{name:myDuelName()}});}
+    duel.oppSkin=payload.skin||'classic';
+    duel.lastSeen=Date.now();
+    if(!helloReplied){helloReplied=true;ch.send({type:'broadcast',event:'hello',payload:{name:myDuelName(),skin:selectedSkin}});}
     if(!duel.ready){duel.ready=true;duelStart();}
   });
   ch.on('broadcast',{event:'state'},({payload})=>{
     duel.oppBest=Math.max(duel.oppBest,payload.b||0);
-    duel.oppY=payload.y;duel.oppX=payload.x;
+    duel.oppY=payload.y;duel.oppX=payload.x;duel.oppFacing=payload.f||1;
+    duel.lastSeen=Date.now();duel.oppOffline=false;
   });
   ch.on('broadcast',{event:'end'},({payload})=>{
     duel.oppBest=Math.max(duel.oppBest,payload.b||0);
-    duel.oppDead=true;duelCheckResult();
+    duel.oppDead=true;duel.lastSeen=Date.now();duelCheckResult();
+  });
+  ch.on('broadcast',{event:'rematch'},()=>{
+    duel.oppRematch=true;duel.lastSeen=Date.now();
+    duelSay('Gegner will Revanche!');
+    duelTryRematch();
+  });
+  ch.on('broadcast',{event:'bye'},()=>{
+    duel.oppOffline=true;
+    duelSay('<span style="color:#ff8a80">Gegner hat das Duell verlassen.</span>');
   });
   ch.subscribe((status)=>{
     if(status==='SUBSCRIBED'){
       duelSay('Raum <b style="color:#7cfc00">'+code+'</b><br>'+(role==='host'?'Warte auf Gegner…':'Verbinde mit Host…'));
-      ch.send({type:'broadcast',event:'hello',payload:{name:myDuelName()}});
+      ch.send({type:'broadcast',event:'hello',payload:{name:myDuelName(),skin:selectedSkin}});
+    }else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'){
+      duelSay('<span style="color:#ff8a80">Verbindungsfehler. Bitte nochmal versuchen.</span>');
     }
   });
 }
 function duelStart(){
-  duel.active=true;duel.finished=false;duel.oppDead=false;duel.oppBest=0;duel.oppY=null;
-  duelSay('Gegner gefunden: <b style="color:#7cfc00">'+escHtml(duel.oppName)+'</b> – GO!');
+  duel.active=true;
+  duelResetRound();
+  duel.seed=duelSeedFromCode(duel.code+':'+duel.round);
+  duelSay('Gegner: <b style="color:#7cfc00">'+escHtml(duel.oppName)+'</b> – GO!');
   duelEl.style.display='none';
   document.getElementById('duelResult').textContent='';
-  setTimeout(()=>{startGame();},400);
+  duelGameOverBtn.style.display='none';
+  setTimeout(()=>{startGame();duel.countdown=3.2;},350);
+}
+function duelRequestRematch(){
+  if(!duel.channel||!duel.code)return;
+  duel.myRematch=true;
+  duel.channel.send({type:'broadcast',event:'rematch',payload:{}});
+  duelSay('Revanche angefragt – warte auf Gegner…');
+  duelGameOverBtn.textContent='⏳ Warte auf Gegner…';
+  duelGameOverBtn.disabled=true;
+  duelTryRematch();
+}
+function duelTryRematch(){
+  if(duel.myRematch&&duel.oppRematch){
+    duel.round=(duel.round||0)+1;
+    duelGameOverBtn.disabled=false;duelGameOverBtn.textContent='⚔ Revanche';
+    duelStart();
+  }
 }
 function duelSendState(){
-  if(!duel.active||!duel.channel||gameState!=='playing')return;
-  duel.channel.send({type:'broadcast',event:'state',payload:{y:player.y,x:player.x,b:bestY}});
+  if(!duel.active||!duel.channel||gameState!=='playing'||!player)return;
+  duel.channel.send({type:'broadcast',event:'state',payload:{y:player.y,x:player.x,b:bestY,f:player.facing}});
 }
 function duelSendEnd(){
   duel.myBest=Math.max(duel.myBest,bestY);
@@ -3255,24 +3784,50 @@ function duelSendEnd(){
 }
 function duelCheckResult(){
   if(!duel.active||duel.finished)return;
-  if(gameState!=='gameover'||!duel.oppDead)return;
+  if(gameState!=='gameover')return;
+  if(!duel.oppDead&&!duel.oppOffline)return;
   duel.finished=true;
   const res=document.getElementById('duelResult');
-  if(duel.myBest>duel.oppBest){
+  const win=duel.oppOffline&&!duel.oppDead ? true : duel.myBest>duel.oppBest;
+  if(win){
     res.textContent='🏆 DU GEWINNST! '+duel.myBest+'m vs '+duel.oppBest+'m';
-    totalBags+=50;localStorage.setItem(BK,totalBags);updateBagsUI();
+    const bonus=150;
+    totalBags+=bonus;localStorage.setItem(BK,totalBags);updateBagsUI();
+    res.textContent+='  (+🌿'+bonus+')';
     missionProgress('duelwin',1);
   }else if(duel.myBest<duel.oppBest){
     res.textContent='💀 Verloren: '+duel.myBest+'m vs '+duel.oppBest+'m';
   }else{
     res.textContent='🤝 Unentschieden bei '+duel.myBest+'m';
+    totalBags+=40;localStorage.setItem(BK,totalBags);updateBagsUI();
   }
+  duelGameOverBtn.style.display='block';
 }
-let duelTick=0;
-setInterval(()=>{if(duel.active&&gameState==='playing'){duel.myBest=Math.max(duel.myBest,bestY);duelSendState();}},120);
+// Rematch button inside the game-over overlay (duel only)
+const duelGameOverBtn=document.createElement('button');
+duelGameOverBtn.className='btn alt';duelGameOverBtn.textContent='⚔ Revanche';
+duelGameOverBtn.style.display='none';
+duelGameOverBtn.onclick=()=>duelRequestRematch();
+overEl.insertBefore(duelGameOverBtn,document.getElementById('duelResult'));
+
+setInterval(()=>{
+  if(duel.active&&gameState==='playing'){duel.myBest=Math.max(duel.myBest,bestY);duelSendState();}
+  // watchdog: opponent silent for too long
+  if(duel.active&&duel.ready&&!duel.oppDead&&duel.lastSeen&&Date.now()-duel.lastSeen>9000){
+    duel.oppOffline=true;
+    if(gameState==='gameover')duelCheckResult();
+  }
+},120);
 
 document.getElementById('menuDuel').onclick=()=>openDuel();
 document.getElementById('duelClose').onclick=()=>closeDuel();
+duelRematchBtn.onclick=()=>duelRequestRematch();
+document.getElementById('duelJoinBtn').onclick=()=>{
+  const el=document.getElementById('duelCode');
+  const code=(el.value||'').trim().toUpperCase();
+  if(!/^[A-Z0-9]{4,8}$/.test(code)){duelSay('<span style="color:#ff8a80">Bitte gültigen Code eingeben.</span>');return;}
+  duelJoin(code,'guest');
+};
 document.getElementById('duelCreate').onclick=()=>{
   const code=randCode();
   duelJoin(code,'host');
