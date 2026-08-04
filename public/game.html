@@ -113,10 +113,23 @@
   </div>
   <div id="shop" class="overlay">
     <div class="head">
-      <h2>🛍 Skin-Shop</h2>
+      <h2>🛍 Shop</h2>
       <div><span id="shopBags">🌿 0</span> &nbsp; <button id="shopClose">✕</button></div>
     </div>
+    <div class="tabs" id="shopTabs">
+      <button data-tab="skins" class="on">🧑 SKINS</button>
+      <button data-tab="boxes">🎒 TÜTCHEN</button>
+      <button data-tab="weapons">🔫 WAFFEN</button>
+      <button data-tab="joints">🚬 JOINTS</button>
+    </div>
     <div class="skinGrid" id="skinGrid"></div>
+  </div>
+  <div id="openBox" class="overlay">
+    <div id="boxLabel">TÜTCHEN ÖFFNEN…</div>
+    <canvas id="boxCanvas" width="300" height="300"></canvas>
+    <div id="boxSub"></div>
+    <button class="btn" id="boxAgain" style="display:none;">🎒 Nochmal öffnen</button>
+    <button class="btn ghost" id="boxDone" style="display:none;">✓ Weiter</button>
   </div>
   <div id="over" class="overlay">
     <h1>GAME OVER</h1>
