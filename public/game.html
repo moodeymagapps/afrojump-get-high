@@ -628,16 +628,16 @@ function drawWeaponPreview(g,w,noClear){
 }
 function drawJointPreview(g,j,noClear){
   if(!noClear)g.clearRect(0,0,80,80);
-  g.save();g.translate(18,46);g.rotate(-0.35);g.scale(2.4,2.4);
   const paper=j.paper==='RAINBOW'?rainbowCol(5):j.paper;
-  g.fillStyle=paper;g.strokeStyle='#000';g.lineWidth=1;
-  g.fillRect(0,-2,18,4);g.strokeRect(0,-2,18,4);
-  g.fillStyle=j.tip;g.fillRect(18,-2,3,4);
-  g.fillStyle='rgba(255,255,255,.5)';g.fillRect(2,-1.6,12,0.8);
+  g.save();
+  g.imageSmoothingEnabled=false;
+  // Gerät groß und zentriert zeichnen (nutzt die Spiel-Zeichenlogik)
+  g.translate(18,58);g.scale(2.7,2.7);
+  drawDevice(g,{joint:paper,jointTip:j.tip,dev:j.dev||'joint'});
   g.restore();
   // smoke puffs
-  g.globalAlpha=.7;g.fillStyle=j.smoke||'#eee';
-  g.beginPath();g.arc(64,34,6,0,Math.PI*2);g.arc(56,22,5,0,Math.PI*2);g.arc(48,13,4,0,Math.PI*2);g.fill();
+  g.globalAlpha=.55;g.fillStyle=j.smoke||'#eee';
+  g.beginPath();g.arc(68,26,5,0,Math.PI*2);g.arc(60,15,4,0,Math.PI*2);g.arc(53,7,3,0,Math.PI*2);g.fill();
   g.globalAlpha=1;
 }
 function makeCard(){const c=document.createElement('div');c.className='skinCard';return c;}
