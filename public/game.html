@@ -343,6 +343,89 @@ const SKINS=[
   {id:'yannic',     name:'Yannic',     price:750, img:'skins/yannic.jpg',     anchorY:0.72},
 ];
 
+// ================= ÖKONOMIE, RARITÄTEN & LOOT =================
+// Rarity colors/labels used by shop cards and the loot animation
+const RARITY={
+  common:   {name:'STREET',   color:'#9ccc65', refund:40},
+  rare:     {name:'DANK',     color:'#4fc3f7', refund:120},
+  epic:     {name:'FIRE OG',  color:'#ba68c8', refund:300},
+  legendary:{name:'TOP SHELF',color:'#ffd54a', refund:800},
+};
+// These character skins are loot-box exclusive (no purchase possible)
+const LOOT_ONLY_SKINS=new Set(['dankninja','ganjascientist','puffpilot','thcalien','bonghead','rollingpaper','cloudwalker','spacecadet','chroniccowboy','kushking','rainbowhigh','fabi']);
+// Rebalanced price curve: cheap entry skins, real long-term goals at the top
+(function rebalanceEconomy(){
+  const tiers=[0,120,220,350,500,700,950,1300,1700,2200,2800];
+  const buyable=SKINS.filter(s=>!LOOT_ONLY_SKINS.has(s.id)).sort((a,b)=>a.price-b.price);
+  buyable.forEach((s,i)=>{
+    const t=Math.round((i/Math.max(1,buyable.length-1))*(tiers.length-1));
+    s.price=tiers[t];
+  });
+  for(const s of SKINS){
+    if(LOOT_ONLY_SKINS.has(s.id)){s.lootOnly=true;s.price=null;}
+    // rarity derived from value
+    const p=s.lootOnly?2400:s.price;
+    s.rarity=p>=1700?'legendary':p>=700?'epic':p>=220?'rare':'common';
+  }
+})();
+
+// ---- Waffen-Skins (nur aus Loot-Tütchen) ----
+const WEAPON_SKINS=[
+  {id:'w_default',name:'Standard',      rarity:'common',   free:true, core:'#ffffff',ring:'rgba(240,240,240,.9)',shape:'ring'},
+  {id:'w_seed',   name:'Seed Shot',     rarity:'common',   core:'#c5a25a',ring:'#7a5c2a',shape:'seed'},
+  {id:'w_bud',    name:'Bud Blaster',   rarity:'common',   core:'#7cfc00',ring:'#2e7d32',shape:'bud'},
+  {id:'w_smoke',  name:'Smoke Puff',    rarity:'rare',     core:'#e0e0e0',ring:'#9e9e9e',shape:'smoke'},
+  {id:'w_bong',   name:'Bong Bubble',   rarity:'rare',     core:'#b3e5fc',ring:'#0288d1',shape:'bubble'},
+  {id:'w_lighter',name:'Feuerzeug',     rarity:'rare',     core:'#ffd54a',ring:'#ff6a00',shape:'flame'},
+  {id:'w_purple', name:'Purple Haze',   rarity:'epic',     core:'#e1bee7',ring:'#7c4dff',shape:'star'},
+  {id:'w_laser',  name:'Space Laser',   rarity:'epic',     core:'#ffffff',ring:'#00e5ff',shape:'laser'},
+  {id:'w_skunk',  name:'Skunk Bomb',    rarity:'epic',     core:'#c5e1a5',ring:'#33691e',shape:'bomb'},
+  {id:'w_gold',   name:'Golden Nug',    rarity:'legendary',core:'#fff59d',ring:'#ffb300',shape:'bud'},
+  {id:'w_rainbow',name:'Rainbow Blast', rarity:'legendary',core:'RAINBOW',ring:'RAINBOW',shape:'star'},
+  {id:'w_alien',  name:'Alien Kush Ray',rarity:'legendary',core:'#b9f6ca',ring:'#00c853',shape:'laser'},
+];
+// ---- Joint-Skins (nur aus Loot-Tütchen) ----
+const JOINT_SKINS=[
+  {id:'j_default',name:'Classic Joint', rarity:'common',   free:true, paper:'#f5ecd0',tip:'#ff6a00',smoke:'#eeeeee'},
+  {id:'j_brown',  name:'Blunt Wrap',    rarity:'common',   paper:'#8d6e63',tip:'#ff8a00',smoke:'#d7ccc8'},
+  {id:'j_slim',   name:'Slim King',     rarity:'common',   paper:'#fff8e1',tip:'#ff5252',smoke:'#f5f5f5'},
+  {id:'j_green',  name:'Green Paper',   rarity:'rare',     paper:'#a5d6a7',tip:'#ff6a00',smoke:'#c8e6c9'},
+  {id:'j_pink',   name:'Cotton Candy',  rarity:'rare',     paper:'#f8bbd0',tip:'#ff4081',smoke:'#fce4ec'},
+  {id:'j_ice',    name:'Menthol Ice',   rarity:'rare',     paper:'#b3e5fc',tip:'#40c4ff',smoke:'#e1f5fe'},
+  {id:'j_purple', name:'Purple Cone',   rarity:'epic',     paper:'#ce93d8',tip:'#7c4dff',smoke:'#ede7f6'},
+  {id:'j_black',  name:'Blackout',      rarity:'epic',     paper:'#212121',tip:'#ff1744',smoke:'#616161'},
+  {id:'j_gold',   name:'24K Joint',     rarity:'legendary',paper:'#ffd700',tip:'#fff176',smoke:'#fff9c4'},
+  {id:'j_rainbow',name:'Rainbow Spliff',rarity:'legendary',paper:'RAINBOW',tip:'#ffffff',smoke:'#ffffff'},
+];
+// ---- Loot-Tütchen ----
+const LOOT_BOXES=[
+  {id:'gram', name:'GRAMM-TÜTCHEN', price:150,  bag:'#9ccc65', odds:{common:0.70,rare:0.25,epic:0.045,legendary:0.005}},
+  {id:'zip',  name:'ZIP-BEUTEL',    price:450,  bag:'#4fc3f7', odds:{common:0.40,rare:0.42,epic:0.15, legendary:0.03}},
+  {id:'pound',name:'PFUND-PAKET',   price:1200, bag:'#ffd54a', odds:{common:0.10,rare:0.35,epic:0.40, legendary:0.15}},
+];
+// Loot inventory
+const WK='afroJumpWeapon',JK='afroJumpJoint',OWK='afroJumpOwnedW',OJK='afroJumpOwnedJ';
+function loadList(key,def){try{const a=JSON.parse(localStorage.getItem(key)||'null');if(Array.isArray(a))return Array.from(new Set([...def,...a]));}catch(_){}return def.slice();}
+let ownedWeapons=loadList(OWK,['w_default']);
+let ownedJoints=loadList(OJK,['j_default']);
+let selectedWeapon=localStorage.getItem(WK)||'w_default';
+let selectedJoint=localStorage.getItem(JK)||'j_default';
+function persistLoot(){
+  localStorage.setItem(OWK,JSON.stringify(ownedWeapons));
+  localStorage.setItem(OJK,JSON.stringify(ownedJoints));
+  localStorage.setItem(WK,selectedWeapon);
+  localStorage.setItem(JK,selectedJoint);
+  localStorage.setItem(BK,totalBags);
+  if(typeof cloudSyncSoon==='function')cloudSyncSoon();
+}
+function currentWeapon(){return WEAPON_SKINS.find(w=>w.id===selectedWeapon)||WEAPON_SKINS[0];}
+function currentJoint(){return JOINT_SKINS.find(j=>j.id===selectedJoint)||JOINT_SKINS[0];}
+function rainbowCol(speed){return 'hsl('+((performance.now()/(speed||4))%360)+',90%,60%)';}
+function weaponColors(){
+  const w=currentWeapon();
+  return {core:w.core==='RAINBOW'?rainbowCol(3):w.core, ring:w.ring==='RAINBOW'?rainbowCol(2):w.ring, shape:w.shape};
+}
+
 // ---- Image skin loader with background removal (flood-fill from corners) ----
 const skinImgCache={};
 function loadSkinImage(src, bgKey){
