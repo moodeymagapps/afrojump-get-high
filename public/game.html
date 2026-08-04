@@ -2717,6 +2717,34 @@ function drawBoss(){
   const y=boss.y-cameraY;
   const bx=boss.x, bw=boss.w, bh=boss.h;
   const t=performance.now()/1000;
+  // Warn-Marker vor jedem Schuss (fairer Bossfight)
+  if(boss.tele>0){
+    ctx.save();
+    ctx.globalAlpha=0.35+0.35*Math.abs(Math.sin(t*18));
+    ctx.fillStyle='#ff5252';
+    ctx.fillRect(bx-3,y+bh/2,6,H);
+    ctx.restore();
+  }
+  // Bild-Bosse (Pixel-Art Artwork)
+  const bimg=BOSS_IMAGES[boss.kind];
+  if(bimg){
+    const e=loadSkinImage(bimg.src,bimg.bg);
+    if(e&&e.ready&&e.canvas){
+      ctx.save();
+      if(boss.hitT>0)ctx.globalAlpha=0.55;
+      const bob=Math.sin(t*3)*3;
+      const ar=e.canvas.width/e.canvas.height;
+      let dh=bh*1.12, dw=dh*ar;
+      if(dw>bw*1.5){dw=bw*1.5;dh=dw/ar;}
+      ctx.imageSmoothingEnabled=false;
+      // Schatten
+      ctx.globalAlpha*=1;
+      ctx.drawImage(e.canvas,bx-dw/2,y-dh/2+bob,dw,dh);
+      ctx.restore();
+      drawBossHP(bx,y,bh);
+      return;
+    }
+  }
   ctx.save();
   if(boss.hitT>0)ctx.globalAlpha=0.55;
   const idle=Math.sin(t*3)*3;
@@ -2843,8 +2871,20 @@ function drawBoss(){
   drawBossHP(bx,y,bh);
 }
 function drawBossHP(bx,y,bh){
-  ctx.fillStyle='#000';ctx.fillRect(bx-40,y-bh/2-30,80,8);
-  ctx.fillStyle='#7cfc00';ctx.fillRect(bx-38,y-bh/2-28,76*Math.max(0,boss.hp)/5,4);
+  const max=boss.hpMax||5;
+  const top=y-bh/2-34;
+  const nm=(typeof BOSS_NAMES!=='undefined'&&BOSS_NAMES[boss.kind])||'BOSS';
+  ctx.save();
+  ctx.textAlign='center';
+  ctx.font='7px "Press Start 2P", monospace';
+  ctx.fillStyle='#000';ctx.fillText(nm,bx+1,top-5);
+  ctx.fillStyle='#ffdd00';ctx.fillText(nm,bx,top-6);
+  ctx.fillStyle='#0a0a0a';ctx.fillRect(bx-42,top,84,9);
+  const frac=Math.max(0,boss.hp)/max;
+  ctx.fillStyle=frac>0.5?'#7cfc00':frac>0.25?'#ffd23f':'#ff5252';
+  ctx.fillRect(bx-40,top+2,80*frac,5);
+  ctx.strokeStyle='rgba(255,255,255,0.35)';ctx.lineWidth=1;ctx.strokeRect(bx-42.5,top-0.5,85,10);
+  ctx.restore();
 }
 // --- New premium boss illustrations (cartoon/chibi, matches skin style) ---
 function bossOutline(fill,stroke){ctx.fillStyle=fill;ctx.strokeStyle=stroke||'#111';ctx.lineWidth=2.5;}
