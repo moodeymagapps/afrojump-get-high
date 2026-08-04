@@ -2851,6 +2851,17 @@ function render(){
   for(const p of platforms)drawPlatform(p);
   for(const c of collectibles)if(!c.taken)drawCollectible(c);
   for(const e of enemies)drawEnemy(e);
+  // duel: opponent ghost on the shared map
+  if(duel.active&&duel.oppY!==null){
+    const gy=duel.oppY-cameraY;
+    ctx.save();ctx.globalAlpha=0.45;
+    ctx.fillStyle='#7c4dff';
+    ctx.beginPath();ctx.arc(duel.oppX,gy,20,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='#e1bee7';ctx.lineWidth=2;ctx.stroke();
+    ctx.globalAlpha=0.9;ctx.fillStyle='#fff';ctx.font="10px 'Press Start 2P', monospace";ctx.textAlign='center';
+    ctx.fillText('👻 '+(duel.oppName||'Gegner').slice(0,8),duel.oppX,gy-28);
+    ctx.restore();
+  }
   for(const pr of projectiles){
     ctx.strokeStyle='rgba(240,240,240,.9)';ctx.lineWidth=3;
     ctx.beginPath();ctx.arc(pr.x,pr.y-cameraY,7,0,Math.PI*2);ctx.stroke();
