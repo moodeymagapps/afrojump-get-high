@@ -1087,7 +1087,8 @@ function spawnBoss(){
   const kind=BOSS_TYPES[bossIndex%BOSS_TYPES.length];bossIndex++;
   // Bosse im Maßstab zum Spieler (player.r=22 → ca. 44px) – unterschiedlich, aber nie riesig
   const PS=(player&&player.r?player.r:22)*2;
-  boss={kind,x:W/2,y:cameraY+150,w:PS*1.15,h:PS*1.35,hp:5,hpMax:5,vx:1.7,shootT:1.8,alive:true,hitT:0,phase:0,spawnT:1.4,tele:0,teleX:W/2};
+  const hp=6+Math.min(6,bossIndex-1)*1; // Boss 1: 6 HP, danach steigend
+  boss={kind,x:W/2,y:cameraY+150,w:PS*1.15,h:PS*1.35,hp,hpMax:hp,vx:1.7,shootT:1.2,alive:true,hitT:0,phase:0,spawnT:1.4,tele:0,teleX:W/2,rage:false,bob:0,gunT:4,dropT:2.5,dashT:3.5,dash:0};
   if(kind==='budboss'){boss.w=PS*1.15;boss.h=PS*1.5;boss.vx=1.7;}
   if(kind==='kingblunt'){boss.w=PS*1.1;boss.h=PS*1.6;boss.vx=1.5;}
   if(kind==='drgreenthumb'){boss.w=PS*1.25;boss.h=PS*1.25;boss.vx=2.0;}
@@ -1109,11 +1110,15 @@ function spawnBoss(){
   }
   platforms.sort((a,b)=>b.y-a.y);
   player.bossLives=3;player.invincible=Math.max(player.invincible,1.2);
+  player.invSrc='spawn';
   if(player.y<arenaTop){player.y=arenaTop+60;player.vy=2;}
   const nm=(BOSS_NAMES[kind]||'BOSS');
   pushFloat(W/2,cameraY+150,nm,'#ffdd00');
   pushFloat(W/2,cameraY+180,'3 ♥  –  drauf springen!','#ff5252');
-  startBossMusic();
+  // Musik komplett aus im Bossfight – nur Sounds
+  stopMusic();stopBossMusic();sfx('boss');
+  // eine Waffe zum Start, damit man sofort was tun kann
+  collectibles.push({x:W/2,y:cameraY+H-140,type:'gun',t:0,taken:false});
 }
 
 
