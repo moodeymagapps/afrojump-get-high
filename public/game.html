@@ -3249,12 +3249,49 @@ function render(){
   // duel: opponent ghost on the shared map
   if(duel.active&&duel.oppY!==null){
     const gy=duel.oppY-cameraY;
-    ctx.save();ctx.globalAlpha=0.45;
-    ctx.fillStyle='#7c4dff';
-    ctx.beginPath();ctx.arc(duel.oppX,gy,20,0,Math.PI*2);ctx.fill();
-    ctx.strokeStyle='#e1bee7';ctx.lineWidth=2;ctx.stroke();
-    ctx.globalAlpha=0.9;ctx.fillStyle='#fff';ctx.font="10px 'Press Start 2P', monospace";ctx.textAlign='center';
-    ctx.fillText('👻 '+(duel.oppName||'Gegner').slice(0,8),duel.oppX,gy-28);
+    const onScreen=gy>-40&&gy<H+40;
+    const oppSkin=SKINS.find(s=>s.id===duel.oppSkin)||SKINS[0];
+    ctx.save();
+    if(onScreen){
+      // ghost of the real opponent character
+      ctx.globalAlpha=duel.oppDead?0.25:0.55;
+      ctx.save();ctx.translate(duel.oppX,gy);ctx.scale(duel.oppFacing||1,1);
+      drawAfroCharacter(ctx,oppSkin,0);
+      ctx.restore();
+      ctx.globalAlpha=0.28;ctx.fillStyle='#7c4dff';
+      ctx.beginPath();ctx.ellipse(duel.oppX,gy+22,16,5,0,0,Math.PI*2);ctx.fill();
+      ctx.globalAlpha=0.95;ctx.fillStyle=duel.oppDead?'#ff8a80':'#e1bee7';
+      ctx.font="8px 'Press Start 2P', monospace";ctx.textAlign='center';
+      ctx.fillText((duel.oppDead?'💀 ':'👻 ')+(duel.oppName||'Gegner').slice(0,10),duel.oppX,gy-34);
+    }else{
+      // off-screen arrow showing where the rival is
+      const above=gy<0;
+      const ay=above?18:H-18;
+      ctx.globalAlpha=0.85;ctx.fillStyle='#e1bee7';
+      ctx.beginPath();
+      if(above){ctx.moveTo(duel.oppX,ay-10);ctx.lineTo(duel.oppX-8,ay+4);ctx.lineTo(duel.oppX+8,ay+4);}
+      else{ctx.moveTo(duel.oppX,ay+10);ctx.lineTo(duel.oppX-8,ay-4);ctx.lineTo(duel.oppX+8,ay-4);}
+      ctx.closePath();ctx.fill();
+      ctx.fillStyle='#fff';ctx.font="8px 'Press Start 2P', monospace";ctx.textAlign='center';
+      ctx.fillText(duel.oppBest+'m',duel.oppX,above?ay+16:ay-12);
+    }
+    ctx.restore();
+  }
+  // duel: lead indicator + countdown
+  if(duel.active){
+    const lead=(duel.myBest||bestY)-duel.oppBest;
+    ctx.save();
+    ctx.font="9px 'Press Start 2P', monospace";ctx.textAlign='center';
+    ctx.fillStyle=lead>=0?'#7cfc00':'#ff8a80';
+    ctx.fillText((lead>=0?'▲ FÜHRUNG +':'▼ ZURÜCK ')+Math.abs(lead)+'m',W/2,40);
+    if(duel.countdown>0){
+      ctx.fillStyle='rgba(0,0,0,.55)';ctx.fillRect(0,0,W,H);
+      const n=Math.ceil(duel.countdown);
+      ctx.fillStyle='#7cfc00';ctx.font="42px 'Press Start 2P', monospace";
+      ctx.fillText(n>0?String(n):'GO!',W/2,H/2);
+      ctx.fillStyle='#fff';ctx.font="10px 'Press Start 2P', monospace";
+      ctx.fillText('VS '+(duel.oppName||'Gegner').slice(0,12),W/2,H/2+40);
+    }
     ctx.restore();
   }
   {
