@@ -66,6 +66,16 @@
   #duelCode{flex:1;padding:10px;background:#0a0518;border:2px solid #4a2c73;color:#fff;font-family:'Press Start 2P',monospace;font-size:11px;text-transform:uppercase;box-sizing:border-box;letter-spacing:2px;}
   #duelCode:focus{outline:none;border-color:#7cfc00;}
   #duelJoinBtn{padding:10px 12px;border:none;background:#4caf50;color:#fff;font-family:'Press Start 2P',monospace;font-size:9px;cursor:pointer;box-shadow:inset -2px -2px 0 #1b5e20, inset 2px 2px 0 #a5d6a7, 0 3px 0 #1b5e20;}
+  /* Rangliste */
+  #board{overflow-y:auto;}
+  .lbRow{display:flex;align-items:center;gap:8px;background:#1b1230;padding:8px 10px;margin-bottom:6px;box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #4a2c73;font-family:'VT323',monospace;font-size:18px;letter-spacing:1px;color:#fff;}
+  .lbRow .rank{flex:0 0 42px;font-family:'Press Start 2P',monospace;font-size:10px;color:#ffd54a;}
+  .lbRow .who{flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .lbRow .val{flex:0 0 auto;color:#7cfc00;font-family:'Press Start 2P',monospace;font-size:10px;}
+  .lbRow.me{box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #7cfc00;background:#16240f;}
+  .lbRow.top1 .rank{color:#ffd700;}
+  .lbRow.top2 .rank{color:#e0e0e0;}
+  .lbRow.top3 .rank{color:#d68910;}
   #hint{position:absolute;bottom:12px;left:0;right:0;text-align:center;font-size:14px;opacity:.6;pointer-events:none;font-family:'VT323',monospace;letter-spacing:1px;}
   #fireBtn{position:absolute;bottom:60px;left:50%;transform:translateX(-50%);width:78px;height:78px;border-radius:50%;background:#c62828;border:none;color:#fff;font-size:30px;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:inset -4px -4px 0 #7f1010, inset 4px 4px 0 #ff8a80, 0 5px 0 #7f1010, 0 0 20px rgba(255,80,80,.6);z-index:5;font-family:'Press Start 2P',monospace;user-select:none;-webkit-tap-highlight-color:transparent;}
   #fireBtn:active{transform:translateX(-50%) translateY(3px);box-shadow:inset -4px -4px 0 #7f1010, inset 4px 4px 0 #ff8a80, 0 2px 0 #7f1010;}
@@ -101,6 +111,7 @@
     <button class="btn" id="menuPlay">▶ Spielen</button>
     <button class="btn alt" id="menuShop">🛍 Shop</button>
     <button class="btn alt" id="menuDaily">🎁 Täglich &amp; Aufgaben</button>
+    <button class="btn alt" id="menuBoard">🏆 Rangliste</button>
     <button class="btn alt" id="menuDuel">⚔ 1v1 Duell (Link)</button>
     <button class="btn ghost" id="menuAccount">👤 Account</button>
     <p id="menuAcctStatus" style="font-size:14px;opacity:.7;margin-top:4px;letter-spacing:1px;"></p>
@@ -181,6 +192,15 @@
       <h3>🏆 Missionen</h3>
       <div id="missionList"></div>
     </div>
+  </div>
+  <div id="board" class="overlay">
+    <div class="head" style="display:flex;justify-content:space-between;width:100%;max-width:360px;align-items:center;margin-bottom:12px;">
+      <h2 style="margin:0;color:#ffd54a;font-family:'Press Start 2P',monospace;font-size:13px;text-shadow:2px 2px 0 #000;">🏆 RANGLISTE</h2>
+      <button id="boardClose" style="background:#c62828;border:none;color:#fff;padding:8px 12px;font-family:'Press Start 2P',monospace;font-size:11px;cursor:pointer;box-shadow:inset -2px -2px 0 #7f1010, inset 2px 2px 0 #ff8a80, 0 3px 0 #7f1010;">✕</button>
+    </div>
+    <div id="boardList" style="width:100%;max-width:360px;"></div>
+    <div id="boardMsg" style="font-family:'VT323',monospace;font-size:16px;opacity:.8;margin-top:6px;text-align:center;max-width:340px;"></div>
+    <button class="btn ghost" id="boardRefresh">🔄 Aktualisieren</button>
   </div>
   <div id="duel" class="overlay">
     <h1>1v1 DUELL</h1>
@@ -333,14 +353,15 @@ const SKINS=[
   {id:'spacecadet',name:'Space Cadet',price:800,render:'astronaut'},
   {id:'fabi',   name:'Prinzessin Fabi',price:1000,render:'fabi'},
   // ---- Community / photo-based pixel skins ----
-  {id:'ina',        name:'Ina',        price:250, img:'skins/ina.png',        anchorY:0.72},
-  {id:'sierrakidd', name:'Sierra Kidd', price:350, img:'skins/sierrakidd.jpg', anchorY:0.72},
-  {id:'danjo420',   name:'Danjo420',   price:400, img:'skins/danjo420.jpg',   anchorY:0.74},
-  {id:'fabienne',   name:'Fabienne',   price:500, img:'skins/fabienne.jpg',   anchorY:0.74},
-  {id:'moodey',     name:'Moodey',     price:800, img:'skins/moodey.jpg',     anchorY:0.72, bgKey:'white'},
-  {id:'revengebird',name:'RevengeBird',price:900, img:'skins/revengebird.png',anchorY:0.72},
-  {id:'kosak',      name:'Kosak',      price:700, img:'skins/kosak.png',      anchorY:0.72},
-  {id:'yannic',     name:'Yannic',     price:750, img:'skins/yannic.jpg',     anchorY:0.72},
+  // fixed prices (community:true → excluded from the auto price curve)
+  {id:'ina',        name:'Ina',        price:900,  community:true, rarity:'epic',      img:'skins/ina.png',        anchorY:0.72},
+  {id:'sierrakidd', name:'Sierra Kidd', price:1100, community:true, rarity:'epic',      img:'skins/sierrakidd.jpg', anchorY:0.72},
+  {id:'danjo420',   name:'Danjo420',   price:1100, community:true, rarity:'epic',      img:'skins/danjo420.jpg',   anchorY:0.74},
+  {id:'fabienne',   name:'Fabienne',   price:1300, community:true, rarity:'epic',      img:'skins/fabienne.jpg',   anchorY:0.74},
+  {id:'kosak',      name:'Kosak',      price:1500, community:true, rarity:'epic',      img:'skins/kosak.png',      anchorY:0.72},
+  {id:'yannic',     name:'Yannic',     price:1700, community:true, rarity:'legendary', img:'skins/yannic.jpg',     anchorY:0.72},
+  {id:'moodey',     name:'Moodey',     price:2000, community:true, rarity:'legendary', img:'skins/moodey.jpg',     anchorY:0.72, bgKey:'white'},
+  {id:'revengebird',name:'RevengeBird',price:2400, community:true, rarity:'legendary', img:'skins/revengebird.png',anchorY:0.72},
 ];
 
 // ================= ÖKONOMIE, RARITÄTEN & LOOT =================
@@ -356,13 +377,14 @@ const LOOT_ONLY_SKINS=new Set(['dankninja','ganjascientist','puffpilot','thcalie
 // Rebalanced price curve: cheap entry skins, real long-term goals at the top
 (function rebalanceEconomy(){
   const tiers=[0,120,220,350,500,700,950,1300,1700,2200,2800];
-  const buyable=SKINS.filter(s=>!LOOT_ONLY_SKINS.has(s.id)).sort((a,b)=>a.price-b.price);
+  const buyable=SKINS.filter(s=>!LOOT_ONLY_SKINS.has(s.id)&&!s.community).sort((a,b)=>a.price-b.price);
   buyable.forEach((s,i)=>{
     const t=Math.round((i/Math.max(1,buyable.length-1))*(tiers.length-1));
     s.price=tiers[t];
   });
   for(const s of SKINS){
     if(LOOT_ONLY_SKINS.has(s.id)){s.lootOnly=true;s.price=null;}
+    if(s.community)continue; // keep hand-tuned price & rarity
     // rarity derived from value
     const p=s.lootOnly?2400:s.price;
     s.rarity=p>=1700?'legendary':p>=700?'epic':p>=220?'rare':'common';
@@ -515,6 +537,8 @@ function showOverlay(which){
   const dEl=document.getElementById('duel'),aEl=document.getElementById('account');
   if(dEl&&which!=='duel')dEl.style.display='none';
   if(aEl&&which!=='account')aEl.style.display='none';
+  const bEl=document.getElementById('board');
+  if(bEl&&which!=='board')bEl.style.display='none';
   pauseBtn.style.display=which==='playing'?'flex':'none';
 }
 function goMenu(){gameState='menu';menuHigh.textContent='Best: '+highScore+'m';updateBagsUI();showOverlay('menu');}
@@ -839,7 +863,15 @@ const keys={l:false,r:false};
 let shootRequested=false;
 function isLeftKey(k){return k==='ArrowLeft'||k==='a'||k==='A';}
 function isRightKey(k){return k==='ArrowRight'||k==='d'||k==='D';}
+// Never swallow keys while the player types in a form field (login, duel code, …)
+function isTypingTarget(el){
+  if(!el)return false;
+  const t=(el.tagName||'').toUpperCase();
+  return t==='INPUT'||t==='TEXTAREA'||t==='SELECT'||el.isContentEditable===true;
+}
 addEventListener('keydown',e=>{
+  if(isTypingTarget(e.target))return;
+  if(gameState!=='playing'&&gameState!=='paused')return;
   if(e.key==='Escape'||e.key==='p'||e.key==='P'){
     if(gameState==='playing')pauseGame();
     else if(gameState==='paused')resumeGame();
@@ -852,6 +884,7 @@ addEventListener('keydown',e=>{
   }
 });
 addEventListener('keyup',e=>{
+  if(isTypingTarget(e.target))return;
   if(isLeftKey(e.key))keys.l=false;
   else if(isRightKey(e.key))keys.r=false;
 });
@@ -1336,6 +1369,7 @@ function die(){
   finalBags.textContent='Gesammelt: 🌿 '+runBags+' (Total: '+totalBags+')';
   missionProgress('runs',1);
   missionProgress('height',bestY);
+  try{submitScore();}catch(_){}
   if(duel.active)duelSendEnd();
   setTimeout(()=>showOverlay('gameover'),500);
 }
@@ -3514,8 +3548,8 @@ function initSupabase(){
     const key='sb_publishable_9J09FWMmBR72oj08yv7qdg_ORmGFCm7';
     if(window.supabase&&window.supabase.createClient){
       sb=window.supabase.createClient(url,key,{auth:{persistSession:true,storage:localStorage,storageKey:'afroJumpSb'}});
-      sb.auth.getSession().then(({data})=>{sbUser=data.session?.user||null;if(sbUser){loadCloudSave();}refreshAccountUI();});
-      sb.auth.onAuthStateChange((_e,session)=>{sbUser=session?.user||null;refreshAccountUI();if(sbUser)loadCloudSave();});
+      sb.auth.getSession().then(({data})=>{sbUser=data.session?.user||null;if(sbUser){loadCloudSave();setTimeout(()=>submitScore(),1500);}refreshAccountUI();});
+      sb.auth.onAuthStateChange((_e,session)=>{sbUser=session?.user||null;refreshAccountUI();if(sbUser){loadCloudSave();setTimeout(()=>submitScore(),1500);}});
     }
   }catch(err){console.warn('supabase init failed',err);}
 }
@@ -3674,6 +3708,60 @@ function refreshMissionUI(){
     row.appendChild(btn);el.appendChild(row);
   }
 }
+
+// ================= RANGLISTE (globale Highscores) =================
+const boardEl=document.getElementById('board');
+const boardListEl=document.getElementById('boardList');
+const boardMsgEl=document.getElementById('boardMsg');
+function openBoard(){gameState='menu';showOverlay('board');boardEl.style.display='flex';loadBoard();}
+function closeBoard(){boardEl.style.display='none';goMenu();}
+function boardName(){
+  const n=(sbProfile&&sbProfile.display_name)||(sbUser&&sbUser.email&&String(sbUser.email).split('@')[0])||'Spieler';
+  return String(n).slice(0,20);
+}
+async function submitScore(){
+  if(!sb||!sbUser)return;
+  try{
+    await sb.from('leaderboard').upsert({
+      user_id:sbUser.id,
+      display_name:boardName(),
+      best_height:highScore|0,
+      total_bags:totalBags|0,
+      skin:selectedSkin,
+      updated_at:new Date().toISOString(),
+    },{onConflict:'user_id'});
+  }catch(err){console.warn('leaderboard submit failed',err);}
+}
+async function loadBoard(){
+  boardMsgEl.textContent='Lade…';
+  if(!sb){boardMsgEl.textContent='Rangliste offline nicht verfügbar.';return;}
+  await submitScore();
+  const {data,error}=await sb.from('leaderboard')
+    .select('user_id,display_name,best_height,total_bags,skin')
+    .order('best_height',{ascending:false}).limit(50);
+  if(error){boardMsgEl.textContent='Fehler beim Laden der Rangliste.';return;}
+  boardListEl.innerHTML='';
+  if(!data||!data.length){boardMsgEl.textContent='Noch keine Einträge – sei der Erste!';return;}
+  let myRank=0;
+  data.forEach((r,i)=>{
+    const mine=sbUser&&r.user_id===sbUser.id;
+    if(mine)myRank=i+1;
+    const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1);
+    const row=document.createElement('div');
+    row.className='lbRow'+(mine?' me':'')+(i<3?' top'+(i+1):'');
+    const sk=SKINS.find(s=>s.id===r.skin);
+    row.innerHTML='<span class="rank">'+medal+'</span>'+
+      '<span class="who">'+escHtml(r.display_name||'Spieler')+(sk?' <span style="opacity:.6">· '+escHtml(sk.name)+'</span>':'')+'</span>'+
+      '<span class="val">'+(r.best_height|0)+'m</span>';
+    boardListEl.appendChild(row);
+  });
+  if(!sbUser)boardMsgEl.textContent='Melde dich an, um in der Rangliste zu erscheinen.';
+  else if(myRank)boardMsgEl.textContent='Dein Platz: #'+myRank+' mit '+highScore+'m';
+  else boardMsgEl.textContent='Du bist noch nicht in den Top 50 – weiter springen!';
+}
+document.getElementById('menuBoard').onclick=()=>openBoard();
+document.getElementById('boardClose').onclick=()=>closeBoard();
+document.getElementById('boardRefresh').onclick=()=>loadBoard();
 
 // ================= 1v1 DUELL v2 (Link/Code, Realtime, Countdown, Revanche) =================
 const duelEl=document.getElementById('duel');
