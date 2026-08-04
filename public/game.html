@@ -1365,6 +1365,9 @@ function update(dt){
       pushFloat(boss.x,boss.y+20,'+'+reward+' 🌿','#7cfc00');sfx('bossdie');
       boss=null;scrollLocked=false;nextBossScore+=1800;bestY+=100;player.vy=-14;
       player.bossLives=0;stopBossMusic();tryPlayMusic();
+      // übrige Boss-Kugeln entfernen (sonst treffen sie einen nach dem Sieg)
+      for(const e of enemies)if(e.boss)e.alive=false;
+      player.invincible=Math.max(player.invincible,1.0);player.invSrc='spawn';
       questProgress('boss',1);
       missionProgress('boss',1);
     }
