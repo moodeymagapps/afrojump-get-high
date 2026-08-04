@@ -595,7 +595,7 @@ function showOverlay(which){
 function goMenu(){gameState='menu';menuHigh.textContent='Best: '+highScore+'m';updateBagsUI();showOverlay('menu');}
 function startGame(){reset();gameState='playing';showOverlay('playing');tryPlayMusic();}
 function pauseGame(){if(gameState!=='playing')return;gameState='paused';showOverlay('paused');stopMusic();stopBossMusic();}
-function resumeGame(){if(gameState!=='paused')return;gameState='playing';showOverlay('playing');last=performance.now();if(boss)startBossMusic();else tryPlayMusic();}
+function resumeGame(){if(gameState!=='paused')return;gameState='playing';showOverlay('playing');last=performance.now();if(!boss)tryPlayMusic();}
 function openShop(from){shopReturn=from;gameState='shop';renderShop();updateBagsUI();showOverlay('shop');}
 function closeShop(){
   if(typeof openBoxEl!=='undefined'&&openBoxEl){openBoxEl.style.display='none';boxAnim=null;}
