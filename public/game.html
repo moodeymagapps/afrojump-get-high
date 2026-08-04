@@ -1373,7 +1373,7 @@ function drawPlayer(){
   // smoke
   for(const s of smokeParticles){
     ctx.globalAlpha=Math.max(0,s.life/1.2)*0.7;
-    ctx.fillStyle='#eee';
+    ctx.fillStyle=currentJoint().smoke||'#eee';
     ctx.beginPath();ctx.arc(s.x,s.y-cameraY,s.r,0,Math.PI*2);ctx.fill();
   }
   ctx.globalAlpha=1;
