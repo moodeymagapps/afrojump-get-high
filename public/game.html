@@ -3622,6 +3622,9 @@ async function loadCloudSave(){
     const d=data.data||{};
     // merge: take max bags, union skins, keep highest highScore, streak/daily most recent
     if(typeof d.totalBags==='number')totalBags=Math.max(totalBags,d.totalBags);
+    // starter gift also applies to cloud saves made before the gift existed
+    if(d.grant2000)grant2000=true,localStorage.setItem(GK,'1');
+    else applyStarterGrant();
     if(typeof d.highScore==='number')highScore=Math.max(highScore,d.highScore);
     if(Array.isArray(d.owned))owned=Array.from(new Set([...owned,...d.owned]));
     if(d.selectedSkin&&owned.includes(d.selectedSkin))selectedSkin=d.selectedSkin;
