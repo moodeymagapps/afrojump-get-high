@@ -3096,6 +3096,12 @@ async function loadCloudSave(){
       }
     }
     if(d.quests&&d.quests.day===todayKey())quests=d.quests;
+    if(d.missions&&d.missions.stats){
+      const s=missionData.stats,o=d.missions.stats;
+      for(const k in s)if(typeof o[k]==='number')s[k]=Math.max(s[k],o[k]);
+      missionData.claimed=Object.assign({},d.missions.claimed||{},missionData.claimed);
+      saveMissions();
+    }
     localStorage.setItem(HK,highScore);localStorage.setItem(BK,totalBags);
     localStorage.setItem(OK,JSON.stringify(owned));localStorage.setItem(SK,selectedSkin);
     saveQuests(quests);
