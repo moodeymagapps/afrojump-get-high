@@ -66,6 +66,16 @@
   #duelCode{flex:1;padding:10px;background:#0a0518;border:2px solid #4a2c73;color:#fff;font-family:'Press Start 2P',monospace;font-size:11px;text-transform:uppercase;box-sizing:border-box;letter-spacing:2px;}
   #duelCode:focus{outline:none;border-color:#7cfc00;}
   #duelJoinBtn{padding:10px 12px;border:none;background:#4caf50;color:#fff;font-family:'Press Start 2P',monospace;font-size:9px;cursor:pointer;box-shadow:inset -2px -2px 0 #1b5e20, inset 2px 2px 0 #a5d6a7, 0 3px 0 #1b5e20;}
+  /* Rangliste */
+  #board{overflow-y:auto;}
+  .lbRow{display:flex;align-items:center;gap:8px;background:#1b1230;padding:8px 10px;margin-bottom:6px;box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #4a2c73;font-family:'VT323',monospace;font-size:18px;letter-spacing:1px;color:#fff;}
+  .lbRow .rank{flex:0 0 42px;font-family:'Press Start 2P',monospace;font-size:10px;color:#ffd54a;}
+  .lbRow .who{flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .lbRow .val{flex:0 0 auto;color:#7cfc00;font-family:'Press Start 2P',monospace;font-size:10px;}
+  .lbRow.me{box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #7cfc00;background:#16240f;}
+  .lbRow.top1 .rank{color:#ffd700;}
+  .lbRow.top2 .rank{color:#e0e0e0;}
+  .lbRow.top3 .rank{color:#d68910;}
   #hint{position:absolute;bottom:12px;left:0;right:0;text-align:center;font-size:14px;opacity:.6;pointer-events:none;font-family:'VT323',monospace;letter-spacing:1px;}
   #fireBtn{position:absolute;bottom:60px;left:50%;transform:translateX(-50%);width:78px;height:78px;border-radius:50%;background:#c62828;border:none;color:#fff;font-size:30px;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:inset -4px -4px 0 #7f1010, inset 4px 4px 0 #ff8a80, 0 5px 0 #7f1010, 0 0 20px rgba(255,80,80,.6);z-index:5;font-family:'Press Start 2P',monospace;user-select:none;-webkit-tap-highlight-color:transparent;}
   #fireBtn:active{transform:translateX(-50%) translateY(3px);box-shadow:inset -4px -4px 0 #7f1010, inset 4px 4px 0 #ff8a80, 0 2px 0 #7f1010;}
