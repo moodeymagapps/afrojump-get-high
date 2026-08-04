@@ -3548,8 +3548,8 @@ function initSupabase(){
     const key='sb_publishable_9J09FWMmBR72oj08yv7qdg_ORmGFCm7';
     if(window.supabase&&window.supabase.createClient){
       sb=window.supabase.createClient(url,key,{auth:{persistSession:true,storage:localStorage,storageKey:'afroJumpSb'}});
-      sb.auth.getSession().then(({data})=>{sbUser=data.session?.user||null;if(sbUser){loadCloudSave();}refreshAccountUI();});
-      sb.auth.onAuthStateChange((_e,session)=>{sbUser=session?.user||null;refreshAccountUI();if(sbUser)loadCloudSave();});
+      sb.auth.getSession().then(({data})=>{sbUser=data.session?.user||null;if(sbUser){loadCloudSave();setTimeout(()=>submitScore(),1500);}refreshAccountUI();});
+      sb.auth.onAuthStateChange((_e,session)=>{sbUser=session?.user||null;refreshAccountUI();if(sbUser){loadCloudSave();setTimeout(()=>submitScore(),1500);}});
     }
   }catch(err){console.warn('supabase init failed',err);}
 }
