@@ -4154,6 +4154,7 @@ document.getElementById('duelCreate').onclick=()=>{
   }
 })();
 
+window.__dbg={forceBoss:()=>{bestY=1800;nextBossScore=0;},get:()=>({boss:boss&&{hp:boss.hp,rage:boss.rage,kind:boss.kind},state:gameState,joints:JOINT_SKINS.length,dev:currentSkin().dev}),setJoint:(id)=>{if(!ownedJoints.includes(id))ownedJoints.push(id);selectedJoint=id;}};
 reset();
 goMenu();
 requestAnimationFrame(loop);
