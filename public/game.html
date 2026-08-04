@@ -3659,7 +3659,7 @@ async function pushCloudSave(nameOverride){
   const payload={
     user_id:sbUser.id,
     display_name:nameOverride||(sbProfile&&sbProfile.display_name)||sbUser.email,
-    data:{totalBags,highScore,owned,selectedSkin,ownedWeapons,ownedJoints,selectedWeapon,selectedJoint,dailyLast:localStorage.getItem(DKL),dailyStreak:+localStorage.getItem(DKS)||0,quests,missions:missionData},
+    data:{totalBags,highScore,owned,selectedSkin,ownedWeapons,ownedJoints,selectedWeapon,selectedJoint,grant2000,dailyLast:localStorage.getItem(DKL),dailyStreak:+localStorage.getItem(DKS)||0,quests,missions:missionData},
     updated_at:new Date().toISOString(),
   };
   const {error}=await sb.from('player_saves').upsert(payload,{onConflict:'user_id'});
