@@ -1253,14 +1253,15 @@ function update(dt){
   if(!boss&&bestY>=nextBossScore){spawnBoss();}
   if(boss){
     if(boss.spawnT>0)boss.spawnT-=dt;
-    boss.x+=boss.vx;
+    // sanftes Schweben statt hartes Zickzack
+    boss.x+=boss.vx*(boss.spawnT>0?0.3:1);
     if(boss.x<60){boss.x=60;boss.vx*=-1;}
     if(boss.x>W-60){boss.x=W-60;boss.vx*=-1;}
     boss.y=cameraY+90;
     boss.hitT-=dt;
     boss.phase+=dt;
     // stomp
-    if(player.vy>0&&Math.abs(player.x-boss.x)<boss.w/2&&player.y+player.r>boss.y-boss.h/2&&player.y+player.r<boss.y-boss.h/2+20){
+    if(player.vy>0&&Math.abs(player.x-boss.x)<boss.w/2+player.r*0.5&&player.y+player.r>boss.y-boss.h/2-4&&player.y+player.r<boss.y-boss.h/2+22){
       boss.hp--;boss.hitT=0.3;player.vy=-16;burst(player.x,boss.y-boss.h/2,'#ff5252',20);addShake(6,0.25);pushFloat(boss.x,boss.y-boss.h/2,'-1','#ff5252');
     }
     // hit by projectile
@@ -1274,14 +1275,22 @@ function update(dt){
       boss.hp-=0.1;
     }
     // body contact — costs one boss life (never instant-kill during reaction window)
-    if(boss.spawnT<=0&&player.invincible<=0&&Math.abs(player.x-boss.x)<boss.w/2-8&&Math.abs(player.y-boss.y)<boss.h/2-4&&!(player.vy>0&&player.y<boss.y)){
+    if(boss.spawnT<=0&&player.invincible<=0&&Math.abs(player.x-boss.x)<boss.w/2-6&&Math.abs(player.y-boss.y)<boss.h/2-6&&!(player.vy>0&&player.y<boss.y)){
       hurtPlayer();
     }
-    // boss shoots (only after reaction window)
-    if(boss.spawnT<=0){boss.shootT-=dt;}
-    if(boss.shootT<=0&&boss.spawnT<=0){
-      boss.shootT=1.4;
-      enemies.push({boss:true,x:boss.x,y:boss.y+boss.h/2,vx:0,vy:5,w:12,h:12,alive:true});
+    // Boss schießt – immer erst telegrafiert (Warn-Marker), danach der Schuss
+    if(boss.spawnT<=0){
+      if(boss.tele>0){
+        boss.tele-=dt;
+        if(boss.tele<=0){
+          const dx=Math.max(-2.4,Math.min(2.4,(player.x-boss.x)*0.02));
+          enemies.push({boss:true,x:boss.x,y:boss.y+boss.h/2,vx:dx,vy:4.2,w:12,h:12,alive:true});
+          burst(boss.x,boss.y+boss.h/2,'#8fff9c',8);
+        }
+      }else{
+        boss.shootT-=dt;
+        if(boss.shootT<=0){boss.shootT=1.9;boss.tele=0.55;boss.teleX=boss.x;}
+      }
     }
     if(boss.hp<=0){
       burst(boss.x,boss.y,'#ffdd00',50);addShake(10,0.5);
