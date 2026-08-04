@@ -3392,10 +3392,12 @@ function render(){
         for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,r=i%2?3:8;const px=Math.cos(a)*r,py2=Math.sin(a)*r;i?ctx.lineTo(px,py2):ctx.moveTo(px,py2);}
         ctx.closePath();ctx.fill();ctx.stroke();
       }else{
-        ctx.strokeStyle=wc.ring;ctx.lineWidth=3;
-        ctx.beginPath();ctx.arc(0,0,7,0,Math.PI*2);ctx.stroke();
-        ctx.strokeStyle=wc.core;
-        ctx.beginPath();ctx.arc(0,0,3,0,Math.PI*2);ctx.stroke();
+        // simple small bullet
+        ctx.shadowBlur=4;
+        ctx.fillStyle=wc.ring;
+        ctx.beginPath();ctx.arc(0,0,3.2,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle=wc.core;
+        ctx.beginPath();ctx.arc(0,-0.6,1.7,0,Math.PI*2);ctx.fill();
       }
       ctx.restore();
     }
