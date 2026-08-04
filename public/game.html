@@ -984,8 +984,13 @@ const duel={active:false,code:null,seed:null,role:null,channel:null,ready:false,
   oppOffline:false,lastSeen:0};
 let shake={t:0,mag:0},timeScale=1,deathT=0,bossIndex=0;
 let killCombo=0,comboT=0,runKills=0;
-const BOSS_TYPES=['kingbong','mightymarijuana','drgreenthumb','theplug','giantblunt','mutantbush'];
-const BOSS_NAMES={kingbong:'KING BONG',mightymarijuana:'MIGHTY MARIJUANA',drgreenthumb:'DR. GREENTHUMB',theplug:'THE PLUG',giantblunt:'GIANT BLUNT',mutantbush:'MUTANT BUSH'};
+const BOSS_TYPES=['budboss','kingblunt','drgreenthumb','theplug','giantblunt','mutantbush'];
+// Bild-Bosse (Pixel-Art) – Namen + Untertitel wie auf den Artworks
+const BOSS_IMAGES={
+  budboss:{src:'/__l5e/assets-v1/23cd3ead-a14b-4f58-a46e-ff04ea7ee915/budboss.png',bg:'white',name:'BUD BOSS',sub:'Der Lord der Blüten'},
+  kingblunt:{src:'/__l5e/assets-v1/bf2f4cc9-c9e3-4980-932a-3ed2711b60f2/kingblunt.png',bg:'white',name:'KING BLUNT',sub:'Der gekrönte Joint'}
+};
+const BOSS_NAMES={budboss:'BUD BOSS',kingblunt:'KING BLUNT',drgreenthumb:'DR. GREENTHUMB',theplug:'THE PLUG',giantblunt:'GIANT BLUNT',mutantbush:'MUTANT BUSH'};
 
 // Seedable RNG — in duel mode both players generate the identical map
 let prngState=null;
@@ -1041,13 +1046,15 @@ function spawnPlatform(y){
 
 function spawnBoss(){
   const kind=BOSS_TYPES[bossIndex%BOSS_TYPES.length];bossIndex++;
-  boss={kind,x:W/2,y:cameraY+80,w:120,h:70,hp:5,vx:2,shootT:1.5,alive:true,hitT:0,phase:0,spawnT:1.0};
-  if(kind==='kingbong'){boss.w=120;boss.h=120;boss.vx=1.8;}
-  if(kind==='mightymarijuana'){boss.w=130;boss.h=110;boss.vx=1.4;}
-  if(kind==='drgreenthumb'){boss.w=110;boss.h=90;boss.vx=2.0;}
-  if(kind==='theplug'){boss.w=90;boss.h=110;boss.vx=2.4;}
-  if(kind==='giantblunt'){boss.w=80;boss.h=130;boss.vx=1.8;}
-  if(kind==='mutantbush'){boss.w=140;boss.h=90;boss.vx=1.6;}
+  // Bosse im Maßstab zum Spieler (player.r=22 → ca. 44px) – unterschiedlich, aber nie riesig
+  const PS=(player&&player.r?player.r:22)*2;
+  boss={kind,x:W/2,y:cameraY+150,w:PS*1.15,h:PS*1.35,hp:5,hpMax:5,vx:1.7,shootT:1.8,alive:true,hitT:0,phase:0,spawnT:1.4,tele:0,teleX:W/2};
+  if(kind==='budboss'){boss.w=PS*1.15;boss.h=PS*1.5;boss.vx=1.7;}
+  if(kind==='kingblunt'){boss.w=PS*1.1;boss.h=PS*1.6;boss.vx=1.5;}
+  if(kind==='drgreenthumb'){boss.w=PS*1.25;boss.h=PS*1.25;boss.vx=2.0;}
+  if(kind==='theplug'){boss.w=PS*1.0;boss.h=PS*1.35;boss.vx=2.3;}
+  if(kind==='giantblunt'){boss.w=PS*0.85;boss.h=PS*1.6;boss.vx=1.9;}
+  if(kind==='mutantbush'){boss.w=PS*1.4;boss.h=PS*1.1;boss.vx=1.6;}
   scrollLocked=true;
   // --- Boss arena: clear everything above the boss so the player can never
   // get stuck on a platform out of reach and build a fair fighting floor ---
@@ -1055,17 +1062,21 @@ function spawnBoss(){
   platforms=platforms.filter(p=>p.y>arenaTop);
   collectibles=collectibles.filter(c=>c.y>arenaTop);
   enemies=enemies.filter(e=>e.boss||!e.plat||e.plat.y>arenaTop);
-  const floorY=cameraY+H-90;
-  const arena=[[40,floorY],[W/2-40,floorY-110],[W-120,floorY-40],[30,floorY-190],[W-110,floorY-210]];
+  const floorY=cameraY+H-80;
+  // fairere Arena: mehr Standflächen, gleichmäßige Sprungabstände bis zum Boss
+  const arena=[[30,floorY],[W/2-40,floorY-70],[W-110,floorY-30],[20,floorY-130],[W/2-40,floorY-195],[W-105,floorY-160],[35,floorY-250],[W-115,floorY-290]];
   for(const [ax,ay] of arena){
-    platforms.push({x:ax,y:ay,w:80,h:12,vx:0,type:'normal',dir:1,range:0,ox:ax,bounce:0,cracked:0,springT:0});
+    platforms.push({x:ax,y:ay,w:86,h:12,vx:0,type:'normal',dir:1,range:0,ox:ax,bounce:0,cracked:0,springT:0});
   }
   platforms.sort((a,b)=>b.y-a.y);
   player.bossLives=3;player.invincible=Math.max(player.invincible,1.2);
   if(player.y<arenaTop){player.y=arenaTop+60;player.vy=2;}
-  pushFloat(W/2,cameraY+140,'BOSS! 3 ♥','#ff5252');
+  const nm=(BOSS_NAMES[kind]||'BOSS');
+  pushFloat(W/2,cameraY+150,nm,'#ffdd00');
+  pushFloat(W/2,cameraY+180,'3 ♥  –  drauf springen!','#ff5252');
   startBossMusic();
 }
+
 
 function pushFloat(x,y,txt,color){floatTexts.push({x,y,txt,color:color||'#fff',life:0.9});}
 function addShake(mag,dur){shake.mag=Math.max(shake.mag,mag);shake.t=Math.max(shake.t,dur);}
@@ -1242,14 +1253,15 @@ function update(dt){
   if(!boss&&bestY>=nextBossScore){spawnBoss();}
   if(boss){
     if(boss.spawnT>0)boss.spawnT-=dt;
-    boss.x+=boss.vx;
+    // sanftes Schweben statt hartes Zickzack
+    boss.x+=boss.vx*(boss.spawnT>0?0.3:1);
     if(boss.x<60){boss.x=60;boss.vx*=-1;}
     if(boss.x>W-60){boss.x=W-60;boss.vx*=-1;}
-    boss.y=cameraY+90;
+    boss.y=cameraY+150;
     boss.hitT-=dt;
     boss.phase+=dt;
     // stomp
-    if(player.vy>0&&Math.abs(player.x-boss.x)<boss.w/2&&player.y+player.r>boss.y-boss.h/2&&player.y+player.r<boss.y-boss.h/2+20){
+    if(player.vy>0&&Math.abs(player.x-boss.x)<boss.w/2+player.r*0.5&&player.y+player.r>boss.y-boss.h/2-4&&player.y+player.r<boss.y-boss.h/2+22){
       boss.hp--;boss.hitT=0.3;player.vy=-16;burst(player.x,boss.y-boss.h/2,'#ff5252',20);addShake(6,0.25);pushFloat(boss.x,boss.y-boss.h/2,'-1','#ff5252');
     }
     // hit by projectile
@@ -1263,14 +1275,22 @@ function update(dt){
       boss.hp-=0.1;
     }
     // body contact — costs one boss life (never instant-kill during reaction window)
-    if(boss.spawnT<=0&&player.invincible<=0&&Math.abs(player.x-boss.x)<boss.w/2-8&&Math.abs(player.y-boss.y)<boss.h/2-4&&!(player.vy>0&&player.y<boss.y)){
+    if(boss.spawnT<=0&&player.invincible<=0&&Math.abs(player.x-boss.x)<boss.w/2-6&&Math.abs(player.y-boss.y)<boss.h/2-6&&!(player.vy>0&&player.y<boss.y)){
       hurtPlayer();
     }
-    // boss shoots (only after reaction window)
-    if(boss.spawnT<=0){boss.shootT-=dt;}
-    if(boss.shootT<=0&&boss.spawnT<=0){
-      boss.shootT=1.4;
-      enemies.push({boss:true,x:boss.x,y:boss.y+boss.h/2,vx:0,vy:5,w:12,h:12,alive:true});
+    // Boss schießt – immer erst telegrafiert (Warn-Marker), danach der Schuss
+    if(boss.spawnT<=0){
+      if(boss.tele>0){
+        boss.tele-=dt;
+        if(boss.tele<=0){
+          const dx=Math.max(-2.4,Math.min(2.4,(player.x-boss.x)*0.02));
+          enemies.push({boss:true,x:boss.x,y:boss.y+boss.h/2,vx:dx,vy:4.2,w:12,h:12,alive:true});
+          burst(boss.x,boss.y+boss.h/2,'#8fff9c',8);
+        }
+      }else{
+        boss.shootT-=dt;
+        if(boss.shootT<=0){boss.shootT=1.9;boss.tele=0.55;boss.teleX=boss.x;}
+      }
     }
     if(boss.hp<=0){
       burst(boss.x,boss.y,'#ffdd00',50);addShake(10,0.5);
@@ -1287,6 +1307,7 @@ function update(dt){
   for(const e of enemies){
     if(e.boss&&e.alive){
       e.y+=e.vy;
+      if(e.vx)e.x+=e.vx;
       if(Math.hypot(player.x-e.x,player.y-e.y)<player.r+6){
         if(player.invincible>0){e.alive=false;}
         else{e.alive=false;hurtPlayer();}
@@ -2696,6 +2717,34 @@ function drawBoss(){
   const y=boss.y-cameraY;
   const bx=boss.x, bw=boss.w, bh=boss.h;
   const t=performance.now()/1000;
+  // Warn-Marker vor jedem Schuss (fairer Bossfight)
+  if(boss.tele>0){
+    ctx.save();
+    ctx.globalAlpha=0.35+0.35*Math.abs(Math.sin(t*18));
+    ctx.fillStyle='#ff5252';
+    ctx.fillRect(bx-3,y+bh/2,6,H);
+    ctx.restore();
+  }
+  // Bild-Bosse (Pixel-Art Artwork)
+  const bimg=BOSS_IMAGES[boss.kind];
+  if(bimg){
+    const e=loadSkinImage(bimg.src,bimg.bg);
+    if(e&&e.ready&&e.canvas){
+      ctx.save();
+      if(boss.hitT>0)ctx.globalAlpha=0.55;
+      const bob=Math.sin(t*3)*3;
+      const ar=e.canvas.width/e.canvas.height;
+      let dh=bh*1.12, dw=dh*ar;
+      if(dw>bw*1.5){dw=bw*1.5;dh=dw/ar;}
+      ctx.imageSmoothingEnabled=false;
+      // Schatten
+      ctx.globalAlpha*=1;
+      ctx.drawImage(e.canvas,bx-dw/2,y-dh/2+bob,dw,dh);
+      ctx.restore();
+      drawBossHP(bx,y,bh);
+      return;
+    }
+  }
   ctx.save();
   if(boss.hitT>0)ctx.globalAlpha=0.55;
   const idle=Math.sin(t*3)*3;
@@ -2822,8 +2871,18 @@ function drawBoss(){
   drawBossHP(bx,y,bh);
 }
 function drawBossHP(bx,y,bh){
-  ctx.fillStyle='#000';ctx.fillRect(bx-40,y-bh/2-30,80,8);
-  ctx.fillStyle='#7cfc00';ctx.fillRect(bx-38,y-bh/2-28,76*Math.max(0,boss.hp)/5,4);
+  const max=boss.hpMax||5;
+  const top=y-bh/2-34;
+  const nm=(typeof BOSS_NAMES!=='undefined'&&BOSS_NAMES[boss.kind])||'BOSS';
+  ctx.save();
+  ctx.textAlign='center';
+  ctx.font='7px "Press Start 2P", monospace';
+  ctx.fillStyle='#0a0a0a';ctx.fillRect(bx-42,top,84,9);
+  const frac=Math.max(0,boss.hp)/max;
+  ctx.fillStyle=frac>0.5?'#7cfc00':frac>0.25?'#ffd23f':'#ff5252';
+  ctx.fillRect(bx-40,top+2,80*frac,5);
+  ctx.strokeStyle='rgba(255,255,255,0.35)';ctx.lineWidth=1;ctx.strokeRect(bx-42.5,top-0.5,85,10);
+  ctx.restore();
 }
 // --- New premium boss illustrations (cartoon/chibi, matches skin style) ---
 function bossOutline(fill,stroke){ctx.fillStyle=fill;ctx.strokeStyle=stroke||'#111';ctx.lineWidth=2.5;}
