@@ -1307,6 +1307,7 @@ function update(dt){
   for(const e of enemies){
     if(e.boss&&e.alive){
       e.y+=e.vy;
+      if(e.vx)e.x+=e.vx;
       if(Math.hypot(player.x-e.x,player.y-e.y)<player.r+6){
         if(player.invincible>0){e.alive=false;}
         else{e.alive=false;hurtPlayer();}
