@@ -1137,7 +1137,7 @@ function update(dt){
   // collision with platforms (only when falling)
   if(player.vy>0){
     for(const p of platforms){
-      if(p.type==='brittle'&&p.cracked>=2)continue;
+      if(p.dead)continue;
       if(player.x>p.x-8&&player.x<p.x+p.w+8){
         if(player.y+player.r>=p.y&&player.y+player.r<=p.y+p.h+player.vy+2){
           player.y=p.y-player.r;
@@ -1146,7 +1146,14 @@ function update(dt){
           p.bounce=1;
           player.landedT=0.15;
           player.squash=1.35;player.stretch=0.75;
-          if(p.type==='brittle'){p.cracked++;if(p.cracked>=2){burst(p.x+p.w/2,p.y+6,'#8a5a2a',12);}}
+          if(p.type==='brittle'){
+            p.cracked++;
+            if(p.cracked>=2){
+              burst(p.x+p.w/2,p.y+6,'#8a5a2a',16);
+              p.dead=true; // remove it visually + physically
+              for(const en of enemies)if(en.plat===p){en.alive=false;en.plat=null;}
+            }
+          }
         }
       }
     }
