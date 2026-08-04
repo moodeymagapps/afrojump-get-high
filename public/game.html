@@ -1048,7 +1048,7 @@ function spawnBoss(){
   const kind=BOSS_TYPES[bossIndex%BOSS_TYPES.length];bossIndex++;
   // Bosse im Maßstab zum Spieler (player.r=22 → ca. 44px) – unterschiedlich, aber nie riesig
   const PS=(player&&player.r?player.r:22)*2;
-  boss={kind,x:W/2,y:cameraY+80,w:PS*1.15,h:PS*1.35,hp:5,hpMax:5,vx:1.7,shootT:1.8,alive:true,hitT:0,phase:0,spawnT:1.4,tele:0,teleX:W/2};
+  boss={kind,x:W/2,y:cameraY+150,w:PS*1.15,h:PS*1.35,hp:5,hpMax:5,vx:1.7,shootT:1.8,alive:true,hitT:0,phase:0,spawnT:1.4,tele:0,teleX:W/2};
   if(kind==='budboss'){boss.w=PS*1.15;boss.h=PS*1.5;boss.vx=1.7;}
   if(kind==='kingblunt'){boss.w=PS*1.1;boss.h=PS*1.6;boss.vx=1.5;}
   if(kind==='drgreenthumb'){boss.w=PS*1.25;boss.h=PS*1.25;boss.vx=2.0;}
@@ -1078,7 +1078,6 @@ function spawnBoss(){
 }
 
 
-window.__dbg={forceBoss(){nextBossScore=0;bestY=Math.max(bestY,1);},get boss(){return boss;},killBoss(){if(boss)boss.hp=0;},get player(){return player;}};
 function pushFloat(x,y,txt,color){floatTexts.push({x,y,txt,color:color||'#fff',life:0.9});}
 function addShake(mag,dur){shake.mag=Math.max(shake.mag,mag);shake.t=Math.max(shake.t,dur);}
 
@@ -1258,7 +1257,7 @@ function update(dt){
     boss.x+=boss.vx*(boss.spawnT>0?0.3:1);
     if(boss.x<60){boss.x=60;boss.vx*=-1;}
     if(boss.x>W-60){boss.x=W-60;boss.vx*=-1;}
-    boss.y=cameraY+90;
+    boss.y=cameraY+150;
     boss.hitT-=dt;
     boss.phase+=dt;
     // stomp
@@ -2878,8 +2877,6 @@ function drawBossHP(bx,y,bh){
   ctx.save();
   ctx.textAlign='center';
   ctx.font='7px "Press Start 2P", monospace';
-  ctx.fillStyle='#000';ctx.fillText(nm,bx+1,top-5);
-  ctx.fillStyle='#ffdd00';ctx.fillText(nm,bx,top-6);
   ctx.fillStyle='#0a0a0a';ctx.fillRect(bx-42,top,84,9);
   const frac=Math.max(0,boss.hp)/max;
   ctx.fillStyle=frac>0.5?'#7cfc00':frac>0.25?'#ffd23f':'#ff5252';
