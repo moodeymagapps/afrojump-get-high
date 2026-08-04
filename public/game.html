@@ -494,7 +494,13 @@ function trimTransparent(src){
 }
 // Preload the image skins right away
 for(const s of SKINS)if(s.img)loadSkinImage(s.img,s.bgKey);
-function currentSkin(){return SKINS.find(s=>s.id===selectedSkin)||SKINS[0];}
+function currentSkin(){
+  const base=SKINS.find(s=>s.id===selectedSkin)||SKINS[0];
+  const j=currentJoint();
+  if(j.id==='j_default')return base;
+  // equipped joint skin recolors the joint of every character skin
+  return Object.assign({},base,{joint:j.paper==='RAINBOW'?rainbowCol(5):j.paper,jointTip:j.tip});
+}
 function persistShop(){localStorage.setItem(BK,totalBags);localStorage.setItem(OK,JSON.stringify(owned));localStorage.setItem(SK,selectedSkin);}
 function updateBagsUI(){bagsEl.textContent='🌿 '+totalBags;menuBags.textContent='🌿 '+totalBags+' Baggys';shopBags.textContent='🌿 '+totalBags;}
 
