@@ -239,7 +239,7 @@ bgm.volume=0.55;
 function updateMuteUI(){muteBtn.textContent=muted?'🔇':'🔊';}
 function tryPlayMusic(){if(!muted){bgm.play().catch(()=>{});}}
 function stopMusic(){try{bgm.pause();}catch(e){}}
-muteBtn.onclick=(e)=>{e.stopPropagation();muted=!muted;localStorage.setItem(MK,muted?'1':'0');updateMuteUI();if(muted){stopMusic();stopBossMusic();}else{if(boss)startBossMusic();else tryPlayMusic();}};
+muteBtn.onclick=(e)=>{e.stopPropagation();muted=!muted;localStorage.setItem(MK,muted?'1':'0');updateMuteUI();if(muted){stopMusic();stopBossMusic();}else{if(!boss)tryPlayMusic();}};
 updateMuteUI();
 // ---------- Procedural Boss Music (WebAudio synth — no file needed) ----------
 let audioCtx=null,bossMusicNodes=null;
@@ -302,6 +302,34 @@ function stopBossMusic(){
   setTimeout(()=>{try{bass.stop();lead.stop();master.disconnect();}catch(e){}},400);
   bossMusicNodes=null;
 }
+// ---------- SFX (kurze WebAudio-Blips – kein Boss-Loop mehr) ----------
+function sfx(kind){
+  if(muted)return;
+  const ac=ensureAudio();if(!ac)return;
+  if(ac.state==='suspended')ac.resume().catch(()=>{});
+  const t=ac.currentTime;
+  const P={
+    tele:   {type:'square',  f0:900, f1:1200, dur:0.10, vol:0.10},
+    shoot:  {type:'square',  f0:520, f1:180,  dur:0.12, vol:0.10},
+    hit:    {type:'triangle',f0:220, f1:90,   dur:0.16, vol:0.16},
+    stomp:  {type:'square',  f0:180, f1:520,  dur:0.14, vol:0.16},
+    hurt:   {type:'sawtooth',f0:320, f1:70,   dur:0.30, vol:0.18},
+    bossdie:{type:'sawtooth',f0:90,  f1:600,  dur:0.60, vol:0.20},
+    pickup: {type:'triangle',f0:660, f1:1320, dur:0.10, vol:0.10},
+    boss:   {type:'sawtooth',f0:70,  f1:40,   dur:0.80, vol:0.20},
+  }[kind];
+  if(!P)return;
+  try{
+    const o=ac.createOscillator(),g=ac.createGain();
+    o.type=P.type;
+    o.frequency.setValueAtTime(P.f0,t);
+    o.frequency.exponentialRampToValueAtTime(Math.max(20,P.f1),t+P.dur);
+    g.gain.setValueAtTime(P.vol,t);
+    g.gain.exponentialRampToValueAtTime(0.0008,t+P.dur);
+    o.connect(g).connect(ac.destination);
+    o.start(t);o.stop(t+P.dur+0.02);
+  }catch(e){}
+}
 // Autostart music on first user interaction (browser policy)
 function firstInteract(){ensureAudio();if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume().catch(()=>{});if(!boss)tryPlayMusic();window.removeEventListener('pointerdown',firstInteract);window.removeEventListener('keydown',firstInteract);}
 window.addEventListener('pointerdown',firstInteract,{once:true});
@@ -311,8 +339,8 @@ let highScore=+localStorage.getItem(HK)||0;
 let totalBags=+localStorage.getItem(BK)||0;
 // One-time starter gift: every player (new and existing) gets 2000 🌿
 let grant2000=localStorage.getItem(GK)==='1';
-function applyStarterGrant(){
-  if(grant2000)return false;
+function applyStarterGrant(force){
+  if(grant2000&&!force)return false;
   totalBags+=2000;
   grant2000=true;
   localStorage.setItem(GK,'1');
@@ -419,17 +447,28 @@ const WEAPON_SKINS=[
   {id:'w_alien',  name:'Alien Kush Ray',rarity:'legendary',core:'#b9f6ca',ring:'#00c853',shape:'laser'},
 ];
 // ---- Joint-Skins (nur aus Loot-Tütchen) ----
+// dev = Form des Konsum-Gegenstands: joint | blunt | bong | vape | pipe | brownie | cookie | pill | gummy | dab | hookah | cigar
 const JOINT_SKINS=[
-  {id:'j_default',name:'Classic Joint', rarity:'common',   free:true, paper:'#f5ecd0',tip:'#ff6a00',smoke:'#eeeeee'},
-  {id:'j_brown',  name:'Blunt Wrap',    rarity:'common',   paper:'#8d6e63',tip:'#ff8a00',smoke:'#d7ccc8'},
-  {id:'j_slim',   name:'Slim King',     rarity:'common',   paper:'#fff8e1',tip:'#ff5252',smoke:'#f5f5f5'},
-  {id:'j_green',  name:'Green Paper',   rarity:'rare',     paper:'#a5d6a7',tip:'#ff6a00',smoke:'#c8e6c9'},
-  {id:'j_pink',   name:'Cotton Candy',  rarity:'rare',     paper:'#f8bbd0',tip:'#ff4081',smoke:'#fce4ec'},
-  {id:'j_ice',    name:'Menthol Ice',   rarity:'rare',     paper:'#b3e5fc',tip:'#40c4ff',smoke:'#e1f5fe'},
-  {id:'j_purple', name:'Purple Cone',   rarity:'epic',     paper:'#ce93d8',tip:'#7c4dff',smoke:'#ede7f6'},
-  {id:'j_black',  name:'Blackout',      rarity:'epic',     paper:'#212121',tip:'#ff1744',smoke:'#616161'},
-  {id:'j_gold',   name:'24K Joint',     rarity:'legendary',paper:'#ffd700',tip:'#fff176',smoke:'#fff9c4'},
-  {id:'j_rainbow',name:'Rainbow Spliff',rarity:'legendary',paper:'RAINBOW',tip:'#ffffff',smoke:'#ffffff'},
+  {id:'j_default',name:'Classic Joint', rarity:'common',   free:true, dev:'joint', paper:'#f5ecd0',tip:'#ff6a00',smoke:'#eeeeee'},
+  {id:'j_brown',  name:'Blunt Wrap',    rarity:'common',   dev:'blunt', paper:'#8d6e63',tip:'#ff8a00',smoke:'#d7ccc8'},
+  {id:'j_slim',   name:'Slim King',     rarity:'common',   dev:'joint', paper:'#fff8e1',tip:'#ff5252',smoke:'#f5f5f5'},
+  {id:'j_pipe',   name:'Apfel-Pfeife',  rarity:'common',   dev:'pipe',  paper:'#8bc34a',tip:'#ff7043',smoke:'#dcedc8'},
+  {id:'j_green',  name:'Green Paper',   rarity:'rare',     dev:'joint', paper:'#a5d6a7',tip:'#ff6a00',smoke:'#c8e6c9'},
+  {id:'j_pink',   name:'Cotton Candy',  rarity:'rare',     dev:'joint', paper:'#f8bbd0',tip:'#ff4081',smoke:'#fce4ec'},
+  {id:'j_ice',    name:'Menthol Ice',   rarity:'rare',     dev:'joint', paper:'#b3e5fc',tip:'#40c4ff',smoke:'#e1f5fe'},
+  {id:'j_vape',   name:'Vaporizer',     rarity:'rare',     dev:'vape',  paper:'#37474f',tip:'#00e5ff',smoke:'#b2ebf2'},
+  {id:'j_brownie',name:'Space Brownie', rarity:'rare',     dev:'brownie',paper:'#5d4037',tip:'#8d6e63',smoke:'#d7ccc8'},
+  {id:'j_cookie', name:'Weed Cookie',   rarity:'rare',     dev:'cookie', paper:'#d7a86e',tip:'#4e342e',smoke:'#f0e0c0'},
+  {id:'j_purple', name:'Purple Cone',   rarity:'epic',     dev:'joint', paper:'#ce93d8',tip:'#7c4dff',smoke:'#ede7f6'},
+  {id:'j_black',  name:'Blackout',      rarity:'epic',     dev:'blunt', paper:'#212121',tip:'#ff1744',smoke:'#616161'},
+  {id:'j_bong',   name:'Glas-Bong',     rarity:'epic',     dev:'bong',  paper:'#8ee6c8',tip:'#ff6a00',smoke:'#e0f7fa'},
+  {id:'j_pill',   name:'Bunte Pille',   rarity:'epic',     dev:'pill',  paper:'RAINBOW',tip:'#ffffff',smoke:'#f8bbd0'},
+  {id:'j_gummy',  name:'THC-Gummibär',  rarity:'epic',     dev:'gummy', paper:'#ff5252',tip:'#ffeb3b',smoke:'#ffcdd2'},
+  {id:'j_hookah', name:'Shisha',        rarity:'epic',     dev:'hookah',paper:'#ffca28',tip:'#ff7043',smoke:'#fff3c4'},
+  {id:'j_dab',    name:'Dab-Rig',       rarity:'legendary',dev:'dab',   paper:'#b388ff',tip:'#ff1744',smoke:'#ede7f6'},
+  {id:'j_cigar',  name:'Kush-Zigarre',  rarity:'legendary',dev:'cigar', paper:'#4e342e',tip:'#ff6a00',smoke:'#efebe9'},
+  {id:'j_gold',   name:'24K Joint',     rarity:'legendary',dev:'joint', paper:'#ffd700',tip:'#fff176',smoke:'#fff9c4'},
+  {id:'j_rainbow',name:'Rainbow Spliff',rarity:'legendary',dev:'joint', paper:'RAINBOW',tip:'#ffffff',smoke:'#ffffff'},
 ];
 // ---- Loot-Tütchen ----
 const LOOT_BOXES=[
@@ -533,7 +572,7 @@ function currentSkin(){
   const j=currentJoint();
   if(j.id==='j_default')return base;
   // equipped joint skin recolors the joint of every character skin
-  return Object.assign({},base,{joint:j.paper==='RAINBOW'?rainbowCol(5):j.paper,jointTip:j.tip});
+  return Object.assign({},base,{joint:j.paper==='RAINBOW'?rainbowCol(5):j.paper,jointTip:j.tip,dev:j.dev||'joint'});
 }
 function persistShop(){localStorage.setItem(BK,totalBags);localStorage.setItem(OK,JSON.stringify(owned));localStorage.setItem(SK,selectedSkin);}
 function updateBagsUI(){bagsEl.textContent='🌿 '+totalBags;menuBags.textContent='🌿 '+totalBags+' Baggys';shopBags.textContent='🌿 '+totalBags;}
@@ -556,7 +595,7 @@ function showOverlay(which){
 function goMenu(){gameState='menu';menuHigh.textContent='Best: '+highScore+'m';updateBagsUI();showOverlay('menu');}
 function startGame(){reset();gameState='playing';showOverlay('playing');tryPlayMusic();}
 function pauseGame(){if(gameState!=='playing')return;gameState='paused';showOverlay('paused');stopMusic();stopBossMusic();}
-function resumeGame(){if(gameState!=='paused')return;gameState='playing';showOverlay('playing');last=performance.now();if(boss)startBossMusic();else tryPlayMusic();}
+function resumeGame(){if(gameState!=='paused')return;gameState='playing';showOverlay('playing');last=performance.now();if(!boss)tryPlayMusic();}
 function openShop(from){shopReturn=from;gameState='shop';renderShop();updateBagsUI();showOverlay('shop');}
 function closeShop(){
   if(typeof openBoxEl!=='undefined'&&openBoxEl){openBoxEl.style.display='none';boxAnim=null;}
@@ -589,16 +628,16 @@ function drawWeaponPreview(g,w,noClear){
 }
 function drawJointPreview(g,j,noClear){
   if(!noClear)g.clearRect(0,0,80,80);
-  g.save();g.translate(18,46);g.rotate(-0.35);g.scale(2.4,2.4);
   const paper=j.paper==='RAINBOW'?rainbowCol(5):j.paper;
-  g.fillStyle=paper;g.strokeStyle='#000';g.lineWidth=1;
-  g.fillRect(0,-2,18,4);g.strokeRect(0,-2,18,4);
-  g.fillStyle=j.tip;g.fillRect(18,-2,3,4);
-  g.fillStyle='rgba(255,255,255,.5)';g.fillRect(2,-1.6,12,0.8);
+  g.save();
+  g.imageSmoothingEnabled=false;
+  // Gerät groß und zentriert zeichnen (nutzt die Spiel-Zeichenlogik)
+  g.translate(18,58);g.scale(2.7,2.7);
+  drawDevice(g,{joint:paper,jointTip:j.tip,dev:j.dev||'joint'});
   g.restore();
   // smoke puffs
-  g.globalAlpha=.7;g.fillStyle=j.smoke||'#eee';
-  g.beginPath();g.arc(64,34,6,0,Math.PI*2);g.arc(56,22,5,0,Math.PI*2);g.arc(48,13,4,0,Math.PI*2);g.fill();
+  g.globalAlpha=.55;g.fillStyle=j.smoke||'#eee';
+  g.beginPath();g.arc(68,26,5,0,Math.PI*2);g.arc(60,15,4,0,Math.PI*2);g.arc(53,7,3,0,Math.PI*2);g.fill();
   g.globalAlpha=1;
 }
 function makeCard(){const c=document.createElement('div');c.className='skinCard';return c;}
@@ -1048,7 +1087,8 @@ function spawnBoss(){
   const kind=BOSS_TYPES[bossIndex%BOSS_TYPES.length];bossIndex++;
   // Bosse im Maßstab zum Spieler (player.r=22 → ca. 44px) – unterschiedlich, aber nie riesig
   const PS=(player&&player.r?player.r:22)*2;
-  boss={kind,x:W/2,y:cameraY+150,w:PS*1.15,h:PS*1.35,hp:5,hpMax:5,vx:1.7,shootT:1.8,alive:true,hitT:0,phase:0,spawnT:1.4,tele:0,teleX:W/2};
+  const hp=6+Math.min(6,bossIndex-1)*1; // Boss 1: 6 HP, danach steigend
+  boss={kind,x:W/2,y:cameraY+150,w:PS*1.15,h:PS*1.35,hp,hpMax:hp,vx:1.7,shootT:1.2,alive:true,hitT:0,phase:0,spawnT:1.4,tele:0,teleX:W/2,rage:false,bob:0,gunT:4,dropT:2.5,dashT:3.5,dash:0};
   if(kind==='budboss'){boss.w=PS*1.15;boss.h=PS*1.5;boss.vx=1.7;}
   if(kind==='kingblunt'){boss.w=PS*1.1;boss.h=PS*1.6;boss.vx=1.5;}
   if(kind==='drgreenthumb'){boss.w=PS*1.25;boss.h=PS*1.25;boss.vx=2.0;}
@@ -1070,11 +1110,15 @@ function spawnBoss(){
   }
   platforms.sort((a,b)=>b.y-a.y);
   player.bossLives=3;player.invincible=Math.max(player.invincible,1.2);
+  player.invSrc='spawn';
   if(player.y<arenaTop){player.y=arenaTop+60;player.vy=2;}
   const nm=(BOSS_NAMES[kind]||'BOSS');
   pushFloat(W/2,cameraY+150,nm,'#ffdd00');
   pushFloat(W/2,cameraY+180,'3 ♥  –  drauf springen!','#ff5252');
-  startBossMusic();
+  // Musik komplett aus im Bossfight – nur Sounds
+  stopMusic();stopBossMusic();sfx('boss');
+  // eine Waffe zum Start, damit man sofort was tun kann
+  collectibles.push({x:W/2,y:cameraY+H-140,type:'gun',t:0,taken:false});
 }
 
 
@@ -1112,6 +1156,7 @@ function update(dt){
   player.vy+=0.35;
   if(player.invincible>0){
     player.invincible-=dt;
+    if(player.invincible<=0)player.invSrc=null;
     if(player.vy>0)player.vy=Math.max(player.vy,-2);
   }
   // jetpack — strong sustained lift
@@ -1195,10 +1240,10 @@ function update(dt){
     c.t+=dt;
     if(Math.hypot(player.x-c.x,player.y-c.y)<player.r+10){
       c.taken=true;
-      if(c.type==='bag'){const gain=2;runBags+=gain;totalBags+=gain;bagsEl.textContent='🌿 '+totalBags;burst(c.x,c.y,'#7cfc00',18);pushFloat(c.x,c.y-4,'+'+gain+' 🌿','#7cfc00');}
-      else if(c.type==='joint'){player.invincible=6;player.vy=-22;burst(c.x,c.y,'#ff69b4',24);pushFloat(c.x,c.y-4,'INVINCIBLE!','#ff69b4');}
+      if(c.type==='bag'){const gain=2;runBags+=gain;totalBags+=gain;bagsEl.textContent='🌿 '+totalBags;burst(c.x,c.y,'#7cfc00',18);pushFloat(c.x,c.y-4,'+'+gain+' 🌿','#7cfc00');sfx('pickup');}
+      else if(c.type==='joint'){player.invincible=6;player.invSrc='power';player.vy=-22;burst(c.x,c.y,'#ff69b4',24);pushFloat(c.x,c.y-4,'INVINCIBLE!','#ff69b4');sfx('pickup');}
       else if(c.type==='jetpack'){player.jetpackT=3.0;player.vy=-14;burst(c.x,c.y,'#ff8a00',30);pushFloat(c.x,c.y-4,'JETPACK!','#ff8a00');}
-      else if(c.type==='gun'){player.gunT=5.0;burst(c.x,c.y,'#e0e0e0',22);pushFloat(c.x,c.y-4,'GUN 5s!','#e0e0e0');}
+      else if(c.type==='gun'){player.gunT=5.0;burst(c.x,c.y,'#e0e0e0',22);pushFloat(c.x,c.y-4,'GUN 5s!','#e0e0e0');sfx('pickup');}
       // gun fires instantly upward on pickup and then keeps auto-firing
       if(c.type==='gun'){player.shootCd=0;shootRequested=true;}
       if(c.type==='bag'){localStorage.setItem(BK,totalBags);questProgress('bags',2);missionProgress('bags',2);}
@@ -1254,25 +1299,42 @@ function update(dt){
   if(boss){
     if(boss.spawnT>0)boss.spawnT-=dt;
     // sanftes Schweben statt hartes Zickzack
-    boss.x+=boss.vx*(boss.spawnT>0?0.3:1);
+    const rageMul=boss.rage?1.5:1;
+    boss.x+=boss.vx*(boss.spawnT>0?0.3:rageMul)*(boss.dash>0?2.2:1);
     if(boss.x<60){boss.x=60;boss.vx*=-1;}
     if(boss.x>W-60){boss.x=W-60;boss.vx*=-1;}
-    boss.y=cameraY+150;
+    boss.bob+=dt;
+    boss.y=cameraY+150+Math.sin(boss.bob*(boss.rage?2.6:1.6))*14;
     boss.hitT-=dt;
     boss.phase+=dt;
+    if(boss.dash>0)boss.dash-=dt;
+    // Phase 2: ab der Hälfte wird er wütend
+    if(!boss.rage&&boss.hp<=boss.hpMax/2){
+      boss.rage=true;boss.shootT=Math.min(boss.shootT,0.5);
+      pushFloat(boss.x,boss.y-30,'WÜTEND!','#ff5252');addShake(7,0.3);sfx('boss');
+    }
+    // regelmäßig Baggys + Waffen in die Arena, damit der Fight aktiv bleibt
+    if(boss.spawnT<=0){
+      boss.dropT-=dt;
+      if(boss.dropT<=0){boss.dropT=3.2;collectibles.push({x:60+Math.random()*(W-120),y:cameraY+H-160-Math.random()*140,type:'bag',t:0,taken:false});}
+      boss.gunT-=dt;
+      if(boss.gunT<=0){boss.gunT=7.5;collectibles.push({x:60+Math.random()*(W-120),y:cameraY+H-120-Math.random()*180,type:'gun',t:0,taken:false});}
+      boss.dashT-=dt;
+      if(boss.dashT<=0){boss.dashT=boss.rage?3.2:5;boss.dash=0.7;}
+    }
     // stomp
     if(player.vy>0&&Math.abs(player.x-boss.x)<boss.w/2+player.r*0.5&&player.y+player.r>boss.y-boss.h/2-4&&player.y+player.r<boss.y-boss.h/2+22){
-      boss.hp--;boss.hitT=0.3;player.vy=-16;burst(player.x,boss.y-boss.h/2,'#ff5252',20);addShake(6,0.25);pushFloat(boss.x,boss.y-boss.h/2,'-1','#ff5252');
+      boss.hp--;boss.hitT=0.3;player.vy=-17;burst(player.x,boss.y-boss.h/2,'#ff5252',20);addShake(6,0.25);pushFloat(boss.x,boss.y-boss.h/2,'-1','#ff5252');sfx('stomp');
     }
     // hit by projectile
     for(const pr of projectiles){
       if(pr.life>0&&Math.abs(pr.x-boss.x)<boss.w/2&&Math.abs(pr.y-boss.y)<boss.h/2){
-        pr.life=0;boss.hp--;boss.hitT=0.3;burst(pr.x,pr.y,'#ffffff',12);addShake(3,0.15);
+        pr.life=0;boss.hp--;boss.hitT=0.3;burst(pr.x,pr.y,'#ffffff',12);addShake(3,0.15);sfx('hit');
       }
     }
-    // invincibility damages
-    if(player.invincible>0&&Math.abs(player.x-boss.x)<boss.w/2+player.r&&Math.abs(player.y-boss.y)<boss.h/2+player.r){
-      boss.hp-=0.1;
+    // Nur die Joint-Unbesiegbarkeit macht Kontaktschaden (nicht die Treffer-Unverwundbarkeit)
+    if(player.invincible>0&&player.invSrc==='power'&&Math.abs(player.x-boss.x)<boss.w/2+player.r&&Math.abs(player.y-boss.y)<boss.h/2+player.r){
+      boss.hp-=dt*2.2;boss.hitT=0.12;
     }
     // body contact — costs one boss life (never instant-kill during reaction window)
     if(boss.spawnT<=0&&player.invincible<=0&&Math.abs(player.x-boss.x)<boss.w/2-6&&Math.abs(player.y-boss.y)<boss.h/2-6&&!(player.vy>0&&player.y<boss.y)){
@@ -1284,21 +1346,29 @@ function update(dt){
         boss.tele-=dt;
         if(boss.tele<=0){
           const dx=Math.max(-2.4,Math.min(2.4,(player.x-boss.x)*0.02));
-          enemies.push({boss:true,x:boss.x,y:boss.y+boss.h/2,vx:dx,vy:4.2,w:12,h:12,alive:true});
-          burst(boss.x,boss.y+boss.h/2,'#8fff9c',8);
+          const shots=boss.rage?3:1;
+          for(let i=0;i<shots;i++){
+            const spread=(i-(shots-1)/2)*1.5;
+            enemies.push({boss:true,x:boss.x,y:boss.y+boss.h/2,vx:dx+spread,vy:boss.rage?4.8:4.2,w:12,h:12,alive:true});
+          }
+          burst(boss.x,boss.y+boss.h/2,'#8fff9c',8);sfx('shoot');
         }
       }else{
         boss.shootT-=dt;
-        if(boss.shootT<=0){boss.shootT=1.9;boss.tele=0.55;boss.teleX=boss.x;}
+        if(boss.shootT<=0){boss.shootT=boss.rage?1.15:1.6;boss.tele=boss.rage?0.42:0.55;boss.teleX=boss.x;sfx('tele');}
       }
     }
     if(boss.hp<=0){
       burst(boss.x,boss.y,'#ffdd00',50);addShake(10,0.5);
       pushFloat(boss.x,boss.y,'BOSS DOWN!','#ffdd00');
-      totalBags+=25;localStorage.setItem(BK,totalBags);updateBagsUI();
-      pushFloat(boss.x,boss.y+20,'+25 🌿','#7cfc00');
+      const reward=40+Math.min(60,bossIndex*10);
+      totalBags+=reward;localStorage.setItem(BK,totalBags);updateBagsUI();
+      pushFloat(boss.x,boss.y+20,'+'+reward+' 🌿','#7cfc00');sfx('bossdie');
       boss=null;scrollLocked=false;nextBossScore+=1800;bestY+=100;player.vy=-14;
       player.bossLives=0;stopBossMusic();tryPlayMusic();
+      // übrige Boss-Kugeln entfernen (sonst treffen sie einen nach dem Sieg)
+      for(const e of enemies)if(e.boss)e.alive=false;
+      player.invincible=Math.max(player.invincible,1.0);player.invSrc='spawn';
       questProgress('boss',1);
       missionProgress('boss',1);
     }
@@ -1383,10 +1453,11 @@ function hurtPlayer(){
   if(gameOver)return;
   if(boss&&player.bossLives>0){
     player.bossLives--;
-    player.invincible=Math.max(player.invincible,1.5);
+    if(player.invSrc!=='power'){player.invincible=Math.max(player.invincible,1.5);player.invSrc='hit';}
     player.hitFlash=0.4;
     burst(player.x,player.y,'#ff5252',18);
     addShake(8,0.3);
+    sfx('hurt');
     if(player.bossLives<=0){pushFloat(player.x,player.y-20,'LAST LIFE!','#ff5252');}
     else pushFloat(player.x,player.y-20,'-1 ♥ ('+player.bossLives+' left)','#ff5252');
     if(player.vy>0)player.vy=-8;
@@ -1834,11 +1905,70 @@ function drawAfroCharacter(g,s,inv){
   // mouth
   g.strokeStyle='#3a2010';g.lineWidth=1.4;
   g.beginPath();g.moveTo(-2,-12);g.quadraticCurveTo(1,-10,4,-12);g.stroke();
-  // joint
-  g.fillStyle=s.joint;g.fillRect(4,-13,10,2.5);
-  g.strokeStyle='#000';g.strokeRect(4,-13,10,2.5);
-  g.fillStyle=s.jointTip||'#ff6a00';g.fillRect(13.5,-13,2,2.5);
-  g.fillStyle='#ffd54a';g.fillRect(14,-12.5,1,1.5);
+  // Konsum-Gegenstand (Joint / Bong / Brownie / Pille / ...)
+  drawDevice(g,s);
+}
+
+// Zeichnet den ausgerüsteten Konsum-Gegenstand am Mund (Pixel-Look)
+function drawDevice(g,s){
+  const col=s.joint||'#f5ecd0', tip=s.jointTip||'#ff6a00', dev=s.dev||'joint';
+  const px=(x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(x,y,w,h);};
+  g.strokeStyle='#000';g.lineWidth=1;
+  if(dev==='joint'||dev==='blunt'||dev==='cigar'){
+    const len=dev==='joint'?10:dev==='blunt'?9:8, th=dev==='cigar'?4:dev==='blunt'?3.4:2.5;
+    px(4,-13,len,th,col);g.strokeRect(4,-13,len,th);
+    px(4+len-0.5,-13,2,th,tip);
+    px(4+len,-12.6,1,th*0.5,'#ffd54a');
+    if(dev==='cigar'){px(5,-13,2.5,th,shade(col,-0.3));}
+  }else if(dev==='pipe'){
+    px(3,-12.5,7,2,shade(col,-0.2));g.strokeRect(3,-12.5,7,2);
+    px(10,-16,4,5,col);g.strokeRect(10,-16,4,5);
+    px(10.5,-16.5,3,1.5,'#4caf50');
+    px(11.5,-17.5,1,1,tip);
+  }else if(dev==='bong'){
+    px(9,-11,7,6,'rgba(190,255,235,0.55)');g.strokeRect(9,-11,7,6);   // Kammer
+    px(11,-9,3,3,'#7fdcc0');                                          // Wasser
+    px(11.5,-20,2.5,9,'rgba(200,255,245,0.6)');g.strokeRect(11.5,-20,2.5,9); // Rohr
+    px(10.5,-21.5,4.5,2,shade(col,-0.1));g.strokeRect(10.5,-21.5,4.5,2);     // Mundstück
+    px(4,-9,6,1.6,shade(col,-0.2));                                   // Chillum zum Mund
+    px(15,-22.5,1.5,1.5,tip);
+  }else if(dev==='vape'){
+    px(4,-13.5,11,3.5,col);g.strokeRect(4,-13.5,11,3.5);
+    px(12.5,-13,2,2.5,tip);
+    px(6,-12.8,1.5,1.5,'#00e5ff');
+  }else if(dev==='dab'){
+    px(9,-11,7,6,'rgba(220,200,255,0.6)');g.strokeRect(9,-11,7,6);
+    px(11.5,-19,2.5,8,'rgba(230,215,255,0.65)');g.strokeRect(11.5,-19,2.5,8);
+    px(15,-19,4,2,col);g.strokeRect(15,-19,4,2);
+    px(18,-20,2,2,tip);
+    px(4,-9,6,1.6,shade(col,-0.2));
+  }else if(dev==='hookah'){
+    px(10,-10,7,7,col);g.strokeRect(10,-10,7,7);
+    px(12.5,-19,2,9,shade(col,-0.25));g.strokeRect(12.5,-19,2,9);
+    px(11,-21,5.5,2.5,shade(col,-0.1));g.strokeRect(11,-21,5.5,2.5);
+    px(12.5,-22,2.5,1.5,tip);
+    g.strokeStyle='#000';g.beginPath();g.moveTo(5,-10);g.quadraticCurveTo(7,-4,10,-6);g.stroke();
+  }else if(dev==='brownie'){
+    px(5,-15,10,6,col);g.strokeRect(5,-15,10,6);
+    px(5,-15,10,2,shade(col,0.18));
+    px(7,-13,1.5,1.5,'#2e7d32');px(11,-12,1.5,1.5,'#43a047');
+  }else if(dev==='cookie'){
+    g.fillStyle=col;g.beginPath();g.arc(10,-12,5,0,Math.PI*2);g.fill();g.stroke();
+    px(8,-14,1.5,1.5,'#3e2723');px(11,-11,1.5,1.5,'#2e7d32');px(9.5,-9.5,1.5,1.5,'#4e342e');
+  }else if(dev==='pill'){
+    px(4,-14,6,5,col==='#f5ecd0'?'#ff5252':col);g.strokeRect(4,-14,6,5);
+    px(10,-14,6,5,'#fafafa');g.strokeRect(10,-14,6,5);
+    px(11,-13.4,2,1.4,'rgba(255,255,255,0.9)');
+  }else if(dev==='gummy'){
+    g.fillStyle=col;
+    g.beginPath();g.arc(10,-15,2.4,0,Math.PI*2);g.fill();g.stroke();      // Kopf
+    px(7.5,-13,5,6,col);g.strokeRect(7.5,-13,5,6);                        // Körper
+    px(5.5,-12,2,2,col);px(12.5,-12,2,2,col);                             // Arme
+    px(9,-14.6,0.8,0.8,'#000');px(10.6,-14.6,0.8,0.8,'#000');
+    px(8,-12.5,1.2,1.2,tip);
+  }else{
+    px(4,-13,10,2.5,col);g.strokeRect(4,-13,10,2.5);px(13.5,-13,2,2.5,tip);
+  }
 }
 
 // utility: darken/lighten a hex color by amount (-1..1)
@@ -3693,8 +3823,12 @@ async function loadCloudSave(){
     // merge: take max bags, union skins, keep highest highScore, streak/daily most recent
     if(typeof d.totalBags==='number')totalBags=Math.max(totalBags,d.totalBags);
     // starter gift also applies to cloud saves made before the gift existed
-    if(d.grant2000)grant2000=true,localStorage.setItem(GK,'1');
-    else applyStarterGrant();
+    if(d.grant2000){grant2000=true;localStorage.setItem(GK,'1');}
+    else{
+      // Account hat das Geschenk noch nie erhalten -> jetzt gutschreiben
+      applyStarterGrant(true);
+      setTimeout(()=>{try{updateBagsUI();pushCloudSave();}catch(e){}},200);
+    }
     if(typeof d.highScore==='number')highScore=Math.max(highScore,d.highScore);
     if(Array.isArray(d.owned))owned=Array.from(new Set([...owned,...d.owned]));
     if(d.selectedSkin&&owned.includes(d.selectedSkin))selectedSkin=d.selectedSkin;
