@@ -527,6 +527,8 @@ function showOverlay(which){
   const dEl=document.getElementById('duel'),aEl=document.getElementById('account');
   if(dEl&&which!=='duel')dEl.style.display='none';
   if(aEl&&which!=='account')aEl.style.display='none';
+  const bEl=document.getElementById('board');
+  if(bEl&&which!=='board')bEl.style.display='none';
   pauseBtn.style.display=which==='playing'?'flex':'none';
 }
 function goMenu(){gameState='menu';menuHigh.textContent='Best: '+highScore+'m';updateBagsUI();showOverlay('menu');}
