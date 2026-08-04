@@ -1298,25 +1298,42 @@ function update(dt){
   if(boss){
     if(boss.spawnT>0)boss.spawnT-=dt;
     // sanftes Schweben statt hartes Zickzack
-    boss.x+=boss.vx*(boss.spawnT>0?0.3:1);
+    const rageMul=boss.rage?1.5:1;
+    boss.x+=boss.vx*(boss.spawnT>0?0.3:rageMul)*(boss.dash>0?2.2:1);
     if(boss.x<60){boss.x=60;boss.vx*=-1;}
     if(boss.x>W-60){boss.x=W-60;boss.vx*=-1;}
-    boss.y=cameraY+150;
+    boss.bob+=dt;
+    boss.y=cameraY+150+Math.sin(boss.bob*(boss.rage?2.6:1.6))*14;
     boss.hitT-=dt;
     boss.phase+=dt;
+    if(boss.dash>0)boss.dash-=dt;
+    // Phase 2: ab der Hälfte wird er wütend
+    if(!boss.rage&&boss.hp<=boss.hpMax/2){
+      boss.rage=true;boss.shootT=Math.min(boss.shootT,0.5);
+      pushFloat(boss.x,boss.y-30,'WÜTEND!','#ff5252');addShake(7,0.3);sfx('boss');
+    }
+    // regelmäßig Baggys + Waffen in die Arena, damit der Fight aktiv bleibt
+    if(boss.spawnT<=0){
+      boss.dropT-=dt;
+      if(boss.dropT<=0){boss.dropT=3.2;collectibles.push({x:60+Math.random()*(W-120),y:cameraY+H-160-Math.random()*140,type:'bag',t:0,taken:false});}
+      boss.gunT-=dt;
+      if(boss.gunT<=0){boss.gunT=7.5;collectibles.push({x:60+Math.random()*(W-120),y:cameraY+H-120-Math.random()*180,type:'gun',t:0,taken:false});}
+      boss.dashT-=dt;
+      if(boss.dashT<=0){boss.dashT=boss.rage?3.2:5;boss.dash=0.7;}
+    }
     // stomp
     if(player.vy>0&&Math.abs(player.x-boss.x)<boss.w/2+player.r*0.5&&player.y+player.r>boss.y-boss.h/2-4&&player.y+player.r<boss.y-boss.h/2+22){
-      boss.hp--;boss.hitT=0.3;player.vy=-16;burst(player.x,boss.y-boss.h/2,'#ff5252',20);addShake(6,0.25);pushFloat(boss.x,boss.y-boss.h/2,'-1','#ff5252');
+      boss.hp--;boss.hitT=0.3;player.vy=-17;burst(player.x,boss.y-boss.h/2,'#ff5252',20);addShake(6,0.25);pushFloat(boss.x,boss.y-boss.h/2,'-1','#ff5252');sfx('stomp');
     }
     // hit by projectile
     for(const pr of projectiles){
       if(pr.life>0&&Math.abs(pr.x-boss.x)<boss.w/2&&Math.abs(pr.y-boss.y)<boss.h/2){
-        pr.life=0;boss.hp--;boss.hitT=0.3;burst(pr.x,pr.y,'#ffffff',12);addShake(3,0.15);
+        pr.life=0;boss.hp--;boss.hitT=0.3;burst(pr.x,pr.y,'#ffffff',12);addShake(3,0.15);sfx('hit');
       }
     }
-    // invincibility damages
-    if(player.invincible>0&&Math.abs(player.x-boss.x)<boss.w/2+player.r&&Math.abs(player.y-boss.y)<boss.h/2+player.r){
-      boss.hp-=0.1;
+    // Nur die Joint-Unbesiegbarkeit macht Kontaktschaden (nicht die Treffer-Unverwundbarkeit)
+    if(player.invincible>0&&player.invSrc==='power'&&Math.abs(player.x-boss.x)<boss.w/2+player.r&&Math.abs(player.y-boss.y)<boss.h/2+player.r){
+      boss.hp-=dt*2.2;boss.hitT=0.12;
     }
     // body contact — costs one boss life (never instant-kill during reaction window)
     if(boss.spawnT<=0&&player.invincible<=0&&Math.abs(player.x-boss.x)<boss.w/2-6&&Math.abs(player.y-boss.y)<boss.h/2-6&&!(player.vy>0&&player.y<boss.y)){
@@ -1328,19 +1345,24 @@ function update(dt){
         boss.tele-=dt;
         if(boss.tele<=0){
           const dx=Math.max(-2.4,Math.min(2.4,(player.x-boss.x)*0.02));
-          enemies.push({boss:true,x:boss.x,y:boss.y+boss.h/2,vx:dx,vy:4.2,w:12,h:12,alive:true});
-          burst(boss.x,boss.y+boss.h/2,'#8fff9c',8);
+          const shots=boss.rage?3:1;
+          for(let i=0;i<shots;i++){
+            const spread=(i-(shots-1)/2)*1.5;
+            enemies.push({boss:true,x:boss.x,y:boss.y+boss.h/2,vx:dx+spread,vy:boss.rage?4.8:4.2,w:12,h:12,alive:true});
+          }
+          burst(boss.x,boss.y+boss.h/2,'#8fff9c',8);sfx('shoot');
         }
       }else{
         boss.shootT-=dt;
-        if(boss.shootT<=0){boss.shootT=1.9;boss.tele=0.55;boss.teleX=boss.x;}
+        if(boss.shootT<=0){boss.shootT=boss.rage?1.15:1.6;boss.tele=boss.rage?0.42:0.55;boss.teleX=boss.x;sfx('tele');}
       }
     }
     if(boss.hp<=0){
       burst(boss.x,boss.y,'#ffdd00',50);addShake(10,0.5);
       pushFloat(boss.x,boss.y,'BOSS DOWN!','#ffdd00');
-      totalBags+=25;localStorage.setItem(BK,totalBags);updateBagsUI();
-      pushFloat(boss.x,boss.y+20,'+25 🌿','#7cfc00');
+      const reward=40+Math.min(60,bossIndex*10);
+      totalBags+=reward;localStorage.setItem(BK,totalBags);updateBagsUI();
+      pushFloat(boss.x,boss.y+20,'+'+reward+' 🌿','#7cfc00');sfx('bossdie');
       boss=null;scrollLocked=false;nextBossScore+=1800;bestY+=100;player.vy=-14;
       player.bossLives=0;stopBossMusic();tryPlayMusic();
       questProgress('boss',1);
