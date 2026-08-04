@@ -595,7 +595,9 @@ function renderShop(){
       card.appendChild(cvS);
     }
     const nm=document.createElement('div');nm.className='name';nm.textContent=s.name;card.appendChild(nm);
-    const pr=document.createElement('div');pr.className='price';pr.textContent=s.price===0?'Gratis':('🌿 '+s.price);card.appendChild(pr);
+    card.appendChild(rarBadge(s.rarity));
+    const pr=document.createElement('div');pr.className='price';
+    pr.textContent=s.lootOnly?'🎒 Loot':(s.price===0?'Gratis':('🌿 '+s.price));card.appendChild(pr);
     const btn=document.createElement('button');
     const isOwned=owned.includes(s.id);
     const isSel=s.id===selectedSkin;
@@ -605,6 +607,80 @@ function renderShop(){
       if(totalBags<s.price)return;
       totalBags-=s.price;owned.push(s.id);selectedSkin=s.id;persistShop();updateBagsUI();renderShop();
     };}
+    card.appendChild(btn);
+    skinGrid.appendChild(card);
+  }
+}
+
+// ---- Waffen/Joint Tabs (Loot-Inhalte) ----
+function renderLootTab(catalog,ownedList,kind){
+  for(const it of catalog){
+    const card=makeCard();
+    const isOwned=ownedList.includes(it.id);
+    const isSel=kind==='weapon'?selectedWeapon===it.id:selectedJoint===it.id;
+    if(isSel)card.classList.add('selected');
+    const cv=document.createElement('canvas');cv.width=80;cv.height=80;
+    const g=cv.getContext('2d');
+    if(kind==='weapon')drawWeaponPreview(g,it);else drawJointPreview(g,it);
+    if(!isOwned){cv.style.filter='grayscale(1) brightness(.5)';}
+    card.appendChild(cv);
+    const nm=document.createElement('div');nm.className='name';nm.textContent=it.name;card.appendChild(nm);
+    card.appendChild(rarBadge(it.rarity));
+    const pr=document.createElement('div');pr.className='price';pr.textContent=it.free?'Gratis':'🎒 Nur Loot';card.appendChild(pr);
+    const btn=document.createElement('button');
+    if(isSel){btn.textContent='✓ Aktiv';btn.className='selected';btn.disabled=true;}
+    else if(isOwned){btn.textContent='Auswählen';btn.className='owned';btn.onclick=()=>{
+      if(kind==='weapon')selectedWeapon=it.id;else selectedJoint=it.id;
+      persistLoot();renderShop();
+    };}
+    else{btn.textContent='🔒 Tütchen';btn.disabled=true;}
+    card.appendChild(btn);
+    skinGrid.appendChild(card);
+  }
+}
+
+// ---- Loot-Tütchen Tab ----
+function drawBaggy(g,cx,cy,scale,col,openAmt,shake){
+  // simple plastic ziplock baggy with weed inside
+  g.save();g.translate(cx+(shake||0),cy);g.scale(scale,scale);
+  g.lineJoin='round';
+  const open=openAmt||0;
+  // bag body
+  g.fillStyle='rgba(255,255,255,0.16)';g.strokeStyle='rgba(255,255,255,0.75)';g.lineWidth=2;
+  g.beginPath();g.moveTo(-26,-30);g.lineTo(26,-30);g.lineTo(24,36);g.lineTo(-24,36);g.closePath();g.fill();g.stroke();
+  // weed buds inside
+  g.fillStyle=col;
+  const buds=[[-10,14,8],[8,18,7],[0,4,9],[-14,-2,6],[13,2,6]];
+  for(const [bx,by,br] of buds){
+    g.beginPath();g.arc(bx,by,br,0,Math.PI*2);g.fill();
+  }
+  g.fillStyle='rgba(255,255,255,0.25)';
+  for(const [bx,by,br] of buds){g.beginPath();g.arc(bx-br*0.3,by-br*0.35,br*0.32,0,Math.PI*2);g.fill();}
+  // zip lips — open upward with openAmt
+  g.strokeStyle='#e0e0e0';g.lineWidth=3;
+  g.beginPath();g.moveTo(-26,-30);g.lineTo(-6-open*8,-32-open*10);g.stroke();
+  g.beginPath();g.moveTo(26,-30);g.lineTo(6+open*8,-32-open*10);g.stroke();
+  // label sticker
+  g.fillStyle='rgba(255,255,255,0.85)';g.fillRect(-12,-26,24,8);
+  g.fillStyle='#2e7d32';g.font='bold 7px monospace';g.textAlign='center';g.fillText('420',0,-20);
+  g.restore();
+}
+function renderBoxes(){
+  skinGrid.style.gridTemplateColumns='1fr';
+  for(const b of LOOT_BOXES){
+    const card=document.createElement('div');card.className='boxCard';
+    const cv=document.createElement('canvas');cv.width=96;cv.height=96;
+    const g=cv.getContext('2d');
+    g.clearRect(0,0,96,96);drawBaggy(g,48,44,1.05,b.bag,0,0);
+    card.appendChild(cv);
+    const nm=document.createElement('div');nm.className='bname';nm.textContent=b.name;card.appendChild(nm);
+    const od=document.createElement('div');od.className='odds';
+    od.innerHTML=Object.entries(b.odds).map(([r,p])=>'<span style="color:'+RARITY[r].color+'">'+RARITY[r].name+' '+(p*100).toFixed(p<0.05?1:0)+'%</span>').join(' · ');
+    card.appendChild(od);
+    const btn=document.createElement('button');
+    btn.textContent='ÖFFNEN – 🌿 '+b.price;
+    btn.disabled=totalBags<b.price;
+    btn.onclick=()=>openLootBox(b);
     card.appendChild(btn);
     skinGrid.appendChild(card);
   }
