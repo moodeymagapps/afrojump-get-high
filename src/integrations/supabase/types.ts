@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      leaderboard: {
+        Row: {
+          best_height: number
+          display_name: string
+          skin: string | null
+          total_bags: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          best_height?: number
+          display_name?: string
+          skin?: string | null
+          total_bags?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          best_height?: number
+          display_name?: string
+          skin?: string | null
+          total_bags?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       player_saves: {
         Row: {
           data: Json
