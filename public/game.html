@@ -717,11 +717,14 @@ function update(dt){
       else if(c.type==='joint'){player.invincible=6;player.vy=-22;burst(c.x,c.y,'#ff69b4',24);pushFloat(c.x,c.y-4,'INVINCIBLE!','#ff69b4');}
       else if(c.type==='jetpack'){player.jetpackT=3.0;player.vy=-14;burst(c.x,c.y,'#ff8a00',30);pushFloat(c.x,c.y-4,'JETPACK!','#ff8a00');}
       else if(c.type==='gun'){player.gunT=8.0;burst(c.x,c.y,'#e0e0e0',22);pushFloat(c.x,c.y-4,'GUN 8s!','#e0e0e0');}
+      // gun fires instantly upward on pickup and then keeps auto-firing
+      if(c.type==='gun'){player.shootCd=0;shootRequested=true;}
       if(c.type==='bag'){localStorage.setItem(BK,totalBags);questProgress('bags',1);}
     }
   }
 
   // projectiles
+  if(player.gunT>0)shootRequested=true; // auto-fire while the gun is active
   if(shootRequested&&player.shootCd<=0){
     if(player.gunT>0){
       // gun power-up: triple spread, faster fire
@@ -737,6 +740,30 @@ function update(dt){
   shootRequested=false;
   player.shootCd-=dt;
   for(const pr of projectiles){pr.x+=(pr.vx||0);pr.y+=pr.vy;pr.life-=dt;}
+
+  // projectiles vs enemies — one hit always destroys a normal enemy
+  for(const pr of projectiles){
+    if(pr.life<=0)continue;
+    for(const e of enemies){
+      if(!e.alive||e.boss||!e.plat)continue;
+      if(Math.abs(pr.x-e.x)<e.w/2+6&&Math.abs(pr.y-(e.y+e.h/2))<e.h/2+8){
+        pr.life=0;e.alive=false;
+        burst(e.x,e.y,'#ffcc00',20);addShake(3,0.12);
+        registerKill(e.x,e.y);
+        break;
+      }
+    }
+  }
+  // shoot down boss orbs too
+  for(const pr of projectiles){
+    if(pr.life<=0)continue;
+    for(const e of enemies){
+      if(!e.alive||!e.boss)continue;
+      if(Math.hypot(pr.x-e.x,pr.y-e.y)<14){pr.life=0;e.alive=false;burst(e.x,e.y,'#ffffff',10);break;}
+    }
+  }
+  comboT=Math.max(0,comboT-dt);
+  if(comboT<=0)killCombo=0;
 
   // boss check
   if(!boss&&bestY>=nextBossScore){spawnBoss();}
@@ -804,11 +831,16 @@ function update(dt){
 
   // recycle platforms
   const topY=cameraY-100;
-  while(platforms[platforms.length-1].y>topY-20){
-    const y=platforms[platforms.length-1].y-rand(60,90);
-    spawnPlatform(y);
+  if(!boss){
+    while(platforms.length&&platforms[platforms.length-1].y>topY-20){
+      const y=platforms[platforms.length-1].y-rand(60,90);
+      spawnPlatform(y);
+    }
   }
   platforms=platforms.filter(p=>p.y<cameraY+H+50);
+  if(!platforms.length){
+    platforms.push({x:W/2-40,y:cameraY+H-60,w:80,h:12,vx:0,type:'normal',dir:1,range:0,ox:W/2-40,bounce:0,cracked:0,springT:0});
+  }
   collectibles=collectibles.filter(c=>!c.taken&&c.y<cameraY+H+50);
   enemies=enemies.filter(e=>e.alive&&(e.boss||e.plat&&e.plat.y<cameraY+H+50));
   projectiles=projectiles.filter(pr=>pr.life>0&&pr.y>cameraY-20);
