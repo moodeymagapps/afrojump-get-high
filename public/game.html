@@ -1449,8 +1449,12 @@ function update(dt){
   if(floatTexts.length)floatTexts=floatTexts.filter(f=>f.life>0);
 }
 
+const MAX_PARTICLES=280;
 function burst(x,y,color,n=14){
-  for(let i=0;i<n;i++)particles.push({x,y,vx:rand(-3,3),vy:rand(-4,1),life:0.8,color});
+  const room=MAX_PARTICLES-particles.length;
+  if(room<=0)return;
+  const cnt=Math.min(n,room);
+  for(let i=0;i<cnt;i++)particles.push({x,y,vx:rand(-3,3),vy:rand(-4,1),life:0.8,color});
 }
 // Kill feedback: combo chain gives bonus baggys and juicy text
 function registerKill(x,y){
