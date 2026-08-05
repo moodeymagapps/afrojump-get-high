@@ -587,6 +587,8 @@ function trimTransparent(src){
 }
 // Preload the image skins right away
 for(const s of SKINS)if(s.img)loadSkinImage(s.img,s.bgKey);
+// Boss-Artworks direkt vorladen -> kein Hänger beim Boss-Spawn
+setTimeout(()=>{try{for(const k in BOSS_IMAGES)loadSkinImage(BOSS_IMAGES[k].src,BOSS_IMAGES[k].bg);}catch(e){}},300);
 function currentSkin(){
   const base=SKINS.find(s=>s.id===selectedSkin)||SKINS[0];
   const j=currentJoint();
