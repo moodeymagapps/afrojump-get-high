@@ -522,10 +522,16 @@ function loadSkinImage(src, bgKey){
   const img=new Image();
   img.onload=()=>{
     try{
+      // Große Uploads vorher verkleinern: Freistellen (Flood-Fill) auf 2000px
+      // Bildern verursacht sonst einen Ruckler beim ersten Anzeigen.
+      const MAXD=320;
+      const sc=Math.min(1,MAXD/Math.max(img.naturalWidth,img.naturalHeight));
       const c=document.createElement('canvas');
-      c.width=img.naturalWidth;c.height=img.naturalHeight;
-      const g=c.getContext('2d');
-      g.drawImage(img,0,0);
+      c.width=Math.max(1,Math.round(img.naturalWidth*sc));
+      c.height=Math.max(1,Math.round(img.naturalHeight*sc));
+      const g=c.getContext('2d',{willReadFrequently:true});
+      g.imageSmoothingEnabled=sc<1;
+      g.drawImage(img,0,0,c.width,c.height);
       const data=g.getImageData(0,0,c.width,c.height);
       removeBackground(data, bgKey);
       g.putImageData(data,0,0);
