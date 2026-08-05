@@ -24,6 +24,13 @@
   .overlay h1{margin:0 0 10px;font-size:26px;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;text-shadow:3px 3px 0 #000, 6px 6px 0 rgba(124,252,0,.35);letter-spacing:2px;}
   .overlay h2{margin:0 0 12px;font-size:18px;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;opacity:.9;}
   .overlay p{margin:4px 0;font-size:20px;letter-spacing:1px;}
+  @keyframes ovIn{from{opacity:0}to{opacity:1}}
+  @keyframes ovPop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+  .overlay{animation:ovIn .16s ease-out;}
+  .overlay>*{animation:ovPop .2s ease-out;}
+  .overlay .btn{transition:filter .12s, transform .06s;}
+  .overlay .btn:hover{filter:brightness(1.08);}
+  @media (prefers-reduced-motion:reduce){.overlay,.overlay>*{animation:none;}}
   .overlay .btn{margin:6px 0;padding:14px 22px;font-size:13px;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;letter-spacing:1px;border:none;background:#4caf50;color:#fff;cursor:pointer;min-width:220px;box-shadow:inset -3px -3px 0 #1b5e20, inset 3px 3px 0 #a5d6a7, 0 5px 0 #1b5e20, 0 8px 12px rgba(0,0,0,.4);image-rendering:pixelated;}
   .overlay .btn:active{transform:translateY(3px);box-shadow:inset -3px -3px 0 #1b5e20, inset 3px 3px 0 #a5d6a7, 0 2px 0 #1b5e20;}
   .overlay .btn.alt{background:#ffb300;box-shadow:inset -3px -3px 0 #b47a00, inset 3px 3px 0 #ffe082, 0 5px 0 #b47a00, 0 8px 12px rgba(0,0,0,.4);}
