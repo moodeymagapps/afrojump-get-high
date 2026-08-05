@@ -220,10 +220,24 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 (()=>{
-const cv=document.getElementById('c'),ctx=cv.getContext('2d');
+const cv=document.getElementById('c'),ctx=cv.getContext('2d',{alpha:false});
 const W=400,H=700;
-function fit(){const s=Math.min(window.innerWidth/W,window.innerHeight/H);cv.style.width=(W*s)+'px';cv.style.height=(H*s)+'px';}
-window.addEventListener('resize',fit);fit();
+// Hi-DPI: interne Auflösung an das Display anpassen -> scharfe Pixel, alle
+// Zeichenkoordinaten bleiben im 400x700-Logikraum.
+let dpr=1;
+function fit(){
+  const s=Math.min(window.innerWidth/W,window.innerHeight/H);
+  cv.style.width=(W*s)+'px';cv.style.height=(H*s)+'px';
+  const want=Math.min(3,Math.max(1,(window.devicePixelRatio||1)*s));
+  const nw=Math.round(W*want),nh=Math.round(H*want);
+  if(cv.width!==nw||cv.height!==nh){cv.width=nw;cv.height=nh;}
+  dpr=cv.width/W;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.imageSmoothingEnabled=false;
+}
+window.addEventListener('resize',fit);
+window.addEventListener('orientationchange',()=>setTimeout(fit,120));
+fit();
 
 const scoreEl=document.getElementById('score'),highEl=document.getElementById('high'),powerEl=document.getElementById('power');
 const overEl=document.getElementById('over'),finalScore=document.getElementById('finalScore'),finalHigh=document.getElementById('finalHigh'),finalBags=document.getElementById('finalBags');
