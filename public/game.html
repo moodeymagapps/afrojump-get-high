@@ -8,23 +8,31 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 <style>
-  html,body{margin:0;padding:0;height:100%;background:#0a0a0a;overflow:hidden;font-family:'VT323',monospace;color:#fff;touch-action:none;user-select:none;-webkit-user-select:none;image-rendering:pixelated;}
+  html,body{margin:0;padding:0;height:100%;background:#0a0a0a;overflow:hidden;font-family:'VT323','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;color:#fff;touch-action:none;user-select:none;-webkit-user-select:none;image-rendering:pixelated;}
   #wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;}
   canvas{background:#87ceeb;display:block;box-shadow:0 0 40px #000a, 0 0 0 4px #2b1a0a, 0 0 0 8px #7cfc00;touch-action:none;image-rendering:pixelated;}
-  #ui{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;align-items:flex-start;font-family:'Press Start 2P',monospace;text-shadow:2px 2px 0 #000;pointer-events:none;font-size:10px;gap:8px;}
+  #ui{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;align-items:flex-start;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;text-shadow:2px 2px 0 #000;pointer-events:none;font-size:10px;gap:8px;}
   #ui .stats{display:flex;flex-direction:column;gap:2px;}
   #ui .right{display:flex;align-items:center;gap:8px;pointer-events:auto;}
   #bags{color:#7cfc00;}
-  .pxBtn{background:#2b1a0a;border:none;color:#fff;width:38px;height:38px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;font-family:'Press Start 2P',monospace;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #7cfc00, 0 3px 0 #000;image-rendering:pixelated;}
+  .pxBtn{background:#2b1a0a;border:none;color:#fff;width:38px;height:38px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #7cfc00, 0 3px 0 #000;image-rendering:pixelated;}
   .pxBtn:active{transform:translateY(2px);box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #7cfc00, 0 1px 0 #000;}
   #pauseBtn,#muteBtn{background:#2b1a0a;border:none;color:#fff;width:38px;height:38px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #7cfc00, 0 3px 0 #000;pointer-events:auto;image-rendering:pixelated;}
   #pauseBtn:active,#muteBtn:active{transform:translateY(2px);box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #7cfc00, 0 1px 0 #000;}
-  #power{position:absolute;top:60px;left:12px;font-size:11px;font-family:'Press Start 2P',monospace;color:#ffd54a;text-shadow:2px 2px 0 #000;pointer-events:none;}
-  .overlay{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(rgba(10,8,20,.88),rgba(10,8,20,.94));padding:20px;box-sizing:border-box;font-family:'VT323',monospace;}
-  .overlay h1{margin:0 0 10px;font-size:26px;font-family:'Press Start 2P',monospace;text-shadow:3px 3px 0 #000, 6px 6px 0 rgba(124,252,0,.35);letter-spacing:2px;}
-  .overlay h2{margin:0 0 12px;font-size:18px;font-family:'Press Start 2P',monospace;opacity:.9;}
+  #power{position:absolute;top:60px;left:12px;font-size:11px;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;color:#ffd54a;text-shadow:2px 2px 0 #000;pointer-events:none;}
+  .overlay{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(rgba(10,8,20,.88),rgba(10,8,20,.94));padding:20px;box-sizing:border-box;font-family:'VT323','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;}
+  .overlay h1{margin:0 0 10px;font-size:26px;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;text-shadow:3px 3px 0 #000, 6px 6px 0 rgba(124,252,0,.35);letter-spacing:2px;}
+  .overlay h2{margin:0 0 12px;font-size:18px;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;opacity:.9;}
   .overlay p{margin:4px 0;font-size:20px;letter-spacing:1px;}
-  .overlay .btn{margin:6px 0;padding:14px 22px;font-size:13px;font-family:'Press Start 2P',monospace;letter-spacing:1px;border:none;background:#4caf50;color:#fff;cursor:pointer;min-width:220px;box-shadow:inset -3px -3px 0 #1b5e20, inset 3px 3px 0 #a5d6a7, 0 5px 0 #1b5e20, 0 8px 12px rgba(0,0,0,.4);image-rendering:pixelated;}
+  @keyframes ovIn{from{opacity:0}to{opacity:1}}
+  @keyframes ovPop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+  .overlay{animation:ovIn .16s ease-out;}
+  .overlay>*{animation:ovPop .2s ease-out;}
+  .overlay .btn{transition:filter .12s, transform .06s;}
+  #menu .btn,#pause .btn,#over .btn{width:270px;min-width:0;box-sizing:border-box;max-width:100%;}
+  .overlay .btn:hover{filter:brightness(1.08);}
+  @media (prefers-reduced-motion:reduce){.overlay,.overlay>*{animation:none;}}
+  .overlay .btn{margin:6px 0;padding:14px 22px;font-size:13px;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;letter-spacing:1px;border:none;background:#4caf50;color:#fff;cursor:pointer;min-width:220px;box-shadow:inset -3px -3px 0 #1b5e20, inset 3px 3px 0 #a5d6a7, 0 5px 0 #1b5e20, 0 8px 12px rgba(0,0,0,.4);image-rendering:pixelated;}
   .overlay .btn:active{transform:translateY(3px);box-shadow:inset -3px -3px 0 #1b5e20, inset 3px 3px 0 #a5d6a7, 0 2px 0 #1b5e20;}
   .overlay .btn.alt{background:#ffb300;box-shadow:inset -3px -3px 0 #b47a00, inset 3px 3px 0 #ffe082, 0 5px 0 #b47a00, 0 8px 12px rgba(0,0,0,.4);}
   .overlay .btn.alt:active{box-shadow:inset -3px -3px 0 #b47a00, inset 3px 3px 0 #ffe082, 0 2px 0 #b47a00;}
@@ -32,58 +40,58 @@
   .overlay .btn.ghost:active{box-shadow:inset -3px -3px 0 #263238, inset 3px 3px 0 #90a4ae, 0 2px 0 #263238;}
   #over h1{color:#ff5252;}
   #menu h1{color:#7cfc00;font-size:30px;}
-  #menu .tag{font-family:'Press Start 2P',monospace;font-size:9px;opacity:.75;margin-bottom:16px;letter-spacing:1px;color:#ffd54a;}
+  #menu .tag{font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:9px;opacity:.75;margin-bottom:16px;letter-spacing:1px;color:#ffd54a;}
   #shop{overflow-y:auto;justify-content:flex-start;padding-top:20px;}
   #shop .head{display:flex;justify-content:space-between;width:100%;max-width:360px;align-items:center;margin-bottom:12px;}
-  #shop h2{margin:0;color:#7cfc00;font-family:'Press Start 2P',monospace;font-size:14px;text-shadow:2px 2px 0 #000;}
-  #shopBags{font-family:'Press Start 2P',monospace;font-size:11px;color:#7cfc00;}
-  #shopClose{background:#c62828;border:none;color:#fff;padding:8px 12px;font-family:'Press Start 2P',monospace;font-size:11px;cursor:pointer;box-shadow:inset -2px -2px 0 #7f1010, inset 2px 2px 0 #ff8a80, 0 3px 0 #7f1010;}
+  #shop h2{margin:0;color:#7cfc00;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:14px;text-shadow:2px 2px 0 #000;}
+  #shopBags{font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:11px;color:#7cfc00;}
+  #shopClose{background:#c62828;border:none;color:#fff;padding:8px 12px;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:11px;cursor:pointer;box-shadow:inset -2px -2px 0 #7f1010, inset 2px 2px 0 #ff8a80, 0 3px 0 #7f1010;}
   .skinGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:360px;padding-bottom:20px;}
   .skinCard{background:#1b1230;border:none;padding:8px;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #4a2c73;image-rendering:pixelated;}
   .skinCard.selected{background:#0d3d00;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #7cfc00, 0 0 12px rgba(124,252,0,.5);}
   .skinCard canvas,.skinCard .thumb{background:linear-gradient(#87ceeb,#c9e9f6);width:80px;height:80px;box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 rgba(255,255,255,.4);image-rendering:pixelated;object-fit:contain;}
-  .skinCard .name{font-family:'Press Start 2P',monospace;font-size:8px;text-align:center;line-height:1.4;min-height:22px;letter-spacing:.5px;}
-  .skinCard .price{font-family:'Press Start 2P',monospace;font-size:9px;color:#7cfc00;}
-  .skinCard button{margin-top:2px;padding:6px 8px;font-family:'Press Start 2P',monospace;font-size:8px;letter-spacing:.5px;border:none;background:#4caf50;color:#fff;cursor:pointer;width:100%;box-shadow:inset -2px -2px 0 #1b5e20, inset 2px 2px 0 #a5d6a7, 0 2px 0 #1b5e20;}
+  .skinCard .name{font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:8px;text-align:center;line-height:1.4;min-height:22px;letter-spacing:.5px;}
+  .skinCard .price{font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:9px;color:#7cfc00;}
+  .skinCard button{margin-top:2px;padding:6px 8px;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:8px;letter-spacing:.5px;border:none;background:#4caf50;color:#fff;cursor:pointer;width:100%;box-shadow:inset -2px -2px 0 #1b5e20, inset 2px 2px 0 #a5d6a7, 0 2px 0 #1b5e20;}
   .skinCard button.owned{background:#455a64;box-shadow:inset -2px -2px 0 #263238, inset 2px 2px 0 #90a4ae, 0 2px 0 #263238;}
   .skinCard button.selected{background:#7cfc00;color:#111;box-shadow:inset -2px -2px 0 #3d7d00, inset 2px 2px 0 #d4ffb3, 0 2px 0 #3d7d00;}
   .skinCard button:disabled{background:#4a1414;color:#c99;cursor:not-allowed;box-shadow:inset -2px -2px 0 #200, inset 2px 2px 0 #7a2a2a, 0 2px 0 #200;}
   .tabs{display:flex;gap:6px;width:100%;max-width:360px;margin-bottom:10px;flex-wrap:wrap;}
-  .tabs button{flex:1;min-width:70px;padding:8px 4px;font-family:'Press Start 2P',monospace;font-size:8px;border:none;background:#2b1a0a;color:#bbb;cursor:pointer;box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #4a2c73;letter-spacing:.5px;}
+  .tabs button{flex:1;min-width:70px;padding:8px 4px;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:8px;border:none;background:#2b1a0a;color:#bbb;cursor:pointer;box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #4a2c73;letter-spacing:.5px;}
   .tabs button.on{background:#0d3d00;color:#7cfc00;box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #7cfc00;}
-  .skinCard .rar{font-family:'Press Start 2P',monospace;font-size:7px;letter-spacing:.5px;}
+  .skinCard .rar{font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:7px;letter-spacing:.5px;}
   .boxCard{background:#1b1230;padding:10px;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #4a2c73;}
   .boxCard canvas{background:#120c22;width:96px;height:96px;image-rendering:pixelated;}
-  .boxCard .bname{font-family:'Press Start 2P',monospace;font-size:8px;text-align:center;line-height:1.5;}
-  .boxCard .odds{font-family:'VT323',monospace;font-size:14px;opacity:.85;text-align:center;line-height:1.25;}
-  .boxCard button{width:100%;padding:8px;border:none;font-family:'Press Start 2P',monospace;font-size:8px;background:#ffb300;color:#111;cursor:pointer;box-shadow:inset -2px -2px 0 #b47a00, inset 2px 2px 0 #ffe082, 0 2px 0 #b47a00;}
+  .boxCard .bname{font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:8px;text-align:center;line-height:1.5;}
+  .boxCard .odds{font-family:'VT323','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:14px;opacity:.85;text-align:center;line-height:1.25;}
+  .boxCard button{width:100%;padding:8px;border:none;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:8px;background:#ffb300;color:#111;cursor:pointer;box-shadow:inset -2px -2px 0 #b47a00, inset 2px 2px 0 #ffe082, 0 2px 0 #b47a00;}
   .boxCard button:disabled{background:#4a1414;color:#c99;cursor:not-allowed;box-shadow:inset -2px -2px 0 #200, inset 2px 2px 0 #7a2a2a;}
   #openBox{background:linear-gradient(rgba(6,4,12,.96),rgba(6,4,12,.99));}
   #openBox canvas{background:transparent;box-shadow:none;image-rendering:pixelated;}
-  #boxLabel{font-family:'Press Start 2P',monospace;font-size:11px;letter-spacing:1px;min-height:20px;text-align:center;text-shadow:2px 2px 0 #000;}
-  #boxSub{font-family:'VT323',monospace;font-size:18px;letter-spacing:1px;min-height:22px;opacity:.9;}
+  #boxLabel{font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:11px;letter-spacing:1px;min-height:20px;text-align:center;text-shadow:2px 2px 0 #000;}
+  #boxSub{font-family:'VT323','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:18px;letter-spacing:1px;min-height:22px;opacity:.9;}
   #duelJoinRow{display:flex;gap:6px;width:100%;max-width:340px;margin:6px 0;}
-  #duelCode{flex:1;padding:10px;background:#0a0518;border:2px solid #4a2c73;color:#fff;font-family:'Press Start 2P',monospace;font-size:11px;text-transform:uppercase;box-sizing:border-box;letter-spacing:2px;}
+  #duelCode{flex:1;padding:10px;background:#0a0518;border:2px solid #4a2c73;color:#fff;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:11px;text-transform:uppercase;box-sizing:border-box;letter-spacing:2px;}
   #duelCode:focus{outline:none;border-color:#7cfc00;}
-  #duelJoinBtn{padding:10px 12px;border:none;background:#4caf50;color:#fff;font-family:'Press Start 2P',monospace;font-size:9px;cursor:pointer;box-shadow:inset -2px -2px 0 #1b5e20, inset 2px 2px 0 #a5d6a7, 0 3px 0 #1b5e20;}
+  #duelJoinBtn{padding:10px 12px;border:none;background:#4caf50;color:#fff;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:9px;cursor:pointer;box-shadow:inset -2px -2px 0 #1b5e20, inset 2px 2px 0 #a5d6a7, 0 3px 0 #1b5e20;}
   /* Rangliste */
   #board{overflow-y:auto;}
-  .lbRow{display:flex;align-items:center;gap:8px;background:#1b1230;padding:8px 10px;margin-bottom:6px;box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #4a2c73;font-family:'VT323',monospace;font-size:18px;letter-spacing:1px;color:#fff;}
-  .lbRow .rank{flex:0 0 42px;font-family:'Press Start 2P',monospace;font-size:10px;color:#ffd54a;}
+  .lbRow{display:flex;align-items:center;gap:8px;background:#1b1230;padding:8px 10px;margin-bottom:6px;box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #4a2c73;font-family:'VT323','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:18px;letter-spacing:1px;color:#fff;}
+  .lbRow .rank{flex:0 0 42px;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:10px;color:#ffd54a;}
   .lbRow .who{flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .lbRow .val{flex:0 0 auto;color:#7cfc00;font-family:'Press Start 2P',monospace;font-size:10px;}
+  .lbRow .val{flex:0 0 auto;color:#7cfc00;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:10px;}
   .lbRow.me{box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #7cfc00;background:#16240f;}
   .lbRow.top1 .rank{color:#ffd700;}
   .lbRow.top2 .rank{color:#e0e0e0;}
   .lbRow.top3 .rank{color:#d68910;}
-  #hint{position:absolute;bottom:12px;left:0;right:0;text-align:center;font-size:14px;opacity:.6;pointer-events:none;font-family:'VT323',monospace;letter-spacing:1px;}
-  #fireBtn{position:absolute;bottom:60px;left:50%;transform:translateX(-50%);width:78px;height:78px;border-radius:50%;background:#c62828;border:none;color:#fff;font-size:30px;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:inset -4px -4px 0 #7f1010, inset 4px 4px 0 #ff8a80, 0 5px 0 #7f1010, 0 0 20px rgba(255,80,80,.6);z-index:5;font-family:'Press Start 2P',monospace;user-select:none;-webkit-tap-highlight-color:transparent;}
+  #hint{position:absolute;bottom:12px;left:0;right:0;text-align:center;font-size:14px;opacity:.6;pointer-events:none;font-family:'VT323','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;letter-spacing:1px;}
+  #fireBtn{position:absolute;bottom:60px;left:50%;transform:translateX(-50%);width:78px;height:78px;border-radius:50%;background:#c62828;border:none;color:#fff;font-size:30px;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:inset -4px -4px 0 #7f1010, inset 4px 4px 0 #ff8a80, 0 5px 0 #7f1010, 0 0 20px rgba(255,80,80,.6);z-index:5;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;user-select:none;-webkit-tap-highlight-color:transparent;}
   #fireBtn:active{transform:translateX(-50%) translateY(3px);box-shadow:inset -4px -4px 0 #7f1010, inset 4px 4px 0 #ff8a80, 0 2px 0 #7f1010;}
   #fireBtn.on{display:flex;}
   #account{overflow-y:auto;justify-content:flex-start;padding-top:20px;}
-  #account .card{background:#1b1230;padding:14px;width:100%;max-width:340px;margin:6px 0;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #4a2c73;font-family:'VT323',monospace;}
-  #account h3{font-family:'Press Start 2P',monospace;font-size:11px;margin:0 0 10px;color:#7cfc00;letter-spacing:1px;}
-  #account input{width:100%;padding:8px;margin:4px 0;background:#0a0518;border:2px solid #4a2c73;color:#fff;font-family:'VT323',monospace;font-size:16px;box-sizing:border-box;letter-spacing:1px;}
+  #account .card{background:#1b1230;padding:14px;width:100%;max-width:340px;margin:6px 0;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #4a2c73;font-family:'VT323','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;}
+  #account h3{font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:11px;margin:0 0 10px;color:#7cfc00;letter-spacing:1px;}
+  #account input{width:100%;padding:8px;margin:4px 0;background:#0a0518;border:2px solid #4a2c73;color:#fff;font-family:'VT323','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:16px;box-sizing:border-box;letter-spacing:1px;}
   #account input:focus{outline:none;border-color:#7cfc00;}
   #account .row{display:flex;gap:6px;}
   #account .row .btn{min-width:0;flex:1;padding:10px 8px;font-size:10px;}
@@ -156,8 +164,8 @@
   <button id="fireBtn" title="Feuer">🔫</button>
   <div id="account" class="overlay">
     <div class="head" style="display:flex;justify-content:space-between;width:100%;max-width:360px;align-items:center;margin-bottom:12px;">
-      <h2 style="margin:0;color:#7cfc00;font-family:'Press Start 2P',monospace;font-size:13px;text-shadow:2px 2px 0 #000;">👤 ACCOUNT</h2>
-      <button id="accountClose" style="background:#c62828;border:none;color:#fff;padding:8px 12px;font-family:'Press Start 2P',monospace;font-size:11px;cursor:pointer;box-shadow:inset -2px -2px 0 #7f1010, inset 2px 2px 0 #ff8a80, 0 3px 0 #7f1010;">✕</button>
+      <h2 style="margin:0;color:#7cfc00;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:13px;text-shadow:2px 2px 0 #000;">👤 ACCOUNT</h2>
+      <button id="accountClose" style="background:#c62828;border:none;color:#fff;padding:8px 12px;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:11px;cursor:pointer;box-shadow:inset -2px -2px 0 #7f1010, inset 2px 2px 0 #ff8a80, 0 3px 0 #7f1010;">✕</button>
     </div>
     <div id="authCard" class="card">
       <h3>Anmelden / Registrieren</h3>
@@ -195,17 +203,17 @@
   </div>
   <div id="board" class="overlay">
     <div class="head" style="display:flex;justify-content:space-between;width:100%;max-width:360px;align-items:center;margin-bottom:12px;">
-      <h2 style="margin:0;color:#ffd54a;font-family:'Press Start 2P',monospace;font-size:13px;text-shadow:2px 2px 0 #000;">🏆 RANGLISTE</h2>
-      <button id="boardClose" style="background:#c62828;border:none;color:#fff;padding:8px 12px;font-family:'Press Start 2P',monospace;font-size:11px;cursor:pointer;box-shadow:inset -2px -2px 0 #7f1010, inset 2px 2px 0 #ff8a80, 0 3px 0 #7f1010;">✕</button>
+      <h2 style="margin:0;color:#ffd54a;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:13px;text-shadow:2px 2px 0 #000;">🏆 RANGLISTE</h2>
+      <button id="boardClose" style="background:#c62828;border:none;color:#fff;padding:8px 12px;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:11px;cursor:pointer;box-shadow:inset -2px -2px 0 #7f1010, inset 2px 2px 0 #ff8a80, 0 3px 0 #7f1010;">✕</button>
     </div>
     <div id="boardList" style="width:100%;max-width:360px;"></div>
-    <div id="boardMsg" style="font-family:'VT323',monospace;font-size:16px;opacity:.8;margin-top:6px;text-align:center;max-width:340px;"></div>
+    <div id="boardMsg" style="font-family:'VT323','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:16px;opacity:.8;margin-top:6px;text-align:center;max-width:340px;"></div>
     <button class="btn ghost" id="boardRefresh">🔄 Aktualisieren</button>
   </div>
   <div id="duel" class="overlay">
     <h1>1v1 DUELL</h1>
     <p style="font-size:16px;max-width:320px;text-align:center;">Gleiche Map, zwei Spieler. Wer höher kommt, gewinnt!</p>
-    <div id="duelBox" style="width:100%;max-width:340px;background:#1b1230;padding:12px;margin:8px 0;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #4a2c73;font-family:'VT323',monospace;font-size:16px;letter-spacing:1px;">Bereit.</div>
+    <div id="duelBox" style="width:100%;max-width:340px;background:#1b1230;padding:12px;margin:8px 0;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #4a2c73;font-family:'VT323','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:16px;letter-spacing:1px;">Bereit.</div>
     <button class="btn" id="duelCreate">⚔ Raum erstellen</button>
     <button class="btn alt" id="duelCopy" style="display:none;">🔗 Link kopieren</button>
     <div id="duelJoinRow">
@@ -220,10 +228,24 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 (()=>{
-const cv=document.getElementById('c'),ctx=cv.getContext('2d');
+const cv=document.getElementById('c'),ctx=cv.getContext('2d',{alpha:false});
 const W=400,H=700;
-function fit(){const s=Math.min(window.innerWidth/W,window.innerHeight/H);cv.style.width=(W*s)+'px';cv.style.height=(H*s)+'px';}
-window.addEventListener('resize',fit);fit();
+// Hi-DPI: interne Auflösung an das Display anpassen -> scharfe Pixel, alle
+// Zeichenkoordinaten bleiben im 400x700-Logikraum.
+let dpr=1;
+function fit(){
+  const s=Math.min(window.innerWidth/W,window.innerHeight/H);
+  cv.style.width=(W*s)+'px';cv.style.height=(H*s)+'px';
+  const want=Math.min(3,Math.max(1,(window.devicePixelRatio||1)*s));
+  const nw=Math.round(W*want),nh=Math.round(H*want);
+  if(cv.width!==nw||cv.height!==nh){cv.width=nw;cv.height=nh;}
+  dpr=cv.width/W;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.imageSmoothingEnabled=false;
+}
+window.addEventListener('resize',fit);
+window.addEventListener('orientationchange',()=>setTimeout(fit,120));
+fit();
 
 const scoreEl=document.getElementById('score'),highEl=document.getElementById('high'),powerEl=document.getElementById('power');
 const overEl=document.getElementById('over'),finalScore=document.getElementById('finalScore'),finalHigh=document.getElementById('finalHigh'),finalBags=document.getElementById('finalBags');
@@ -508,10 +530,16 @@ function loadSkinImage(src, bgKey){
   const img=new Image();
   img.onload=()=>{
     try{
+      // Große Uploads vorher verkleinern: Freistellen (Flood-Fill) auf 2000px
+      // Bildern verursacht sonst einen Ruckler beim ersten Anzeigen.
+      const MAXD=320;
+      const sc=Math.min(1,MAXD/Math.max(img.naturalWidth,img.naturalHeight));
       const c=document.createElement('canvas');
-      c.width=img.naturalWidth;c.height=img.naturalHeight;
-      const g=c.getContext('2d');
-      g.drawImage(img,0,0);
+      c.width=Math.max(1,Math.round(img.naturalWidth*sc));
+      c.height=Math.max(1,Math.round(img.naturalHeight*sc));
+      const g=c.getContext('2d',{willReadFrequently:true});
+      g.imageSmoothingEnabled=sc<1;
+      g.drawImage(img,0,0,c.width,c.height);
       const data=g.getImageData(0,0,c.width,c.height);
       removeBackground(data, bgKey);
       g.putImageData(data,0,0);
@@ -553,7 +581,7 @@ function removeBackground(imageData, bgKey){
   }
 }
 function trimTransparent(src){
-  const g=src.getContext('2d');
+  const g=src.getContext('2d',{willReadFrequently:true});
   const {data,width,height}=g.getImageData(0,0,src.width,src.height);
   let minX=width,minY=height,maxX=0,maxY=0,found=false;
   for(let y=0;y<height;y++)for(let x=0;x<width;x++){
@@ -567,6 +595,8 @@ function trimTransparent(src){
 }
 // Preload the image skins right away
 for(const s of SKINS)if(s.img)loadSkinImage(s.img,s.bgKey);
+// Boss-Artworks direkt vorladen -> kein Hänger beim Boss-Spawn
+setTimeout(()=>{try{for(const k in BOSS_IMAGES)loadSkinImage(BOSS_IMAGES[k].src,BOSS_IMAGES[k].bg);}catch(e){}},300);
 function currentSkin(){
   const base=SKINS.find(s=>s.id===selectedSkin)||SKINS[0];
   const j=currentJoint();
@@ -1002,6 +1032,15 @@ addEventListener('mouseup',()=>{
 
 // Menu buttons
 pauseBtn.onclick=()=>pauseGame();
+// Tab-Wechsel / Fensterwechsel: automatisch pausieren, Tasten loslassen
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){
+    keys.l=keys.r=false;touchLeft=touchRight=false;
+    if(gameState==='playing'&&!duel.active){try{pauseGame();}catch(e){}}
+  }else{
+    last=performance.now();acc=0;
+  }
+});
 document.getElementById('menuPlay').onclick=()=>startGame();
 document.getElementById('menuShop').onclick=()=>openShop('menu');
 document.getElementById('pauseResume').onclick=()=>resumeGame();
@@ -1386,10 +1425,14 @@ function update(dt){
     }
   }
 
-  // camera
+  // camera – sanft nachziehen (kein hartes Rucken beim Landen)
   if(!scrollLocked){
     const target=player.y-H*0.4;
-    if(target<cameraY){cameraY=target;}
+    if(target<cameraY){
+      const d=cameraY-target;
+      cameraY-=d>260?d:d*0.35;   // bei großen Sprüngen sofort, sonst geglättet
+      if(cameraY-target<0.05)cameraY=target;
+    }
   }
   const meters=Math.max(0,Math.floor(-cameraY/10));
   if(meters>bestY)bestY=meters;
@@ -1419,20 +1462,24 @@ function update(dt){
   }
 
   // smoke from joint
-  if(Math.random()<0.5){
+  if(smokeParticles.length<70&&Math.random()<0.5){
     smokeParticles.push({x:player.x+8*player.facing,y:player.y-8,vx:rand(-.3,.3)+player.facing*.2,vy:-.6,life:1.2,r:2});
   }
   for(const s of smokeParticles){s.x+=s.vx;s.y+=s.vy;s.life-=dt;s.r+=0.05;}
-  smokeParticles=smokeParticles.filter(s=>s.life>0);
+  if(smokeParticles.length)smokeParticles=smokeParticles.filter(s=>s.life>0&&s.y>cameraY-40);
 
   for(const pa of particles){pa.x+=pa.vx;pa.y+=pa.vy;pa.vy+=0.15;pa.life-=dt;}
-  particles=particles.filter(p=>p.life>0);
+  if(particles.length)particles=particles.filter(p=>p.life>0);
   for(const f of floatTexts){f.y-=40*dt;f.life-=dt;}
-  floatTexts=floatTexts.filter(f=>f.life>0);
+  if(floatTexts.length)floatTexts=floatTexts.filter(f=>f.life>0);
 }
 
+const MAX_PARTICLES=280;
 function burst(x,y,color,n=14){
-  for(let i=0;i<n;i++)particles.push({x,y,vx:rand(-3,3),vy:rand(-4,1),life:0.8,color});
+  const room=MAX_PARTICLES-particles.length;
+  if(room<=0)return;
+  const cnt=Math.min(n,room);
+  for(let i=0;i<cnt;i++)particles.push({x,y,vx:rand(-3,3),vy:rand(-4,1),life:0.8,color});
 }
 // Kill feedback: combo chain gives bonus baggys and juicy text
 function registerKill(x,y){
@@ -1518,12 +1565,31 @@ function mixHex(h1,h2,t){
   return '#'+c.map(v=>v.toString(16).padStart(2,'0')).join('');
 }
 
+// Render-Caches (werden nur einmal bzw. bei Farbwechsel gebaut)
+let bgGrad=null,bgGradKey='';
+const nebulaCache=[];
+function nebulaSprite(variant){
+  if(nebulaCache[variant])return nebulaCache[variant];
+  const c=document.createElement('canvas');c.width=160;c.height=160;
+  const g=c.getContext('2d');
+  const grd=g.createRadialGradient(80,80,0,80,80,80);
+  grd.addColorStop(0,variant?'rgba(200,80,200,0.35)':'rgba(80,180,220,0.3)');
+  grd.addColorStop(1,'rgba(0,0,0,0)');
+  g.fillStyle=grd;g.fillRect(0,0,160,160);
+  nebulaCache[variant]=c;return c;
+}
+
 function drawBg(){
   const m=bestY;
   const cols=biomeColors(m);
-  const g=ctx.createLinearGradient(0,0,0,H);
-  g.addColorStop(0,cols[0]);g.addColorStop(1,cols[1]);
-  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  // Gradient cachen: nur bei Farbwechsel neu bauen (spart Arbeit pro Frame)
+  const key=cols[0]+cols[1];
+  if(bgGradKey!==key){
+    const g=ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,cols[0]);g.addColorStop(1,cols[1]);
+    bgGrad=g;bgGradKey=key;
+  }
+  ctx.fillStyle=bgGrad;ctx.fillRect(0,0,W,H);
 
   // Sun/moon — sun in day, moon at dusk+
   if(m<600){
@@ -1583,13 +1649,11 @@ function drawBg(){
   // Nebula clouds (deep space)
   if(m>3000){
     for(let i=0;i<4;i++){
-      const nx=((i*173+(cameraY*0.08)|0)%(W+200))-100;
-      const ny=(((i*137)+(cameraY*0.04)|0)%H+H)%H;
+      const nx=((i*173+cameraY*0.08)%(W+200))-100;
+      const ny=((((i*137)+cameraY*0.04)%H)+H)%H;
       const x=((nx%W)+W)%W;
-      const grd=ctx.createRadialGradient(x,ny,0,x,ny,80);
-      grd.addColorStop(0,i%2?'rgba(200,80,200,0.35)':'rgba(80,180,220,0.3)');
-      grd.addColorStop(1,'rgba(0,0,0,0)');
-      ctx.fillStyle=grd;ctx.fillRect(x-80,ny-80,160,160);
+      const spr=nebulaSprite(i%2);
+      ctx.drawImage(spr,x-80,ny-80);
     }
   }
 
@@ -1599,15 +1663,15 @@ function drawBg(){
     // back layer (small, slow)
     ctx.fillStyle='rgba(255,255,255,'+(0.5*cloudA)+')';
     for(let i=0;i<5;i++){
-      const cx=(i*167+((cameraY*0.15)|0))%(W+120)-60;
-      const cy=((i*211)+((cameraY*0.08)|0))%H;
+      const cx=(i*167+cameraY*0.15)%(W+120)-60;
+      const cy=((i*211)+cameraY*0.08)%H;
       drawCloud(((cx%W)+W)%W,((cy%H)+H)%H,14+((i*5)%10));
     }
     // front layer (big, faster)
     ctx.fillStyle='rgba(255,255,255,'+(0.85*cloudA)+')';
     for(let i=0;i<6;i++){
-      const cx=(i*137+((cameraY*0.35)|0))%(W+120)-60;
-      const cy=((i*191)+((cameraY*0.18)|0))%H;
+      const cx=(i*137+cameraY*0.35)%(W+120)-60;
+      const cy=((i*191)+cameraY*0.18)%H;
       drawCloud(((cx%W)+W)%W,((cy%H)+H)%H,20+((i*7)%15));
     }
   }
@@ -1615,7 +1679,7 @@ function drawBg(){
   // Hot air balloons at low altitude
   if(m<900){
     for(let i=0;i<2;i++){
-      const bx=((i*233+((cameraY*0.25)|0))%(W+80))-40;
+      const bx=((i*233+cameraY*0.25)%(W+80))-40;
       const by=((i*171+120)%H);
       const x=((bx%W)+W)%W,y=((by%H)+H)%H;
       // balloon
@@ -1636,7 +1700,7 @@ function drawBg(){
     ctx.strokeStyle='#222';ctx.lineWidth=2;
     const flap=Math.sin(performance.now()/200)*2;
     for(let i=0;i<4;i++){
-      const bx=((i*173+((cameraY*0.5)|0))%(W+60))-30;
+      const bx=((i*173+cameraY*0.5)%(W+60))-30;
       const by=((i*97)%H);
       const x=((bx%W)+W)%W,y=((by%H)+H)%H;
       ctx.beginPath();ctx.moveTo(x-7,y);ctx.quadraticCurveTo(x-3,y-4-flap,x,y);ctx.quadraticCurveTo(x+3,y-4-flap,x+7,y);ctx.stroke();
@@ -1792,13 +1856,16 @@ function drawPlayer(){
   drawAfroCharacter(ctx,currentSkin(),player.invincible);
   ctx.restore();
 
-  // smoke
-  for(const s of smokeParticles){
-    ctx.globalAlpha=Math.max(0,s.life/1.2)*0.7;
+  // smoke – weicher Ausklang statt harter Kreise
+  if(smokeParticles.length){
     ctx.fillStyle=currentJoint().smoke||'#eee';
-    ctx.beginPath();ctx.arc(s.x,s.y-cameraY,s.r,0,Math.PI*2);ctx.fill();
+    for(const s of smokeParticles){
+      const k=Math.max(0,s.life/1.2);
+      ctx.globalAlpha=k*k*0.5;
+      ctx.beginPath();ctx.arc(s.x,s.y-cameraY,s.r*(1.15-k*0.3),0,Math.PI*2);ctx.fill();
+    }
+    ctx.globalAlpha=1;
   }
-  ctx.globalAlpha=1;
 
   if(player.invincible>0){
     ctx.strokeStyle='hsl('+((performance.now()/2)%360)+',90%,60%)';
@@ -3488,8 +3555,11 @@ function drawBossPipePusher(bx,y,bw,bh,t){
 function render(){
   ctx.save();
   if(shake.t>0){
-    const s=Math.min(shake.t,0.5)*shake.mag;
-    ctx.translate((Math.random()-0.5)*s,(Math.random()-0.5)*s);
+    // ausklingende Schwingung statt Zufalls-Zittern -> saubere Kamera
+    const k=Math.min(1,shake.t/0.4);
+    const s=shake.mag*k*k;
+    const tt=performance.now()/1000;
+    ctx.translate(Math.sin(tt*47)*s,Math.cos(tt*61)*s*0.7);
   }
   drawBg();
   for(const p of platforms)drawPlatform(p);
@@ -3633,26 +3703,40 @@ function render(){
   }
 }
 
-// loop
-let last=performance.now();
+// ---------- loop: feste Physik-Zeitschritte (gleiche Geschwindigkeit auf 60/90/120 Hz) ----------
+const STEP=1/60;
+let last=performance.now(),acc=0;
+const hud={score:'',high:'',power:''};
 function loop(t){
-  const dt=Math.min(0.033,(t-last)/1000);last=t;
-  if(gameState==='playing')update(dt);
-  render();
-  scoreEl.textContent='Höhe: '+bestY+'m';
-  highEl.textContent='Best: '+Math.max(highScore,bestY)+'m';
-  {
-    let parts=[];
-    if(player){
-      if(player.invincible>0)parts.push('★ INVINCIBLE '+player.invincible.toFixed(1)+'s');
-      if(player.jetpackT>0)parts.push('🚀 JETPACK '+player.jetpackT.toFixed(1)+'s');
-      if(player.gunT>0)parts.push('🔫 GUN '+player.gunT.toFixed(1)+'s');
-      if(killCombo>1)parts.push('🔥 COMBO x'+killCombo);
-      if(duel.active)parts.push('⚔ '+(duel.oppName||'Gegner')+': '+duel.oppBest+'m');
-    }
-    powerEl.textContent=parts.join('  ');
-    fireBtn.classList.toggle('on', !!(player && player.gunT>0 && gameState==='playing'));
+  let frame=(t-last)/1000;last=t;
+  if(!(frame>0))frame=0;
+  if(frame>0.25)frame=0.25;          // Tab-Wechsel / Lag: nicht aufholen
+  if(gameState==='playing'){
+    acc+=frame;
+    let steps=0;
+    while(acc>=STEP&&steps<5){update(STEP);acc-=STEP;steps++;}
+    if(steps>=5)acc=0;               // Spiral-of-death-Schutz
+  }else{
+    acc=0;
   }
+  render();
+  // HUD nur bei Änderung schreiben (spart Layout-Arbeit pro Frame)
+  const sTxt='Höhe: '+bestY+'m';
+  if(sTxt!==hud.score){hud.score=sTxt;scoreEl.textContent=sTxt;}
+  const hTxt='Best: '+Math.max(highScore,bestY)+'m';
+  if(hTxt!==hud.high){hud.high=hTxt;highEl.textContent=hTxt;}
+  let parts=[];
+  if(player){
+    if(player.invincible>0)parts.push('★ INVINCIBLE '+player.invincible.toFixed(1)+'s');
+    if(player.jetpackT>0)parts.push('🚀 JETPACK '+player.jetpackT.toFixed(1)+'s');
+    if(player.gunT>0)parts.push('🔫 GUN '+player.gunT.toFixed(1)+'s');
+    if(killCombo>1)parts.push('🔥 COMBO x'+killCombo);
+    if(duel.active)parts.push('⚔ '+(duel.oppName||'Gegner')+': '+duel.oppBest+'m');
+  }
+  const pTxt=parts.join('  ');
+  if(pTxt!==hud.power){hud.power=pTxt;powerEl.textContent=pTxt;}
+  const wantFire=!!(player&&player.gunT>0&&gameState==='playing');
+  if(wantFire!==hud.fire){hud.fire=wantFire;fireBtn.classList.toggle('on',wantFire);}
   // quest live tracking
   if(gameState==='playing'){
     if(bestY>questSessionHeight){questProgress('height',bestY-questSessionHeight);questSessionHeight=bestY;}
