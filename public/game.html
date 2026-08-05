@@ -1839,13 +1839,16 @@ function drawPlayer(){
   drawAfroCharacter(ctx,currentSkin(),player.invincible);
   ctx.restore();
 
-  // smoke
-  for(const s of smokeParticles){
-    ctx.globalAlpha=Math.max(0,s.life/1.2)*0.7;
+  // smoke – weicher Ausklang statt harter Kreise
+  if(smokeParticles.length){
     ctx.fillStyle=currentJoint().smoke||'#eee';
-    ctx.beginPath();ctx.arc(s.x,s.y-cameraY,s.r,0,Math.PI*2);ctx.fill();
+    for(const s of smokeParticles){
+      const k=Math.max(0,s.life/1.2);
+      ctx.globalAlpha=k*k*0.5;
+      ctx.beginPath();ctx.arc(s.x,s.y-cameraY,s.r*(1.15-k*0.3),0,Math.PI*2);ctx.fill();
+    }
+    ctx.globalAlpha=1;
   }
-  ctx.globalAlpha=1;
 
   if(player.invincible>0){
     ctx.strokeStyle='hsl('+((performance.now()/2)%360)+',90%,60%)';
