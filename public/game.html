@@ -1024,6 +1024,15 @@ addEventListener('mouseup',()=>{
 
 // Menu buttons
 pauseBtn.onclick=()=>pauseGame();
+// Tab-Wechsel / Fensterwechsel: automatisch pausieren, Tasten loslassen
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){
+    keys.l=keys.r=false;touchLeft=touchRight=false;
+    if(gameState==='playing'&&!duel.active){try{pauseGame();}catch(e){}}
+  }else{
+    last=performance.now();acc=0;
+  }
+});
 document.getElementById('menuPlay').onclick=()=>startGame();
 document.getElementById('menuShop').onclick=()=>openShop('menu');
 document.getElementById('pauseResume').onclick=()=>resumeGame();
