@@ -3647,26 +3647,40 @@ function render(){
   }
 }
 
-// loop
-let last=performance.now();
+// ---------- loop: feste Physik-Zeitschritte (gleiche Geschwindigkeit auf 60/90/120 Hz) ----------
+const STEP=1/60;
+let last=performance.now(),acc=0;
+const hud={score:'',high:'',power:''};
 function loop(t){
-  const dt=Math.min(0.033,(t-last)/1000);last=t;
-  if(gameState==='playing')update(dt);
-  render();
-  scoreEl.textContent='Höhe: '+bestY+'m';
-  highEl.textContent='Best: '+Math.max(highScore,bestY)+'m';
-  {
-    let parts=[];
-    if(player){
-      if(player.invincible>0)parts.push('★ INVINCIBLE '+player.invincible.toFixed(1)+'s');
-      if(player.jetpackT>0)parts.push('🚀 JETPACK '+player.jetpackT.toFixed(1)+'s');
-      if(player.gunT>0)parts.push('🔫 GUN '+player.gunT.toFixed(1)+'s');
-      if(killCombo>1)parts.push('🔥 COMBO x'+killCombo);
-      if(duel.active)parts.push('⚔ '+(duel.oppName||'Gegner')+': '+duel.oppBest+'m');
-    }
-    powerEl.textContent=parts.join('  ');
-    fireBtn.classList.toggle('on', !!(player && player.gunT>0 && gameState==='playing'));
+  let frame=(t-last)/1000;last=t;
+  if(!(frame>0))frame=0;
+  if(frame>0.25)frame=0.25;          // Tab-Wechsel / Lag: nicht aufholen
+  if(gameState==='playing'){
+    acc+=frame;
+    let steps=0;
+    while(acc>=STEP&&steps<5){update(STEP);acc-=STEP;steps++;}
+    if(steps>=5)acc=0;               // Spiral-of-death-Schutz
+  }else{
+    acc=0;
   }
+  render();
+  // HUD nur bei Änderung schreiben (spart Layout-Arbeit pro Frame)
+  const sTxt='Höhe: '+bestY+'m';
+  if(sTxt!==hud.score){hud.score=sTxt;scoreEl.textContent=sTxt;}
+  const hTxt='Best: '+Math.max(highScore,bestY)+'m';
+  if(hTxt!==hud.high){hud.high=hTxt;highEl.textContent=hTxt;}
+  let parts=[];
+  if(player){
+    if(player.invincible>0)parts.push('★ INVINCIBLE '+player.invincible.toFixed(1)+'s');
+    if(player.jetpackT>0)parts.push('🚀 JETPACK '+player.jetpackT.toFixed(1)+'s');
+    if(player.gunT>0)parts.push('🔫 GUN '+player.gunT.toFixed(1)+'s');
+    if(killCombo>1)parts.push('🔥 COMBO x'+killCombo);
+    if(duel.active)parts.push('⚔ '+(duel.oppName||'Gegner')+': '+duel.oppBest+'m');
+  }
+  const pTxt=parts.join('  ');
+  if(pTxt!==hud.power){hud.power=pTxt;powerEl.textContent=pTxt;}
+  const wantFire=!!(player&&player.gunT>0&&gameState==='playing');
+  if(wantFire!==hud.fire){hud.fire=wantFire;fireBtn.classList.toggle('on',wantFire);}
   // quest live tracking
   if(gameState==='playing'){
     if(bestY>questSessionHeight){questProgress('height',bestY-questSessionHeight);questSessionHeight=bestY;}
