@@ -377,30 +377,30 @@ highEl.textContent='Best: '+highScore+'m';
 
 // Skins catalog
 const SKINS=[
-  {id:'classic',name:'Classic',price:0,afro:'#2b1a0a',skin:'#5b3a1a',body:'#e57373',arms:'#c68863',pants:'#2d4373',joint:'#f5ecd0'},
-  {id:'blonde', name:'Blondie',price:50, afro:'#f4d35e',skin:'#f5c890',body:'#4fc3f7',arms:'#3ba8d8',pants:'#263238',joint:'#f5ecd0'},
-  {id:'hippy',  name:'Hippy',  price:60, afro:'#2b1a0a',skin:'#7a4a20',body:'#7c4dff',arms:'#5e35b1',pants:'#8d6e63',joint:'#f5ecd0',flower:true},
-  {id:'stoner', name:'Stoner', price:80, afro:'#2b1a0a',skin:'#e0b48a',body:'#2e7d32',arms:'#1b5e20',pants:'#3e2723',joint:'#f5ecd0',hood:'#2e7d32'},
-  {id:'greenbuddy',name:'Green Buddy',price:100,afro:'#2e7d32',skin:'#c9975a',body:'#43a047',arms:'#2e7d32',pants:'#263238',joint:'#f5ecd0'},
-  {id:'ginger', name:'Ginger', price:120,afro:'#c9531f',skin:'#f5c890',body:'#7cb342',arms:'#5e8f2a',pants:'#3e2723',joint:'#f5ecd0'},
-  {id:'blaze',  name:'Blaze',  price:140,afro:'#ff7a1a',skin:'#7b4a1a',body:'#111',arms:'#222',pants:'#000',joint:'#f5ecd0'},
-  {id:'maryjane',name:'Mary Jane',price:160,afro:'#2b1a0a',skin:'#c9975a',body:'#66bb6a',arms:'#43a047',pants:'#2e7d32',joint:'#f5ecd0',flower:true},
+  {id:'classic',name:'Classic',price:0,afro:'#2b1a0a',skin:'#5b3a1a',body:'#e57373',arms:'#c68863',pants:'#2d4373',joint:'#e8d9ac'},
+  {id:'blonde', name:'Blondie',price:50, afro:'#f4d35e',skin:'#f5c890',body:'#4fc3f7',arms:'#3ba8d8',pants:'#263238',joint:'#e8d9ac'},
+  {id:'hippy',  name:'Hippy',  price:60, afro:'#2b1a0a',skin:'#7a4a20',body:'#7c4dff',arms:'#5e35b1',pants:'#8d6e63',joint:'#e8d9ac',flower:true},
+  {id:'stoner', name:'Stoner', price:80, afro:'#2b1a0a',skin:'#e0b48a',body:'#2e7d32',arms:'#1b5e20',pants:'#3e2723',joint:'#e8d9ac',hood:'#2e7d32'},
+  {id:'greenbuddy',name:'Green Buddy',price:100,afro:'#2e7d32',skin:'#c9975a',body:'#43a047',arms:'#2e7d32',pants:'#263238',joint:'#e8d9ac'},
+  {id:'ginger', name:'Ginger', price:120,afro:'#c9531f',skin:'#f5c890',body:'#7cb342',arms:'#5e8f2a',pants:'#3e2723',joint:'#e8d9ac'},
+  {id:'blaze',  name:'Blaze',  price:140,afro:'#ff7a1a',skin:'#7b4a1a',body:'#111',arms:'#222',pants:'#000',joint:'#e8d9ac'},
+  {id:'maryjane',name:'Mary Jane',price:160,afro:'#2b1a0a',skin:'#c9975a',body:'#66bb6a',arms:'#43a047',pants:'#2e7d32',joint:'#e8d9ac',flower:true},
   {id:'dog',    name:'Stoner Dog',price:180,render:'dog'},
   {id:'skunkboy',name:'Skunk Boy',price:200,render:'skunkboy'},
-  {id:'punk',   name:'Punk',   price:220,afro:'#e91e63',skin:'#7b4a1a',body:'#111',arms:'#333',pants:'#c62828',joint:'#f5ecd0'},
+  {id:'punk',   name:'Punk',   price:220,afro:'#e91e63',skin:'#7b4a1a',body:'#111',arms:'#333',pants:'#c62828',joint:'#e8d9ac'},
   {id:'ice',    name:'Ice',    price:240,afro:'#e0f7fa',skin:'#9fbdd8',body:'#0288d1',arms:'#01579b',pants:'#1a237e',joint:'#b3e5fc'},
   {id:'cat',    name:'Chill Cat',price:260,render:'cat'},
   {id:'ogg',    name:'OG G',    price:280,render:'ogg'},
   {id:'dopechef',name:'Dope Chef',price:300,render:'chef'},
   {id:'gold',   name:'Golden', price:320,afro:'#ffd700',skin:'#8a5a1a',body:'#ffb300',arms:'#c68400',pants:'#4a2c00',joint:'#fff9c4'},
-  {id:'rainbowhigh',name:'Rainbow High',price:340,afro:'RAINBOW',skin:'#c9975a',body:'#7c4dff',arms:'#5e35b1',pants:'#212121',joint:'#f5ecd0'},
+  {id:'rainbowhigh',name:'Rainbow High',price:340,afro:'RAINBOW',skin:'#c9975a',body:'#7c4dff',arms:'#5e35b1',pants:'#212121',joint:'#e8d9ac'},
   {id:'kushking',name:'Kush King',price:380,render:'kushking'},
   {id:'chroniccowboy',name:'Chronic Cowboy',price:400,render:'cowboy'},
   {id:'robot',  name:'420 Bot',price:420,render:'robot'},
   {id:'dankninja',name:'Dank Ninja',price:450,render:'ninja'},
   {id:'shadow', name:'Shadow', price:470,afro:'#111',skin:'#3a3a3a',body:'#1a1a1a',arms:'#0a0a0a',pants:'#000',joint:'#7c4dff'},
   {id:'ganjascientist',name:'Ganja Scientist',price:490,render:'scientist'},
-  {id:'rasta',  name:'Rasta',  price:510,afro:'#2b1a0a',skin:'#5b3a1a',body:'#c62828',arms:'#2e7d32',pants:'#f9a825',joint:'#f5ecd0'},
+  {id:'rasta',  name:'Rasta',  price:510,afro:'#2b1a0a',skin:'#5b3a1a',body:'#c62828',arms:'#2e7d32',pants:'#f9a825',joint:'#e8d9ac'},
   {id:'bobmarley',name:'Reggae Rob',price:540,render:'reggae'},
   {id:'puffpilot',name:'Puff Pilot',price:560,render:'pilot'},
   {id:'suit420',name:'420 Suit', price:580,render:'suit'},
@@ -471,7 +471,7 @@ const WEAPON_SKINS=[
 // ---- Joint-Skins (nur aus Loot-Tütchen) ----
 // dev = Form des Konsum-Gegenstands: joint | blunt | bong | vape | pipe | brownie | cookie | pill | gummy | dab | hookah | cigar
 const JOINT_SKINS=[
-  {id:'j_default',name:'Classic Joint', rarity:'common',   free:true, dev:'joint', paper:'#f5ecd0',tip:'#ff6a00',smoke:'#eeeeee'},
+  {id:'j_default',name:'Classic Joint', rarity:'common',   free:true, dev:'joint', paper:'#e8d9ac',tip:'#e03a10',smoke:'#eeeeee'},
   {id:'j_brown',  name:'Blunt Wrap',    rarity:'common',   dev:'blunt', paper:'#8d6e63',tip:'#ff8a00',smoke:'#d7ccc8'},
   {id:'j_slim',   name:'Slim King',     rarity:'common',   dev:'joint', paper:'#fff8e1',tip:'#ff5252',smoke:'#f5f5f5'},
   {id:'j_pipe',   name:'Apfel-Pfeife',  rarity:'common',   dev:'pipe',  paper:'#8bc34a',tip:'#ff7043',smoke:'#dcedc8'},
@@ -1976,65 +1976,106 @@ function drawAfroCharacter(g,s,inv){
   drawDevice(g,s);
 }
 
+// Gezeichneter Pixel-Joint (angeschrägt, kegelig, geglühte Spitze + Rauch)
+// Referenz-Look: dunkle Outline, sandfarbenes Papier mit Grün-/Braun-Flecken,
+// verkohlter Ring und rot-gelbe Glut.
+function drawJointSprite(g,ox,oy,len,th,col,tip,tilt){
+  const p=(x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(ox+x,oy+y,w,h);};
+  const dark=shade(col,-0.42),light=shade(col,0.30),paper=col;
+  g.save();
+  g.translate(ox,oy);g.rotate(tilt||-0.30);g.translate(-ox,-oy);
+  // Outline (ein Pixel rundherum)
+  p(-1,-1,len+2,th+2,'#0b0a08');
+  // Papier-Grundkörper mit Verlaufsstufen (oben hell, unten schattig)
+  p(0,0,len,th,paper);
+  p(0,0,len,Math.max(1,th*0.34),light);
+  p(0,th-Math.max(1,th*0.30),len,Math.max(1,th*0.30),dark);
+  // Filter/Crutch am Mundende
+  p(0,0,Math.max(2,len*0.16),th,shade(col,0.14));
+  p(Math.max(2,len*0.16),0,1,th,'#0b0a08');
+  // Grün-/Braun-Flecken (Weed durchs Papier)
+  p(len*0.34,th*0.42,Math.max(1,len*0.10),Math.max(1,th*0.34),'#6f8f3a');
+  p(len*0.50,th*0.20,Math.max(1,len*0.07),Math.max(1,th*0.30),'#8a7b3f');
+  p(len*0.66,th*0.55,Math.max(1,len*0.08),Math.max(1,th*0.30),'#5d6f34');
+  // verkohlter Ring + Glut
+  const ash=Math.max(1.5,len*0.13);
+  p(len-ash,0,ash,th,'#1d1a16');
+  p(len-ash*0.35,th*0.12,ash*0.8,th*0.76,tip);
+  p(len-ash*0.1,th*0.34,ash*0.5,th*0.32,'#ffe066');
+  g.restore();
+  // Rauchfahne (getreppte Pixel, statisch am Sprite)
+  const sx=ox+Math.cos(tilt||-0.30)*len, sy=oy+Math.sin(tilt||-0.30)*len;
+  g.globalAlpha=0.55;
+  const sm=(x,y,w)=>{g.fillStyle='#e8e4dc';g.fillRect(sx+x,sy+y,w,w);};
+  sm(1,-3,1.4);sm(2.4,-5,1.2);sm(1.4,-7,1.6);sm(3,-9,1.2);
+  g.globalAlpha=1;
+}
+
 // Zeichnet den ausgerüsteten Konsum-Gegenstand am Mund (Pixel-Look)
 function drawDevice(g,s){
-  const col=s.joint||'#f5ecd0', tip=s.jointTip||'#ff6a00', dev=s.dev||'joint';
+  const col=s.joint||'#e8d9ac', tip=s.jointTip||'#e03a10', dev=s.dev||'joint';
   const px=(x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(x,y,w,h);};
-  g.strokeStyle='#000';g.lineWidth=1;
+  const outline=(x,y,w,h)=>{g.fillStyle='#0b0a08';g.fillRect(x-1,y-1,w+2,h+2);};
+  g.strokeStyle='#0b0a08';g.lineWidth=1;
   if(dev==='joint'||dev==='blunt'||dev==='cigar'){
-    const len=dev==='joint'?10:dev==='blunt'?9:8, th=dev==='cigar'?4:dev==='blunt'?3.4:2.5;
-    px(4,-13,len,th,col);g.strokeRect(4,-13,len,th);
-    px(4+len-0.5,-13,2,th,tip);
-    px(4+len,-12.6,1,th*0.5,'#ffd54a');
-    if(dev==='cigar'){px(5,-13,2.5,th,shade(col,-0.3));}
+    const len=dev==='joint'?11:dev==='blunt'?10:9;
+    const th=dev==='cigar'?4:dev==='blunt'?3.4:2.6;
+    drawJointSprite(g,4,-13,len,th,dev==='blunt'?shade(col,-0.35):col,tip,-0.30);
   }else if(dev==='pipe'){
-    px(3,-12.5,7,2,shade(col,-0.2));g.strokeRect(3,-12.5,7,2);
-    px(10,-16,4,5,col);g.strokeRect(10,-16,4,5);
-    px(10.5,-16.5,3,1.5,'#4caf50');
-    px(11.5,-17.5,1,1,tip);
+    outline(3,-12.5,7,2);px(3,-12.5,7,2,shade(col,-0.25));px(3,-12.5,7,0.8,shade(col,0.15));
+    outline(10,-16,4,5);px(10,-16,4,5,col);px(10,-16,4,1.4,shade(col,0.22));px(10,-12.4,4,1.4,shade(col,-0.35));
+    px(10.5,-16.4,3,1.4,'#5c8f38');px(11.2,-16.2,1,1,'#7fbf4a');
+    px(11.4,-17.4,1.2,1.2,tip);
   }else if(dev==='bong'){
-    px(9,-11,7,6,'rgba(190,255,235,0.55)');g.strokeRect(9,-11,7,6);   // Kammer
-    px(11,-9,3,3,'#7fdcc0');                                          // Wasser
-    px(11.5,-20,2.5,9,'rgba(200,255,245,0.6)');g.strokeRect(11.5,-20,2.5,9); // Rohr
-    px(10.5,-21.5,4.5,2,shade(col,-0.1));g.strokeRect(10.5,-21.5,4.5,2);     // Mundstück
-    px(4,-9,6,1.6,shade(col,-0.2));                                   // Chillum zum Mund
-    px(15,-22.5,1.5,1.5,tip);
+    outline(11.5,-20,2.5,9);px(11.5,-20,2.5,9,'rgba(205,255,246,0.55)');px(11.5,-20,0.9,9,'rgba(255,255,255,0.85)'); // Rohr
+    outline(9,-11,7,6);px(9,-11,7,6,'rgba(198,255,240,0.5)');                 // Kammer
+    px(10.6,-9.2,4.2,3.4,'#6fd3b8');px(10.6,-9.2,4.2,0.9,'#a9f0dd');          // Wasser
+    px(9.6,-10.6,1,4.6,'rgba(255,255,255,0.8)');                              // Glanz
+    outline(10.5,-21.5,4.5,2);px(10.5,-21.5,4.5,2,shade(col,-0.1));px(10.5,-21.5,4.5,0.8,shade(col,0.2));
+    px(4,-9.2,6,1.8,shade(col,-0.25));px(4,-9.2,6,0.7,shade(col,0.1));        // Chillum
+    px(14.8,-22.4,1.6,1.6,tip);
   }else if(dev==='vape'){
-    px(4,-13.5,11,3.5,col);g.strokeRect(4,-13.5,11,3.5);
-    px(12.5,-13,2,2.5,tip);
-    px(6,-12.8,1.5,1.5,'#00e5ff');
+    outline(4,-13.5,11,3.5);px(4,-13.5,11,3.5,col);
+    px(4,-13.5,11,1.1,shade(col,0.28));px(4,-11.1,11,1.1,shade(col,-0.35));
+    px(12.6,-13.1,2,2.7,tip);
+    px(6,-12.9,1.6,1.6,'#22e8ff');px(6.4,-12.5,0.7,0.7,'#dffcff');
   }else if(dev==='dab'){
-    px(9,-11,7,6,'rgba(220,200,255,0.6)');g.strokeRect(9,-11,7,6);
-    px(11.5,-19,2.5,8,'rgba(230,215,255,0.65)');g.strokeRect(11.5,-19,2.5,8);
-    px(15,-19,4,2,col);g.strokeRect(15,-19,4,2);
-    px(18,-20,2,2,tip);
-    px(4,-9,6,1.6,shade(col,-0.2));
+    outline(11.5,-19,2.5,8);px(11.5,-19,2.5,8,'rgba(232,218,255,0.6)');px(11.5,-19,0.9,8,'rgba(255,255,255,0.8)');
+    outline(9,-11,7,6);px(9,-11,7,6,'rgba(222,203,255,0.55)');px(10.6,-9,4.2,3,'#b79bf0');
+    outline(15,-19,4,2);px(15,-19,4,2,col);px(15,-19,4,0.8,shade(col,0.22));
+    px(17.8,-20.2,2,2,tip);px(18.2,-19.8,0.9,0.9,'#ffe066');
+    px(4,-9.2,6,1.8,shade(col,-0.25));
   }else if(dev==='hookah'){
-    px(10,-10,7,7,col);g.strokeRect(10,-10,7,7);
-    px(12.5,-19,2,9,shade(col,-0.25));g.strokeRect(12.5,-19,2,9);
-    px(11,-21,5.5,2.5,shade(col,-0.1));g.strokeRect(11,-21,5.5,2.5);
-    px(12.5,-22,2.5,1.5,tip);
-    g.strokeStyle='#000';g.beginPath();g.moveTo(5,-10);g.quadraticCurveTo(7,-4,10,-6);g.stroke();
+    outline(12.5,-19,2,9);px(12.5,-19,2,9,shade(col,-0.25));px(12.5,-19,0.8,9,shade(col,0.05));
+    outline(10,-10,7,7);px(10,-10,7,7,col);px(10,-10,7,1.5,shade(col,0.25));px(10,-4.5,7,1.5,shade(col,-0.35));
+    outline(11,-21,5.5,2.5);px(11,-21,5.5,2.5,shade(col,-0.1));px(11,-21,5.5,0.9,shade(col,0.2));
+    px(12.4,-22.1,2.6,1.6,tip);
+    g.strokeStyle='#0b0a08';g.lineWidth=1.4;g.beginPath();g.moveTo(5,-10);g.quadraticCurveTo(7,-4,10,-6);g.stroke();g.lineWidth=1;
   }else if(dev==='brownie'){
-    px(5,-15,10,6,col);g.strokeRect(5,-15,10,6);
-    px(5,-15,10,2,shade(col,0.18));
-    px(7,-13,1.5,1.5,'#2e7d32');px(11,-12,1.5,1.5,'#43a047');
+    outline(5,-15,10,6);px(5,-15,10,6,col);
+    px(5,-15,10,1.8,shade(col,0.22));px(5,-10.6,10,1.6,shade(col,-0.35));
+    px(7,-13.2,1.6,1.6,'#3f8f3a');px(11,-12.2,1.6,1.6,'#5cb85c');px(9,-14.4,1.2,1.2,shade(col,0.35));
   }else if(dev==='cookie'){
-    g.fillStyle=col;g.beginPath();g.arc(10,-12,5,0,Math.PI*2);g.fill();g.stroke();
-    px(8,-14,1.5,1.5,'#3e2723');px(11,-11,1.5,1.5,'#2e7d32');px(9.5,-9.5,1.5,1.5,'#4e342e');
+    g.lineWidth=1.4;g.fillStyle=col;g.beginPath();g.arc(10,-12,5,0,Math.PI*2);g.fill();g.stroke();g.lineWidth=1;
+    g.fillStyle=shade(col,0.25);g.beginPath();g.arc(8.6,-13.4,2.4,0,Math.PI*2);g.fill();
+    px(8,-14,1.6,1.6,'#3e2723');px(11,-11.2,1.6,1.6,'#3f8f3a');px(9.4,-9.6,1.6,1.6,'#4e342e');
   }else if(dev==='pill'){
-    px(4,-14,6,5,col==='#f5ecd0'?'#ff5252':col);g.strokeRect(4,-14,6,5);
-    px(10,-14,6,5,'#fafafa');g.strokeRect(10,-14,6,5);
-    px(11,-13.4,2,1.4,'rgba(255,255,255,0.9)');
+    outline(4,-14,12,5);
+    const pc=(col==='#f5ecd0'||col==='#e8d9ac')?'#ff5252':col;
+    px(4,-14,6,5,pc);px(4,-14,6,1.4,shade(pc,0.3));px(4,-10.4,6,1.4,shade(pc,-0.3));
+    px(10,-14,6,5,'#fafafa');px(10,-14,6,1.4,'#ffffff');px(10,-10.4,6,1.4,'#d6d6d6');
+    px(9.6,-14,0.8,5,'#0b0a08');
   }else if(dev==='gummy'){
-    g.fillStyle=col;
+    g.lineWidth=1.4;g.fillStyle=col;
     g.beginPath();g.arc(10,-15,2.4,0,Math.PI*2);g.fill();g.stroke();      // Kopf
-    px(7.5,-13,5,6,col);g.strokeRect(7.5,-13,5,6);                        // Körper
+    outline(7.5,-13,5,6);px(7.5,-13,5,6,col);                             // Körper
+    px(7.5,-13,5,1.4,shade(col,0.3));px(7.5,-8.4,5,1.4,shade(col,-0.3));
     px(5.5,-12,2,2,col);px(12.5,-12,2,2,col);                             // Arme
-    px(9,-14.6,0.8,0.8,'#000');px(10.6,-14.6,0.8,0.8,'#000');
-    px(8,-12.5,1.2,1.2,tip);
+    px(9,-14.8,0.9,0.9,'#0b0a08');px(10.7,-14.8,0.9,0.9,'#0b0a08');
+    px(9.2,-16.1,1.2,1.2,shade(col,0.4));                                 // Glanz
+    g.lineWidth=1;
   }else{
-    px(4,-13,10,2.5,col);g.strokeRect(4,-13,10,2.5);px(13.5,-13,2,2.5,tip);
+    drawJointSprite(g,4,-13,11,2.6,col,tip,-0.30);
   }
 }
 
