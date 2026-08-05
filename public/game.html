@@ -3527,8 +3527,11 @@ function drawBossPipePusher(bx,y,bw,bh,t){
 function render(){
   ctx.save();
   if(shake.t>0){
-    const s=Math.min(shake.t,0.5)*shake.mag;
-    ctx.translate((Math.random()-0.5)*s,(Math.random()-0.5)*s);
+    // ausklingende Schwingung statt Zufalls-Zittern -> saubere Kamera
+    const k=Math.min(1,shake.t/0.4);
+    const s=shake.mag*k*k;
+    const tt=performance.now()/1000;
+    ctx.translate(Math.sin(tt*47)*s,Math.cos(tt*61)*s*0.7);
   }
   drawBg();
   for(const p of platforms)drawPlatform(p);
