@@ -1400,10 +1400,14 @@ function update(dt){
     }
   }
 
-  // camera
+  // camera – sanft nachziehen (kein hartes Rucken beim Landen)
   if(!scrollLocked){
     const target=player.y-H*0.4;
-    if(target<cameraY){cameraY=target;}
+    if(target<cameraY){
+      const d=cameraY-target;
+      cameraY-=d>260?d:d*0.35;   // bei großen Sprüngen sofort, sonst geglättet
+      if(cameraY-target<0.05)cameraY=target;
+    }
   }
   const meters=Math.max(0,Math.floor(-cameraY/10));
   if(meters>bestY)bestY=meters;
@@ -1433,16 +1437,16 @@ function update(dt){
   }
 
   // smoke from joint
-  if(Math.random()<0.5){
+  if(smokeParticles.length<70&&Math.random()<0.5){
     smokeParticles.push({x:player.x+8*player.facing,y:player.y-8,vx:rand(-.3,.3)+player.facing*.2,vy:-.6,life:1.2,r:2});
   }
   for(const s of smokeParticles){s.x+=s.vx;s.y+=s.vy;s.life-=dt;s.r+=0.05;}
-  smokeParticles=smokeParticles.filter(s=>s.life>0);
+  if(smokeParticles.length)smokeParticles=smokeParticles.filter(s=>s.life>0&&s.y>cameraY-40);
 
   for(const pa of particles){pa.x+=pa.vx;pa.y+=pa.vy;pa.vy+=0.15;pa.life-=dt;}
-  particles=particles.filter(p=>p.life>0);
+  if(particles.length)particles=particles.filter(p=>p.life>0);
   for(const f of floatTexts){f.y-=40*dt;f.life-=dt;}
-  floatTexts=floatTexts.filter(f=>f.life>0);
+  if(floatTexts.length)floatTexts=floatTexts.filter(f=>f.life>0);
 }
 
 function burst(x,y,color,n=14){
