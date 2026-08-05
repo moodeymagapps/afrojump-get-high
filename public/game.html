@@ -1532,6 +1532,20 @@ function mixHex(h1,h2,t){
   return '#'+c.map(v=>v.toString(16).padStart(2,'0')).join('');
 }
 
+// Render-Caches (werden nur einmal bzw. bei Farbwechsel gebaut)
+let bgGrad=null,bgGradKey='';
+const nebulaCache=[];
+function nebulaSprite(variant){
+  if(nebulaCache[variant])return nebulaCache[variant];
+  const c=document.createElement('canvas');c.width=160;c.height=160;
+  const g=c.getContext('2d');
+  const grd=g.createRadialGradient(80,80,0,80,80,80);
+  grd.addColorStop(0,variant?'rgba(200,80,200,0.35)':'rgba(80,180,220,0.3)');
+  grd.addColorStop(1,'rgba(0,0,0,0)');
+  g.fillStyle=grd;g.fillRect(0,0,160,160);
+  nebulaCache[variant]=c;return c;
+}
+
 function drawBg(){
   const m=bestY;
   const cols=biomeColors(m);
