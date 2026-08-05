@@ -573,7 +573,7 @@ function removeBackground(imageData, bgKey){
   }
 }
 function trimTransparent(src){
-  const g=src.getContext('2d');
+  const g=src.getContext('2d',{willReadFrequently:true});
   const {data,width,height}=g.getImageData(0,0,src.width,src.height);
   let minX=width,minY=height,maxX=0,maxY=0,found=false;
   for(let y=0;y<height;y++)for(let x=0;x<width;x++){
