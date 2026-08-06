@@ -3342,6 +3342,22 @@ function drawEnemy(e){
     return;
   }
   const y=e.y-cameraY;
+  // ---- Pixel-Art Sprites (Polizist / Streifenwagen) ----
+  const spr=sprite(e.type==='car'?'copcar':'cop');
+  if(spr){
+    const dir=e.vx<0?-1:1;
+    ctx.save();
+    ctx.imageSmoothingEnabled=false;
+    const bob=e.type==='car'?0:Math.sin(performance.now()/220+e.x)*0.8;
+    let dh,dw;
+    if(e.type==='car'){ dw=e.w*1.5; dh=dw*(spr.height/spr.width); }
+    else { dh=e.h*1.9; dw=dh*(spr.width/spr.height); }
+    ctx.translate(e.x,y+e.h-dh+bob);
+    ctx.scale(dir,1);
+    ctx.drawImage(spr,-dw/2,0,dw,dh);
+    ctx.restore();
+    return;
+  }
   if(e.type==='car'){
     ctx.fillStyle='#2a5aef';roundRect(e.x-e.w/2,y,e.w,e.h-4,3,true,false);
     ctx.fillStyle='#fff';ctx.fillRect(e.x-e.w/2,y,e.w,4);
