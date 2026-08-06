@@ -129,6 +129,21 @@
     box-shadow:0 2px 0 rgba(0,0,0,.5),0 6px 14px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.12);
     text-shadow:0 2px 0 rgba(0,0,0,.65);letter-spacing:.5px;line-height:1;}
   .hudChip .ic{font-size:11px;filter:drop-shadow(0 1px 0 #000);}
+  /* --- HUD Animationen --- */
+  .hudChip{transition:transform .18s cubic-bezier(.2,1.6,.4,1),box-shadow .25s ease,border-color .25s ease;will-change:transform;}
+  @keyframes hudPop{0%{transform:scale(1)}35%{transform:scale(1.16) translateY(-2px)}70%{transform:scale(.97)}100%{transform:scale(1)}}
+  @keyframes hudFlash{0%{filter:brightness(2.2)}100%{filter:brightness(1)}}
+  @keyframes hudSlideIn{from{opacity:0;transform:translateY(-6px) scale(.96)}to{opacity:1;transform:none}}
+  @keyframes hudGlow{0%,100%{box-shadow:0 2px 0 rgba(0,0,0,.5),0 0 10px rgba(124,252,0,.15),inset 0 1px 0 rgba(255,255,255,.12)}
+    50%{box-shadow:0 2px 0 rgba(0,0,0,.5),0 0 22px rgba(124,252,0,.55),inset 0 1px 0 rgba(255,255,255,.2)}}
+  .hudChip.pop{animation:hudPop .34s ease-out;}
+  .hudChip.pop>div{animation:hudFlash .34s ease-out;}
+  .hudChip.hot{animation:hudGlow .9s ease-in-out infinite;border-color:rgba(141,255,60,.6);}
+  .hudChip.rec{border-color:rgba(255,213,74,.7);box-shadow:0 2px 0 rgba(0,0,0,.5),0 0 20px rgba(255,213,74,.45),inset 0 1px 0 rgba(255,255,255,.16);}
+  #ui{animation:hudSlideIn .3s ease-out;}
+  #power{transition:opacity .2s ease,transform .2s ease;}
+  #power.in{animation:hudSlideIn .22s ease-out;}
+  @media (prefers-reduced-motion:reduce){.hudChip,.hudChip.pop,.hudChip.hot,#ui,#power.in{animation:none!important;transition:none!important;}}
   #score{color:#eafff0;}
   #high{color:#b9a7ff;}
   #bags{color:#8dff3c;}
@@ -188,6 +203,23 @@
   #edScroll::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;
     background:linear-gradient(180deg,#eaffd6,#7cfc00);border:1px solid #0a0518;box-shadow:0 0 8px rgba(124,252,0,.6);}
   #edMsg{font-size:15px;color:#ffe08a;}
+  /* Lobby-Einstellungen (Host) */
+  #duelCfg{width:100%;max-width:340px;margin:4px 0 8px;padding:10px;border-radius:14px;
+    background:linear-gradient(180deg,rgba(28,20,48,.9),rgba(10,8,20,.92));
+    border:1px solid rgba(255,255,255,.14);box-shadow:0 4px 0 rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.1);
+    display:flex;flex-direction:column;gap:8px;}
+  #duelCfg .cfgRow{display:flex;flex-direction:column;gap:5px;}
+  #duelCfg .cfgLab{font-family:'Press Start 2P',monospace;font-size:7px;letter-spacing:1px;color:#b9a7ff;}
+  #duelCfg .cfgBtns{display:flex;gap:5px;}
+  #duelCfg .cfgBtns button{flex:1;padding:8px 2px;border:1px solid rgba(255,255,255,.14);border-radius:10px;
+    background:linear-gradient(180deg,rgba(48,34,80,.8),rgba(16,12,30,.9));color:#cfc9e6;cursor:pointer;
+    font-family:'Press Start 2P',monospace;font-size:7px;letter-spacing:.5px;
+    transition:transform .12s ease,box-shadow .2s ease,background .2s ease,color .2s ease;}
+  #duelCfg .cfgBtns button:active{transform:translateY(2px);}
+  #duelCfg .cfgBtns button.on{background:linear-gradient(180deg,#8dff3c,#3f9d00);color:#0b1a00;
+    box-shadow:0 0 14px rgba(141,255,60,.45);border-color:rgba(141,255,60,.7);}
+  #duelCfg.locked .cfgBtns button{opacity:.55;cursor:not-allowed;}
+  #duelCfg .cfgNote{font-family:'VT323',monospace;font-size:14px;opacity:.75;letter-spacing:1px;text-align:center;}
 </style>
 </head>
 <body>
@@ -317,6 +349,11 @@
     <p style="font-size:16px;max-width:320px;text-align:center;">Jeder baut dem anderen eine Map – und muss sie einmal selbst schaffen. Dann spielt jeder die Map des Gegners: wer zuerst am Ziel ist, gewinnt!</p>
     <div id="duelBox" style="width:100%;max-width:340px;background:#1b1230;padding:12px;margin:8px 0;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #4a2c73;font-family:'VT323','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:16px;letter-spacing:1px;">Bereit.</div>
     <button class="btn" id="duelCreate">⚔ Raum erstellen</button>
+    <div id="duelCfg">
+      <div class="cfgRow"><span class="cfgLab">MAP-GRÖSSE</span><div class="cfgBtns" id="cfgSize"></div></div>
+      <div class="cfgRow"><span class="cfgLab">BUDGET</span><div class="cfgBtns" id="cfgBudget"></div></div>
+      <div class="cfgNote" id="cfgNote">Nur der Host stellt ein.</div>
+    </div>
     <button class="btn alt" id="duelCopy" style="display:none;">🔗 Link kopieren</button>
     <div id="duelJoinRow">
       <input id="duelCode" maxlength="8" placeholder="CODE" autocomplete="off" />
@@ -461,17 +498,11 @@ window.addEventListener('keydown',firstInteract,{once:true});
 
 let highScore=+localStorage.getItem(HK)||0;
 let totalBags=+localStorage.getItem(BK)||0;
-// One-time starter gift: every player (new and existing) gets 2000 🌿
-let grant2000=localStorage.getItem(GK)==='1';
-function applyStarterGrant(force){
-  if(grant2000&&!force)return false;
-  totalBags+=2000;
-  grant2000=true;
-  localStorage.setItem(GK,'1');
-  localStorage.setItem(BK,totalBags);
-  return true;
-}
-applyStarterGrant();
+// Starter-Geschenk ist abgeschlossen: keine automatischen 2000 🌿 mehr.
+// Flag bleibt gesetzt, damit alte Cloud-Saves nichts erneut gutschreiben.
+let grant2000=true;
+localStorage.setItem(GK,'1');
+function applyStarterGrant(){return false;}
 let owned=JSON.parse(localStorage.getItem(OK)||'["classic"]');
 if(!owned.includes('classic'))owned.push('classic');
 let selectedSkin=localStorage.getItem(SK)||'classic';
@@ -708,7 +739,19 @@ function currentSkin(){
   return Object.assign({},base,{joint:j.paper==='RAINBOW'?rainbowCol(5):j.paper,jointTip:j.tip,dev:j.dev||'joint'});
 }
 function persistShop(){localStorage.setItem(BK,totalBags);localStorage.setItem(OK,JSON.stringify(owned));localStorage.setItem(SK,selectedSkin);}
-function updateBagsUI(){bagsEl.textContent='🌿 '+totalBags;menuBags.textContent='🌿 '+totalBags+' Baggys';shopBags.textContent='🌿 '+totalBags;}
+const bagsChipEl=document.querySelector('.hudChip.bagsChip');
+const scoreChipEl=scoreEl.parentElement, highChipEl=highEl.parentElement;
+function hudPop(el){
+  if(!el)return;
+  el.classList.remove('pop');
+  void el.offsetWidth;          // Reflow -> Animation startet neu
+  el.classList.add('pop');
+  setTimeout(()=>el.classList.remove('pop'),360);
+}
+function updateBagsUI(anim){
+  bagsEl.textContent='🌿 '+totalBags;menuBags.textContent='🌿 '+totalBags+' Baggys';shopBags.textContent='🌿 '+totalBags;
+  if(anim)hudPop(bagsChipEl);
+}
 
 // Game state machine
 let gameState='menu'; // 'menu' | 'playing' | 'paused' | 'shop' | 'gameover'
@@ -1167,9 +1210,12 @@ document.getElementById('overMenu').onclick=()=>goMenu();
 let player,platforms,collectibles,enemies,projectiles,particles,smokeParticles,floatTexts,cameraY,bestY,scrollLocked,boss,bossTimer,nextBossScore,gameOver,rngSeed,runBags;
 // Map-Duell: selbstgebaute Map (parts) + Laufzustand
 let hazards=[],zones=[],goalY=null,customMap=null;
-const GOAL_M=1200;                 // Ziel-Höhe einer gebauten Map
+let GOAL_M=1500;                   // Ziel-Höhe einer gebauten Map (Host wählt)
 const START_Y=H-40;                // Start-Plattform
-const GOAL_Y=START_Y-GOAL_M*10;    // Weltkoordinate des Ziels
+let GOAL_Y=START_Y-GOAL_M*10;      // Weltkoordinate des Ziels
+// Lobby-Einstellungen (nur der Host stellt ein, Gast bekommt sie übertragen)
+const MAP_SIZES=[{m:750,label:'KLEIN 750m'},{m:1500,label:'NORMAL 1500m'},{m:3000,label:'GROSS 3000m'}];
+const duelCfg={size:1500,budget:'normal'};
 const mapRun={phase:null,deaths:0,startT:0,done:false}; // 'test' | 'race'
 // duel state (1v1 online)
 const duel={active:false,code:null,seed:null,role:null,channel:null,ready:false,round:0,
@@ -1242,7 +1288,20 @@ const PARTS=[
   {k:'joint', cat:'item', icon:'🚬', name:'Joint'},
 ];
 const PART_BY_K={};for(const p of PARTS)PART_BY_K[p.k]=p;
-const BUDGET={plat:80,boost:16,trap:16,enemy:14,item:22};
+const BASE_BUDGET={plat:80,boost:16,trap:16,enemy:14,item:22};
+let BUDGET=Object.assign({},BASE_BUDGET);
+// Budget skaliert mit der Map-Größe; "unendlich" hebt alle Limits auf
+function applyDuelCfg(){
+  GOAL_M=duelCfg.size;
+  GOAL_Y=START_Y-GOAL_M*10;
+  CAM_MIN=GOAL_Y-90;
+  const f=GOAL_M/1500;
+  BUDGET={};
+  for(const k in BASE_BUDGET){
+    BUDGET[k]=duelCfg.budget==='inf'?Infinity:Math.max(6,Math.round(BASE_BUDGET[k]*f));
+  }
+}
+function budTxt(n){return n===Infinity?'∞':n;}
 const PLAT_KINDS={plat:'normal',move:'moving',brit:'brittle',fake:'fake',spring:'spring',tramp:'tramp'};
 function mkPlat(x,y,type){
   const w=type==='tramp'?70:80;
@@ -1478,7 +1537,7 @@ function update(dt){
     c.t+=dt;
     if(Math.hypot(player.x-c.x,player.y-c.y)<player.r+10){
       c.taken=true;
-      if(c.type==='bag'){const gain=2;runBags+=gain;totalBags+=gain;bagsEl.textContent='🌿 '+totalBags;burst(c.x,c.y,'#7cfc00',18);pushFloat(c.x,c.y-4,'+'+gain+' 🌿','#7cfc00');sfx('pickup');}
+      if(c.type==='bag'){const gain=2;runBags+=gain;totalBags+=gain;bagsEl.textContent='🌿 '+totalBags;hudPop(bagsChipEl);burst(c.x,c.y,'#7cfc00',18);pushFloat(c.x,c.y-4,'+'+gain+' 🌿','#7cfc00');sfx('pickup');}
       else if(c.type==='joint'){player.invincible=6;player.invSrc='power';player.vy=-22;burst(c.x,c.y,'#ff69b4',24);pushFloat(c.x,c.y-4,'INVINCIBLE!','#ff69b4');sfx('pickup');}
       else if(c.type==='jetpack'){player.jetpackT=3.0;player.vy=-14;burst(c.x,c.y,'#ff8a00',30);pushFloat(c.x,c.y-4,'JETPACK!','#ff8a00');}
       else if(c.type==='gun'){player.gunT=5.0;burst(c.x,c.y,'#e0e0e0',22);pushFloat(c.x,c.y-4,'GUN 5s!','#e0e0e0');sfx('pickup');}
@@ -2137,7 +2196,7 @@ function drawPlayer(){
   ctx.save();
   ctx.translate(x,y+(1-player.squash)*18);
   ctx.scale(player.facing*player.stretch,player.squash);
-  drawAfroCharacter(ctx,currentSkin(),player.invincible);
+  drawAfroCharacter(ctx,currentSkin(),player.invincible,true);
   ctx.restore();
 
   // smoke – weicher Ausklang statt harter Kreise
@@ -2159,7 +2218,7 @@ function drawPlayer(){
 }
 
 // Draws the player centered at (0,0) in local coords. Used by game and shop preview.
-function drawImageSkin(g,s,inv){
+function drawImageSkin(g,s,inv,live){
   const entry=loadSkinImage(s.img,s.bgKey);
   if(!entry.canvas)return;
   const im=entry.canvas;
@@ -2172,7 +2231,34 @@ function drawImageSkin(g,s,inv){
   const dy=-h*anchor;
   g.save();
   g.imageSmoothingEnabled=false;
-  if(inv>0){
+  if(live){
+    // Mini-"Skelett": Oberkörper + Beine leicht getrennt animieren
+    const t=performance.now()/1000;
+    const air=Math.max(-1,Math.min(1,(player&&player.vy?player.vy:0)/14));
+    const hip=0.62;                       // Trennlinie im Bild
+    const sh=im.height*hip, lh=im.height-sh;
+    const lean=Math.sin(t*4.2)*0.05-air*0.06;
+    const bob=Math.sin(t*8.4)*0.8;
+    const swing=Math.sin(t*8.4)*1.6;
+    const legSq=1+(-air)*0.10;
+    // Beine
+    g.save();
+    g.translate(swing*0.5,dy+sh*sc);
+    g.scale(1,legSq);
+    g.drawImage(im,0,sh,im.width,lh,dx,0,w,lh*sc);
+    g.restore();
+    // Oberkörper
+    g.save();
+    g.translate(0,dy+sh*sc+bob*0.3);
+    g.rotate(lean);
+    g.drawImage(im,0,0,im.width,sh,dx,-sh*sc+bob*0.5,w,sh*sc);
+    g.restore();
+    if(inv>0){
+      g.globalCompositeOperation='source-atop';
+      g.fillStyle='hsla('+((performance.now()/2)%360)+',90%,60%,0.35)';
+      g.fillRect(dx,dy,w,h);
+    }
+  }else if(inv>0){
     // subtle rainbow tint via composite
     g.drawImage(im,dx,dy,w,h);
     g.globalCompositeOperation='source-atop';
@@ -2184,8 +2270,8 @@ function drawImageSkin(g,s,inv){
   g.restore();
 }
 
-function drawAfroCharacter(g,s,inv){
-  if(s.img){drawImageSkin(g,s,inv);return;}
+function drawAfroCharacter(g,s,inv,live){
+  if(s.img){drawImageSkin(g,s,inv,live);return;}
   if(s.render){drawSkinAlt(g,s,inv);return;}
   const rainbow=inv>0;
   const bodyCol=rainbow?`hsl(${(performance.now()/4)%360},90%,55%)`:s.body;
@@ -4132,9 +4218,16 @@ function loop(t){
   render();
   // HUD nur bei Änderung schreiben (spart Layout-Arbeit pro Frame)
   const sTxt='Höhe: '+bestY+'m';
-  if(sTxt!==hud.score){hud.score=sTxt;scoreEl.textContent=sTxt;}
+  if(sTxt!==hud.score){
+    hud.score=sTxt;scoreEl.textContent=sTxt;
+    const mile=Math.floor(bestY/100);
+    if(gameState==='playing'&&mile>(hud.mile||0)){hud.mile=mile;hudPop(scoreChipEl);}
+    else if(mile<(hud.mile||0))hud.mile=mile;
+  }
   const hTxt='Best: '+Math.max(highScore,bestY)+'m';
   if(hTxt!==hud.high){hud.high=hTxt;highEl.textContent=hTxt;}
+  const rec=gameState==='playing'&&bestY>highScore&&highScore>0;
+  if(rec!==hud.rec){hud.rec=rec;highChipEl.classList.toggle('rec',rec);if(rec)hudPop(highChipEl);}
   let parts=[];
   if(player){
     if(player.invincible>0)parts.push('★ INVINCIBLE '+player.invincible.toFixed(1)+'s');
@@ -4144,7 +4237,14 @@ function loop(t){
     if(duel.active)parts.push('⚔ '+(duel.oppName||'Gegner')+': '+(customMap?Math.round((duel.oppProg||0)*100)+'%':duel.oppBest+'m'));
   }
   const pTxt=parts.join('  ');
-  if(pTxt!==hud.power){hud.power=pTxt;powerEl.textContent=pTxt;}
+  if(pTxt!==hud.power){
+    const wasEmpty=!hud.power;
+    hud.power=pTxt;powerEl.textContent=pTxt;
+    if(pTxt&&wasEmpty){powerEl.classList.remove('in');void powerEl.offsetWidth;powerEl.classList.add('in');}
+    if(!pTxt)powerEl.classList.remove('in');
+  }
+  const hot=!!(player&&(player.invincible>0||player.jetpackT>0||player.gunT>0)&&gameState==='playing');
+  if(hot!==hud.hot){hud.hot=hot;if(bagsChipEl)bagsChipEl.classList.toggle('hot',hot);}
   const wantFire=!!(player&&player.gunT>0&&gameState==='playing');
   if(wantFire!==hud.fire){hud.fire=wantFire;fireBtn.classList.toggle('on',wantFire);}
   // quest live tracking
@@ -4316,13 +4416,7 @@ async function loadCloudSave(){
     const d=data.data||{};
     // merge: take max bags, union skins, keep highest highScore, streak/daily most recent
     if(typeof d.totalBags==='number')totalBags=Math.max(totalBags,d.totalBags);
-    // starter gift also applies to cloud saves made before the gift existed
-    if(d.grant2000){grant2000=true;localStorage.setItem(GK,'1');}
-    else{
-      // Account hat das Geschenk noch nie erhalten -> jetzt gutschreiben
-      applyStarterGrant(true);
-      setTimeout(()=>{try{updateBagsUI();pushCloudSave();}catch(e){}},200);
-    }
+    // Starter-Geschenk wird nicht mehr vergeben (kein erneutes Gutschreiben)
     if(typeof d.highScore==='number')highScore=Math.max(highScore,d.highScore);
     if(Array.isArray(d.owned))owned=Array.from(new Set([...owned,...d.owned]));
     if(d.selectedSkin&&owned.includes(d.selectedSkin))selectedSkin=d.selectedSkin;
@@ -4365,6 +4459,10 @@ async function pushCloudSave(nameOverride){
 }
 let cloudSyncT=null;
 function cloudSyncSoon(){if(!sb||!sbUser)return;clearTimeout(cloudSyncT);cloudSyncT=setTimeout(pushCloudSave,1500);}
+// Skins/Fortschritt dauerhaft am Account: beim Verlassen/Tabwechsel sofort sichern
+function cloudSyncNow(){if(!sb||!sbUser)return;clearTimeout(cloudSyncT);pushCloudSave();}
+window.addEventListener('pagehide',()=>cloudSyncNow());
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')cloudSyncNow();});
 
 // Auto-sync total bags occasionally
 const origPersistShop=persistShop;
@@ -4496,13 +4594,50 @@ function duelResetRound(){
 function openDuel(){
   gameState='menu';showOverlay('duel');duelEl.style.display='flex';
   duelRematchBtn.style.display=(duel.active&&duel.code)?'block':'none';
-  if(!duel.code)duelSay('<b style="color:#7cfc00">MAP-DUELL</b><br>Raum erstellen, Link teilen. Dann baut jeder eine Map (bis '+GOAL_M+'m) für den anderen – du musst sie einmal selbst schaffen, damit sie fair ist. Danach spielt jeder die Map des Gegners: wer zuerst oben ist, gewinnt!');
+  renderDuelCfg();
+  if(!duel.code)duelSay('<b style="color:#7cfc00">MAP-DUELL</b><br>Raum erstellen, Link teilen. Dann baut jeder eine Map (bis '+duelCfg.size+'m) für den anderen – du musst sie einmal selbst schaffen, damit sie fair ist. Danach spielt jeder die Map des Gegners: wer zuerst oben ist, gewinnt!');
+}
+// ---- Lobby-Einstellungen: Größe + Budget (Host entscheidet) ----
+const duelCfgEl=document.getElementById('duelCfg');
+const cfgSizeEl=document.getElementById('cfgSize');
+const cfgBudgetEl=document.getElementById('cfgBudget');
+const cfgNoteEl=document.getElementById('cfgNote');
+function isDuelHost(){return duel.role!=='guest';}
+function renderDuelCfg(){
+  const host=isDuelHost();
+  duelCfgEl.classList.toggle('locked',!host);
+  cfgSizeEl.innerHTML='';
+  for(const s of MAP_SIZES){
+    const b=document.createElement('button');
+    b.textContent=s.label;
+    b.className=duelCfg.size===s.m?'on':'';
+    b.onclick=()=>{if(!host)return;duelCfg.size=s.m;pushDuelCfg();};
+    cfgSizeEl.appendChild(b);
+  }
+  cfgBudgetEl.innerHTML='';
+  for(const o of [{k:'normal',l:'NORMAL'},{k:'inf',l:'UNENDLICH ∞'}]){
+    const b=document.createElement('button');
+    b.textContent=o.l;
+    b.className=duelCfg.budget===o.k?'on':'';
+    b.onclick=()=>{if(!host)return;duelCfg.budget=o.k;pushDuelCfg();};
+    cfgBudgetEl.appendChild(b);
+  }
+  cfgNoteEl.textContent=host?'Ziel: '+duelCfg.size+'m · Budget: '+(duelCfg.budget==='inf'?'unendlich':'normal'):'Host stellt ein · Ziel '+duelCfg.size+'m · Budget '+(duelCfg.budget==='inf'?'unendlich':'normal');
+  applyDuelCfg();
+}
+function pushDuelCfg(){
+  applyDuelCfg();
+  renderDuelCfg();
+  if(duel.channel&&isDuelHost()){
+    try{duel.channel.send({type:'broadcast',event:'cfg',payload:{size:duelCfg.size,budget:duelCfg.budget}});}catch(_){}
+  }
 }
 function closeDuel(){duelLeave();showOverlay('menu');goMenu();}
 function duelLeave(){
   if(duel.channel){try{duel.channel.send({type:'broadcast',event:'bye',payload:{}});}catch(_){}
     try{duel.channel.unsubscribe();}catch(_){}}
   duel.channel=null;duel.active=false;duel.code=null;duel.seed=null;duel.ready=false;duel.round=0;
+  duel.role=null;
   duel.mapMode=false;customMap=null;mapRun.phase=null;mapRun.done=false;
   duelResetRound();
   duelCopyBtn.style.display='none';duelRematchBtn.style.display='none';
@@ -4514,6 +4649,7 @@ async function duelJoin(code,role){
   duelLeave();
   duel.code=code;duel.role=role;duel.round=0;duel.seed=duelSeedFromCode(code);
   duelResetRound();
+  renderDuelCfg();
   const ch=sb.channel('afrojump-duel-'+code,{config:{broadcast:{self:false}}});
   duel.channel=ch;
   let helloReplied=false;
@@ -4522,6 +4658,20 @@ async function duelJoin(code,role){
     duel.oppSkin=payload.skin||'classic';
     duel.lastSeen=Date.now();
     if(!helloReplied){helloReplied=true;ch.send({type:'broadcast',event:'hello',payload:{name:myDuelName(),skin:selectedSkin}});}
+    if(isDuelHost()){try{ch.send({type:'broadcast',event:'cfg',payload:{size:duelCfg.size,budget:duelCfg.budget}});}catch(_){}}
+    if(!duel.ready){
+      if(isDuelHost()){duel.ready=true;duelBeginBuild();}
+      else duelSay('Verbunden mit <b style="color:#7cfc00">'+escHtml(duel.oppName)+'</b><br>Warte auf die Einstellungen des Hosts…');
+    }
+  });
+  // Host-Einstellungen (Map-Größe / Budget)
+  ch.on('broadcast',{event:'cfg'},({payload})=>{
+    if(isDuelHost()||!payload)return;
+    if(MAP_SIZES.some(s=>s.m===payload.size))duelCfg.size=payload.size;
+    if(payload.budget==='inf'||payload.budget==='normal')duelCfg.budget=payload.budget;
+    applyDuelCfg();
+    if(gameState==='menu')renderDuelCfg();
+    duel.lastSeen=Date.now();
     if(!duel.ready){duel.ready=true;duelBeginBuild();}
   });
   ch.on('broadcast',{event:'state'},({payload})=>{
@@ -4683,7 +4833,8 @@ const edBudgetEl=document.getElementById('edBudget');
 const edScrollEl=document.getElementById('edScroll');
 const edSendBtn=document.getElementById('edSend');
 const ed={cam:0,tool:'plat',parts:[],hist:[],verified:false,rev:0,world:null,worldRev:-1,cursor:null,valid:null};
-const CAM_MIN=GOAL_Y-90, CAM_MAX=0;
+var CAM_MIN=GOAL_Y-90;
+const CAM_MAX=0;
 const CAT_NAMES={plat:'PLATTF.',boost:'BOOST',trap:'FALLE',enemy:'GEGNER',item:'ITEM'};
 
 function edTouch(){ed.rev++;ed.verified=false;edValidate();edRefreshUI();}
@@ -4726,7 +4877,7 @@ function edValidate(){
 }
 function edRefreshUI(){
   const c=ed.valid||edValidate();
-  edBudgetEl.textContent=edCount('plat')+'/'+BUDGET.plat+' ▬  '+edCount('boost')+'/'+BUDGET.boost+' ⇧  '+edCount('trap')+'/'+BUDGET.trap+' ▲  '+edCount('enemy')+'/'+BUDGET.enemy+' 👮  '+edCount('item')+'/'+BUDGET.item+' 🌿';
+  edBudgetEl.textContent=edCount('plat')+'/'+budTxt(BUDGET.plat)+' ▬  '+edCount('boost')+'/'+budTxt(BUDGET.boost)+' ⇧  '+edCount('trap')+'/'+budTxt(BUDGET.trap)+' ▲  '+edCount('enemy')+'/'+budTxt(BUDGET.enemy)+' 👮  '+edCount('item')+'/'+budTxt(BUDGET.item)+' 🌿';
   edSendBtn.disabled=!ed.verified;
   if(!ed.msgSticky){
     if(ed.verified)edMsgEl.innerHTML='<span style="color:#7cfc00">✔ Selbst geschafft – jetzt senden!</span>';
@@ -4882,6 +5033,7 @@ function finishMapDuel(win){
 // ---------- Bauphase / Netzwerk ----------
 function duelBeginBuild(){
   duel.active=true;duel.mapMode=true;
+  applyDuelCfg();
   duel.myMapSent=false;duel.oppMap=null;duel.oppGoalT=0;duel.myGoalT=0;duel.oppProg=0;
   duel.finished=false;duel.raceStarted=false;
   customMap=null;mapRun.phase=null;mapRun.done=false;
@@ -4889,7 +5041,7 @@ function duelBeginBuild(){
   edSetCam(CAM_MAX);
   gameState='editor';showOverlay('editor');
   edValidate();edRefreshUI();
-  edPhaseEl.textContent='MAP BAUEN';
+  edPhaseEl.textContent='MAP BAUEN · ZIEL '+GOAL_M+'m'+(duelCfg.budget==='inf'?' · ∞':'');
 }
 function duelSendMap(){
   if(!ed.verified){edSay('Erst selbst schaffen (▶ TEST), dann senden.',true);return;}
