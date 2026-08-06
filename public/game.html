@@ -1657,6 +1657,31 @@ function hurtPlayer(){
   }
   die();
 }
+// Fallen/Gegner in gebauten Maps: Boss-Leben egal, aber kein Game Over — Neustart
+function hurtOrDie(){
+  if(customMap){mapFail();return;}
+  hurtPlayer();
+}
+// Tod in einer gebauten Map: kurzer Neustart derselben Map (kein Game Over)
+let mapFailT=0;
+function mapFail(){
+  if(mapRun.done||mapFailT>0)return;
+  mapRun.deaths++;
+  burst(player.x,player.y,'#ff5252',26);addShake(8,0.4);sfx('hurt');
+  mapFailT=0.8;
+  pushFloat(W/2,player.y-24,'NOCHMAL! ('+mapRun.deaths+'×)','#ff8a80');
+  setTimeout(()=>{
+    mapFailT=0;
+    if(!customMap||mapRun.done)return;
+    respawnCustom();
+  },700);
+}
+function respawnCustom(){
+  const keepPhase=mapRun.phase,keepDeaths=mapRun.deaths,keepStart=mapRun.startT;
+  reset();
+  mapRun.phase=keepPhase;mapRun.deaths=keepDeaths;mapRun.startT=keepStart;mapRun.done=false;
+  gameState='playing';showOverlay('playing');
+}
 function die(){
   if(gameOver)return;
   if(customMap){mapFail();return;}
