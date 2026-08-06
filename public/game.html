@@ -527,61 +527,26 @@ let totalBags=+localStorage.getItem(BK)||0;
 let grant2000=true;
 localStorage.setItem(GK,'1');
 function applyStarterGrant(){return false;}
-let owned=JSON.parse(localStorage.getItem(OK)||'["classic"]');
-if(!owned.includes('classic'))owned.push('classic');
-let selectedSkin=localStorage.getItem(SK)||'classic';
+const DEFAULT_SKIN='revengebird';
+let owned=JSON.parse(localStorage.getItem(OK)||'["revengebird"]');
+owned=owned.filter(id=>true);
+if(!owned.includes(DEFAULT_SKIN))owned.push(DEFAULT_SKIN);
+let selectedSkin=localStorage.getItem(SK)||DEFAULT_SKIN;
+if(!owned.includes(selectedSkin))selectedSkin=DEFAULT_SKIN;
 highEl.textContent='Best: '+highScore+'m';
 
 // Skins catalog
 const SKINS=[
-  {id:'classic',name:'Classic',price:0,afro:'#2b1a0a',skin:'#5b3a1a',body:'#e57373',arms:'#c68863',pants:'#2d4373',joint:'#e8d9ac'},
-  {id:'blonde', name:'Blondie',price:50, afro:'#f4d35e',skin:'#f5c890',body:'#4fc3f7',arms:'#3ba8d8',pants:'#263238',joint:'#e8d9ac'},
-  {id:'hippy',  name:'Hippy',  price:60, afro:'#2b1a0a',skin:'#7a4a20',body:'#7c4dff',arms:'#5e35b1',pants:'#8d6e63',joint:'#e8d9ac',flower:true},
-  {id:'stoner', name:'Stoner', price:80, afro:'#2b1a0a',skin:'#e0b48a',body:'#2e7d32',arms:'#1b5e20',pants:'#3e2723',joint:'#e8d9ac',hood:'#2e7d32'},
-  {id:'greenbuddy',name:'Green Buddy',price:100,afro:'#2e7d32',skin:'#c9975a',body:'#43a047',arms:'#2e7d32',pants:'#263238',joint:'#e8d9ac'},
-  {id:'ginger', name:'Ginger', price:120,afro:'#c9531f',skin:'#f5c890',body:'#7cb342',arms:'#5e8f2a',pants:'#3e2723',joint:'#e8d9ac'},
-  {id:'blaze',  name:'Blaze',  price:140,afro:'#ff7a1a',skin:'#7b4a1a',body:'#111',arms:'#222',pants:'#000',joint:'#e8d9ac'},
-  {id:'maryjane',name:'Mary Jane',price:160,afro:'#2b1a0a',skin:'#c9975a',body:'#66bb6a',arms:'#43a047',pants:'#2e7d32',joint:'#e8d9ac',flower:true},
-  {id:'dog',    name:'Stoner Dog',price:180,render:'dog'},
-  {id:'skunkboy',name:'Skunk Boy',price:200,render:'skunkboy'},
-  {id:'punk',   name:'Punk',   price:220,afro:'#e91e63',skin:'#7b4a1a',body:'#111',arms:'#333',pants:'#c62828',joint:'#e8d9ac'},
-  {id:'ice',    name:'Ice',    price:240,afro:'#e0f7fa',skin:'#9fbdd8',body:'#0288d1',arms:'#01579b',pants:'#1a237e',joint:'#b3e5fc'},
-  {id:'cat',    name:'Chill Cat',price:260,render:'cat'},
-  {id:'ogg',    name:'OG G',    price:280,render:'ogg'},
-  {id:'dopechef',name:'Dope Chef',price:300,render:'chef'},
-  {id:'gold',   name:'Golden', price:320,afro:'#ffd700',skin:'#8a5a1a',body:'#ffb300',arms:'#c68400',pants:'#4a2c00',joint:'#fff9c4'},
-  {id:'rainbowhigh',name:'Rainbow High',price:340,afro:'RAINBOW',skin:'#c9975a',body:'#7c4dff',arms:'#5e35b1',pants:'#212121',joint:'#e8d9ac'},
-  {id:'kushking',name:'Kush King',price:380,render:'kushking'},
-  {id:'chroniccowboy',name:'Chronic Cowboy',price:400,render:'cowboy'},
-  {id:'robot',  name:'420 Bot',price:420,render:'robot'},
-  {id:'dankninja',name:'Dank Ninja',price:450,render:'ninja'},
-  {id:'shadow', name:'Shadow', price:470,afro:'#111',skin:'#3a3a3a',body:'#1a1a1a',arms:'#0a0a0a',pants:'#000',joint:'#7c4dff'},
-  {id:'ganjascientist',name:'Ganja Scientist',price:490,render:'scientist'},
-  {id:'rasta',  name:'Rasta',  price:510,afro:'#2b1a0a',skin:'#5b3a1a',body:'#c62828',arms:'#2e7d32',pants:'#f9a825',joint:'#e8d9ac'},
-  {id:'bobmarley',name:'Reggae Rob',price:540,render:'reggae'},
-  {id:'puffpilot',name:'Puff Pilot',price:560,render:'pilot'},
-  {id:'suit420',name:'420 Suit', price:580,render:'suit'},
-  {id:'alien',  name:'Alien',  price:600,render:'alien'},
-  {id:'thcalien',name:'THC Alien',price:620,render:'thcalien'},
-  {id:'bonghead',name:'Bong Head',price:640,render:'bonghead'},
-  {id:'spliffstar',name:'Spliff Star',price:660,render:'star'},
-  {id:'rollingpaper',name:'Rolling Paper',price:680,render:'paperhead'},
-  {id:'pineapple',name:'Pineapple Express',price:700,render:'pineapple'},
-  {id:'cloudwalker',name:'Cloud Walker',price:720,render:'cloud'},
-  {id:'stickyicky',name:'Sticky Icky',price:750,render:'sticky'},
-  {id:'spacecadet',name:'Space Cadet',price:800,render:'astronaut'},
-  {id:'fabi',   name:'Prinzessin Fabi',price:1000,render:'fabi'},
-  // ---- Community / photo-based pixel skins ----
-  // fixed prices (community:true → excluded from the auto price curve)
+  // ---- Nur noch die Pixel-Art Community-Skins ----
+  {id:'revengebird',name:'RevengeBird',price:0,    community:true, rarity:'legendary', img:'skins/revengebird.png',anchorY:0.72},
   {id:'ina',        name:'Ina',        price:900,  community:true, rarity:'epic',      img:'skins/ina.png',        anchorY:0.72},
-  {id:'sierrakidd', name:'Sierra Kidd', price:1100, community:true, rarity:'epic',      img:'skins/sierrakidd.jpg', anchorY:0.72},
+  {id:'sierrakidd', name:'Sierra Kidd',price:1100, community:true, rarity:'epic',      img:'skins/sierrakidd.jpg', anchorY:0.72},
   {id:'danjo420',   name:'Danjo420',   price:1100, community:true, rarity:'epic',      img:'skins/danjo420.jpg',   anchorY:0.74},
   {id:'fabienne',   name:'Fabienne',   price:1300, community:true, rarity:'epic',      img:'skins/fabienne.jpg',   anchorY:0.74},
   {id:'kosak',      name:'Kosak',      price:1500, community:true, rarity:'epic',      img:'skins/kosak.png',      anchorY:0.72},
   {id:'yannic',     name:'Yannic',     price:1700, community:true, rarity:'legendary', img:'skins/yannic.jpg',     anchorY:0.72},
-  {id:'moodey',     name:'Moodey',     price:2000, community:true, rarity:'legendary', img:'skins/moodey.jpg',     anchorY:0.72, bgKey:'white'},
   {id:'stephan',    name:'Stephan',    price:1900, community:true, rarity:'legendary', img:'skins/stephan.png',    anchorY:0.72, bgKey:'white'},
-  {id:'revengebird',name:'RevengeBird',price:2400, community:true, rarity:'legendary', img:'skins/revengebird.png',anchorY:0.72},
+  {id:'moodey',     name:'Moodey',     price:2000, community:true, rarity:'legendary', img:'skins/moodey.jpg',     anchorY:0.72, bgKey:'white'},
 ];
 
 // ================= ÖKONOMIE, RARITÄTEN & LOOT =================
@@ -593,7 +558,7 @@ const RARITY={
   legendary:{name:'TOP SHELF',color:'#ffd54a', refund:800},
 };
 // These character skins are loot-box exclusive (no purchase possible)
-const LOOT_ONLY_SKINS=new Set(['dankninja','ganjascientist','puffpilot','thcalien','bonghead','rollingpaper','cloudwalker','spacecadet','chroniccowboy','kushking','rainbowhigh','fabi']);
+const LOOT_ONLY_SKINS=new Set([]);
 // Rebalanced price curve: cheap entry skins, real long-term goals at the top
 (function rebalanceEconomy(){
   const tiers=[0,120,220,350,500,700,950,1300,1700,2200,2800];
@@ -681,6 +646,42 @@ function weaponColors(){
 
 // ---- Image skin loader with background removal (flood-fill from corners) ----
 const skinImgCache={};
+// ---- Plattform-/Item-Sprites (bereits freigestellte PNGs, kein BG-Removal nötig) ----
+const SPRITE_FILES={
+  grass:'plats/grass.png', stone:'plats/stone.png', crumble:'plats/crumble.png',
+  springbtn:'plats/springbtn.png', cloud:'plats/cloud.png', slime:'plats/slime.png',
+  gold:'plats/gold.png', boost:'plats/boost.png', ice:'plats/ice.png',
+  icewide:'plats/icewide.png', mossrock:'plats/mossrock.png', tech:'plats/tech.png',
+  lava:'plats/lava.png', conveyor:'plats/conveyor.png', crate:'plats/crate.png',
+  jetpack:'plats/jetpack.png',
+};
+const spriteCache={};
+function sprite(key){
+  const src=SPRITE_FILES[key];
+  if(!src)return null;
+  let e=spriteCache[key];
+  if(!e){
+    e=spriteCache[key]={img:new Image(),ok:false};
+    e.img.onload=()=>{e.ok=true;};
+    e.img.src=src;
+  }
+  return e.ok?e.img:null;
+}
+for(const k in SPRITE_FILES)sprite(k);
+// Zeichnet ein Plattform-Sprite: Oberkante = Kollisionskante, Breite = Plattformbreite
+function drawPlatSprite(key,x,topY,w,opts){
+  const im=sprite(key);
+  if(!im)return false;
+  const o=opts||{};
+  const sw=w*(o.wScale||1);
+  const sh=sw*(im.height/im.width)*(o.hScale||1);
+  ctx.save();
+  ctx.imageSmoothingEnabled=false;
+  if(o.alpha!=null)ctx.globalAlpha=o.alpha;
+  ctx.drawImage(im,x+(w-sw)/2,topY+(o.dy||0),sw,sh);
+  ctx.restore();
+  return true;
+}
 function loadSkinImage(src, bgKey){
   if(skinImgCache[src])return skinImgCache[src];
   const entry={ready:false,canvas:null};
@@ -975,7 +976,8 @@ function renderBoxes(){
 // ---- Loot-Ziehung + Öffnungs-Animation ----
 function lootPool(rarity){
   const out=[];
-  for(const s of SKINS)if(s.rarity===rarity)out.push({kind:'skin',id:s.id,name:s.name,rarity,ref:s});
+  // Charakter-Skins sind kaufbar -> Tütchen enthalten nur Waffen-/Joint-Skins
+  for(const s of SKINS)if(s.rarity===rarity&&s.lootOnly)out.push({kind:'skin',id:s.id,name:s.name,rarity,ref:s});
   for(const w of WEAPON_SKINS)if(w.rarity===rarity&&!w.free)out.push({kind:'weapon',id:w.id,name:w.name+' (Waffe)',rarity,ref:w});
   for(const j of JOINT_SKINS)if(j.rarity===rarity&&!j.free)out.push({kind:'joint',id:j.id,name:j.name+' (Joint)',rarity,ref:j});
   return out;
@@ -1243,7 +1245,7 @@ const duelCfg={size:1500,budget:'normal'};
 const mapRun={phase:null,deaths:0,startT:0,done:false}; // 'test' | 'race'
 // duel state (1v1 online)
 const duel={active:false,code:null,seed:null,role:null,channel:null,ready:false,round:0,
-  myBest:0,oppBest:0,oppDead:false,oppY:null,oppX:W/2,oppFacing:1,oppSkin:'classic',
+  myBest:0,oppBest:0,oppDead:false,oppY:null,oppX:W/2,oppFacing:1,oppSkin:'revengebird',
   finished:false,oppName:'Gegner',countdown:0,myRematch:false,oppRematch:false,
   oppOffline:false,lastSeen:0};
 let shake={t:0,mag:0},timeScale=1,deathT=0,bossIndex=0;
@@ -1299,6 +1301,14 @@ const PARTS=[
   {k:'move',  cat:'plat', icon:'↔',  name:'Beweg.'},
   {k:'brit',  cat:'plat', icon:'▨',  name:'Brüchig'},
   {k:'fake',  cat:'plat', icon:'▢',  name:'Fake'},
+  // ---- nur im Duell-Editor (Multiplayer) verfügbar ----
+  {k:'rock',  cat:'plat', icon:'🪨', name:'Fels'},
+  {k:'slip',  cat:'plat', icon:'🧊', name:'Eis'},
+  {k:'conv',  cat:'plat', icon:'⏩', name:'Band'},
+  {k:'crate', cat:'plat', icon:'📦', name:'Kiste'},
+  {k:'boostp',cat:'boost',icon:'⏫', name:'Boost'},
+  {k:'tech',  cat:'boost',icon:'🌀', name:'Beamer'},
+  {k:'lava',  cat:'trap', icon:'🔥', name:'Lava'},
   {k:'spring',cat:'boost',icon:'⇧',  name:'Feder'},
   {k:'tramp', cat:'boost',icon:'⤒',  name:'Trampo'},
   {k:'rocket',cat:'boost',icon:'🚀', name:'Rakete'},
@@ -1326,11 +1336,13 @@ function applyDuelCfg(){
   }
 }
 function budTxt(n){return n===Infinity?'∞':n;}
-const PLAT_KINDS={plat:'normal',move:'moving',brit:'brittle',fake:'fake',spring:'spring',tramp:'tramp'};
+const PLAT_KINDS={plat:'normal',move:'moving',brit:'brittle',fake:'fake',spring:'spring',tramp:'tramp',
+  rock:'rock',slip:'slip',conv:'conveyor',crate:'crate',boostp:'boost',tech:'tech',lava:'lava'};
 function mkPlat(x,y,type){
-  const w=type==='tramp'?70:80;
+  const w=type==='tramp'?70:(type==='lava'?76:80);
   const p={x:x-w/2,y:y,w:w,h:12,vx:0,type:type==='fake'?'fake':type,dir:1,range:0,ox:x-w/2,bounce:0,cracked:0,springT:0};
   if(type==='moving'){p.range=70;p.vx=1.1;}
+  if(type==='conveyor')p.dir=x<W/2?1:-1;
   return p;
 }
 // Baut aus der Teile-Liste die echte Spielwelt (deterministisch, ohne Zufall)
@@ -1513,7 +1525,15 @@ function update(dt){
           if(p.type==='spring'){player.vy=-22;p.springT=1;burst(p.x+p.w/2,p.y,'#ffd54a',6);}
           else if(p.type==='tramp'){player.vy=-30;p.springT=1;burst(p.x+p.w/2,p.y,'#e040fb',10);sfx('pickup');}
           else if(p.type==='goal'){player.vy=-6;}
+          else if(p.type==='boost'){player.vy=-25;p.springT=1;burst(p.x+p.w/2,p.y,'#ffd54a',10);sfx('pickup');}
+          else if(p.type==='tech'){player.vy=-13.5;player.y-=230;burst(p.x+p.w/2,p.y,'#b388ff',18);pushFloat(p.x+p.w/2,p.y-10,'BEAM!','#b388ff');sfx('pickup');}
+          else if(p.type==='slip'){player.vy=-11;player.x+=(player.x<p.x+p.w/2?-16:16);}
+          else if(p.type==='conveyor'){player.vy=-13.5;player.x+=p.dir*24;}
+          else if(p.type==='crate'){player.vy=-16;burst(p.x+p.w/2,p.y+6,'#c98a3c',18);p.dead=true;
+            for(const en of enemies)if(en.plat===p){en.alive=false;en.plat=null;}
+            collectibles.push({x:p.x+p.w/2,y:p.y-14,type:'bag',t:0,taken:false});}
           else{player.vy=-13.5;}
+          if(player.x<12)player.x=12;if(player.x>W-12)player.x=W-12;
           p.bounce=1;
           player.landedT=0.15;
           player.squash=1.35;player.stretch=0.75;
@@ -1537,6 +1557,17 @@ function update(dt){
 
   // purge destroyed brittle platforms (no ghost graphics left behind)
   if(platforms.some(p=>p.dead))platforms=platforms.filter(p=>!p.dead);
+
+  // Lava-Plattformen: Kontakt = Tod (im Duell -> Respawn)
+  for(const p of platforms){
+    if(p.type!=='lava'||p.dead)continue;
+    if(player.x>p.x-6&&player.x<p.x+p.w+6&&player.y+player.r>p.y-2&&player.y-player.r<p.y+p.h+8){
+      if(player.invincible>0){burst(player.x,player.y,'#ff7043',12);}
+      else if(boss&&player.bossLives>0)hurtPlayer();
+      else{burst(player.x,player.y,'#ff5722',24);die();}
+      break;
+    }
+  }
 
   // enemies patrol
   for(const e of enemies){
@@ -2124,6 +2155,32 @@ function drawPlatform(p){
   const h=p.h*squish;
   const yy=y+(p.h-h);
   ctx.save();
+  // ---- Pixel-Art-Sprites (Standard-Darstellung aller Plattformen) ----
+  const SPR={
+    normal:{k:'grass'}, moving:{k:'stone'}, brittle:{k:'crumble'}, fake:{k:'slime'},
+    spring:{k:'springbtn',wScale:0.72}, tramp:{k:'cloud'}, goal:{k:'gold'},
+    slip:{k:'ice'}, boost:{k:'boost'}, conveyor:{k:'conveyor'}, lava:{k:'lava'},
+    tech:{k:'tech'}, rock:{k:'mossrock'}, crate:{k:'crate'},
+  };
+  const sp=SPR[p.type];
+  if(sp){
+    const dy=(p.springT>0?3:0);
+    if(drawPlatSprite(sp.k,p.x,yy+dy,p.w,{wScale:sp.wScale})){
+      if(p.type==='brittle'&&p.cracked>0){
+        ctx.globalAlpha=0.45;
+        drawPlatSprite('crumble',p.x,yy+dy+2,p.w,{});
+        ctx.globalAlpha=1;
+      }
+      if(p.type==='goal'){
+        ctx.strokeStyle='#eee';ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(p.x+p.w/2,yy);ctx.lineTo(p.x+p.w/2,yy-26);ctx.stroke();
+        ctx.fillStyle='#7cfc00';ctx.fillRect(p.x+p.w/2,yy-26,18,12);
+        ctx.fillStyle='#fff';ctx.font="7px 'Press Start 2P', monospace";ctx.textAlign='center';
+        ctx.fillText('ZIEL',p.x+p.w/2,yy-32);ctx.textAlign='left';
+      }
+      ctx.restore();return;
+    }
+  }
   if(p.type==='goal'){
     // Ziel-Plattform: goldener Zielstreifen mit Flagge
     const g=ctx.createLinearGradient(0,yy,0,yy+h);
@@ -3215,6 +3272,14 @@ function drawCollectible(c){
     ctx.restore();
   }else if(c.type==='jetpack'){
     ctx.save();
+    const jp=sprite('jetpack');
+    if(jp){
+      const hh=40, ww=hh*(jp.width/jp.height);
+      ctx.imageSmoothingEnabled=false;
+      const bob=Math.sin(c.t*4)*1.5;
+      ctx.drawImage(jp,c.x-ww/2,y-hh*0.55+bob,ww,hh);
+      ctx.restore();return;
+    }
     // twin tanks
     ctx.fillStyle='#c62828';ctx.strokeStyle='#111';ctx.lineWidth=1.5;
     roundRect(c.x-9,y-10,7,18,2,true,true);
@@ -4679,7 +4744,7 @@ async function duelJoin(code,role){
   let helloReplied=false;
   ch.on('broadcast',{event:'hello'},({payload})=>{
     duel.oppName=payload.name||'Gegner';
-    duel.oppSkin=payload.skin||'classic';
+    duel.oppSkin=payload.skin||'revengebird';
     duel.lastSeen=Date.now();
     if(!helloReplied){helloReplied=true;ch.send({type:'broadcast',event:'hello',payload:{name:myDuelName(),skin:selectedSkin}});}
     if(isDuelHost()){try{ch.send({type:'broadcast',event:'cfg',payload:{size:duelCfg.size,budget:duelCfg.budget}});}catch(_){}}
