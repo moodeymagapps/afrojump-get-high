@@ -1289,6 +1289,15 @@ function update(dt){
   if(left)player.vx-=acc;if(right)player.vx+=acc;
   if(!left&&!right)player.vx*=0.85;
   player.vx=Math.max(-maxV,Math.min(maxV,player.vx));
+  // Wind-Zonen aus gebauten Maps schieben zur Seite
+  if(zones.length){
+    for(const z of zones){
+      if(player.x>z.x&&player.x<z.x+z.w&&player.y>z.y&&player.y<z.y+z.h){
+        player.x+=z.dir*2.1;
+        if(Math.random()<0.4)particles.push({x:player.x-z.dir*10,y:player.y+rand(-10,10),vx:z.dir*2,vy:rand(-.4,.4),life:0.4,color:'#cfe9ff'});
+      }
+    }
+  }
   player.x+=player.vx;
   if(player.x<0)player.x=W;if(player.x>W)player.x=0;
   if(player.vx<-0.1)player.facing=-1;else if(player.vx>0.1)player.facing=1;
@@ -1338,6 +1347,8 @@ function update(dt){
         if(player.y+player.r>=p.y&&player.y+player.r<=p.y+p.h+player.vy+2){
           player.y=p.y-player.r;
           if(p.type==='spring'){player.vy=-22;p.springT=1;burst(p.x+p.w/2,p.y,'#ffd54a',6);}
+          else if(p.type==='tramp'){player.vy=-30;p.springT=1;burst(p.x+p.w/2,p.y,'#e040fb',10);sfx('pickup');}
+          else if(p.type==='goal'){player.vy=-6;}
           else{player.vy=-13.5;}
           p.bounce=1;
           player.landedT=0.15;
@@ -1349,6 +1360,11 @@ function update(dt){
               p.dead=true; // remove it visually + physically
               for(const en of enemies)if(en.plat===p){en.alive=false;en.plat=null;}
             }
+          }
+          if(p.type==='fake'){
+            burst(p.x+p.w/2,p.y+6,'#b0bec5',14);
+            p.dead=true;
+            for(const en of enemies)if(en.plat===p){en.alive=false;en.plat=null;}
           }
         }
       }
