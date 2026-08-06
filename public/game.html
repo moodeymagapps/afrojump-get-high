@@ -4621,6 +4621,7 @@ async function duelJoin(code,role){
   duelLeave();
   duel.code=code;duel.role=role;duel.round=0;duel.seed=duelSeedFromCode(code);
   duelResetRound();
+  renderDuelCfg();
   const ch=sb.channel('afrojump-duel-'+code,{config:{broadcast:{self:false}}});
   duel.channel=ch;
   let helloReplied=false;
