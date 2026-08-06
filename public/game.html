@@ -32,14 +32,36 @@
   #menu .btn,#pause .btn,#over .btn{width:270px;min-width:0;box-sizing:border-box;max-width:100%;}
   .overlay .btn:hover{filter:brightness(1.08);}
   @media (prefers-reduced-motion:reduce){.overlay,.overlay>*{animation:none;}}
-  .overlay .btn{margin:6px 0;padding:14px 22px;font-size:13px;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;letter-spacing:1px;border:none;background:#4caf50;color:#fff;cursor:pointer;min-width:220px;box-shadow:inset -3px -3px 0 #1b5e20, inset 3px 3px 0 #a5d6a7, 0 5px 0 #1b5e20, 0 8px 12px rgba(0,0,0,.4);image-rendering:pixelated;}
-  .overlay .btn:active{transform:translateY(3px);box-shadow:inset -3px -3px 0 #1b5e20, inset 3px 3px 0 #a5d6a7, 0 2px 0 #1b5e20;}
-  .overlay .btn.alt{background:#ffb300;box-shadow:inset -3px -3px 0 #b47a00, inset 3px 3px 0 #ffe082, 0 5px 0 #b47a00, 0 8px 12px rgba(0,0,0,.4);}
-  .overlay .btn.alt:active{box-shadow:inset -3px -3px 0 #b47a00, inset 3px 3px 0 #ffe082, 0 2px 0 #b47a00;}
-  .overlay .btn.ghost{background:#455a64;box-shadow:inset -3px -3px 0 #263238, inset 3px 3px 0 #90a4ae, 0 5px 0 #263238, 0 8px 12px rgba(0,0,0,.4);}
-  .overlay .btn.ghost:active{box-shadow:inset -3px -3px 0 #263238, inset 3px 3px 0 #90a4ae, 0 2px 0 #263238;}
+  /* ---- Pixel-Art Buttons (Stil: geschnittene Ecken, Bevel, Farbvarianten) ---- */
+  .overlay .btn{
+    --c:#4f9d20;--cd:#254c0c;--cl:#8fd94a;
+    position:relative;margin:7px 0;padding:15px 20px;font-size:12px;
+    font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;
+    letter-spacing:1px;border:none;color:#fff;cursor:pointer;min-width:220px;line-height:1.5;
+    text-shadow:2px 2px 0 rgba(0,0,0,.75);
+    background:
+      linear-gradient(rgba(255,255,255,.16),rgba(255,255,255,0) 42%,rgba(0,0,0,.22)),
+      var(--c);
+    clip-path:polygon(0 8px,8px 8px,8px 0,calc(100% - 8px) 0,calc(100% - 8px) 8px,100% 8px,100% calc(100% - 8px),calc(100% - 8px) calc(100% - 8px),calc(100% - 8px) 100%,8px 100%,8px calc(100% - 8px),0 calc(100% - 8px));
+    box-shadow:inset -4px -4px 0 var(--cd), inset 4px 4px 0 var(--cl), 0 6px 0 rgba(0,0,0,.55);
+    image-rendering:pixelated;transition:filter .12s, transform .06s;
+  }
+  .overlay .btn:active{transform:translateY(4px);box-shadow:inset -4px -4px 0 var(--cd), inset 4px 4px 0 var(--cl), 0 2px 0 rgba(0,0,0,.55);}
+  .overlay .btn:disabled{filter:grayscale(.6) brightness(.75);cursor:not-allowed;}
+  .overlay .btn.alt{--c:#7a2fa8;--cd:#3d1257;--cl:#c078e8;}
+  .overlay .btn.ghost{--c:#5b6472;--cd:#2b3138;--cl:#9aa5b3;}
+  .btn.v-green{--c:#4f9d20;--cd:#254c0c;--cl:#8fd94a;}
+  .btn.v-purple{--c:#7a2fa8;--cd:#3d1257;--cl:#c078e8;}
+  .btn.v-blue{--c:#1f5fa8;--cd:#0d2c56;--cl:#5fa8ec;}
+  .btn.v-gold{--c:#c99012;--cd:#6b4703;--cl:#ffd766;}
+  .btn.v-red{--c:#b52a26;--cd:#5c0f0d;--cl:#f2726c;}
+  .btn.v-slate{--c:#5b6472;--cd:#2b3138;--cl:#9aa5b3;}
   #over h1{color:#ff5252;}
   #menu h1{color:#7cfc00;font-size:30px;}
+  .logoImg{width:min(88%,340px);image-rendering:pixelated;display:block;margin:0 auto 6px;filter:drop-shadow(0 6px 0 rgba(0,0,0,.5));animation:logoFloat 3.4s ease-in-out infinite;}
+  .logoImg.sm{width:min(58%,190px);margin-bottom:2px;animation:none;}
+  @keyframes logoFloat{0%,100%{transform:translateY(0) rotate(-.4deg)}50%{transform:translateY(-6px) rotate(.4deg)}}
+  @media (prefers-reduced-motion:reduce){.logoImg{animation:none;}}
   #menu .tag{font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:9px;opacity:.75;margin-bottom:16px;letter-spacing:1px;color:#ffd54a;}
   #shop{overflow-y:auto;justify-content:flex-start;padding-top:20px;}
   #shop .head{display:flex;justify-content:space-between;width:100%;max-width:360px;align-items:center;margin-bottom:12px;}
