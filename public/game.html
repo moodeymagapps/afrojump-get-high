@@ -1266,7 +1266,20 @@ const PARTS=[
   {k:'joint', cat:'item', icon:'🚬', name:'Joint'},
 ];
 const PART_BY_K={};for(const p of PARTS)PART_BY_K[p.k]=p;
-const BUDGET={plat:80,boost:16,trap:16,enemy:14,item:22};
+const BASE_BUDGET={plat:80,boost:16,trap:16,enemy:14,item:22};
+let BUDGET=Object.assign({},BASE_BUDGET);
+// Budget skaliert mit der Map-Größe; "unendlich" hebt alle Limits auf
+function applyDuelCfg(){
+  GOAL_M=duelCfg.size;
+  GOAL_Y=START_Y-GOAL_M*10;
+  CAM_MIN=GOAL_Y-90;
+  const f=GOAL_M/1500;
+  BUDGET={};
+  for(const k in BASE_BUDGET){
+    BUDGET[k]=duelCfg.budget==='inf'?Infinity:Math.max(6,Math.round(BASE_BUDGET[k]*f));
+  }
+}
+function budTxt(n){return n===Infinity?'∞':n;}
 const PLAT_KINDS={plat:'normal',move:'moving',brit:'brittle',fake:'fake',spring:'spring',tramp:'tramp'};
 function mkPlat(x,y,type){
   const w=type==='tramp'?70:80;
