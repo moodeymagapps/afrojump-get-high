@@ -692,23 +692,16 @@ function loadSkinImage(src, bgKey){
   const img=new Image();
   img.onload=()=>{
     try{
-      // Große Uploads vorher verkleinern: Freistellen (Flood-Fill) auf 2000px
-      // Bildern verursacht sonst einen Ruckler beim ersten Anzeigen.
-      const MAXD=320;
-      const sc=Math.min(1,MAXD/Math.max(img.naturalWidth,img.naturalHeight));
+      // Alle Skin-PNGs sind bereits freigestellt & auf Sprite-Größe gebracht.
+      // Kein Runtime-Freistellen mehr: das hat Löcher in dunkle Outlines gestanzt.
       const c=document.createElement('canvas');
-      c.width=Math.max(1,Math.round(img.naturalWidth*sc));
-      c.height=Math.max(1,Math.round(img.naturalHeight*sc));
+      c.width=img.naturalWidth; c.height=img.naturalHeight;
       const g=c.getContext('2d',{willReadFrequently:true});
-      g.imageSmoothingEnabled=sc<1;
-      g.drawImage(img,0,0,c.width,c.height);
-      const data=g.getImageData(0,0,c.width,c.height);
-      removeBackground(data, bgKey);
-      g.putImageData(data,0,0);
-      // trim transparent margins
+      g.imageSmoothingEnabled=false;
+      g.drawImage(img,0,0);
       entry.canvas=trimTransparent(c);
       entry.ready=true;
-    }catch(e){console.warn('skin bg-removal failed',src,e);entry.canvas=null;entry.ready=true;}
+    }catch(e){console.warn('skin load failed',src,e);entry.canvas=null;entry.ready=true;}
   };
   img.onerror=()=>{entry.ready=true;};
   img.src=src;
