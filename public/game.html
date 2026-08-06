@@ -129,6 +129,21 @@
     box-shadow:0 2px 0 rgba(0,0,0,.5),0 6px 14px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.12);
     text-shadow:0 2px 0 rgba(0,0,0,.65);letter-spacing:.5px;line-height:1;}
   .hudChip .ic{font-size:11px;filter:drop-shadow(0 1px 0 #000);}
+  /* --- HUD Animationen --- */
+  .hudChip{transition:transform .18s cubic-bezier(.2,1.6,.4,1),box-shadow .25s ease,border-color .25s ease;will-change:transform;}
+  @keyframes hudPop{0%{transform:scale(1)}35%{transform:scale(1.16) translateY(-2px)}70%{transform:scale(.97)}100%{transform:scale(1)}}
+  @keyframes hudFlash{0%{filter:brightness(2.2)}100%{filter:brightness(1)}}
+  @keyframes hudSlideIn{from{opacity:0;transform:translateY(-6px) scale(.96)}to{opacity:1;transform:none}}
+  @keyframes hudGlow{0%,100%{box-shadow:0 2px 0 rgba(0,0,0,.5),0 0 10px rgba(124,252,0,.15),inset 0 1px 0 rgba(255,255,255,.12)}
+    50%{box-shadow:0 2px 0 rgba(0,0,0,.5),0 0 22px rgba(124,252,0,.55),inset 0 1px 0 rgba(255,255,255,.2)}}
+  .hudChip.pop{animation:hudPop .34s ease-out;}
+  .hudChip.pop>div{animation:hudFlash .34s ease-out;}
+  .hudChip.hot{animation:hudGlow .9s ease-in-out infinite;border-color:rgba(141,255,60,.6);}
+  .hudChip.rec{border-color:rgba(255,213,74,.7);box-shadow:0 2px 0 rgba(0,0,0,.5),0 0 20px rgba(255,213,74,.45),inset 0 1px 0 rgba(255,255,255,.16);}
+  #ui{animation:hudSlideIn .3s ease-out;}
+  #power{transition:opacity .2s ease,transform .2s ease;}
+  #power.in{animation:hudSlideIn .22s ease-out;}
+  @media (prefers-reduced-motion:reduce){.hudChip,.hudChip.pop,.hudChip.hot,#ui,#power.in{animation:none!important;transition:none!important;}}
   #score{color:#eafff0;}
   #high{color:#b9a7ff;}
   #bags{color:#8dff3c;}
