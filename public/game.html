@@ -813,6 +813,8 @@ function showOverlay(which){
   if(aEl&&which!=='account')aEl.style.display='none';
   const bEl=document.getElementById('board');
   if(bEl&&which!=='board')bEl.style.display='none';
+  const stEl=document.getElementById('settings');
+  if(stEl)stEl.style.display='none';
   const eb=document.getElementById('edBar');
   if(eb)eb.classList.toggle('on',which==='editor');
   const hintEl=document.getElementById('hint');
