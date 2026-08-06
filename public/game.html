@@ -3797,6 +3797,7 @@ function drawBossPipePusher(bx,y,bw,bh,t){
 }
 
 function render(){
+  if(gameState==='editor'){drawEditor();return;}
   ctx.save();
   if(shake.t>0){
     // ausklingende Schwingung statt Zufalls-Zittern -> saubere Kamera
