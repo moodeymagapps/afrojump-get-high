@@ -101,6 +101,23 @@
   #account .quest.done{color:#7cfc00;}
   #account .quest .bar{flex:1;height:8px;background:#0a0518;margin:0 8px;border:1px solid #4a2c73;}
   #account .quest .bar span{display:block;height:100%;background:#7cfc00;}
+  /* ---------- Map-Editor (Map-Duell) ---------- */
+  #edBar{position:absolute;left:0;right:0;bottom:0;display:none;flex-direction:column;gap:4px;padding:6px 8px 8px;box-sizing:border-box;background:linear-gradient(rgba(10,8,20,.55),rgba(10,8,20,.96));z-index:7;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;}
+  #edBar.on{display:flex;}
+  #edTop{display:flex;justify-content:space-between;align-items:center;font-size:8px;color:#7cfc00;text-shadow:2px 2px 0 #000;}
+  #edBudget{color:#ffd54a;}
+  #edPal{display:flex;gap:4px;overflow-x:auto;padding-bottom:2px;}
+  #edPal button{flex:0 0 auto;width:46px;height:44px;border:none;background:#2b1a0a;color:#fff;font-size:15px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #4a2c73;font-family:inherit;}
+  #edPal button b{font-size:6px;color:#bbb;font-weight:normal;}
+  #edPal button.on{background:#0d3d00;box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #7cfc00;}
+  #edPal button.on b{color:#7cfc00;}
+  #edRow{display:flex;gap:4px;align-items:center;}
+  #edRow button{border:none;background:#455a64;color:#fff;font-family:inherit;font-size:8px;padding:8px 6px;cursor:pointer;box-shadow:inset -2px -2px 0 #263238, inset 2px 2px 0 #90a4ae, 0 2px 0 #263238;}
+  #edTest{background:#ffb300!important;color:#111!important;box-shadow:inset -2px -2px 0 #b47a00, inset 2px 2px 0 #ffe082, 0 2px 0 #b47a00!important;}
+  #edSend{background:#4caf50!important;box-shadow:inset -2px -2px 0 #1b5e20, inset 2px 2px 0 #a5d6a7, 0 2px 0 #1b5e20!important;}
+  #edSend:disabled{background:#4a1414!important;color:#c99!important;box-shadow:inset -2px -2px 0 #200, inset 2px 2px 0 #7a2a2a!important;cursor:not-allowed;}
+  #edScroll{flex:1;min-width:40px;accent-color:#7cfc00;}
+  #edMsg{font-family:'VT323',monospace;font-size:14px;color:#ffd54a;min-height:16px;letter-spacing:1px;text-align:center;}
 </style>
 </head>
 <body>
@@ -120,7 +137,7 @@
     <button class="btn alt" id="menuShop">🛍 Shop</button>
     <button class="btn alt" id="menuDaily">🎁 Täglich &amp; Aufgaben</button>
     <button class="btn alt" id="menuBoard">🏆 Rangliste</button>
-    <button class="btn alt" id="menuDuel">⚔ 1v1 Duell (Link)</button>
+    <button class="btn alt" id="menuDuel">⚔ Map-Duell (1v1)</button>
     <button class="btn ghost" id="menuAccount">👤 Account</button>
     <p id="menuAcctStatus" style="font-size:14px;opacity:.7;margin-top:4px;letter-spacing:1px;"></p>
   </div>
@@ -162,6 +179,18 @@
   </div>
   <div id="hint">← → / A D bewegen · Schießen nur mit aufgesammelter Waffe 🔫 · Mobile: Tap links/rechts</div>
   <button id="fireBtn" title="Feuer">🔫</button>
+  <div id="edBar">
+    <div id="edTop"><span id="edPhase">MAP BAUEN</span><span id="edBudget"></span></div>
+    <div id="edPal"></div>
+    <div id="edRow">
+      <button id="edUndo" title="Zurück">↶</button>
+      <button id="edClear" title="Alles löschen">🗑</button>
+      <input id="edScroll" type="range" min="0" max="1000" value="1000" />
+      <button id="edTest">▶ TEST</button>
+      <button id="edSend" disabled>✓ SENDEN</button>
+    </div>
+    <div id="edMsg"></div>
+  </div>
   <div id="account" class="overlay">
     <div class="head" style="display:flex;justify-content:space-between;width:100%;max-width:360px;align-items:center;margin-bottom:12px;">
       <h2 style="margin:0;color:#7cfc00;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:13px;text-shadow:2px 2px 0 #000;">👤 ACCOUNT</h2>
@@ -211,8 +240,8 @@
     <button class="btn ghost" id="boardRefresh">🔄 Aktualisieren</button>
   </div>
   <div id="duel" class="overlay">
-    <h1>1v1 DUELL</h1>
-    <p style="font-size:16px;max-width:320px;text-align:center;">Gleiche Map, zwei Spieler. Wer höher kommt, gewinnt!</p>
+    <h1>MAP-DUELL</h1>
+    <p style="font-size:16px;max-width:320px;text-align:center;">Jeder baut dem anderen eine Map – und muss sie einmal selbst schaffen. Dann spielt jeder die Map des Gegners: wer zuerst am Ziel ist, gewinnt!</p>
     <div id="duelBox" style="width:100%;max-width:340px;background:#1b1230;padding:12px;margin:8px 0;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #4a2c73;font-family:'VT323','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:16px;letter-spacing:1px;">Bereit.</div>
     <button class="btn" id="duelCreate">⚔ Raum erstellen</button>
     <button class="btn alt" id="duelCopy" style="display:none;">🔗 Link kopieren</button>
@@ -620,6 +649,13 @@ function showOverlay(which){
   if(aEl&&which!=='account')aEl.style.display='none';
   const bEl=document.getElementById('board');
   if(bEl&&which!=='board')bEl.style.display='none';
+  const eb=document.getElementById('edBar');
+  if(eb)eb.classList.toggle('on',which==='editor');
+  const hintEl=document.getElementById('hint');
+  if(hintEl)hintEl.style.display=(which==='editor'||customMap)?'none':'block';
+  const uiEl=document.getElementById('ui');
+  if(uiEl)uiEl.style.display=which==='editor'?'none':'flex';
+  powerEl.style.display=which==='editor'?'none':'block';
   pauseBtn.style.display=which==='playing'?'flex':'none';
 }
 function goMenu(){gameState='menu';menuHigh.textContent='Best: '+highScore+'m';updateBagsUI();showOverlay('menu');}
@@ -1055,6 +1091,12 @@ document.getElementById('overMenu').onclick=()=>goMenu();
 
 // State
 let player,platforms,collectibles,enemies,projectiles,particles,smokeParticles,floatTexts,cameraY,bestY,scrollLocked,boss,bossTimer,nextBossScore,gameOver,rngSeed,runBags;
+// Map-Duell: selbstgebaute Map (parts) + Laufzustand
+let hazards=[],zones=[],goalY=null,customMap=null;
+const GOAL_M=1200;                 // Ziel-Höhe einer gebauten Map
+const START_Y=H-40;                // Start-Plattform
+const GOAL_Y=START_Y-GOAL_M*10;    // Weltkoordinate des Ziels
+const mapRun={phase:null,deaths:0,startT:0,done:false}; // 'test' | 'race'
 // duel state (1v1 online)
 const duel={active:false,code:null,seed:null,role:null,channel:null,ready:false,round:0,
   myBest:0,oppBest:0,oppDead:false,oppY:null,oppX:W/2,oppFacing:1,oppSkin:'classic',
@@ -1090,6 +1132,14 @@ function reset(){
   killCombo=0;comboT=0;runKills=0;bossIndex=0;
   duel.myBest=0;duel.oppBest=0;duel.oppDead=false;duel.oppY=null;duel.oppX=W/2;duel.finished=false;
   stopBossMusic();
+  hazards=[];zones=[];goalY=null;
+  if(customMap){
+    buildCustomWorld(customMap,{platforms,collectibles,enemies,hazards,zones});
+    goalY=GOAL_Y;
+    nextBossScore=Infinity;   // keine Bosse in gebauten Maps
+    player.y=START_Y-30;
+    return;
+  }
   // starting platform
   platforms.push({x:W/2-40,y:H-40,w:80,h:12,vx:0,type:'normal',dir:1,range:0,ox:W/2-40,bounce:0,cracked:0});
   let py=H-40;
@@ -1097,6 +1147,64 @@ function reset(){
     py-=rand(60,90);
     spawnPlatform(py);
   }
+}
+
+// ---------- Bau-Teile: eine Definition für Editor UND Spielwelt ----------
+const PARTS=[
+  {k:'plat',  cat:'plat', icon:'▬',  name:'Platte'},
+  {k:'move',  cat:'plat', icon:'↔',  name:'Beweg.'},
+  {k:'brit',  cat:'plat', icon:'▨',  name:'Brüchig'},
+  {k:'fake',  cat:'plat', icon:'▢',  name:'Fake'},
+  {k:'spring',cat:'boost',icon:'⇧',  name:'Feder'},
+  {k:'tramp', cat:'boost',icon:'⤒',  name:'Trampo'},
+  {k:'rocket',cat:'boost',icon:'🚀', name:'Rakete'},
+  {k:'wind',  cat:'boost',icon:'🌬', name:'Wind'},
+  {k:'spike', cat:'trap', icon:'▲',  name:'Stachel'},
+  {k:'saw',   cat:'trap', icon:'✳',  name:'Säge'},
+  {k:'cop',   cat:'enemy',icon:'👮', name:'Cop'},
+  {k:'car',   cat:'enemy',icon:'🚓', name:'Wagen'},
+  {k:'bag',   cat:'item', icon:'🌿', name:'Baggy'},
+  {k:'gun',   cat:'item', icon:'🔫', name:'Waffe'},
+  {k:'joint', cat:'item', icon:'🚬', name:'Joint'},
+];
+const PART_BY_K={};for(const p of PARTS)PART_BY_K[p.k]=p;
+const BUDGET={plat:80,boost:16,trap:16,enemy:14,item:22};
+const PLAT_KINDS={plat:'normal',move:'moving',brit:'brittle',fake:'fake',spring:'spring',tramp:'tramp'};
+function mkPlat(x,y,type){
+  const w=type==='tramp'?70:80;
+  const p={x:x-w/2,y:y,w:w,h:12,vx:0,type:type==='fake'?'fake':type,dir:1,range:0,ox:x-w/2,bounce:0,cracked:0,springT:0};
+  if(type==='moving'){p.range=70;p.vx=1.1;}
+  return p;
+}
+// Baut aus der Teile-Liste die echte Spielwelt (deterministisch, ohne Zufall)
+function buildCustomWorld(map,out){
+  const parts=(map&&map.parts)||[];
+  out.platforms.push(mkPlat(W/2,START_Y,'normal'));
+  // Ziel-Plattform (immer vorhanden, unzerstörbar)
+  out.platforms.push({x:W/2-70,y:GOAL_Y,w:140,h:14,vx:0,type:'goal',dir:1,range:0,ox:W/2-70,bounce:0,cracked:0,springT:0});
+  const pending=[];
+  for(const q of parts){
+    const t=PLAT_KINDS[q.k];
+    if(t){out.platforms.push(mkPlat(q.x,q.y,t));continue;}
+    if(q.k==='rocket'){out.collectibles.push({x:q.x,y:q.y,type:'jetpack',t:0,taken:false});continue;}
+    if(q.k==='bag'||q.k==='gun'||q.k==='joint'){out.collectibles.push({x:q.x,y:q.y,type:q.k==='bag'?'bag':q.k,t:0,taken:false});continue;}
+    if(q.k==='wind'){out.zones.push({x:Math.max(0,q.x-70),y:q.y-70,w:140,h:140,dir:q.x<W/2?1:-1});continue;}
+    if(q.k==='spike'){out.hazards.push({type:'spike',x:q.x,y:q.y,w:38,h:14});continue;}
+    if(q.k==='saw'){out.hazards.push({type:'saw',x:q.x,y:q.y,rad:34,ang:0});continue;}
+    if(q.k==='cop'||q.k==='car')pending.push(q);
+  }
+  out.platforms.sort((a,b)=>b.y-a.y);
+  // Gegner brauchen eine Plattform zum Patrouillieren
+  for(const q of pending){
+    let best=null,bd=1e9;
+    for(const p of out.platforms){
+      if(p.type==='goal')continue;
+      const d=Math.abs(p.y-q.y);
+      if(d<46&&q.x>p.x-10&&q.x<p.x+p.w+10&&d<bd){bd=d;best=p;}
+    }
+    if(best)out.enemies.push({x:best.x+best.w/2,y:best.y-18,w:34,h:18,vx:1.2,plat:best,type:q.k,alive:true});
+  }
+  return out;
 }
 function spawnPlatform(y){
   const w=rand(55,80);
@@ -1188,6 +1296,15 @@ function update(dt){
   if(left)player.vx-=acc;if(right)player.vx+=acc;
   if(!left&&!right)player.vx*=0.85;
   player.vx=Math.max(-maxV,Math.min(maxV,player.vx));
+  // Wind-Zonen aus gebauten Maps schieben zur Seite
+  if(zones.length){
+    for(const z of zones){
+      if(player.x>z.x&&player.x<z.x+z.w&&player.y>z.y&&player.y<z.y+z.h){
+        player.x+=z.dir*2.1;
+        if(Math.random()<0.4)particles.push({x:player.x-z.dir*10,y:player.y+rand(-10,10),vx:z.dir*2,vy:rand(-.4,.4),life:0.4,color:'#cfe9ff'});
+      }
+    }
+  }
   player.x+=player.vx;
   if(player.x<0)player.x=W;if(player.x>W)player.x=0;
   if(player.vx<-0.1)player.facing=-1;else if(player.vx>0.1)player.facing=1;
@@ -1237,6 +1354,8 @@ function update(dt){
         if(player.y+player.r>=p.y&&player.y+player.r<=p.y+p.h+player.vy+2){
           player.y=p.y-player.r;
           if(p.type==='spring'){player.vy=-22;p.springT=1;burst(p.x+p.w/2,p.y,'#ffd54a',6);}
+          else if(p.type==='tramp'){player.vy=-30;p.springT=1;burst(p.x+p.w/2,p.y,'#e040fb',10);sfx('pickup');}
+          else if(p.type==='goal'){player.vy=-6;}
           else{player.vy=-13.5;}
           p.bounce=1;
           player.landedT=0.15;
@@ -1248,6 +1367,11 @@ function update(dt){
               p.dead=true; // remove it visually + physically
               for(const en of enemies)if(en.plat===p){en.alive=false;en.plat=null;}
             }
+          }
+          if(p.type==='fake'){
+            burst(p.x+p.w/2,p.y+6,'#b0bec5',14);
+            p.dead=true;
+            for(const en of enemies)if(en.plat===p){en.alive=false;en.plat=null;}
           }
         }
       }
@@ -1275,6 +1399,7 @@ function update(dt){
 
   // collectibles
   for(const c of collectibles){
+    if(c.y<cameraY-200||c.y>cameraY+H+200){c.t+=dt;continue;}
     if(c.taken)continue;
     c.t+=dt;
     if(Math.hypot(player.x-c.x,player.y-c.y)<player.r+10){
@@ -1332,6 +1457,32 @@ function update(dt){
   }
   comboT=Math.max(0,comboT-dt);
   if(comboT<=0)killCombo=0;
+
+  // ---- Fallen aus gebauten Maps (Stacheln, Sägen) ----
+  for(const hz of hazards){
+    if(hz.type==='saw'){
+      hz.ang+=dt*3.2;
+      const sx=hz.x+Math.cos(hz.ang)*hz.rad, sy=hz.y+Math.sin(hz.ang)*hz.rad;
+      hz.px=sx;hz.py=sy;
+      if(Math.hypot(player.x-sx,player.y-sy)<player.r*0.7+11){
+        if(player.invincible>0){}
+        else hurtOrDie();
+      }
+    }else{
+      if(Math.abs(player.x-hz.x)<hz.w/2+player.r-8&&Math.abs(player.y-(hz.y-hz.h/2))<hz.h/2+player.r-6){
+        if(player.invincible>0){}
+        else hurtOrDie();
+      }
+    }
+  }
+
+  // ---- Ziel erreicht (Map-Duell) ----
+  if(goalY!==null&&!mapRun.done&&player.y<=goalY+6){
+    mapRun.done=true;
+    burst(player.x,player.y,'#ffd700',40);addShake(6,0.3);
+    pushFloat(W/2,player.y-30,'ZIEL!','#ffd700');sfx('bossdie');
+    onGoalReached();
+  }
 
   // boss check
   if(!boss&&bestY>=nextBossScore){spawnBoss();}
@@ -1439,7 +1590,7 @@ function update(dt){
 
   // recycle platforms
   const topY=cameraY-100;
-  if(!boss){
+  if(!boss&&!customMap){
     while(platforms.length&&platforms[platforms.length-1].y>topY-20){
       const y=platforms[platforms.length-1].y-rand(60,90);
       spawnPlatform(y);
@@ -1455,7 +1606,8 @@ function update(dt){
 
   // fall off — during boss fight this still spends a life instead of instant game over
   if(player.y>cameraY+H+40){
-    if(boss&&player.bossLives>0){
+    if(customMap){mapFail();}
+    else if(boss&&player.bossLives>0){
       hurtPlayer();
       player.y=cameraY+H*0.4;player.vy=-16;player.x=W/2;
     } else die();
@@ -1512,8 +1664,34 @@ function hurtPlayer(){
   }
   die();
 }
+// Fallen/Gegner in gebauten Maps: Boss-Leben egal, aber kein Game Over — Neustart
+function hurtOrDie(){
+  if(customMap){mapFail();return;}
+  hurtPlayer();
+}
+// Tod in einer gebauten Map: kurzer Neustart derselben Map (kein Game Over)
+let mapFailT=0;
+function mapFail(){
+  if(mapRun.done||mapFailT>0)return;
+  mapRun.deaths++;
+  burst(player.x,player.y,'#ff5252',26);addShake(8,0.4);sfx('hurt');
+  mapFailT=0.8;
+  pushFloat(W/2,player.y-24,'NOCHMAL! ('+mapRun.deaths+'×)','#ff8a80');
+  setTimeout(()=>{
+    mapFailT=0;
+    if(!customMap||mapRun.done)return;
+    respawnCustom();
+  },700);
+}
+function respawnCustom(){
+  const keepPhase=mapRun.phase,keepDeaths=mapRun.deaths,keepStart=mapRun.startT;
+  reset();
+  mapRun.phase=keepPhase;mapRun.deaths=keepDeaths;mapRun.startT=keepStart;mapRun.done=false;
+  gameState='playing';showOverlay('playing');
+}
 function die(){
   if(gameOver)return;
+  if(customMap){mapFail();return;}
   gameOver=true;
   gameState='gameover';
   burst(player.x,player.y,'#ff5252',30);
@@ -1789,7 +1967,39 @@ function drawPlatform(p){
   const h=p.h*squish;
   const yy=y+(p.h-h);
   ctx.save();
-  if(p.type==='spring'){
+  if(p.type==='goal'){
+    // Ziel-Plattform: goldener Zielstreifen mit Flagge
+    const g=ctx.createLinearGradient(0,yy,0,yy+h);
+    g.addColorStop(0,'#ffe680');g.addColorStop(1,'#c9a227');
+    ctx.fillStyle=g;ctx.strokeStyle='#3a2a12';ctx.lineWidth=2;
+    roundRect(p.x,yy,p.w,h,4,true,true);
+    ctx.fillStyle='#111';
+    for(let i=0;i<p.w;i+=12)ctx.fillRect(p.x+i+(Math.floor(i/12)%2?6:0),yy+2,6,4);
+    ctx.strokeStyle='#eee';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(p.x+p.w/2,yy);ctx.lineTo(p.x+p.w/2,yy-26);ctx.stroke();
+    ctx.fillStyle='#7cfc00';ctx.fillRect(p.x+p.w/2,yy-26,18,12);
+    ctx.fillStyle='#fff';ctx.font="7px 'Press Start 2P', monospace";ctx.textAlign='center';
+    ctx.fillText('ZIEL',p.x+p.w/2,yy-30);ctx.textAlign='left';
+    ctx.restore();return;
+  } else if(p.type==='tramp'){
+    // Trampolin: dunkler Rahmen + violette Sprungmatte
+    ctx.strokeStyle='#6a1b9a';ctx.lineWidth=3;
+    ctx.beginPath();ctx.moveTo(p.x+3,yy+h+9);ctx.lineTo(p.x+7,yy+h);ctx.moveTo(p.x+p.w-3,yy+h+9);ctx.lineTo(p.x+p.w-7,yy+h);ctx.stroke();
+    const g=ctx.createLinearGradient(0,yy,0,yy+h);
+    g.addColorStop(0,'#ea80fc');g.addColorStop(1,'#8e24aa');
+    ctx.fillStyle=g;ctx.strokeStyle='#2a0a33';ctx.lineWidth=2;
+    roundRect(p.x,yy+(p.springT>0?3:0),p.w,h,6,true,true);
+    ctx.fillStyle='rgba(255,255,255,.5)';ctx.fillRect(p.x+5,yy+2,p.w-10,2);
+    ctx.restore();return;
+  } else if(p.type==='fake'){
+    // Fake-Plattform: sieht normal aus, bricht sofort weg
+    const g=ctx.createLinearGradient(0,yy,0,yy+h);
+    g.addColorStop(0,'#7fe89a');g.addColorStop(1,'#3aa856');
+    ctx.fillStyle=g;ctx.strokeStyle='#123a1c';ctx.lineWidth=2;
+    roundRect(p.x,yy,p.w,h,4,true,true);
+    ctx.fillStyle='rgba(255,255,255,.35)';ctx.fillRect(p.x+4,yy+2,p.w-8,2);
+    ctx.restore();return;
+  } else if(p.type==='spring'){
     // spring platform
     const sT=p.springT;
     ctx.strokeStyle='#111';ctx.lineWidth=2;
@@ -3593,7 +3803,56 @@ function drawBossPipePusher(bx,y,bw,bh,t){
   ctx.strokeStyle='#111';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(bx+11,y+4);ctx.quadraticCurveTo(bx+13,y+8,bx+15,y+4);ctx.stroke();
 }
 
+// ---------- Fallen & Wind (gebaute Maps) ----------
+function drawHazard(hz){
+  if(hz.type==='saw'){
+    const cx=hz.x,cy=hz.y-cameraY;
+    ctx.save();
+    ctx.strokeStyle='rgba(255,255,255,.18)';ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(cx,cy,hz.rad,0,Math.PI*2);ctx.stroke();
+    ctx.fillStyle='#455a64';ctx.beginPath();ctx.arc(cx,cy,4,0,Math.PI*2);ctx.fill();
+    const sx=cx+Math.cos(hz.ang)*hz.rad, sy=cy+Math.sin(hz.ang)*hz.rad;
+    ctx.translate(sx,sy);ctx.rotate(hz.ang*4);
+    ctx.fillStyle='#cfd8dc';ctx.strokeStyle='#263238';ctx.lineWidth=1.5;
+    ctx.beginPath();
+    for(let i=0;i<12;i++){const a=i*Math.PI/6,r=i%2?7:11;const px=Math.cos(a)*r,py=Math.sin(a)*r;i?ctx.lineTo(px,py):ctx.moveTo(px,py);}
+    ctx.closePath();ctx.fill();ctx.stroke();
+    ctx.fillStyle='#78909c';ctx.beginPath();ctx.arc(0,0,3,0,Math.PI*2);ctx.fill();
+    ctx.restore();
+  }else{
+    const y=hz.y-cameraY;
+    ctx.save();
+    ctx.fillStyle='#546e7a';ctx.fillRect(hz.x-hz.w/2,y-3,hz.w,4);
+    ctx.fillStyle='#eceff1';ctx.strokeStyle='#263238';ctx.lineWidth=1.2;
+    for(let i=0;i<5;i++){
+      const bx=hz.x-hz.w/2+3+i*(hz.w-6)/4.6;
+      ctx.beginPath();ctx.moveTo(bx,y-3);ctx.lineTo(bx+3.5,y-3-hz.h);ctx.lineTo(bx+7,y-3);ctx.closePath();ctx.fill();ctx.stroke();
+    }
+    ctx.restore();
+  }
+}
+function drawZone(z){
+  const y=z.y-cameraY;
+  if(y>H+60||y+z.h<-60)return;
+  ctx.save();
+  ctx.fillStyle='rgba(160,215,255,.10)';ctx.fillRect(z.x,y,z.w,z.h);
+  ctx.strokeStyle='rgba(200,235,255,.35)';ctx.lineWidth=1;ctx.strokeRect(z.x,y,z.w,z.h);
+  ctx.fillStyle='rgba(220,245,255,.55)';
+  const t=performance.now()/500;
+  for(let i=0;i<4;i++){
+    const ly=y+18+i*(z.h-30)/3;
+    const off=((t+i*0.3)%1)*z.w;
+    const ax=z.dir>0?z.x+off:z.x+z.w-off;
+    ctx.fillRect(Math.min(z.x+z.w-14,Math.max(z.x,ax)),ly,14,2);
+    ctx.beginPath();
+    if(z.dir>0){ctx.moveTo(ax+14,ly+1);ctx.lineTo(ax+8,ly-3);ctx.lineTo(ax+8,ly+5);}
+    else{ctx.moveTo(ax,ly+1);ctx.lineTo(ax+6,ly-3);ctx.lineTo(ax+6,ly+5);}
+    ctx.closePath();ctx.fill();
+  }
+  ctx.restore();
+}
 function render(){
+  if(gameState==='editor'){drawEditor();return;}
   ctx.save();
   if(shake.t>0){
     // ausklingende Schwingung statt Zufalls-Zittern -> saubere Kamera
@@ -3603,11 +3862,13 @@ function render(){
     ctx.translate(Math.sin(tt*47)*s,Math.cos(tt*61)*s*0.7);
   }
   drawBg();
+  for(const z of zones)drawZone(z);
   for(const p of platforms)drawPlatform(p);
+  for(const hz of hazards)drawHazard(hz);
   for(const c of collectibles)if(!c.taken)drawCollectible(c);
   for(const e of enemies)drawEnemy(e);
   // duel: opponent ghost on the shared map
-  if(duel.active&&duel.oppY!==null){
+  if(duel.active&&duel.oppY!==null&&!customMap){
     const gy=duel.oppY-cameraY;
     const onScreen=gy>-40&&gy<H+40;
     const oppSkin=SKINS.find(s=>s.id===duel.oppSkin)||SKINS[0];
@@ -3638,7 +3899,7 @@ function render(){
     ctx.restore();
   }
   // duel: lead indicator + countdown
-  if(duel.active){
+  if(duel.active&&!customMap){
     const lead=(duel.myBest||bestY)-duel.oppBest;
     ctx.save();
     ctx.font="9px 'Press Start 2P', monospace";ctx.textAlign='center';
@@ -3653,6 +3914,40 @@ function render(){
       ctx.fillText('VS '+(duel.oppName||'Gegner').slice(0,12),W/2,H/2+40);
     }
     ctx.restore();
+  }
+  // Map-Duell: Fortschrittsbalken statt Geister (jeder spielt eine andere Map)
+  if(customMap){
+    const prog=Math.max(0,Math.min(1,(START_Y-player.y)/(START_Y-GOAL_Y)));
+    const oppProg=Math.max(0,Math.min(1,(duel.oppProg||0)));
+    ctx.save();
+    ctx.font="8px 'Press Start 2P', monospace";ctx.textAlign='left';
+    const bar=(bx,by,p,col,label)=>{
+      ctx.fillStyle='rgba(0,0,0,.55)';ctx.fillRect(bx,by,10,150);
+      ctx.fillStyle=col;ctx.fillRect(bx+2,by+148-146*p,6,146*p);
+      ctx.strokeStyle='#000';ctx.lineWidth=1;ctx.strokeRect(bx,by,10,150);
+      ctx.fillStyle=col;ctx.fillText(label,bx-2,by-6);
+    };
+    bar(14,110,prog,'#7cfc00','DU');
+    if(mapRun.phase==='race')bar(W-24,110,oppProg,'#ff8a80','GEG');
+    ctx.fillStyle='#fff';ctx.textAlign='center';
+    ctx.fillText(Math.round(prog*100)+'%  ZIEL '+GOAL_M+'m',W/2,H-14);
+    if(mapRun.deaths)ctx.fillText('💀 '+mapRun.deaths,W/2,H-28);
+    ctx.textAlign='left';
+    ctx.restore();
+    // Renn-Countdown
+    if(duel.active&&duel.countdown>0){
+      ctx.save();
+      ctx.fillStyle='rgba(0,0,0,.55)';ctx.fillRect(0,0,W,H);
+      ctx.textAlign='center';ctx.fillStyle='#7cfc00';
+      ctx.font="12px 'Press Start 2P', monospace";
+      ctx.fillText('MAP VON '+String(duel.oppName||'GEGNER').toUpperCase().slice(0,12),W/2,H/2-60);
+      const n=Math.ceil(duel.countdown-0.2);
+      ctx.font="42px 'Press Start 2P', monospace";ctx.fillStyle='#ffd54a';
+      ctx.fillText(n>0?String(n):'GO!',W/2,H/2+10);
+      ctx.font="9px 'Press Start 2P', monospace";ctx.fillStyle='#fff';
+      ctx.fillText('WER ZUERST OBEN IST, GEWINNT',W/2,H/2+50);
+      ctx.textAlign='left';ctx.restore();
+    }
   }
   {
     const wc=weaponColors();
@@ -3772,7 +4067,7 @@ function loop(t){
     if(player.jetpackT>0)parts.push('🚀 JETPACK '+player.jetpackT.toFixed(1)+'s');
     if(player.gunT>0)parts.push('🔫 GUN '+player.gunT.toFixed(1)+'s');
     if(killCombo>1)parts.push('🔥 COMBO x'+killCombo);
-    if(duel.active)parts.push('⚔ '+(duel.oppName||'Gegner')+': '+duel.oppBest+'m');
+    if(duel.active)parts.push('⚔ '+(duel.oppName||'Gegner')+': '+(customMap?Math.round((duel.oppProg||0)*100)+'%':duel.oppBest+'m'));
   }
   const pTxt=parts.join('  ');
   if(pTxt!==hud.power){hud.power=pTxt;powerEl.textContent=pTxt;}
@@ -4120,18 +4415,21 @@ function duelResetRound(){
   duel.finished=false;duel.oppDead=false;duel.oppBest=0;duel.myBest=0;
   duel.oppY=null;duel.oppX=W/2;duel.oppFacing=1;
   duel.myRematch=false;duel.oppRematch=false;duel.oppOffline=false;
+  duel.oppMap=null;duel.myMapSent=false;duel.raceStarted=false;
+  duel.oppGoalT=0;duel.myGoalT=0;duel.oppProg=0;
   duel.lastSeen=Date.now();
 }
 function openDuel(){
   gameState='menu';showOverlay('duel');duelEl.style.display='flex';
   duelRematchBtn.style.display=(duel.active&&duel.code)?'block':'none';
-  if(!duel.code)duelSay('Erstelle einen Raum und teile den Link/Code. Sobald dein Gegner drin ist, geht es los – gleiche Map, gleiche Chancen.');
+  if(!duel.code)duelSay('<b style="color:#7cfc00">MAP-DUELL</b><br>Raum erstellen, Link teilen. Dann baut jeder eine Map (bis '+GOAL_M+'m) für den anderen – du musst sie einmal selbst schaffen, damit sie fair ist. Danach spielt jeder die Map des Gegners: wer zuerst oben ist, gewinnt!');
 }
 function closeDuel(){duelLeave();showOverlay('menu');goMenu();}
 function duelLeave(){
   if(duel.channel){try{duel.channel.send({type:'broadcast',event:'bye',payload:{}});}catch(_){}
     try{duel.channel.unsubscribe();}catch(_){}}
   duel.channel=null;duel.active=false;duel.code=null;duel.seed=null;duel.ready=false;duel.round=0;
+  duel.mapMode=false;customMap=null;mapRun.phase=null;mapRun.done=false;
   duelResetRound();
   duelCopyBtn.style.display='none';duelRematchBtn.style.display='none';
 }
@@ -4150,12 +4448,26 @@ async function duelJoin(code,role){
     duel.oppSkin=payload.skin||'classic';
     duel.lastSeen=Date.now();
     if(!helloReplied){helloReplied=true;ch.send({type:'broadcast',event:'hello',payload:{name:myDuelName(),skin:selectedSkin}});}
-    if(!duel.ready){duel.ready=true;duelStart();}
+    if(!duel.ready){duel.ready=true;duelBeginBuild();}
   });
   ch.on('broadcast',{event:'state'},({payload})=>{
     duel.oppBest=Math.max(duel.oppBest,payload.b||0);
     duel.oppY=payload.y;duel.oppX=payload.x;duel.oppFacing=payload.f||1;
+    if(typeof payload.p==='number')duel.oppProg=payload.p;
     duel.lastSeen=Date.now();duel.oppOffline=false;
+  });
+  // Map-Duell: fertige Map des Gegners
+  ch.on('broadcast',{event:'map'},({payload})=>{
+    duel.oppMap=(payload&&Array.isArray(payload.parts))?payload.parts:[];
+    duel.lastSeen=Date.now();
+    if(gameState==='menu')duelSay('Map vom Gegner ist da! '+(duel.myMapSent?'Los geht’s…':'Baue und sende deine Map.'));
+    tryStartRace();
+  });
+  // Map-Duell: Gegner hat das Ziel erreicht
+  ch.on('broadcast',{event:'goal'},({payload})=>{
+    duel.oppGoalT=(payload&&payload.t)||1;
+    duel.lastSeen=Date.now();
+    if(!duel.myGoalT)finishMapDuel(false);
   });
   ch.on('broadcast',{event:'end'},({payload})=>{
     duel.oppBest=Math.max(duel.oppBest,payload.b||0);
@@ -4170,6 +4482,7 @@ async function duelJoin(code,role){
     duel.oppOffline=true;
     duelSay('<span style="color:#ff8a80">Gegner hat das Duell verlassen.</span>');
   });
+  ch.on('broadcast',{event:'ping'},()=>{duel.lastSeen=Date.now();duel.oppOffline=false;});
   ch.subscribe((status)=>{
     if(status==='SUBSCRIBED'){
       duelSay('Raum <b style="color:#7cfc00">'+code+'</b><br>'+(role==='host'?'Warte auf Gegner…':'Verbinde mit Host…'));
@@ -4202,12 +4515,14 @@ function duelTryRematch(){
   if(duel.myRematch&&duel.oppRematch){
     duel.round=(duel.round||0)+1;
     duelGameOverBtn.disabled=false;duelGameOverBtn.textContent='⚔ Revanche';
-    duelStart();
+    duel.myRematch=false;duel.oppRematch=false;
+    duelBeginBuild();
   }
 }
 function duelSendState(){
   if(!duel.active||!duel.channel||gameState!=='playing'||!player)return;
-  duel.channel.send({type:'broadcast',event:'state',payload:{y:player.y,x:player.x,b:bestY,f:player.facing}});
+  const prog=customMap?Math.max(0,Math.min(1,(START_Y-player.y)/(START_Y-GOAL_Y))):0;
+  duel.channel.send({type:'broadcast',event:'state',payload:{y:player.y,x:player.x,b:bestY,f:player.facing,p:prog}});
 }
 function duelSendEnd(){
   duel.myBest=Math.max(duel.myBest,bestY);
@@ -4216,6 +4531,7 @@ function duelSendEnd(){
 }
 function duelCheckResult(){
   if(!duel.active||duel.finished)return;
+  if(duel.mapMode)return;   // Map-Duell entscheidet über das Ziel, nicht über Höhe
   if(gameState!=='gameover')return;
   if(!duel.oppDead&&!duel.oppOffline)return;
   duel.finished=true;
@@ -4244,6 +4560,11 @@ overEl.insertBefore(duelGameOverBtn,document.getElementById('duelResult'));
 
 setInterval(()=>{
   if(duel.active&&gameState==='playing'){duel.myBest=Math.max(duel.myBest,bestY);duelSendState();}
+  // Lebenszeichen während Bauphase/Menüs, damit der Watchdog nicht fälschlich auslöst
+  if(duel.active&&duel.channel&&gameState!=='playing'&&Date.now()-(duel.lastPing||0)>2000){
+    duel.lastPing=Date.now();
+    try{duel.channel.send({type:'broadcast',event:'ping',payload:{}});}catch(_){}
+  }
   // watchdog: opponent silent for too long
   if(duel.active&&duel.ready&&!duel.oppDead&&duel.lastSeen&&Date.now()-duel.lastSeen>9000){
     duel.oppOffline=true;
@@ -4279,9 +4600,310 @@ document.getElementById('duelCreate').onclick=()=>{
   }
 })();
 
+// ================= MAP-DUELL: Editor + Rennen =================
+const edBarEl=document.getElementById('edBar');
+const edPalEl=document.getElementById('edPal');
+const edMsgEl=document.getElementById('edMsg');
+const edPhaseEl=document.getElementById('edPhase');
+const edBudgetEl=document.getElementById('edBudget');
+const edScrollEl=document.getElementById('edScroll');
+const edSendBtn=document.getElementById('edSend');
+const ed={cam:0,tool:'plat',parts:[],hist:[],verified:false,rev:0,world:null,worldRev:-1,cursor:null,valid:null};
+const CAM_MIN=GOAL_Y-90, CAM_MAX=0;
+const CAT_NAMES={plat:'PLATTF.',boost:'BOOST',trap:'FALLE',enemy:'GEGNER',item:'ITEM'};
+
+function edTouch(){ed.rev++;ed.verified=false;edValidate();edRefreshUI();}
+function edCount(cat){let n=0;for(const q of ed.parts)if(PART_BY_K[q.k]&&PART_BY_K[q.k].cat===cat)n++;return n;}
+function edWorld(){
+  if(ed.worldRev===ed.rev&&ed.world)return ed.world;
+  const out={platforms:[],collectibles:[],enemies:[],hazards:[],zones:[]};
+  buildCustomWorld({parts:ed.parts},out);
+  ed.world=out;ed.worldRev=ed.rev;return out;
+}
+// --- Erreichbarkeits-Check: verhindert offensichtlich unspielbare Maps ---
+function edValidate(){
+  const nodes=[{x:W/2,y:START_Y,k:'plat'}];
+  for(const q of ed.parts)if(PLAT_KINDS[q.k])nodes.push(q);
+  const goal={x:W/2,y:GOAL_Y,k:'goal'};
+  nodes.push(goal);
+  const reach=new Set([0]);
+  const jumpH=q=>q.k==='spring'?400:q.k==='tramp'?720:190;
+  let changed=true;
+  while(changed){
+    changed=false;
+    for(let i=0;i<nodes.length;i++){
+      if(!reach.has(i))continue;
+      const a=nodes[i],up=jumpH(a.k);
+      for(let j=0;j<nodes.length;j++){
+        if(reach.has(j))continue;
+        const b=nodes[j];
+        let dx=Math.abs(a.x-b.x);dx=Math.min(dx,W-dx); // Bildschirmrand-Wrap
+        const dy=a.y-b.y;
+        const okUp=dy>0&&dy<=up&&dx<=210;
+        const okDown=dy<=0&&-dy<=520&&dx<=230;
+        if(okUp||okDown){reach.add(j);changed=true;}
+      }
+    }
+  }
+  const bad=[];
+  for(let i=1;i<nodes.length-1;i++)if(!reach.has(i))bad.push(nodes[i]);
+  ed.valid={ok:reach.has(nodes.length-1),bad,nodes};
+  return ed.valid;
+}
+function edRefreshUI(){
+  const c=ed.valid||edValidate();
+  edBudgetEl.textContent=edCount('plat')+'/'+BUDGET.plat+' ▬  '+edCount('boost')+'/'+BUDGET.boost+' ⇧  '+edCount('trap')+'/'+BUDGET.trap+' ▲  '+edCount('enemy')+'/'+BUDGET.enemy+' 👮  '+edCount('item')+'/'+BUDGET.item+' 🌿';
+  edSendBtn.disabled=!ed.verified;
+  if(!ed.msgSticky){
+    if(ed.verified)edMsgEl.innerHTML='<span style="color:#7cfc00">✔ Selbst geschafft – jetzt senden!</span>';
+    else if(!c.ok)edMsgEl.innerHTML='<span style="color:#ff8a80">✘ Weg zum Ziel unterbrochen</span>';
+    else if(c.bad.length)edMsgEl.innerHTML='<span style="color:#ffd54a">⚠ '+c.bad.length+' Teil(e) unerreichbar</span> – Test läuft trotzdem';
+    else edMsgEl.innerHTML='Weg sieht gut aus – jetzt <b>▶ TEST</b> spielen (Pflicht!)';
+  }
+}
+function edSay(html,sticky){edMsgEl.innerHTML=html;ed.msgSticky=!!sticky;if(sticky)setTimeout(()=>{ed.msgSticky=false;edRefreshUI();},1800);}
+function edSetCam(y){ed.cam=Math.max(CAM_MIN,Math.min(CAM_MAX,y));edScrollEl.value=String(Math.round((ed.cam-CAM_MIN)/(CAM_MAX-CAM_MIN)*1000));}
+function edSnap(v){return Math.round(v/10)*10;}
+
+function edPlace(lx,ly){
+  const wy=edSnap(ly+ed.cam), wx=edSnap(Math.max(24,Math.min(W-24,lx)));
+  if(ed.tool==='erase'){
+    let bi=-1,bd=1e9;
+    for(let i=0;i<ed.parts.length;i++){
+      const d=Math.hypot(ed.parts[i].x-wx,ed.parts[i].y-wy);
+      if(d<40&&d<bd){bd=d;bi=i;}
+    }
+    if(bi>=0){const rem=ed.parts.splice(bi,1)[0];ed.hist.push({t:'del',p:rem,i:bi});edTouch();sfx('pickup');}
+    else edSay('Nichts zum Löschen hier.',true);
+    return;
+  }
+  const def=PART_BY_K[ed.tool];if(!def)return;
+  if(wy>START_Y-70){edSay('Zu nah an der Startplattform.',true);return;}
+  if(wy<GOAL_Y+60){edSay('Zu nah am Ziel.',true);return;}
+  if(edCount(def.cat)>=BUDGET[def.cat]){edSay('Budget für '+CAT_NAMES[def.cat]+' aufgebraucht.',true);return;}
+  if(PLAT_KINDS[def.k]){
+    for(const q of ed.parts){
+      if(!PLAT_KINDS[q.k])continue;
+      if(Math.abs(q.y-wy)<24&&Math.abs(q.x-wx)<76){edSay('Da liegt schon eine Plattform.',true);return;}
+    }
+  }
+  if(def.cat==='enemy'||def.k==='spike'){
+    let host=null;
+    const cand=[{x:W/2,y:START_Y,k:'plat'}].concat(ed.parts.filter(q=>PLAT_KINDS[q.k]));
+    for(const q of cand){
+      const pw=q.k==='tramp'?70:80;
+      if(Math.abs(q.y-wy)<52&&wx>q.x-pw/2-8&&wx<q.x+pw/2+8){host=q;break;}
+    }
+    if(!host){edSay((def.cat==='enemy'?'Gegner':'Stacheln')+' brauchen eine Plattform darunter.',true);return;}
+    ed.parts.push({k:def.k,x:host.x,y:host.y});ed.hist.push({t:'add'});edTouch();sfx('pickup');return;
+  }
+  ed.parts.push({k:def.k,x:wx,y:wy});ed.hist.push({t:'add'});edTouch();sfx('pickup');
+}
+function edUndo(){
+  const h=ed.hist.pop();if(!h)return;
+  if(h.t==='add')ed.parts.pop();
+  else ed.parts.splice(h.i,0,h.p);
+  edTouch();
+}
+
+// ---------- Editor-Rendering ----------
+function drawEditor(){
+  cameraY=ed.cam;
+  bestY=Math.max(0,Math.round((START_Y-ed.cam-H*0.4)/10));
+  drawBg();
+  const w=edWorld();
+  for(const z of w.zones)drawZone(z);
+  // Raster + Höhenmarken
+  ctx.save();
+  ctx.strokeStyle='rgba(255,255,255,.10)';ctx.lineWidth=1;
+  ctx.font="7px 'Press Start 2P', monospace";ctx.textAlign='left';
+  const step=200;
+  const top=ed.cam-step, bot=ed.cam+H+step;
+  for(let wy=Math.ceil(bot/step)*step;wy>top;wy-=step){
+    const y=wy-ed.cam;
+    ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.45)';
+    ctx.fillText(Math.round((START_Y-wy)/10)+'m',4,y-3);
+  }
+  ctx.restore();
+  for(const p of w.platforms)drawPlatform(p);
+  for(const hz of w.hazards)drawHazard(hz);
+  for(const c of w.collectibles)drawCollectible(c);
+  for(const e of w.enemies)drawEnemy(e);
+  // unerreichbare Teile markieren
+  if(ed.valid&&ed.valid.bad.length){
+    ctx.save();ctx.strokeStyle='#ff5252';ctx.lineWidth=2;
+    for(const b of ed.valid.bad){
+      const y=b.y-ed.cam;if(y<-40||y>H+40)continue;
+      ctx.beginPath();ctx.moveTo(b.x-16,y-10);ctx.lineTo(b.x+16,y+14);ctx.moveTo(b.x+16,y-10);ctx.lineTo(b.x-16,y+14);ctx.stroke();
+    }
+    ctx.restore();
+  }
+  // Cursor-Vorschau
+  if(ed.cursor){
+    ctx.save();ctx.globalAlpha=0.5;
+    const def=PART_BY_K[ed.tool];
+    ctx.fillStyle=ed.tool==='erase'?'#ff5252':'#7cfc00';
+    ctx.font="18px 'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace";ctx.textAlign='center';
+    ctx.fillText(ed.tool==='erase'?'✕':(def?def.icon:'?'),ed.cursor.x,ed.cursor.y+6);
+    ctx.restore();
+  }
+  // Kopfzeile
+  ctx.save();
+  ctx.fillStyle='rgba(0,0,0,.5)';ctx.fillRect(0,0,W,26);
+  ctx.fillStyle='#7cfc00';ctx.font="9px 'Press Start 2P', monospace";ctx.textAlign='center';
+  ctx.fillText('MAP FÜR '+String(duel.oppName||'GEGNER').toUpperCase().slice(0,10),W/2,17);
+  ctx.restore();
+}
+
+// ---------- Test- und Renn-Läufe ----------
+function startMapRun(parts,phase){
+  customMap={parts:parts.slice()};
+  mapRun.phase=phase;mapRun.deaths=0;mapRun.done=false;mapRun.startT=Date.now();
+  mapFailT=0;
+  reset();
+  gameState='playing';showOverlay('playing');
+  if(phase==='race'){duel.countdown=3.2;stopMusic();tryPlayMusic();}
+  else tryPlayMusic();
+}
+function exitToEditor(msg){
+  customMap=null;mapRun.phase=null;mapRun.done=false;
+  gameState='editor';showOverlay('editor');
+  edValidate();edRefreshUI();
+  if(msg)edSay(msg,true);
+}
+function onGoalReached(){
+  if(mapRun.phase==='test'){
+    ed.verified=true;
+    setTimeout(()=>exitToEditor('<span style="color:#7cfc00">✔ Map bestätigt spielbar!</span>'),900);
+    return;
+  }
+  if(mapRun.phase==='race'){
+    const t=Date.now()-mapRun.startT;
+    if(duel.channel)duel.channel.send({type:'broadcast',event:'goal',payload:{t}});
+    duel.myGoalT=t;
+    setTimeout(()=>finishMapDuel(!duel.oppGoalT),700);
+  }
+}
+function finishMapDuel(win){
+  if(duel.finished)return;
+  duel.finished=true;
+  gameState='gameover';gameOver=true;
+  const res=document.getElementById('duelResult');
+  finalScore.textContent='Map von '+(duel.oppName||'Gegner');
+  finalHigh.textContent='Versuche: '+(mapRun.deaths+1);
+  finalBags.textContent='🌿 '+totalBags;
+  if(win){
+    const bonus=200;totalBags+=bonus;localStorage.setItem(BK,totalBags);updateBagsUI();
+    res.innerHTML='🏆 <b>GEWONNEN!</b> Du warst zuerst oben (+🌿'+bonus+')';
+    missionProgress('duelwin',1);
+  }else{
+    res.innerHTML='💀 Verloren – dein Gegner war zuerst am Ziel.';
+  }
+  duelGameOverBtn.style.display='block';
+  customMap=null;mapRun.phase=null;
+  showOverlay('gameover');
+}
+
+// ---------- Bauphase / Netzwerk ----------
+function duelBeginBuild(){
+  duel.active=true;duel.mapMode=true;
+  duel.myMapSent=false;duel.oppMap=null;duel.oppGoalT=0;duel.myGoalT=0;duel.oppProg=0;
+  duel.finished=false;duel.raceStarted=false;
+  customMap=null;mapRun.phase=null;mapRun.done=false;
+  ed.parts=[];ed.hist=[];ed.verified=false;ed.rev++;ed.world=null;ed.worldRev=-1;
+  edSetCam(CAM_MAX);
+  gameState='editor';showOverlay('editor');
+  edValidate();edRefreshUI();
+  edPhaseEl.textContent='MAP BAUEN';
+}
+function duelSendMap(){
+  if(!ed.verified){edSay('Erst selbst schaffen (▶ TEST), dann senden.',true);return;}
+  duel.myMapSent=true;
+  if(duel.channel)duel.channel.send({type:'broadcast',event:'map',payload:{parts:ed.parts}});
+  if(duel.oppMap)tryStartRace();
+  else{
+    gameState='menu';showOverlay('duel');duelEl.style.display='flex';
+    duelSay('Map gesendet ✔<br>Warte auf die Map von <b style="color:#7cfc00">'+escHtml(duel.oppName||'Gegner')+'</b>…');
+  }
+}
+function tryStartRace(){
+  if(duel.raceStarted||!duel.myMapSent||!duel.oppMap)return;
+  duel.raceStarted=true;
+  duelEl.style.display='none';
+  document.getElementById('duelResult').textContent='';
+  duelGameOverBtn.style.display='none';
+  startMapRun(duel.oppMap,'race');
+}
+
+// ---------- Editor-Bedienung ----------
+for(const def of PARTS.concat([{k:'erase',cat:null,icon:'✕',name:'Radier'}])){
+  const b=document.createElement('button');
+  b.innerHTML='<span>'+def.icon+'</span><b>'+def.name+'</b>';
+  b.dataset.k=def.k;
+  b.onclick=()=>{ed.tool=def.k;for(const o of edPalEl.children)o.classList.toggle('on',o.dataset.k===def.k);};
+  if(def.k==='plat')b.classList.add('on');
+  edPalEl.appendChild(b);
+}
+edScrollEl.addEventListener('input',()=>{
+  const t=Number(edScrollEl.value)/1000;
+  ed.cam=CAM_MIN+(CAM_MAX-CAM_MIN)*t;
+});
+document.getElementById('edUndo').onclick=()=>edUndo();
+document.getElementById('edClear').onclick=()=>{if(!ed.parts.length)return;ed.parts=[];ed.hist=[];edTouch();edSay('Map geleert.',true);};
+document.getElementById('edTest').onclick=()=>{
+  if(!ed.parts.length){edSay('Baue erst ein paar Teile.',true);return;}
+  startMapRun(ed.parts,'test');
+};
+edSendBtn.onclick=()=>duelSendMap();
+// Abbruch-Button im Pause-Menü (nur im Testlauf)
+const edBackBtn=document.createElement('button');
+edBackBtn.className='btn alt';edBackBtn.textContent='✏ Zurück zum Editor';
+edBackBtn.style.display='none';
+edBackBtn.onclick=()=>{resumeGuard=false;exitToEditor();};
+pauseEl.appendChild(edBackBtn);
+let resumeGuard=false;
+const _pauseGame=pauseGame;
+pauseGame=function(){_pauseGame();edBackBtn.style.display=(mapRun.phase==='test')?'block':'none';};
+
+// Zeigen/Verstecken je Zustand
+(function edPointer(){
+  let down=null,moved=false;
+  const toLogic=(e)=>{
+    const r=cv.getBoundingClientRect();
+    return {x:(e.clientX-r.left)/r.width*W,y:(e.clientY-r.top)/r.height*H};
+  };
+  cv.addEventListener('pointerdown',e=>{
+    if(gameState!=='editor')return;
+    const p=toLogic(e);
+    down={x:p.x,y:p.y,cam:ed.cam};moved=false;ed.cursor=p;
+  });
+  cv.addEventListener('pointermove',e=>{
+    if(gameState!=='editor')return;
+    const p=toLogic(e);ed.cursor=p;
+    if(!down)return;
+    if(Math.abs(p.y-down.y)>10||moved){
+      moved=true;
+      edSetCam(down.cam-(p.y-down.y));
+    }
+  });
+  const up=(e)=>{
+    if(gameState!=='editor'||!down)return;
+    const p=toLogic(e);
+    if(!moved)edPlace(p.x,p.y);
+    down=null;
+  };
+  cv.addEventListener('pointerup',up);
+  cv.addEventListener('pointercancel',()=>{down=null;});
+  cv.addEventListener('pointerleave',()=>{ed.cursor=null;});
+})();
+
 reset();
 goMenu();
 requestAnimationFrame(loop);
+// kleine Debug-Brücke (nur zum Testen des Editors/Duells)
+window.__afro={ed,duel,mapRun,duelBeginBuild,startMapRun,exitToEditor,
+  get state(){return gameState;},get player(){return player;},get goalY(){return goalY;},get customMap(){return customMap;}};
 })();
 </script>
 </body>
