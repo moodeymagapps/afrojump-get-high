@@ -527,9 +527,9 @@ let totalBags=+localStorage.getItem(BK)||0;
 let grant2000=true;
 localStorage.setItem(GK,'1');
 function applyStarterGrant(){return false;}
-const DEFAULT_SKIN='bob';
-let owned=JSON.parse(localStorage.getItem(OK)||'["bob"]');
-// Migration: alter Standard-Skin heißt jetzt "Bob"
+const DEFAULT_SKIN='james';
+let owned=JSON.parse(localStorage.getItem(OK)||'["james"]');
+// Migration: alter Standard-Skin heißt jetzt "James"
 owned=owned.map(id=>id==='revengebird'?'bob':id);
 if(!owned.includes(DEFAULT_SKIN))owned.push(DEFAULT_SKIN);
 let selectedSkin=localStorage.getItem(SK)||DEFAULT_SKIN;
@@ -539,7 +539,8 @@ highEl.textContent='Best: '+highScore+'m';
 // Skins catalog
 const SKINS=[
   // ---- Nur noch die Pixel-Art Community-Skins ----
-  {id:'bob',        name:'Bob',        price:0,    community:true, rarity:'legendary', img:'skins/bob.png',        anchorY:0.72},
+  {id:'james',      name:'James',      price:0,    community:true, rarity:'legendary', img:'skins/james.png',      anchorY:0.72},
+  {id:'bob',        name:'Bob',        price:50,   community:true, rarity:'rare',      img:'skins/bob.png',        anchorY:0.72},
   {id:'ina',        name:'Ina',        price:900,  community:true, rarity:'epic',      img:'skins/ina.png',        anchorY:0.72},
   {id:'sierrakidd', name:'Sierra Kidd',price:1100, community:true, rarity:'epic',      img:'skins/sierrakidd.jpg', anchorY:0.72},
   {id:'danjo420',   name:'Danjo420',   price:1100, community:true, rarity:'epic',      img:'skins/danjo420.jpg',   anchorY:0.74},
