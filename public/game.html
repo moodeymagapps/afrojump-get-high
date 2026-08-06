@@ -4629,7 +4629,17 @@ async function duelJoin(code,role){
     duel.oppSkin=payload.skin||'classic';
     duel.lastSeen=Date.now();
     if(!helloReplied){helloReplied=true;ch.send({type:'broadcast',event:'hello',payload:{name:myDuelName(),skin:selectedSkin}});}
+    if(isDuelHost()){try{ch.send({type:'broadcast',event:'cfg',payload:{size:duelCfg.size,budget:duelCfg.budget}});}catch(_){}}
     if(!duel.ready){duel.ready=true;duelBeginBuild();}
+  });
+  // Host-Einstellungen (Map-Größe / Budget)
+  ch.on('broadcast',{event:'cfg'},({payload})=>{
+    if(isDuelHost()||!payload)return;
+    if(MAP_SIZES.some(s=>s.m===payload.size))duelCfg.size=payload.size;
+    if(payload.budget==='inf'||payload.budget==='normal')duelCfg.budget=payload.budget;
+    applyDuelCfg();
+    if(gameState==='menu')renderDuelCfg();
+    duel.lastSeen=Date.now();
   });
   ch.on('broadcast',{event:'state'},({payload})=>{
     duel.oppBest=Math.max(duel.oppBest,payload.b||0);
