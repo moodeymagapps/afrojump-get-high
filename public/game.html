@@ -976,7 +976,8 @@ function renderBoxes(){
 // ---- Loot-Ziehung + Öffnungs-Animation ----
 function lootPool(rarity){
   const out=[];
-  for(const s of SKINS)if(s.rarity===rarity)out.push({kind:'skin',id:s.id,name:s.name,rarity,ref:s});
+  // Charakter-Skins sind kaufbar -> Tütchen enthalten nur Waffen-/Joint-Skins
+  for(const s of SKINS)if(s.rarity===rarity&&s.lootOnly)out.push({kind:'skin',id:s.id,name:s.name,rarity,ref:s});
   for(const w of WEAPON_SKINS)if(w.rarity===rarity&&!w.free)out.push({kind:'weapon',id:w.id,name:w.name+' (Waffe)',rarity,ref:w});
   for(const j of JOINT_SKINS)if(j.rarity===rarity&&!j.free)out.push({kind:'joint',id:j.id,name:j.name+' (Joint)',rarity,ref:j});
   return out;
