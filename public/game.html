@@ -1084,6 +1084,12 @@ document.getElementById('overMenu').onclick=()=>goMenu();
 
 // State
 let player,platforms,collectibles,enemies,projectiles,particles,smokeParticles,floatTexts,cameraY,bestY,scrollLocked,boss,bossTimer,nextBossScore,gameOver,rngSeed,runBags;
+// Map-Duell: selbstgebaute Map (parts) + Laufzustand
+let hazards=[],zones=[],goalY=null,customMap=null;
+const GOAL_M=1200;                 // Ziel-Höhe einer gebauten Map
+const START_Y=H-40;                // Start-Plattform
+const GOAL_Y=START_Y-GOAL_M*10;    // Weltkoordinate des Ziels
+const mapRun={phase:null,deaths:0,startT:0,done:false}; // 'test' | 'race'
 // duel state (1v1 online)
 const duel={active:false,code:null,seed:null,role:null,channel:null,ready:false,round:0,
   myBest:0,oppBest:0,oppDead:false,oppY:null,oppX:W/2,oppFacing:1,oppSkin:'classic',
