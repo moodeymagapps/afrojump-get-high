@@ -4732,7 +4732,8 @@ const edBudgetEl=document.getElementById('edBudget');
 const edScrollEl=document.getElementById('edScroll');
 const edSendBtn=document.getElementById('edSend');
 const ed={cam:0,tool:'plat',parts:[],hist:[],verified:false,rev:0,world:null,worldRev:-1,cursor:null,valid:null};
-const CAM_MIN=GOAL_Y-90, CAM_MAX=0;
+var CAM_MIN=GOAL_Y-90;
+const CAM_MAX=0;
 const CAT_NAMES={plat:'PLATTF.',boost:'BOOST',trap:'FALLE',enemy:'GEGNER',item:'ITEM'};
 
 function edTouch(){ed.rev++;ed.verified=false;edValidate();edRefreshUI();}
