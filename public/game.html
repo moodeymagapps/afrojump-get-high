@@ -1659,6 +1659,7 @@ function hurtPlayer(){
 }
 function die(){
   if(gameOver)return;
+  if(customMap){mapFail();return;}
   gameOver=true;
   gameState='gameover';
   burst(player.x,player.y,'#ff5252',30);
