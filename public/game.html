@@ -4567,7 +4567,43 @@ function duelResetRound(){
 function openDuel(){
   gameState='menu';showOverlay('duel');duelEl.style.display='flex';
   duelRematchBtn.style.display=(duel.active&&duel.code)?'block':'none';
-  if(!duel.code)duelSay('<b style="color:#7cfc00">MAP-DUELL</b><br>Raum erstellen, Link teilen. Dann baut jeder eine Map (bis '+GOAL_M+'m) für den anderen – du musst sie einmal selbst schaffen, damit sie fair ist. Danach spielt jeder die Map des Gegners: wer zuerst oben ist, gewinnt!');
+  renderDuelCfg();
+  if(!duel.code)duelSay('<b style="color:#7cfc00">MAP-DUELL</b><br>Raum erstellen, Link teilen. Dann baut jeder eine Map (bis '+duelCfg.size+'m) für den anderen – du musst sie einmal selbst schaffen, damit sie fair ist. Danach spielt jeder die Map des Gegners: wer zuerst oben ist, gewinnt!');
+}
+// ---- Lobby-Einstellungen: Größe + Budget (Host entscheidet) ----
+const duelCfgEl=document.getElementById('duelCfg');
+const cfgSizeEl=document.getElementById('cfgSize');
+const cfgBudgetEl=document.getElementById('cfgBudget');
+const cfgNoteEl=document.getElementById('cfgNote');
+function isDuelHost(){return duel.role!=='guest';}
+function renderDuelCfg(){
+  const host=isDuelHost();
+  duelCfgEl.classList.toggle('locked',!host);
+  cfgSizeEl.innerHTML='';
+  for(const s of MAP_SIZES){
+    const b=document.createElement('button');
+    b.textContent=s.label;
+    b.className=duelCfg.size===s.m?'on':'';
+    b.onclick=()=>{if(!host)return;duelCfg.size=s.m;pushDuelCfg();};
+    cfgSizeEl.appendChild(b);
+  }
+  cfgBudgetEl.innerHTML='';
+  for(const o of [{k:'normal',l:'NORMAL'},{k:'inf',l:'UNENDLICH ∞'}]){
+    const b=document.createElement('button');
+    b.textContent=o.l;
+    b.className=duelCfg.budget===o.k?'on':'';
+    b.onclick=()=>{if(!host)return;duelCfg.budget=o.k;pushDuelCfg();};
+    cfgBudgetEl.appendChild(b);
+  }
+  cfgNoteEl.textContent=host?'Ziel: '+duelCfg.size+'m · Budget: '+(duelCfg.budget==='inf'?'unendlich':'normal'):'Host stellt ein · Ziel '+duelCfg.size+'m · Budget '+(duelCfg.budget==='inf'?'unendlich':'normal');
+  applyDuelCfg();
+}
+function pushDuelCfg(){
+  applyDuelCfg();
+  renderDuelCfg();
+  if(duel.channel&&isDuelHost()){
+    try{duel.channel.send({type:'broadcast',event:'cfg',payload:{size:duelCfg.size,budget:duelCfg.budget}});}catch(_){}
+  }
 }
 function closeDuel(){duelLeave();showOverlay('menu');goMenu();}
 function duelLeave(){
