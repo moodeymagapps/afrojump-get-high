@@ -1392,6 +1392,7 @@ function update(dt){
 
   // collectibles
   for(const c of collectibles){
+    if(c.y<cameraY-200||c.y>cameraY+H+200){c.t+=dt;continue;}
     if(c.taken)continue;
     c.t+=dt;
     if(Math.hypot(player.x-c.x,player.y-c.y)<player.r+10){
@@ -1449,6 +1450,32 @@ function update(dt){
   }
   comboT=Math.max(0,comboT-dt);
   if(comboT<=0)killCombo=0;
+
+  // ---- Fallen aus gebauten Maps (Stacheln, Sägen) ----
+  for(const hz of hazards){
+    if(hz.type==='saw'){
+      hz.ang+=dt*3.2;
+      const sx=hz.x+Math.cos(hz.ang)*hz.rad, sy=hz.y+Math.sin(hz.ang)*hz.rad;
+      hz.px=sx;hz.py=sy;
+      if(Math.hypot(player.x-sx,player.y-sy)<player.r*0.7+11){
+        if(player.invincible>0){}
+        else hurtOrDie();
+      }
+    }else{
+      if(Math.abs(player.x-hz.x)<hz.w/2+player.r-8&&Math.abs(player.y-(hz.y-hz.h/2))<hz.h/2+player.r-6){
+        if(player.invincible>0){}
+        else hurtOrDie();
+      }
+    }
+  }
+
+  // ---- Ziel erreicht (Map-Duell) ----
+  if(goalY!==null&&!mapRun.done&&player.y<=goalY+6){
+    mapRun.done=true;
+    burst(player.x,player.y,'#ffd700',40);addShake(6,0.3);
+    pushFloat(W/2,player.y-30,'ZIEL!','#ffd700');sfx('bossdie');
+    onGoalReached();
+  }
 
   // boss check
   if(!boss&&bestY>=nextBossScore){spawnBoss();}
