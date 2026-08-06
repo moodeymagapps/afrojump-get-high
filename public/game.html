@@ -1125,6 +1125,14 @@ function reset(){
   killCombo=0;comboT=0;runKills=0;bossIndex=0;
   duel.myBest=0;duel.oppBest=0;duel.oppDead=false;duel.oppY=null;duel.oppX=W/2;duel.finished=false;
   stopBossMusic();
+  hazards=[];zones=[];goalY=null;
+  if(customMap){
+    buildCustomWorld(customMap,{platforms,collectibles,enemies,hazards,zones});
+    goalY=GOAL_Y;
+    nextBossScore=Infinity;   // keine Bosse in gebauten Maps
+    player.y=START_Y-30;
+    return;
+  }
   // starting platform
   platforms.push({x:W/2-40,y:H-40,w:80,h:12,vx:0,type:'normal',dir:1,range:0,ox:W/2-40,bounce:0,cracked:0});
   let py=H-40;
@@ -1132,6 +1140,64 @@ function reset(){
     py-=rand(60,90);
     spawnPlatform(py);
   }
+}
+
+// ---------- Bau-Teile: eine Definition für Editor UND Spielwelt ----------
+const PARTS=[
+  {k:'plat',  cat:'plat', icon:'▬',  name:'Platte'},
+  {k:'move',  cat:'plat', icon:'↔',  name:'Beweg.'},
+  {k:'brit',  cat:'plat', icon:'▨',  name:'Brüchig'},
+  {k:'fake',  cat:'plat', icon:'▢',  name:'Fake'},
+  {k:'spring',cat:'boost',icon:'⇧',  name:'Feder'},
+  {k:'tramp', cat:'boost',icon:'⤒',  name:'Trampo'},
+  {k:'rocket',cat:'boost',icon:'🚀', name:'Rakete'},
+  {k:'wind',  cat:'boost',icon:'🌬', name:'Wind'},
+  {k:'spike', cat:'trap', icon:'▲',  name:'Stachel'},
+  {k:'saw',   cat:'trap', icon:'✳',  name:'Säge'},
+  {k:'cop',   cat:'enemy',icon:'👮', name:'Cop'},
+  {k:'car',   cat:'enemy',icon:'🚓', name:'Wagen'},
+  {k:'bag',   cat:'item', icon:'🌿', name:'Baggy'},
+  {k:'gun',   cat:'item', icon:'🔫', name:'Waffe'},
+  {k:'joint', cat:'item', icon:'🚬', name:'Joint'},
+];
+const PART_BY_K={};for(const p of PARTS)PART_BY_K[p.k]=p;
+const BUDGET={plat:80,boost:16,trap:16,enemy:14,item:22};
+const PLAT_KINDS={plat:'normal',move:'moving',brit:'brittle',fake:'fake',spring:'spring',tramp:'tramp'};
+function mkPlat(x,y,type){
+  const w=type==='tramp'?70:80;
+  const p={x:x-w/2,y:y,w:w,h:12,vx:0,type:type==='fake'?'fake':type,dir:1,range:0,ox:x-w/2,bounce:0,cracked:0,springT:0};
+  if(type==='moving'){p.range=70;p.vx=1.1;}
+  return p;
+}
+// Baut aus der Teile-Liste die echte Spielwelt (deterministisch, ohne Zufall)
+function buildCustomWorld(map,out){
+  const parts=(map&&map.parts)||[];
+  out.platforms.push(mkPlat(W/2,START_Y,'normal'));
+  // Ziel-Plattform (immer vorhanden, unzerstörbar)
+  out.platforms.push({x:W/2-70,y:GOAL_Y,w:140,h:14,vx:0,type:'goal',dir:1,range:0,ox:W/2-70,bounce:0,cracked:0,springT:0});
+  const pending=[];
+  for(const q of parts){
+    const t=PLAT_KINDS[q.k];
+    if(t){out.platforms.push(mkPlat(q.x,q.y,t));continue;}
+    if(q.k==='rocket'){out.collectibles.push({x:q.x,y:q.y,type:'jetpack',t:0,taken:false});continue;}
+    if(q.k==='bag'||q.k==='gun'||q.k==='joint'){out.collectibles.push({x:q.x,y:q.y,type:q.k==='bag'?'bag':q.k,t:0,taken:false});continue;}
+    if(q.k==='wind'){out.zones.push({x:Math.max(0,q.x-70),y:q.y-70,w:140,h:140,dir:q.x<W/2?1:-1});continue;}
+    if(q.k==='spike'){out.hazards.push({type:'spike',x:q.x,y:q.y,w:38,h:14});continue;}
+    if(q.k==='saw'){out.hazards.push({type:'saw',x:q.x,y:q.y,rad:34,ang:0});continue;}
+    if(q.k==='cop'||q.k==='car')pending.push(q);
+  }
+  out.platforms.sort((a,b)=>b.y-a.y);
+  // Gegner brauchen eine Plattform zum Patrouillieren
+  for(const q of pending){
+    let best=null,bd=1e9;
+    for(const p of out.platforms){
+      if(p.type==='goal')continue;
+      const d=Math.abs(p.y-q.y);
+      if(d<46&&q.x>p.x-10&&q.x<p.x+p.w+10&&d<bd){bd=d;best=p;}
+    }
+    if(best)out.enemies.push({x:best.x+best.w/2,y:best.y-18,w:34,h:18,vx:1.2,plat:best,type:q.k,alive:true});
+  }
+  return out;
 }
 function spawnPlatform(y){
   const w=rand(55,80);
