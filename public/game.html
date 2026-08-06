@@ -2160,6 +2160,32 @@ function drawPlatform(p){
   const h=p.h*squish;
   const yy=y+(p.h-h);
   ctx.save();
+  // ---- Pixel-Art-Sprites (Standard-Darstellung aller Plattformen) ----
+  const SPR={
+    normal:{k:'grass'}, moving:{k:'stone'}, brittle:{k:'crumble'}, fake:{k:'slime'},
+    spring:{k:'springbtn',wScale:0.72}, tramp:{k:'cloud'}, goal:{k:'gold'},
+    slip:{k:'ice'}, boost:{k:'boost'}, conveyor:{k:'conveyor'}, lava:{k:'lava'},
+    tech:{k:'tech'}, rock:{k:'mossrock'}, crate:{k:'crate'},
+  };
+  const sp=SPR[p.type];
+  if(sp){
+    const dy=(p.springT>0?3:0);
+    if(drawPlatSprite(sp.k,p.x,yy+dy,p.w,{wScale:sp.wScale})){
+      if(p.type==='brittle'&&p.cracked>0){
+        ctx.globalAlpha=0.45;
+        drawPlatSprite('crumble',p.x,yy+dy+2,p.w,{});
+        ctx.globalAlpha=1;
+      }
+      if(p.type==='goal'){
+        ctx.strokeStyle='#eee';ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(p.x+p.w/2,yy);ctx.lineTo(p.x+p.w/2,yy-26);ctx.stroke();
+        ctx.fillStyle='#7cfc00';ctx.fillRect(p.x+p.w/2,yy-26,18,12);
+        ctx.fillStyle='#fff';ctx.font="7px 'Press Start 2P', monospace";ctx.textAlign='center';
+        ctx.fillText('ZIEL',p.x+p.w/2,yy-32);ctx.textAlign='left';
+      }
+      ctx.restore();return;
+    }
+  }
   if(p.type==='goal'){
     // Ziel-Plattform: goldener Zielstreifen mit Flagge
     const g=ctx.createLinearGradient(0,yy,0,yy+h);
