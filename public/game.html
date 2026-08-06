@@ -4396,6 +4396,27 @@ fireBtn.addEventListener('mousedown',fireTap);
 // Menu extras
 document.getElementById('menuDaily').onclick=()=>openAccount();
 document.getElementById('menuAccount').onclick=()=>openAccount();
+
+// ---- Settings (Helligkeit) ----
+const settingsEl=document.getElementById('settings');
+const brightRange=document.getElementById('brightRange');
+const brightVal=document.getElementById('brightVal');
+function applyBrightness(v){
+  const cv=document.getElementById('c');
+  if(cv)cv.style.filter='brightness('+(v/100)+')';
+  if(brightVal)brightVal.textContent=v+'%';
+  if(brightRange)brightRange.value=v;
+}
+let brightness=100;
+try{const s=parseInt(localStorage.getItem('aj_brightness')||'100',10);if(s>=50&&s<=160)brightness=s;}catch(e){}
+applyBrightness(brightness);
+function openSettings(){settingsEl.style.display='flex';}
+function closeSettings(){settingsEl.style.display='none';}
+document.getElementById('menuSettings').onclick=openSettings;
+document.getElementById('pauseSettings').onclick=openSettings;
+document.getElementById('settingsClose').onclick=closeSettings;
+document.getElementById('brightReset').onclick=()=>{brightness=100;applyBrightness(100);try{localStorage.setItem('aj_brightness','100');}catch(e){}};
+brightRange.oninput=()=>{brightness=parseInt(brightRange.value,10);applyBrightness(brightness);try{localStorage.setItem('aj_brightness',String(brightness));}catch(e){}};
 document.getElementById('accountClose').onclick=()=>{accountEl.style.display='none';goMenu();};
 function openAccount(){gameState='menu';showOverlay('menu');menuEl.style.display='none';accountEl.style.display='flex';refreshAccountUI();refreshDailyUI();refreshQuestUI();refreshMissionUI();}
 
