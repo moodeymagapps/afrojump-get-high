@@ -101,6 +101,23 @@
   #account .quest.done{color:#7cfc00;}
   #account .quest .bar{flex:1;height:8px;background:#0a0518;margin:0 8px;border:1px solid #4a2c73;}
   #account .quest .bar span{display:block;height:100%;background:#7cfc00;}
+  /* ---------- Map-Editor (Map-Duell) ---------- */
+  #edBar{position:absolute;left:0;right:0;bottom:0;display:none;flex-direction:column;gap:4px;padding:6px 8px 8px;box-sizing:border-box;background:linear-gradient(rgba(10,8,20,.55),rgba(10,8,20,.96));z-index:7;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;}
+  #edBar.on{display:flex;}
+  #edTop{display:flex;justify-content:space-between;align-items:center;font-size:8px;color:#7cfc00;text-shadow:2px 2px 0 #000;}
+  #edBudget{color:#ffd54a;}
+  #edPal{display:flex;gap:4px;overflow-x:auto;padding-bottom:2px;}
+  #edPal button{flex:0 0 auto;width:46px;height:44px;border:none;background:#2b1a0a;color:#fff;font-size:15px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #4a2c73;font-family:inherit;}
+  #edPal button b{font-size:6px;color:#bbb;font-weight:normal;}
+  #edPal button.on{background:#0d3d00;box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #7cfc00;}
+  #edPal button.on b{color:#7cfc00;}
+  #edRow{display:flex;gap:4px;align-items:center;}
+  #edRow button{border:none;background:#455a64;color:#fff;font-family:inherit;font-size:8px;padding:8px 6px;cursor:pointer;box-shadow:inset -2px -2px 0 #263238, inset 2px 2px 0 #90a4ae, 0 2px 0 #263238;}
+  #edTest{background:#ffb300!important;color:#111!important;box-shadow:inset -2px -2px 0 #b47a00, inset 2px 2px 0 #ffe082, 0 2px 0 #b47a00!important;}
+  #edSend{background:#4caf50!important;box-shadow:inset -2px -2px 0 #1b5e20, inset 2px 2px 0 #a5d6a7, 0 2px 0 #1b5e20!important;}
+  #edSend:disabled{background:#4a1414!important;color:#c99!important;box-shadow:inset -2px -2px 0 #200, inset 2px 2px 0 #7a2a2a!important;cursor:not-allowed;}
+  #edScroll{flex:1;min-width:40px;accent-color:#7cfc00;}
+  #edMsg{font-family:'VT323',monospace;font-size:14px;color:#ffd54a;min-height:16px;letter-spacing:1px;text-align:center;}
 </style>
 </head>
 <body>
