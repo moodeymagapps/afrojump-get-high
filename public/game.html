@@ -4776,7 +4776,7 @@ function edValidate(){
 }
 function edRefreshUI(){
   const c=ed.valid||edValidate();
-  edBudgetEl.textContent=edCount('plat')+'/'+BUDGET.plat+' ▬  '+edCount('boost')+'/'+BUDGET.boost+' ⇧  '+edCount('trap')+'/'+BUDGET.trap+' ▲  '+edCount('enemy')+'/'+BUDGET.enemy+' 👮  '+edCount('item')+'/'+BUDGET.item+' 🌿';
+  edBudgetEl.textContent=edCount('plat')+'/'+budTxt(BUDGET.plat)+' ▬  '+edCount('boost')+'/'+budTxt(BUDGET.boost)+' ⇧  '+edCount('trap')+'/'+budTxt(BUDGET.trap)+' ▲  '+edCount('enemy')+'/'+budTxt(BUDGET.enemy)+' 👮  '+edCount('item')+'/'+budTxt(BUDGET.item)+' 🌿';
   edSendBtn.disabled=!ed.verified;
   if(!ed.msgSticky){
     if(ed.verified)edMsgEl.innerHTML='<span style="color:#7cfc00">✔ Selbst geschafft – jetzt senden!</span>';
