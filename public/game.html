@@ -1583,7 +1583,7 @@ function update(dt){
 
   // recycle platforms
   const topY=cameraY-100;
-  if(!boss){
+  if(!boss&&!customMap){
     while(platforms.length&&platforms[platforms.length-1].y>topY-20){
       const y=platforms[platforms.length-1].y-rand(60,90);
       spawnPlatform(y);
@@ -1599,7 +1599,8 @@ function update(dt){
 
   // fall off — during boss fight this still spends a life instead of instant game over
   if(player.y>cameraY+H+40){
-    if(boss&&player.bossLives>0){
+    if(customMap){mapFail();}
+    else if(boss&&player.bossLives>0){
       hurtPlayer();
       player.y=cameraY+H*0.4;player.vy=-16;player.x=W/2;
     } else die();
