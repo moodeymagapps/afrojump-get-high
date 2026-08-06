@@ -1335,6 +1335,14 @@ const PARTS=[
   {k:'move',  cat:'plat', icon:'↔',  name:'Beweg.'},
   {k:'brit',  cat:'plat', icon:'▨',  name:'Brüchig'},
   {k:'fake',  cat:'plat', icon:'▢',  name:'Fake'},
+  // ---- nur im Duell-Editor (Multiplayer) verfügbar ----
+  {k:'rock',  cat:'plat', icon:'🪨', name:'Fels'},
+  {k:'slip',  cat:'plat', icon:'🧊', name:'Eis'},
+  {k:'conv',  cat:'plat', icon:'⏩', name:'Band'},
+  {k:'crate', cat:'plat', icon:'📦', name:'Kiste'},
+  {k:'boostp',cat:'boost',icon:'⏫', name:'Boost'},
+  {k:'tech',  cat:'boost',icon:'🌀', name:'Beamer'},
+  {k:'lava',  cat:'trap', icon:'🔥', name:'Lava'},
   {k:'spring',cat:'boost',icon:'⇧',  name:'Feder'},
   {k:'tramp', cat:'boost',icon:'⤒',  name:'Trampo'},
   {k:'rocket',cat:'boost',icon:'🚀', name:'Rakete'},
@@ -1362,11 +1370,13 @@ function applyDuelCfg(){
   }
 }
 function budTxt(n){return n===Infinity?'∞':n;}
-const PLAT_KINDS={plat:'normal',move:'moving',brit:'brittle',fake:'fake',spring:'spring',tramp:'tramp'};
+const PLAT_KINDS={plat:'normal',move:'moving',brit:'brittle',fake:'fake',spring:'spring',tramp:'tramp',
+  rock:'rock',slip:'slip',conv:'conveyor',crate:'crate',boostp:'boost',tech:'tech',lava:'lava'};
 function mkPlat(x,y,type){
-  const w=type==='tramp'?70:80;
+  const w=type==='tramp'?70:(type==='lava'?76:80);
   const p={x:x-w/2,y:y,w:w,h:12,vx:0,type:type==='fake'?'fake':type,dir:1,range:0,ox:x-w/2,bounce:0,cracked:0,springT:0};
   if(type==='moving'){p.range=70;p.vx=1.1;}
+  if(type==='conveyor')p.dir=x<W/2?1:-1;
   return p;
 }
 // Baut aus der Teile-Liste die echte Spielwelt (deterministisch, ohne Zufall)
