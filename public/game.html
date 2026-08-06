@@ -3321,6 +3321,18 @@ function drawCollectible(c){
     ctx.restore();
   }else{
     // joint
+    const js=sprite('cjoint');
+    if(js){
+      ctx.save();
+      ctx.imageSmoothingEnabled=false;
+      const hh=26, ww=hh*(js.width/js.height);
+      ctx.translate(c.x,y);ctx.rotate(-0.12+Math.sin(c.t*3)*0.06);
+      ctx.drawImage(js,-ww/2,-hh/2,ww,hh);
+      ctx.restore();
+      ctx.fillStyle='rgba(255,255,255,'+(0.35+0.35*Math.sin(c.t*6))+')';
+      ctx.beginPath();ctx.arc(c.x+9,y-11,2.4,0,Math.PI*2);ctx.fill();
+      return;
+    }
     ctx.save();ctx.translate(c.x,y);ctx.rotate(-0.3);
     ctx.fillStyle='#f5ecd0';ctx.strokeStyle='#000';ctx.lineWidth=1.5;
     ctx.fillRect(-10,-3,20,6);ctx.strokeRect(-10,-3,20,6);
