@@ -4398,18 +4398,21 @@ function duelResetRound(){
   duel.finished=false;duel.oppDead=false;duel.oppBest=0;duel.myBest=0;
   duel.oppY=null;duel.oppX=W/2;duel.oppFacing=1;
   duel.myRematch=false;duel.oppRematch=false;duel.oppOffline=false;
+  duel.oppMap=null;duel.myMapSent=false;duel.raceStarted=false;
+  duel.oppGoalT=0;duel.myGoalT=0;duel.oppProg=0;
   duel.lastSeen=Date.now();
 }
 function openDuel(){
   gameState='menu';showOverlay('duel');duelEl.style.display='flex';
   duelRematchBtn.style.display=(duel.active&&duel.code)?'block':'none';
-  if(!duel.code)duelSay('Erstelle einen Raum und teile den Link/Code. Sobald dein Gegner drin ist, geht es los – gleiche Map, gleiche Chancen.');
+  if(!duel.code)duelSay('<b style="color:#7cfc00">MAP-DUELL</b><br>Raum erstellen, Link teilen. Dann baut jeder eine Map (bis '+GOAL_M+'m) für den anderen – du musst sie einmal selbst schaffen, damit sie fair ist. Danach spielt jeder die Map des Gegners: wer zuerst oben ist, gewinnt!');
 }
 function closeDuel(){duelLeave();showOverlay('menu');goMenu();}
 function duelLeave(){
   if(duel.channel){try{duel.channel.send({type:'broadcast',event:'bye',payload:{}});}catch(_){}
     try{duel.channel.unsubscribe();}catch(_){}}
   duel.channel=null;duel.active=false;duel.code=null;duel.seed=null;duel.ready=false;duel.round=0;
+  duel.mapMode=false;customMap=null;mapRun.phase=null;mapRun.done=false;
   duelResetRound();
   duelCopyBtn.style.display='none';duelRematchBtn.style.display='none';
 }
