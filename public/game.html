@@ -2196,7 +2196,7 @@ function drawPlayer(){
   ctx.save();
   ctx.translate(x,y+(1-player.squash)*18);
   ctx.scale(player.facing*player.stretch,player.squash);
-  drawAfroCharacter(ctx,currentSkin(),player.invincible);
+  drawAfroCharacter(ctx,currentSkin(),player.invincible,true);
   ctx.restore();
 
   // smoke – weicher Ausklang statt harter Kreise
@@ -2218,7 +2218,7 @@ function drawPlayer(){
 }
 
 // Draws the player centered at (0,0) in local coords. Used by game and shop preview.
-function drawImageSkin(g,s,inv){
+function drawImageSkin(g,s,inv,live){
   const entry=loadSkinImage(s.img,s.bgKey);
   if(!entry.canvas)return;
   const im=entry.canvas;
@@ -2231,7 +2231,34 @@ function drawImageSkin(g,s,inv){
   const dy=-h*anchor;
   g.save();
   g.imageSmoothingEnabled=false;
-  if(inv>0){
+  if(live){
+    // Mini-"Skelett": Oberkörper + Beine leicht getrennt animieren
+    const t=performance.now()/1000;
+    const air=Math.max(-1,Math.min(1,(player&&player.vy?player.vy:0)/14));
+    const hip=0.62;                       // Trennlinie im Bild
+    const sh=im.height*hip, lh=im.height-sh;
+    const lean=Math.sin(t*4.2)*0.05-air*0.06;
+    const bob=Math.sin(t*8.4)*0.8;
+    const swing=Math.sin(t*8.4)*1.6;
+    const legSq=1+(-air)*0.10;
+    // Beine
+    g.save();
+    g.translate(swing*0.5,dy+sh*sc);
+    g.scale(1,legSq);
+    g.drawImage(im,0,sh,im.width,lh,dx,0,w,lh*sc);
+    g.restore();
+    // Oberkörper
+    g.save();
+    g.translate(0,dy+sh*sc+bob*0.3);
+    g.rotate(lean);
+    g.drawImage(im,0,0,im.width,sh,dx,-sh*sc+bob*0.5,w,sh*sc);
+    g.restore();
+    if(inv>0){
+      g.globalCompositeOperation='source-atop';
+      g.fillStyle='hsla('+((performance.now()/2)%360)+',90%,60%,0.35)';
+      g.fillRect(dx,dy,w,h);
+    }
+  }else if(inv>0){
     // subtle rainbow tint via composite
     g.drawImage(im,dx,dy,w,h);
     g.globalCompositeOperation='source-atop';
@@ -2243,8 +2270,8 @@ function drawImageSkin(g,s,inv){
   g.restore();
 }
 
-function drawAfroCharacter(g,s,inv){
-  if(s.img){drawImageSkin(g,s,inv);return;}
+function drawAfroCharacter(g,s,inv,live){
+  if(s.img){drawImageSkin(g,s,inv,live);return;}
   if(s.render){drawSkinAlt(g,s,inv);return;}
   const rainbow=inv>0;
   const bodyCol=rainbow?`hsl(${(performance.now()/4)%360},90%,55%)`:s.body;
