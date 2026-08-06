@@ -3934,6 +3934,20 @@ function render(){
     if(mapRun.deaths)ctx.fillText('💀 '+mapRun.deaths,W/2,H-28);
     ctx.textAlign='left';
     ctx.restore();
+    // Renn-Countdown
+    if(duel.active&&duel.countdown>0){
+      ctx.save();
+      ctx.fillStyle='rgba(0,0,0,.55)';ctx.fillRect(0,0,W,H);
+      ctx.textAlign='center';ctx.fillStyle='#7cfc00';
+      ctx.font="12px 'Press Start 2P', monospace";
+      ctx.fillText('MAP VON '+String(duel.oppName||'GEGNER').toUpperCase().slice(0,12),W/2,H/2-60);
+      const n=Math.ceil(duel.countdown-0.2);
+      ctx.font="42px 'Press Start 2P', monospace";ctx.fillStyle='#ffd54a';
+      ctx.fillText(n>0?String(n):'GO!',W/2,H/2+10);
+      ctx.font="9px 'Press Start 2P', monospace";ctx.fillStyle='#fff';
+      ctx.fillText('WER ZUERST OBEN IST, GEWINNT',W/2,H/2+50);
+      ctx.textAlign='left';ctx.restore();
+    }
   }
   {
     const wc=weaponColors();
