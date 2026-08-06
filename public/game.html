@@ -653,6 +653,9 @@ function showOverlay(which){
   if(eb)eb.classList.toggle('on',which==='editor');
   const hintEl=document.getElementById('hint');
   if(hintEl)hintEl.style.display=which==='editor'?'none':'block';
+  const uiEl=document.getElementById('ui');
+  if(uiEl)uiEl.style.display=which==='editor'?'none':'flex';
+  powerEl.style.display=which==='editor'?'none':'block';
   pauseBtn.style.display=which==='playing'?'flex':'none';
 }
 function goMenu(){gameState='menu';menuHigh.textContent='Best: '+highScore+'m';updateBagsUI();showOverlay('menu');}
