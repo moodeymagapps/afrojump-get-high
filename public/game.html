@@ -3806,7 +3806,9 @@ function render(){
     ctx.translate(Math.sin(tt*47)*s,Math.cos(tt*61)*s*0.7);
   }
   drawBg();
+  for(const z of zones)drawZone(z);
   for(const p of platforms)drawPlatform(p);
+  for(const hz of hazards)drawHazard(hz);
   for(const c of collectibles)if(!c.taken)drawCollectible(c);
   for(const e of enemies)drawEnemy(e);
   // duel: opponent ghost on the shared map
