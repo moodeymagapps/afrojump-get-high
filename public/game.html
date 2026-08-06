@@ -527,9 +527,10 @@ let totalBags=+localStorage.getItem(BK)||0;
 let grant2000=true;
 localStorage.setItem(GK,'1');
 function applyStarterGrant(){return false;}
-const DEFAULT_SKIN='revengebird';
-let owned=JSON.parse(localStorage.getItem(OK)||'["revengebird"]');
-owned=owned.filter(id=>true);
+const DEFAULT_SKIN='bob';
+let owned=JSON.parse(localStorage.getItem(OK)||'["bob"]');
+// Migration: alter Standard-Skin heißt jetzt "Bob"
+owned=owned.map(id=>id==='revengebird'?'bob':id);
 if(!owned.includes(DEFAULT_SKIN))owned.push(DEFAULT_SKIN);
 let selectedSkin=localStorage.getItem(SK)||DEFAULT_SKIN;
 if(!owned.includes(selectedSkin))selectedSkin=DEFAULT_SKIN;
@@ -538,7 +539,7 @@ highEl.textContent='Best: '+highScore+'m';
 // Skins catalog
 const SKINS=[
   // ---- Nur noch die Pixel-Art Community-Skins ----
-  {id:'revengebird',name:'RevengeBird',price:0,    community:true, rarity:'legendary', img:'skins/revengebird.png',anchorY:0.72},
+  {id:'bob',        name:'Bob',        price:0,    community:true, rarity:'legendary', img:'skins/bob.png',        anchorY:0.72},
   {id:'ina',        name:'Ina',        price:900,  community:true, rarity:'epic',      img:'skins/ina.png',        anchorY:0.72},
   {id:'sierrakidd', name:'Sierra Kidd',price:1100, community:true, rarity:'epic',      img:'skins/sierrakidd.jpg', anchorY:0.72},
   {id:'danjo420',   name:'Danjo420',   price:1100, community:true, rarity:'epic',      img:'skins/danjo420.jpg',   anchorY:0.74},
@@ -654,6 +655,7 @@ const SPRITE_FILES={
   icewide:'plats/icewide.png', mossrock:'plats/mossrock.png', tech:'plats/tech.png',
   lava:'plats/lava.png', conveyor:'plats/conveyor.png', crate:'plats/crate.png',
   jetpack:'plats/jetpack.png',
+  cop:'sprites/cop.png', copcar:'sprites/copcar.png', cjoint:'sprites/joint.png',
 };
 const spriteCache={};
 function sprite(key){
@@ -1245,7 +1247,7 @@ const duelCfg={size:1500,budget:'normal'};
 const mapRun={phase:null,deaths:0,startT:0,done:false}; // 'test' | 'race'
 // duel state (1v1 online)
 const duel={active:false,code:null,seed:null,role:null,channel:null,ready:false,round:0,
-  myBest:0,oppBest:0,oppDead:false,oppY:null,oppX:W/2,oppFacing:1,oppSkin:'revengebird',
+  myBest:0,oppBest:0,oppDead:false,oppY:null,oppX:W/2,oppFacing:1,oppSkin:'bob',
   finished:false,oppName:'Gegner',countdown:0,myRematch:false,oppRematch:false,
   oppOffline:false,lastSeen:0};
 let shake={t:0,mag:0},timeScale=1,deathT=0,bossIndex=0;
@@ -3319,6 +3321,18 @@ function drawCollectible(c){
     ctx.restore();
   }else{
     // joint
+    const js=sprite('cjoint');
+    if(js){
+      ctx.save();
+      ctx.imageSmoothingEnabled=false;
+      const hh=26, ww=hh*(js.width/js.height);
+      ctx.translate(c.x,y);ctx.rotate(-0.12+Math.sin(c.t*3)*0.06);
+      ctx.drawImage(js,-ww/2,-hh/2,ww,hh);
+      ctx.restore();
+      ctx.fillStyle='rgba(255,255,255,'+(0.35+0.35*Math.sin(c.t*6))+')';
+      ctx.beginPath();ctx.arc(c.x+9,y-11,2.4,0,Math.PI*2);ctx.fill();
+      return;
+    }
     ctx.save();ctx.translate(c.x,y);ctx.rotate(-0.3);
     ctx.fillStyle='#f5ecd0';ctx.strokeStyle='#000';ctx.lineWidth=1.5;
     ctx.fillRect(-10,-3,20,6);ctx.strokeRect(-10,-3,20,6);
@@ -3340,6 +3354,22 @@ function drawEnemy(e){
     return;
   }
   const y=e.y-cameraY;
+  // ---- Pixel-Art Sprites (Polizist / Streifenwagen) ----
+  const spr=sprite(e.type==='car'?'copcar':'cop');
+  if(spr){
+    const dir=e.vx<0?-1:1;
+    ctx.save();
+    ctx.imageSmoothingEnabled=false;
+    const bob=e.type==='car'?0:Math.sin(performance.now()/220+e.x)*0.8;
+    let dh,dw;
+    if(e.type==='car'){ dw=e.w*1.5; dh=dw*(spr.height/spr.width); }
+    else { dh=e.h*1.9; dw=dh*(spr.width/spr.height); }
+    ctx.translate(e.x,y+e.h-dh+bob);
+    ctx.scale(dir,1);
+    ctx.drawImage(spr,-dw/2,0,dw,dh);
+    ctx.restore();
+    return;
+  }
   if(e.type==='car'){
     ctx.fillStyle='#2a5aef';roundRect(e.x-e.w/2,y,e.w,e.h-4,3,true,false);
     ctx.fillStyle='#fff';ctx.fillRect(e.x-e.w/2,y,e.w,4);
@@ -4744,7 +4774,7 @@ async function duelJoin(code,role){
   let helloReplied=false;
   ch.on('broadcast',{event:'hello'},({payload})=>{
     duel.oppName=payload.name||'Gegner';
-    duel.oppSkin=payload.skin||'revengebird';
+    duel.oppSkin=payload.skin||'bob';
     duel.lastSeen=Date.now();
     if(!helloReplied){helloReplied=true;ch.send({type:'broadcast',event:'hello',payload:{name:myDuelName(),skin:selectedSkin}});}
     if(isDuelHost()){try{ch.send({type:'broadcast',event:'cfg',payload:{size:duelCfg.size,budget:duelCfg.budget}});}catch(_){}}
