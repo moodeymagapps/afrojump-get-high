@@ -242,6 +242,16 @@
     box-shadow:0 0 14px rgba(141,255,60,.45);border-color:rgba(141,255,60,.7);}
   #duelCfg.locked .cfgBtns button{opacity:.55;cursor:not-allowed;}
   #duelCfg .cfgNote{font-family:'VT323',monospace;font-size:14px;opacity:.75;letter-spacing:1px;text-align:center;}
+  #settings{z-index:60;background:linear-gradient(rgba(6,5,12,.985),rgba(6,5,12,.995));}
+  #settings .setRow{width:min(320px,86%);display:flex;flex-direction:column;gap:10px;margin:6px 0 2px;}
+  #settings .setLbl{font-family:'Press Start 2P',monospace;font-size:11px;letter-spacing:1px;color:#d7ffb0;
+    display:flex;justify-content:space-between;}
+  #settings input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:14px;background:#1c2430;
+    border:2px solid rgba(255,255,255,.18);box-shadow:inset 2px 2px 0 rgba(0,0,0,.5);outline:none;}
+  #settings input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:26px;
+    background:linear-gradient(180deg,#8dff3c,#3f9d00);border:2px solid #0b1a00;box-shadow:0 0 10px rgba(141,255,60,.5);cursor:pointer;}
+  #settings input[type=range]::-moz-range-thumb{width:20px;height:26px;background:#7ce02f;border:2px solid #0b1a00;cursor:pointer;}
+  #settings .setNote{font-family:'VT323',monospace;font-size:15px;opacity:.75;letter-spacing:1px;text-align:center;margin-bottom:6px;}
 </style>
 </head>
 <body>
@@ -255,6 +265,16 @@
     <div class="right"><div class="hudChip bagsChip"><div id="bags">🌿 0</div></div><button id="muteBtn" title="Musik">🔊</button><button id="pauseBtn" title="Pause">❚❚</button></div>
   </div>
   <div id="power"></div>
+  <div id="settings" class="overlay">
+    <h1>EINSTELLUNGEN</h1>
+    <div class="setRow">
+      <div class="setLbl">HELLIGKEIT <span id="brightVal">100%</span></div>
+      <input id="brightRange" type="range" min="50" max="160" step="5" value="100" />
+    </div>
+    <div class="setNote">Regler nach links = dunkler, nach rechts = heller.</div>
+    <button class="btn v-slate" id="brightReset">↺ Zurücksetzen</button>
+    <button class="btn v-green" id="settingsClose">✓ Fertig</button>
+  </div>
   <div id="menu" class="overlay">
     <img class="logoImg" src="/__l5e/assets-v1/69274bbc-7857-4d3d-a4d3-4747a688e509/afro-jump-logo.png" alt="Afro Jump">
     <div class="tag">Doodle-Style Highscore Game</div>
@@ -266,6 +286,7 @@
     <button class="btn v-gold" id="menuBoard">🏆 Rangliste</button>
     <button class="btn v-red" id="menuDuel">⚔ Map-Duell (1v1)</button>
     <button class="btn v-slate" id="menuAccount">👤 Account</button>
+    <button class="btn v-slate" id="menuSettings">⚙ Einstellungen</button>
     <p id="menuAcctStatus" style="font-size:14px;opacity:.7;margin-top:4px;letter-spacing:1px;"></p>
   </div>
   <div id="pause" class="overlay">
@@ -273,6 +294,7 @@
     <h1>PAUSE</h1>
     <button class="btn v-green" id="pauseResume">▶ Weiter</button>
     <button class="btn v-purple" id="pauseShop">🛍 Shop</button>
+    <button class="btn v-blue" id="pauseSettings">⚙ Einstellungen</button>
     <button class="btn v-slate" id="pauseQuit">↺ Neustart</button>
   </div>
   <div id="shop" class="overlay">
@@ -550,6 +572,10 @@ const SKINS=[
   {id:'yannic',     name:'Yannic',     price:1700, community:true, rarity:'legendary', img:'skins/yannic.png',     anchorY:0.70},
   {id:'stephan',    name:'Stephan',    price:1900, community:true, rarity:'legendary', img:'skins/stephan.png',    anchorY:0.70},
   {id:'moodey',     name:'Moodey',     price:2000, community:true, rarity:'legendary', img:'skins/moodey.png',     anchorY:0.70},
+  {id:'ranger',     name:'Blaze Ranger',price:700,  community:true, rarity:'epic',      img:'skins/ranger.png',     anchorY:0.70},
+  {id:'skullcap',   name:'Captain Skull',price:1000,community:true, rarity:'epic',      img:'skins/skullcap.png',   anchorY:0.70},
+  {id:'ducknoir',   name:'Duck Noir',   price:1200, community:true, rarity:'epic',      img:'skins/ducknoir.png',   anchorY:0.70},
+  {id:'infernus',   name:'Infernus',    price:2200, community:true, rarity:'legendary', img:'skins/infernus.png',   anchorY:0.70},
 ];
 
 // ================= ÖKONOMIE, RARITÄTEN & LOOT =================
@@ -788,6 +814,8 @@ function showOverlay(which){
   if(aEl&&which!=='account')aEl.style.display='none';
   const bEl=document.getElementById('board');
   if(bEl&&which!=='board')bEl.style.display='none';
+  const stEl=document.getElementById('settings');
+  if(stEl)stEl.style.display='none';
   const eb=document.getElementById('edBar');
   if(eb)eb.classList.toggle('on',which==='editor');
   const hintEl=document.getElementById('hint');
@@ -4371,6 +4399,27 @@ fireBtn.addEventListener('mousedown',fireTap);
 // Menu extras
 document.getElementById('menuDaily').onclick=()=>openAccount();
 document.getElementById('menuAccount').onclick=()=>openAccount();
+
+// ---- Settings (Helligkeit) ----
+const settingsEl=document.getElementById('settings');
+const brightRange=document.getElementById('brightRange');
+const brightVal=document.getElementById('brightVal');
+function applyBrightness(v){
+  const cv=document.getElementById('c');
+  if(cv)cv.style.filter='brightness('+(v/100)+')';
+  if(brightVal)brightVal.textContent=v+'%';
+  if(brightRange)brightRange.value=v;
+}
+let brightness=100;
+try{const s=parseInt(localStorage.getItem('aj_brightness')||'100',10);if(s>=50&&s<=160)brightness=s;}catch(e){}
+applyBrightness(brightness);
+function openSettings(){settingsEl.style.display='flex';}
+function closeSettings(){settingsEl.style.display='none';}
+document.getElementById('menuSettings').onclick=openSettings;
+document.getElementById('pauseSettings').onclick=openSettings;
+document.getElementById('settingsClose').onclick=closeSettings;
+document.getElementById('brightReset').onclick=()=>{brightness=100;applyBrightness(100);try{localStorage.setItem('aj_brightness','100');}catch(e){}};
+brightRange.oninput=()=>{brightness=parseInt(brightRange.value,10);applyBrightness(brightness);try{localStorage.setItem('aj_brightness',String(brightness));}catch(e){}};
 document.getElementById('accountClose').onclick=()=>{accountEl.style.display='none';goMenu();};
 function openAccount(){gameState='menu';showOverlay('menu');menuEl.style.display='none';accountEl.style.display='flex';refreshAccountUI();refreshDailyUI();refreshQuestUI();refreshMissionUI();}
 
