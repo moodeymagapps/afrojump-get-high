@@ -4494,12 +4494,14 @@ function duelTryRematch(){
   if(duel.myRematch&&duel.oppRematch){
     duel.round=(duel.round||0)+1;
     duelGameOverBtn.disabled=false;duelGameOverBtn.textContent='⚔ Revanche';
-    duelStart();
+    duel.myRematch=false;duel.oppRematch=false;
+    duelBeginBuild();
   }
 }
 function duelSendState(){
   if(!duel.active||!duel.channel||gameState!=='playing'||!player)return;
-  duel.channel.send({type:'broadcast',event:'state',payload:{y:player.y,x:player.x,b:bestY,f:player.facing}});
+  const prog=customMap?Math.max(0,Math.min(1,(START_Y-player.y)/(START_Y-GOAL_Y))):0;
+  duel.channel.send({type:'broadcast',event:'state',payload:{y:player.y,x:player.x,b:bestY,f:player.facing,p:prog}});
 }
 function duelSendEnd(){
   duel.myBest=Math.max(duel.myBest,bestY);
