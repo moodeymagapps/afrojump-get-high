@@ -3796,6 +3796,54 @@ function drawBossPipePusher(bx,y,bw,bh,t){
   ctx.strokeStyle='#111';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(bx+11,y+4);ctx.quadraticCurveTo(bx+13,y+8,bx+15,y+4);ctx.stroke();
 }
 
+// ---------- Fallen & Wind (gebaute Maps) ----------
+function drawHazard(hz){
+  if(hz.type==='saw'){
+    const cx=hz.x,cy=hz.y-cameraY;
+    ctx.save();
+    ctx.strokeStyle='rgba(255,255,255,.18)';ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(cx,cy,hz.rad,0,Math.PI*2);ctx.stroke();
+    ctx.fillStyle='#455a64';ctx.beginPath();ctx.arc(cx,cy,4,0,Math.PI*2);ctx.fill();
+    const sx=cx+Math.cos(hz.ang)*hz.rad, sy=cy+Math.sin(hz.ang)*hz.rad;
+    ctx.translate(sx,sy);ctx.rotate(hz.ang*4);
+    ctx.fillStyle='#cfd8dc';ctx.strokeStyle='#263238';ctx.lineWidth=1.5;
+    ctx.beginPath();
+    for(let i=0;i<12;i++){const a=i*Math.PI/6,r=i%2?7:11;const px=Math.cos(a)*r,py=Math.sin(a)*r;i?ctx.lineTo(px,py):ctx.moveTo(px,py);}
+    ctx.closePath();ctx.fill();ctx.stroke();
+    ctx.fillStyle='#78909c';ctx.beginPath();ctx.arc(0,0,3,0,Math.PI*2);ctx.fill();
+    ctx.restore();
+  }else{
+    const y=hz.y-cameraY;
+    ctx.save();
+    ctx.fillStyle='#546e7a';ctx.fillRect(hz.x-hz.w/2,y-3,hz.w,4);
+    ctx.fillStyle='#eceff1';ctx.strokeStyle='#263238';ctx.lineWidth=1.2;
+    for(let i=0;i<5;i++){
+      const bx=hz.x-hz.w/2+3+i*(hz.w-6)/4.6;
+      ctx.beginPath();ctx.moveTo(bx,y-3);ctx.lineTo(bx+3.5,y-3-hz.h);ctx.lineTo(bx+7,y-3);ctx.closePath();ctx.fill();ctx.stroke();
+    }
+    ctx.restore();
+  }
+}
+function drawZone(z){
+  const y=z.y-cameraY;
+  if(y>H+60||y+z.h<-60)return;
+  ctx.save();
+  ctx.fillStyle='rgba(160,215,255,.10)';ctx.fillRect(z.x,y,z.w,z.h);
+  ctx.strokeStyle='rgba(200,235,255,.35)';ctx.lineWidth=1;ctx.strokeRect(z.x,y,z.w,z.h);
+  ctx.fillStyle='rgba(220,245,255,.55)';
+  const t=performance.now()/500;
+  for(let i=0;i<4;i++){
+    const ly=y+18+i*(z.h-30)/3;
+    const off=((t+i*0.3)%1)*z.w;
+    const ax=z.dir>0?z.x+off:z.x+z.w-off;
+    ctx.fillRect(Math.min(z.x+z.w-14,Math.max(z.x,ax)),ly,14,2);
+    ctx.beginPath();
+    if(z.dir>0){ctx.moveTo(ax+14,ly+1);ctx.lineTo(ax+8,ly-3);ctx.lineTo(ax+8,ly+5);}
+    else{ctx.moveTo(ax,ly+1);ctx.lineTo(ax+6,ly-3);ctx.lineTo(ax+6,ly+5);}
+    ctx.closePath();ctx.fill();
+  }
+  ctx.restore();
+}
 function render(){
   if(gameState==='editor'){drawEditor();return;}
   ctx.save();
