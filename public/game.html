@@ -681,6 +681,42 @@ function weaponColors(){
 
 // ---- Image skin loader with background removal (flood-fill from corners) ----
 const skinImgCache={};
+// ---- Plattform-/Item-Sprites (bereits freigestellte PNGs, kein BG-Removal nötig) ----
+const SPRITE_FILES={
+  grass:'plats/grass.png', stone:'plats/stone.png', crumble:'plats/crumble.png',
+  springbtn:'plats/springbtn.png', cloud:'plats/cloud.png', slime:'plats/slime.png',
+  gold:'plats/gold.png', boost:'plats/boost.png', ice:'plats/ice.png',
+  icewide:'plats/icewide.png', mossrock:'plats/mossrock.png', tech:'plats/tech.png',
+  lava:'plats/lava.png', conveyor:'plats/conveyor.png', crate:'plats/crate.png',
+  jetpack:'plats/jetpack.png',
+};
+const spriteCache={};
+function sprite(key){
+  const src=SPRITE_FILES[key];
+  if(!src)return null;
+  let e=spriteCache[key];
+  if(!e){
+    e=spriteCache[key]={img:new Image(),ok:false};
+    e.img.onload=()=>{e.ok=true;};
+    e.img.src=src;
+  }
+  return e.ok?e.img:null;
+}
+for(const k in SPRITE_FILES)sprite(k);
+// Zeichnet ein Plattform-Sprite: Oberkante = Kollisionskante, Breite = Plattformbreite
+function drawPlatSprite(key,x,topY,w,opts){
+  const im=sprite(key);
+  if(!im)return false;
+  const o=opts||{};
+  const sw=w*(o.wScale||1);
+  const sh=sw*(im.height/im.width)*(o.hScale||1);
+  ctx.save();
+  ctx.imageSmoothingEnabled=false;
+  if(o.alpha!=null)ctx.globalAlpha=o.alpha;
+  ctx.drawImage(im,x+(w-sw)/2,topY+(o.dy||0),sw,sh);
+  ctx.restore();
+  return true;
+}
 function loadSkinImage(src, bgKey){
   if(skinImgCache[src])return skinImgCache[src];
   const entry={ready:false,canvas:null};
