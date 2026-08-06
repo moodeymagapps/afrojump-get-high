@@ -4159,9 +4159,16 @@ function loop(t){
   render();
   // HUD nur bei Änderung schreiben (spart Layout-Arbeit pro Frame)
   const sTxt='Höhe: '+bestY+'m';
-  if(sTxt!==hud.score){hud.score=sTxt;scoreEl.textContent=sTxt;}
+  if(sTxt!==hud.score){
+    hud.score=sTxt;scoreEl.textContent=sTxt;
+    const mile=Math.floor(bestY/100);
+    if(gameState==='playing'&&mile>(hud.mile||0)){hud.mile=mile;hudPop(scoreChipEl);}
+    else if(mile<(hud.mile||0))hud.mile=mile;
+  }
   const hTxt='Best: '+Math.max(highScore,bestY)+'m';
   if(hTxt!==hud.high){hud.high=hTxt;highEl.textContent=hTxt;}
+  const rec=gameState==='playing'&&bestY>highScore&&highScore>0;
+  if(rec!==hud.rec){hud.rec=rec;highChipEl.classList.toggle('rec',rec);if(rec)hudPop(highChipEl);}
   let parts=[];
   if(player){
     if(player.invincible>0)parts.push('★ INVINCIBLE '+player.invincible.toFixed(1)+'s');
@@ -4171,7 +4178,14 @@ function loop(t){
     if(duel.active)parts.push('⚔ '+(duel.oppName||'Gegner')+': '+(customMap?Math.round((duel.oppProg||0)*100)+'%':duel.oppBest+'m'));
   }
   const pTxt=parts.join('  ');
-  if(pTxt!==hud.power){hud.power=pTxt;powerEl.textContent=pTxt;}
+  if(pTxt!==hud.power){
+    const wasEmpty=!hud.power;
+    hud.power=pTxt;powerEl.textContent=pTxt;
+    if(pTxt&&wasEmpty){powerEl.classList.remove('in');void powerEl.offsetWidth;powerEl.classList.add('in');}
+    if(!pTxt)powerEl.classList.remove('in');
+  }
+  const hot=!!(player&&(player.invincible>0||player.jetpackT>0||player.gunT>0)&&gameState==='playing');
+  if(hot!==hud.hot){hud.hot=hot;if(bagsChipEl)bagsChipEl.classList.toggle('hot',hot);}
   const wantFire=!!(player&&player.gunT>0&&gameState==='playing');
   if(wantFire!==hud.fire){hud.fire=wantFire;fireBtn.classList.toggle('on',wantFire);}
   // quest live tracking
