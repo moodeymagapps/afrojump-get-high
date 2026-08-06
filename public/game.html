@@ -2316,27 +2316,15 @@ function drawImageSkin(g,s,inv,live){
   g.save();
   g.imageSmoothingEnabled=false;
   if(live){
-    // Mini-"Skelett": Oberkörper + Beine leicht getrennt animieren
+    // Animate the complete sprite as one rigid pixel-art layer. Splitting an
+    // image skin at the hips created transparent seams and detached limbs.
     const t=performance.now()/1000;
     const air=Math.max(-1,Math.min(1,(player&&player.vy?player.vy:0)/14));
-    const hip=0.62;                       // Trennlinie im Bild
-    const sh=im.height*hip, lh=im.height-sh;
-    const lean=Math.sin(t*4.2)*0.05-air*0.06;
-    const bob=Math.sin(t*8.4)*0.8;
-    const swing=Math.sin(t*8.4)*1.6;
-    const legSq=1+(-air)*0.10;
-    // Beine
-    g.save();
-    g.translate(swing*0.5,dy+sh*sc);
-    g.scale(1,legSq);
-    g.drawImage(im,0,sh,im.width,lh,dx,0,w,lh*sc);
-    g.restore();
-    // Oberkörper
-    g.save();
-    g.translate(0,dy+sh*sc+bob*0.3);
+    const lean=Math.sin(t*4.2)*0.018-air*0.025;
+    const bob=Math.sin(t*8.4)*0.45;
+    g.translate(0,bob);
     g.rotate(lean);
-    g.drawImage(im,0,0,im.width,sh,dx,-sh*sc+bob*0.5,w,sh*sc);
-    g.restore();
+    g.drawImage(im,dx,dy,w,h);
     if(inv>0){
       g.globalCompositeOperation='source-atop';
       g.fillStyle='hsla('+((performance.now()/2)%360)+',90%,60%,0.35)';
