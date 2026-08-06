@@ -4428,12 +4428,26 @@ async function duelJoin(code,role){
     duel.oppSkin=payload.skin||'classic';
     duel.lastSeen=Date.now();
     if(!helloReplied){helloReplied=true;ch.send({type:'broadcast',event:'hello',payload:{name:myDuelName(),skin:selectedSkin}});}
-    if(!duel.ready){duel.ready=true;duelStart();}
+    if(!duel.ready){duel.ready=true;duelBeginBuild();}
   });
   ch.on('broadcast',{event:'state'},({payload})=>{
     duel.oppBest=Math.max(duel.oppBest,payload.b||0);
     duel.oppY=payload.y;duel.oppX=payload.x;duel.oppFacing=payload.f||1;
+    if(typeof payload.p==='number')duel.oppProg=payload.p;
     duel.lastSeen=Date.now();duel.oppOffline=false;
+  });
+  // Map-Duell: fertige Map des Gegners
+  ch.on('broadcast',{event:'map'},({payload})=>{
+    duel.oppMap=(payload&&Array.isArray(payload.parts))?payload.parts:[];
+    duel.lastSeen=Date.now();
+    if(gameState==='menu')duelSay('Map vom Gegner ist da! '+(duel.myMapSent?'Los geht’s…':'Baue und sende deine Map.'));
+    tryStartRace();
+  });
+  // Map-Duell: Gegner hat das Ziel erreicht
+  ch.on('broadcast',{event:'goal'},({payload})=>{
+    duel.oppGoalT=(payload&&payload.t)||1;
+    duel.lastSeen=Date.now();
+    if(!duel.myGoalT)finishMapDuel(false);
   });
   ch.on('broadcast',{event:'end'},({payload})=>{
     duel.oppBest=Math.max(duel.oppBest,payload.b||0);
