@@ -203,6 +203,23 @@
   #edScroll::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;
     background:linear-gradient(180deg,#eaffd6,#7cfc00);border:1px solid #0a0518;box-shadow:0 0 8px rgba(124,252,0,.6);}
   #edMsg{font-size:15px;color:#ffe08a;}
+  /* Lobby-Einstellungen (Host) */
+  #duelCfg{width:100%;max-width:340px;margin:4px 0 8px;padding:10px;border-radius:14px;
+    background:linear-gradient(180deg,rgba(28,20,48,.9),rgba(10,8,20,.92));
+    border:1px solid rgba(255,255,255,.14);box-shadow:0 4px 0 rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.1);
+    display:flex;flex-direction:column;gap:8px;}
+  #duelCfg .cfgRow{display:flex;flex-direction:column;gap:5px;}
+  #duelCfg .cfgLab{font-family:'Press Start 2P',monospace;font-size:7px;letter-spacing:1px;color:#b9a7ff;}
+  #duelCfg .cfgBtns{display:flex;gap:5px;}
+  #duelCfg .cfgBtns button{flex:1;padding:8px 2px;border:1px solid rgba(255,255,255,.14);border-radius:10px;
+    background:linear-gradient(180deg,rgba(48,34,80,.8),rgba(16,12,30,.9));color:#cfc9e6;cursor:pointer;
+    font-family:'Press Start 2P',monospace;font-size:7px;letter-spacing:.5px;
+    transition:transform .12s ease,box-shadow .2s ease,background .2s ease,color .2s ease;}
+  #duelCfg .cfgBtns button:active{transform:translateY(2px);}
+  #duelCfg .cfgBtns button.on{background:linear-gradient(180deg,#8dff3c,#3f9d00);color:#0b1a00;
+    box-shadow:0 0 14px rgba(141,255,60,.45);border-color:rgba(141,255,60,.7);}
+  #duelCfg.locked .cfgBtns button{opacity:.55;cursor:not-allowed;}
+  #duelCfg .cfgNote{font-family:'VT323',monospace;font-size:14px;opacity:.75;letter-spacing:1px;text-align:center;}
 </style>
 </head>
 <body>
