@@ -1481,9 +1481,13 @@ function update(dt){
     if(player.invincible<=0)player.invSrc=null;
     if(player.vy>0)player.vy=Math.max(player.vy,-2);
   }
-  // jetpack — strong sustained lift
+  // jetpack — strong sustained lift + invincible during jetpack
   if(player.jetpackT>0){
     player.jetpackT-=dt;
+    if(player.invincible<player.jetpackT){
+      player.invincible=player.jetpackT;
+      player.invSrc='jetpack';
+    }
     player.vy=Math.min(player.vy,-11);
     // exhaust particles
     if(Math.random()<0.9){
