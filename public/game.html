@@ -255,6 +255,16 @@
     <div class="right"><div class="hudChip bagsChip"><div id="bags">🌿 0</div></div><button id="muteBtn" title="Musik">🔊</button><button id="pauseBtn" title="Pause">❚❚</button></div>
   </div>
   <div id="power"></div>
+  <div id="settings" class="overlay">
+    <h1>EINSTELLUNGEN</h1>
+    <div class="setRow">
+      <div class="setLbl">HELLIGKEIT <span id="brightVal">100%</span></div>
+      <input id="brightRange" type="range" min="50" max="160" step="5" value="100" />
+    </div>
+    <div class="setNote">Regler nach links = dunkler, nach rechts = heller.</div>
+    <button class="btn v-slate" id="brightReset">↺ Zurücksetzen</button>
+    <button class="btn v-green" id="settingsClose">✓ Fertig</button>
+  </div>
   <div id="menu" class="overlay">
     <img class="logoImg" src="/__l5e/assets-v1/69274bbc-7857-4d3d-a4d3-4747a688e509/afro-jump-logo.png" alt="Afro Jump">
     <div class="tag">Doodle-Style Highscore Game</div>
@@ -266,6 +276,7 @@
     <button class="btn v-gold" id="menuBoard">🏆 Rangliste</button>
     <button class="btn v-red" id="menuDuel">⚔ Map-Duell (1v1)</button>
     <button class="btn v-slate" id="menuAccount">👤 Account</button>
+    <button class="btn v-slate" id="menuSettings">⚙ Einstellungen</button>
     <p id="menuAcctStatus" style="font-size:14px;opacity:.7;margin-top:4px;letter-spacing:1px;"></p>
   </div>
   <div id="pause" class="overlay">
@@ -273,6 +284,7 @@
     <h1>PAUSE</h1>
     <button class="btn v-green" id="pauseResume">▶ Weiter</button>
     <button class="btn v-purple" id="pauseShop">🛍 Shop</button>
+    <button class="btn v-blue" id="pauseSettings">⚙ Einstellungen</button>
     <button class="btn v-slate" id="pauseQuit">↺ Neustart</button>
   </div>
   <div id="shop" class="overlay">
