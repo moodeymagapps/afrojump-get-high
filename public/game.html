@@ -1960,7 +1960,39 @@ function drawPlatform(p){
   const h=p.h*squish;
   const yy=y+(p.h-h);
   ctx.save();
-  if(p.type==='spring'){
+  if(p.type==='goal'){
+    // Ziel-Plattform: goldener Zielstreifen mit Flagge
+    const g=ctx.createLinearGradient(0,yy,0,yy+h);
+    g.addColorStop(0,'#ffe680');g.addColorStop(1,'#c9a227');
+    ctx.fillStyle=g;ctx.strokeStyle='#3a2a12';ctx.lineWidth=2;
+    roundRect(p.x,yy,p.w,h,4,true,true);
+    ctx.fillStyle='#111';
+    for(let i=0;i<p.w;i+=12)ctx.fillRect(p.x+i+(Math.floor(i/12)%2?6:0),yy+2,6,4);
+    ctx.strokeStyle='#eee';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(p.x+p.w/2,yy);ctx.lineTo(p.x+p.w/2,yy-26);ctx.stroke();
+    ctx.fillStyle='#7cfc00';ctx.fillRect(p.x+p.w/2,yy-26,18,12);
+    ctx.fillStyle='#fff';ctx.font="7px 'Press Start 2P', monospace";ctx.textAlign='center';
+    ctx.fillText('ZIEL',p.x+p.w/2,yy-30);ctx.textAlign='left';
+    ctx.restore();return;
+  } else if(p.type==='tramp'){
+    // Trampolin: dunkler Rahmen + violette Sprungmatte
+    ctx.strokeStyle='#6a1b9a';ctx.lineWidth=3;
+    ctx.beginPath();ctx.moveTo(p.x+3,yy+h+9);ctx.lineTo(p.x+7,yy+h);ctx.moveTo(p.x+p.w-3,yy+h+9);ctx.lineTo(p.x+p.w-7,yy+h);ctx.stroke();
+    const g=ctx.createLinearGradient(0,yy,0,yy+h);
+    g.addColorStop(0,'#ea80fc');g.addColorStop(1,'#8e24aa');
+    ctx.fillStyle=g;ctx.strokeStyle='#2a0a33';ctx.lineWidth=2;
+    roundRect(p.x,yy+(p.springT>0?3:0),p.w,h,6,true,true);
+    ctx.fillStyle='rgba(255,255,255,.5)';ctx.fillRect(p.x+5,yy+2,p.w-10,2);
+    ctx.restore();return;
+  } else if(p.type==='fake'){
+    // Fake-Plattform: sieht normal aus, bricht sofort weg
+    const g=ctx.createLinearGradient(0,yy,0,yy+h);
+    g.addColorStop(0,'#7fe89a');g.addColorStop(1,'#3aa856');
+    ctx.fillStyle=g;ctx.strokeStyle='#123a1c';ctx.lineWidth=2;
+    roundRect(p.x,yy,p.w,h,4,true,true);
+    ctx.fillStyle='rgba(255,255,255,.35)';ctx.fillRect(p.x+4,yy+2,p.w-8,2);
+    ctx.restore();return;
+  } else if(p.type==='spring'){
     // spring platform
     const sT=p.springT;
     ctx.strokeStyle='#111';ctx.lineWidth=2;
