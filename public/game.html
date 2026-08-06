@@ -1246,7 +1246,7 @@ const duelCfg={size:1500,budget:'normal'};
 const mapRun={phase:null,deaths:0,startT:0,done:false}; // 'test' | 'race'
 // duel state (1v1 online)
 const duel={active:false,code:null,seed:null,role:null,channel:null,ready:false,round:0,
-  myBest:0,oppBest:0,oppDead:false,oppY:null,oppX:W/2,oppFacing:1,oppSkin:'revengebird',
+  myBest:0,oppBest:0,oppDead:false,oppY:null,oppX:W/2,oppFacing:1,oppSkin:'bob',
   finished:false,oppName:'Gegner',countdown:0,myRematch:false,oppRematch:false,
   oppOffline:false,lastSeen:0};
 let shake={t:0,mag:0},timeScale=1,deathT=0,bossIndex=0;
@@ -4745,7 +4745,7 @@ async function duelJoin(code,role){
   let helloReplied=false;
   ch.on('broadcast',{event:'hello'},({payload})=>{
     duel.oppName=payload.name||'Gegner';
-    duel.oppSkin=payload.skin||'revengebird';
+    duel.oppSkin=payload.skin||'bob';
     duel.lastSeen=Date.now();
     if(!helloReplied){helloReplied=true;ch.send({type:'broadcast',event:'hello',payload:{name:myDuelName(),skin:selectedSkin}});}
     if(isDuelHost()){try{ch.send({type:'broadcast',event:'cfg',payload:{size:duelCfg.size,budget:duelCfg.budget}});}catch(_){}}
