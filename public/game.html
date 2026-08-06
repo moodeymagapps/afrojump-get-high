@@ -527,61 +527,26 @@ let totalBags=+localStorage.getItem(BK)||0;
 let grant2000=true;
 localStorage.setItem(GK,'1');
 function applyStarterGrant(){return false;}
-let owned=JSON.parse(localStorage.getItem(OK)||'["classic"]');
-if(!owned.includes('classic'))owned.push('classic');
-let selectedSkin=localStorage.getItem(SK)||'classic';
+const DEFAULT_SKIN='revengebird';
+let owned=JSON.parse(localStorage.getItem(OK)||'["revengebird"]');
+owned=owned.filter(id=>true);
+if(!owned.includes(DEFAULT_SKIN))owned.push(DEFAULT_SKIN);
+let selectedSkin=localStorage.getItem(SK)||DEFAULT_SKIN;
+if(!owned.includes(selectedSkin))selectedSkin=DEFAULT_SKIN;
 highEl.textContent='Best: '+highScore+'m';
 
 // Skins catalog
 const SKINS=[
-  {id:'classic',name:'Classic',price:0,afro:'#2b1a0a',skin:'#5b3a1a',body:'#e57373',arms:'#c68863',pants:'#2d4373',joint:'#e8d9ac'},
-  {id:'blonde', name:'Blondie',price:50, afro:'#f4d35e',skin:'#f5c890',body:'#4fc3f7',arms:'#3ba8d8',pants:'#263238',joint:'#e8d9ac'},
-  {id:'hippy',  name:'Hippy',  price:60, afro:'#2b1a0a',skin:'#7a4a20',body:'#7c4dff',arms:'#5e35b1',pants:'#8d6e63',joint:'#e8d9ac',flower:true},
-  {id:'stoner', name:'Stoner', price:80, afro:'#2b1a0a',skin:'#e0b48a',body:'#2e7d32',arms:'#1b5e20',pants:'#3e2723',joint:'#e8d9ac',hood:'#2e7d32'},
-  {id:'greenbuddy',name:'Green Buddy',price:100,afro:'#2e7d32',skin:'#c9975a',body:'#43a047',arms:'#2e7d32',pants:'#263238',joint:'#e8d9ac'},
-  {id:'ginger', name:'Ginger', price:120,afro:'#c9531f',skin:'#f5c890',body:'#7cb342',arms:'#5e8f2a',pants:'#3e2723',joint:'#e8d9ac'},
-  {id:'blaze',  name:'Blaze',  price:140,afro:'#ff7a1a',skin:'#7b4a1a',body:'#111',arms:'#222',pants:'#000',joint:'#e8d9ac'},
-  {id:'maryjane',name:'Mary Jane',price:160,afro:'#2b1a0a',skin:'#c9975a',body:'#66bb6a',arms:'#43a047',pants:'#2e7d32',joint:'#e8d9ac',flower:true},
-  {id:'dog',    name:'Stoner Dog',price:180,render:'dog'},
-  {id:'skunkboy',name:'Skunk Boy',price:200,render:'skunkboy'},
-  {id:'punk',   name:'Punk',   price:220,afro:'#e91e63',skin:'#7b4a1a',body:'#111',arms:'#333',pants:'#c62828',joint:'#e8d9ac'},
-  {id:'ice',    name:'Ice',    price:240,afro:'#e0f7fa',skin:'#9fbdd8',body:'#0288d1',arms:'#01579b',pants:'#1a237e',joint:'#b3e5fc'},
-  {id:'cat',    name:'Chill Cat',price:260,render:'cat'},
-  {id:'ogg',    name:'OG G',    price:280,render:'ogg'},
-  {id:'dopechef',name:'Dope Chef',price:300,render:'chef'},
-  {id:'gold',   name:'Golden', price:320,afro:'#ffd700',skin:'#8a5a1a',body:'#ffb300',arms:'#c68400',pants:'#4a2c00',joint:'#fff9c4'},
-  {id:'rainbowhigh',name:'Rainbow High',price:340,afro:'RAINBOW',skin:'#c9975a',body:'#7c4dff',arms:'#5e35b1',pants:'#212121',joint:'#e8d9ac'},
-  {id:'kushking',name:'Kush King',price:380,render:'kushking'},
-  {id:'chroniccowboy',name:'Chronic Cowboy',price:400,render:'cowboy'},
-  {id:'robot',  name:'420 Bot',price:420,render:'robot'},
-  {id:'dankninja',name:'Dank Ninja',price:450,render:'ninja'},
-  {id:'shadow', name:'Shadow', price:470,afro:'#111',skin:'#3a3a3a',body:'#1a1a1a',arms:'#0a0a0a',pants:'#000',joint:'#7c4dff'},
-  {id:'ganjascientist',name:'Ganja Scientist',price:490,render:'scientist'},
-  {id:'rasta',  name:'Rasta',  price:510,afro:'#2b1a0a',skin:'#5b3a1a',body:'#c62828',arms:'#2e7d32',pants:'#f9a825',joint:'#e8d9ac'},
-  {id:'bobmarley',name:'Reggae Rob',price:540,render:'reggae'},
-  {id:'puffpilot',name:'Puff Pilot',price:560,render:'pilot'},
-  {id:'suit420',name:'420 Suit', price:580,render:'suit'},
-  {id:'alien',  name:'Alien',  price:600,render:'alien'},
-  {id:'thcalien',name:'THC Alien',price:620,render:'thcalien'},
-  {id:'bonghead',name:'Bong Head',price:640,render:'bonghead'},
-  {id:'spliffstar',name:'Spliff Star',price:660,render:'star'},
-  {id:'rollingpaper',name:'Rolling Paper',price:680,render:'paperhead'},
-  {id:'pineapple',name:'Pineapple Express',price:700,render:'pineapple'},
-  {id:'cloudwalker',name:'Cloud Walker',price:720,render:'cloud'},
-  {id:'stickyicky',name:'Sticky Icky',price:750,render:'sticky'},
-  {id:'spacecadet',name:'Space Cadet',price:800,render:'astronaut'},
-  {id:'fabi',   name:'Prinzessin Fabi',price:1000,render:'fabi'},
-  // ---- Community / photo-based pixel skins ----
-  // fixed prices (community:true → excluded from the auto price curve)
+  // ---- Nur noch die Pixel-Art Community-Skins ----
+  {id:'revengebird',name:'RevengeBird',price:0,    community:true, rarity:'legendary', img:'skins/revengebird.png',anchorY:0.72},
   {id:'ina',        name:'Ina',        price:900,  community:true, rarity:'epic',      img:'skins/ina.png',        anchorY:0.72},
-  {id:'sierrakidd', name:'Sierra Kidd', price:1100, community:true, rarity:'epic',      img:'skins/sierrakidd.jpg', anchorY:0.72},
+  {id:'sierrakidd', name:'Sierra Kidd',price:1100, community:true, rarity:'epic',      img:'skins/sierrakidd.jpg', anchorY:0.72},
   {id:'danjo420',   name:'Danjo420',   price:1100, community:true, rarity:'epic',      img:'skins/danjo420.jpg',   anchorY:0.74},
   {id:'fabienne',   name:'Fabienne',   price:1300, community:true, rarity:'epic',      img:'skins/fabienne.jpg',   anchorY:0.74},
   {id:'kosak',      name:'Kosak',      price:1500, community:true, rarity:'epic',      img:'skins/kosak.png',      anchorY:0.72},
   {id:'yannic',     name:'Yannic',     price:1700, community:true, rarity:'legendary', img:'skins/yannic.jpg',     anchorY:0.72},
-  {id:'moodey',     name:'Moodey',     price:2000, community:true, rarity:'legendary', img:'skins/moodey.jpg',     anchorY:0.72, bgKey:'white'},
   {id:'stephan',    name:'Stephan',    price:1900, community:true, rarity:'legendary', img:'skins/stephan.png',    anchorY:0.72, bgKey:'white'},
-  {id:'revengebird',name:'RevengeBird',price:2400, community:true, rarity:'legendary', img:'skins/revengebird.png',anchorY:0.72},
+  {id:'moodey',     name:'Moodey',     price:2000, community:true, rarity:'legendary', img:'skins/moodey.jpg',     anchorY:0.72, bgKey:'white'},
 ];
 
 // ================= ÖKONOMIE, RARITÄTEN & LOOT =================
@@ -593,7 +558,7 @@ const RARITY={
   legendary:{name:'TOP SHELF',color:'#ffd54a', refund:800},
 };
 // These character skins are loot-box exclusive (no purchase possible)
-const LOOT_ONLY_SKINS=new Set(['dankninja','ganjascientist','puffpilot','thcalien','bonghead','rollingpaper','cloudwalker','spacecadet','chroniccowboy','kushking','rainbowhigh','fabi']);
+const LOOT_ONLY_SKINS=new Set([]);
 // Rebalanced price curve: cheap entry skins, real long-term goals at the top
 (function rebalanceEconomy(){
   const tiers=[0,120,220,350,500,700,950,1300,1700,2200,2800];
@@ -1279,7 +1244,7 @@ const duelCfg={size:1500,budget:'normal'};
 const mapRun={phase:null,deaths:0,startT:0,done:false}; // 'test' | 'race'
 // duel state (1v1 online)
 const duel={active:false,code:null,seed:null,role:null,channel:null,ready:false,round:0,
-  myBest:0,oppBest:0,oppDead:false,oppY:null,oppX:W/2,oppFacing:1,oppSkin:'classic',
+  myBest:0,oppBest:0,oppDead:false,oppY:null,oppX:W/2,oppFacing:1,oppSkin:'revengebird',
   finished:false,oppName:'Gegner',countdown:0,myRematch:false,oppRematch:false,
   oppOffline:false,lastSeen:0};
 let shake={t:0,mag:0},timeScale=1,deathT=0,bossIndex=0;
@@ -4778,7 +4743,7 @@ async function duelJoin(code,role){
   let helloReplied=false;
   ch.on('broadcast',{event:'hello'},({payload})=>{
     duel.oppName=payload.name||'Gegner';
-    duel.oppSkin=payload.skin||'classic';
+    duel.oppSkin=payload.skin||'revengebird';
     duel.lastSeen=Date.now();
     if(!helloReplied){helloReplied=true;ch.send({type:'broadcast',event:'hello',payload:{name:myDuelName(),skin:selectedSkin}});}
     if(isDuelHost()){try{ch.send({type:'broadcast',event:'cfg',payload:{size:duelCfg.size,budget:duelCfg.budget}});}catch(_){}}
