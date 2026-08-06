@@ -4557,6 +4557,304 @@ document.getElementById('duelCreate').onclick=()=>{
   }
 })();
 
+// ================= MAP-DUELL: Editor + Rennen =================
+const edBarEl=document.getElementById('edBar');
+const edPalEl=document.getElementById('edPal');
+const edMsgEl=document.getElementById('edMsg');
+const edPhaseEl=document.getElementById('edPhase');
+const edBudgetEl=document.getElementById('edBudget');
+const edScrollEl=document.getElementById('edScroll');
+const edSendBtn=document.getElementById('edSend');
+const ed={cam:0,tool:'plat',parts:[],hist:[],verified:false,rev:0,world:null,worldRev:-1,cursor:null,valid:null};
+const CAM_MIN=GOAL_Y-90, CAM_MAX=0;
+const CAT_NAMES={plat:'PLATTF.',boost:'BOOST',trap:'FALLE',enemy:'GEGNER',item:'ITEM'};
+
+function edTouch(){ed.rev++;ed.verified=false;edValidate();edRefreshUI();}
+function edCount(cat){let n=0;for(const q of ed.parts)if(PART_BY_K[q.k]&&PART_BY_K[q.k].cat===cat)n++;return n;}
+function edWorld(){
+  if(ed.worldRev===ed.rev&&ed.world)return ed.world;
+  const out={platforms:[],collectibles:[],enemies:[],hazards:[],zones:[]};
+  buildCustomWorld({parts:ed.parts},out);
+  ed.world=out;ed.worldRev=ed.rev;return out;
+}
+// --- Erreichbarkeits-Check: verhindert offensichtlich unspielbare Maps ---
+function edValidate(){
+  const nodes=[{x:W/2,y:START_Y,k:'plat'}];
+  for(const q of ed.parts)if(PLAT_KINDS[q.k])nodes.push(q);
+  const goal={x:W/2,y:GOAL_Y,k:'goal'};
+  nodes.push(goal);
+  const reach=new Set([0]);
+  const jumpH=q=>q.k==='spring'?400:q.k==='tramp'?720:190;
+  let changed=true;
+  while(changed){
+    changed=false;
+    for(let i=0;i<nodes.length;i++){
+      if(!reach.has(i))continue;
+      const a=nodes[i],up=jumpH(a.k);
+      for(let j=0;j<nodes.length;j++){
+        if(reach.has(j))continue;
+        const b=nodes[j];
+        let dx=Math.abs(a.x-b.x);dx=Math.min(dx,W-dx); // Bildschirmrand-Wrap
+        const dy=a.y-b.y;
+        const okUp=dy>0&&dy<=up&&dx<=210;
+        const okDown=dy<=0&&-dy<=520&&dx<=230;
+        if(okUp||okDown){reach.add(j);changed=true;}
+      }
+    }
+  }
+  const bad=[];
+  for(let i=1;i<nodes.length-1;i++)if(!reach.has(i))bad.push(nodes[i]);
+  ed.valid={ok:reach.has(nodes.length-1),bad,nodes};
+  return ed.valid;
+}
+function edRefreshUI(){
+  const c=ed.valid||edValidate();
+  edBudgetEl.textContent=edCount('plat')+'/'+BUDGET.plat+' ▬  '+edCount('boost')+'/'+BUDGET.boost+' ⇧  '+edCount('trap')+'/'+BUDGET.trap+' ▲  '+edCount('enemy')+'/'+BUDGET.enemy+' 👮  '+edCount('item')+'/'+BUDGET.item+' 🌿';
+  edSendBtn.disabled=!ed.verified;
+  if(!ed.msgSticky){
+    if(ed.verified)edMsgEl.innerHTML='<span style="color:#7cfc00">✔ Selbst geschafft – jetzt senden!</span>';
+    else if(!c.ok)edMsgEl.innerHTML='<span style="color:#ff8a80">✘ Weg zum Ziel unterbrochen</span>';
+    else if(c.bad.length)edMsgEl.innerHTML='<span style="color:#ffd54a">⚠ '+c.bad.length+' Teil(e) unerreichbar</span> – Test läuft trotzdem';
+    else edMsgEl.innerHTML='Weg sieht gut aus – jetzt <b>▶ TEST</b> spielen (Pflicht!)';
+  }
+}
+function edSay(html,sticky){edMsgEl.innerHTML=html;ed.msgSticky=!!sticky;if(sticky)setTimeout(()=>{ed.msgSticky=false;edRefreshUI();},1800);}
+function edSetCam(y){ed.cam=Math.max(CAM_MIN,Math.min(CAM_MAX,y));edScrollEl.value=String(Math.round((ed.cam-CAM_MIN)/(CAM_MAX-CAM_MIN)*1000));}
+function edSnap(v){return Math.round(v/10)*10;}
+
+function edPlace(lx,ly){
+  const wy=edSnap(ly+ed.cam), wx=edSnap(Math.max(24,Math.min(W-24,lx)));
+  if(ed.tool==='erase'){
+    let bi=-1,bd=1e9;
+    for(let i=0;i<ed.parts.length;i++){
+      const d=Math.hypot(ed.parts[i].x-wx,ed.parts[i].y-wy);
+      if(d<40&&d<bd){bd=d;bi=i;}
+    }
+    if(bi>=0){const rem=ed.parts.splice(bi,1)[0];ed.hist.push({t:'del',p:rem,i:bi});edTouch();sfx('pickup');}
+    else edSay('Nichts zum Löschen hier.',true);
+    return;
+  }
+  const def=PART_BY_K[ed.tool];if(!def)return;
+  if(wy>START_Y-70){edSay('Zu nah an der Startplattform.',true);return;}
+  if(wy<GOAL_Y+60){edSay('Zu nah am Ziel.',true);return;}
+  if(edCount(def.cat)>=BUDGET[def.cat]){edSay('Budget für '+CAT_NAMES[def.cat]+' aufgebraucht.',true);return;}
+  if(PLAT_KINDS[def.k]){
+    for(const q of ed.parts){
+      if(!PLAT_KINDS[q.k])continue;
+      if(Math.abs(q.y-wy)<24&&Math.abs(q.x-wx)<76){edSay('Da liegt schon eine Plattform.',true);return;}
+    }
+  }
+  if(def.cat==='enemy'||def.k==='spike'){
+    let host=null;
+    const cand=[{x:W/2,y:START_Y,k:'plat'}].concat(ed.parts.filter(q=>PLAT_KINDS[q.k]));
+    for(const q of cand){
+      const pw=q.k==='tramp'?70:80;
+      if(Math.abs(q.y-wy)<52&&wx>q.x-pw/2-8&&wx<q.x+pw/2+8){host=q;break;}
+    }
+    if(!host){edSay((def.cat==='enemy'?'Gegner':'Stacheln')+' brauchen eine Plattform darunter.',true);return;}
+    ed.parts.push({k:def.k,x:host.x,y:host.y});ed.hist.push({t:'add'});edTouch();sfx('pickup');return;
+  }
+  ed.parts.push({k:def.k,x:wx,y:wy});ed.hist.push({t:'add'});edTouch();sfx('pickup');
+}
+function edUndo(){
+  const h=ed.hist.pop();if(!h)return;
+  if(h.t==='add')ed.parts.pop();
+  else ed.parts.splice(h.i,0,h.p);
+  edTouch();
+}
+
+// ---------- Editor-Rendering ----------
+function drawEditor(){
+  cameraY=ed.cam;
+  bestY=Math.max(0,Math.round((START_Y-ed.cam-H*0.4)/10));
+  drawBg();
+  const w=edWorld();
+  for(const z of w.zones)drawZone(z);
+  // Raster + Höhenmarken
+  ctx.save();
+  ctx.strokeStyle='rgba(255,255,255,.10)';ctx.lineWidth=1;
+  ctx.font="7px 'Press Start 2P', monospace";ctx.textAlign='left';
+  const step=200;
+  const top=ed.cam-step, bot=ed.cam+H+step;
+  for(let wy=Math.ceil(bot/step)*step;wy>top;wy-=step){
+    const y=wy-ed.cam;
+    ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.45)';
+    ctx.fillText(Math.round((START_Y-wy)/10)+'m',4,y-3);
+  }
+  ctx.restore();
+  for(const p of w.platforms)drawPlatform(p);
+  for(const hz of w.hazards)drawHazard(hz);
+  for(const c of w.collectibles)drawCollectible(c);
+  for(const e of w.enemies)drawEnemy(e);
+  // unerreichbare Teile markieren
+  if(ed.valid&&ed.valid.bad.length){
+    ctx.save();ctx.strokeStyle='#ff5252';ctx.lineWidth=2;
+    for(const b of ed.valid.bad){
+      const y=b.y-ed.cam;if(y<-40||y>H+40)continue;
+      ctx.beginPath();ctx.moveTo(b.x-16,y-10);ctx.lineTo(b.x+16,y+14);ctx.moveTo(b.x+16,y-10);ctx.lineTo(b.x-16,y+14);ctx.stroke();
+    }
+    ctx.restore();
+  }
+  // Cursor-Vorschau
+  if(ed.cursor){
+    ctx.save();ctx.globalAlpha=0.5;
+    const def=PART_BY_K[ed.tool];
+    ctx.fillStyle=ed.tool==='erase'?'#ff5252':'#7cfc00';
+    ctx.font="18px 'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace";ctx.textAlign='center';
+    ctx.fillText(ed.tool==='erase'?'✕':(def?def.icon:'?'),ed.cursor.x,ed.cursor.y+6);
+    ctx.restore();
+  }
+  // Kopfzeile
+  ctx.save();
+  ctx.fillStyle='rgba(0,0,0,.5)';ctx.fillRect(0,0,W,26);
+  ctx.fillStyle='#7cfc00';ctx.font="9px 'Press Start 2P', monospace";ctx.textAlign='center';
+  ctx.fillText('MAP FÜR '+String(duel.oppName||'GEGNER').toUpperCase().slice(0,10),W/2,17);
+  ctx.restore();
+}
+
+// ---------- Test- und Renn-Läufe ----------
+function startMapRun(parts,phase){
+  customMap={parts:parts.slice()};
+  mapRun.phase=phase;mapRun.deaths=0;mapRun.done=false;mapRun.startT=Date.now();
+  mapFailT=0;
+  reset();
+  gameState='playing';showOverlay('playing');
+  if(phase==='race'){duel.countdown=3.2;stopMusic();tryPlayMusic();}
+  else tryPlayMusic();
+}
+function exitToEditor(msg){
+  customMap=null;mapRun.phase=null;mapRun.done=false;
+  gameState='editor';showOverlay('editor');
+  edValidate();edRefreshUI();
+  if(msg)edSay(msg,true);
+}
+function onGoalReached(){
+  if(mapRun.phase==='test'){
+    ed.verified=true;
+    setTimeout(()=>exitToEditor('<span style="color:#7cfc00">✔ Map bestätigt spielbar!</span>'),900);
+    return;
+  }
+  if(mapRun.phase==='race'){
+    const t=Date.now()-mapRun.startT;
+    if(duel.channel)duel.channel.send({type:'broadcast',event:'goal',payload:{t}});
+    duel.myGoalT=t;
+    setTimeout(()=>finishMapDuel(!duel.oppGoalT),700);
+  }
+}
+function finishMapDuel(win){
+  if(duel.finished)return;
+  duel.finished=true;
+  gameState='gameover';gameOver=true;
+  const res=document.getElementById('duelResult');
+  finalScore.textContent='Map von '+(duel.oppName||'Gegner');
+  finalHigh.textContent='Versuche: '+(mapRun.deaths+1);
+  finalBags.textContent='🌿 '+totalBags;
+  if(win){
+    const bonus=200;totalBags+=bonus;localStorage.setItem(BK,totalBags);updateBagsUI();
+    res.innerHTML='🏆 <b>GEWONNEN!</b> Du warst zuerst oben (+🌿'+bonus+')';
+    missionProgress('duelwin',1);
+  }else{
+    res.innerHTML='💀 Verloren – dein Gegner war zuerst am Ziel.';
+  }
+  duelGameOverBtn.style.display='block';
+  customMap=null;mapRun.phase=null;
+  showOverlay('gameover');
+}
+
+// ---------- Bauphase / Netzwerk ----------
+function duelBeginBuild(){
+  duel.active=true;duel.mapMode=true;
+  duel.myMapSent=false;duel.oppMap=null;duel.oppGoalT=0;duel.myGoalT=0;duel.oppProg=0;
+  duel.finished=false;duel.raceStarted=false;
+  customMap=null;mapRun.phase=null;mapRun.done=false;
+  ed.parts=[];ed.hist=[];ed.verified=false;ed.rev++;ed.world=null;ed.worldRev=-1;
+  edSetCam(CAM_MAX);
+  gameState='editor';showOverlay('editor');
+  edValidate();edRefreshUI();
+  edPhaseEl.textContent='MAP BAUEN';
+}
+function duelSendMap(){
+  if(!ed.verified){edSay('Erst selbst schaffen (▶ TEST), dann senden.',true);return;}
+  duel.myMapSent=true;
+  if(duel.channel)duel.channel.send({type:'broadcast',event:'map',payload:{parts:ed.parts}});
+  if(duel.oppMap)tryStartRace();
+  else{
+    gameState='menu';showOverlay('duel');duelEl.style.display='flex';
+    duelSay('Map gesendet ✔<br>Warte auf die Map von <b style="color:#7cfc00">'+escHtml(duel.oppName||'Gegner')+'</b>…');
+  }
+}
+function tryStartRace(){
+  if(duel.raceStarted||!duel.myMapSent||!duel.oppMap)return;
+  duel.raceStarted=true;
+  duelEl.style.display='none';
+  document.getElementById('duelResult').textContent='';
+  duelGameOverBtn.style.display='none';
+  startMapRun(duel.oppMap,'race');
+}
+
+// ---------- Editor-Bedienung ----------
+for(const def of PARTS.concat([{k:'erase',cat:null,icon:'✕',name:'Radier'}])){
+  const b=document.createElement('button');
+  b.innerHTML='<span>'+def.icon+'</span><b>'+def.name+'</b>';
+  b.dataset.k=def.k;
+  b.onclick=()=>{ed.tool=def.k;for(const o of edPalEl.children)o.classList.toggle('on',o.dataset.k===def.k);};
+  if(def.k==='plat')b.classList.add('on');
+  edPalEl.appendChild(b);
+}
+edScrollEl.addEventListener('input',()=>{
+  const t=Number(edScrollEl.value)/1000;
+  ed.cam=CAM_MIN+(CAM_MAX-CAM_MIN)*t;
+});
+document.getElementById('edUndo').onclick=()=>edUndo();
+document.getElementById('edClear').onclick=()=>{if(!ed.parts.length)return;ed.parts=[];ed.hist=[];edTouch();edSay('Map geleert.',true);};
+document.getElementById('edTest').onclick=()=>{
+  if(!ed.parts.length){edSay('Baue erst ein paar Teile.',true);return;}
+  startMapRun(ed.parts,'test');
+};
+edSendBtn.onclick=()=>duelSendMap();
+// Abbruch-Button im Pause-Menü (nur im Testlauf)
+const edBackBtn=document.createElement('button');
+edBackBtn.className='btn alt';edBackBtn.textContent='✏ Zurück zum Editor';
+edBackBtn.style.display='none';
+edBackBtn.onclick=()=>{resumeGuard=false;exitToEditor();};
+pauseEl.appendChild(edBackBtn);
+let resumeGuard=false;
+const _pauseGame=pauseGame;
+pauseGame=function(){_pauseGame();edBackBtn.style.display=(mapRun.phase==='test')?'block':'none';};
+
+// Zeigen/Verstecken je Zustand
+(function edPointer(){
+  let down=null,moved=false;
+  const toLogic=(e)=>{
+    const r=cv.getBoundingClientRect();
+    return {x:(e.clientX-r.left)/r.width*W,y:(e.clientY-r.top)/r.height*H};
+  };
+  cv.addEventListener('pointerdown',e=>{
+    if(gameState!=='editor')return;
+    const p=toLogic(e);
+    down={x:p.x,y:p.y,cam:ed.cam};moved=false;ed.cursor=p;
+  });
+  cv.addEventListener('pointermove',e=>{
+    if(gameState!=='editor')return;
+    const p=toLogic(e);ed.cursor=p;
+    if(!down)return;
+    if(Math.abs(p.y-down.y)>10||moved){
+      moved=true;
+      edSetCam(down.cam-(p.y-down.y));
+    }
+  });
+  const up=(e)=>{
+    if(gameState!=='editor'||!down)return;
+    const p=toLogic(e);
+    if(!moved)edPlace(p.x,p.y);
+    down=null;
+  };
+  cv.addEventListener('pointerup',up);
+  cv.addEventListener('pointercancel',()=>{down=null;});
+  cv.addEventListener('pointerleave',()=>{ed.cursor=null;});
+})();
+
 reset();
 goMenu();
 requestAnimationFrame(loop);
