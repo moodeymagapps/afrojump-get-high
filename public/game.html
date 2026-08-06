@@ -4394,6 +4394,10 @@ async function pushCloudSave(nameOverride){
 }
 let cloudSyncT=null;
 function cloudSyncSoon(){if(!sb||!sbUser)return;clearTimeout(cloudSyncT);cloudSyncT=setTimeout(pushCloudSave,1500);}
+// Skins/Fortschritt dauerhaft am Account: beim Verlassen/Tabwechsel sofort sichern
+function cloudSyncNow(){if(!sb||!sbUser)return;clearTimeout(cloudSyncT);pushCloudSave();}
+window.addEventListener('pagehide',()=>cloudSyncNow());
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')cloudSyncNow();});
 
 // Auto-sync total bags occasionally
 const origPersistShop=persistShop;
