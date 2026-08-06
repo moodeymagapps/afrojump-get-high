@@ -3861,7 +3861,7 @@ function render(){
   for(const c of collectibles)if(!c.taken)drawCollectible(c);
   for(const e of enemies)drawEnemy(e);
   // duel: opponent ghost on the shared map
-  if(duel.active&&duel.oppY!==null){
+  if(duel.active&&duel.oppY!==null&&!customMap){
     const gy=duel.oppY-cameraY;
     const onScreen=gy>-40&&gy<H+40;
     const oppSkin=SKINS.find(s=>s.id===duel.oppSkin)||SKINS[0];
@@ -3892,7 +3892,7 @@ function render(){
     ctx.restore();
   }
   // duel: lead indicator + countdown
-  if(duel.active){
+  if(duel.active&&!customMap){
     const lead=(duel.myBest||bestY)-duel.oppBest;
     ctx.save();
     ctx.font="9px 'Press Start 2P', monospace";ctx.textAlign='center';
@@ -3906,6 +3906,26 @@ function render(){
       ctx.fillStyle='#fff';ctx.font="10px 'Press Start 2P', monospace";
       ctx.fillText('VS '+(duel.oppName||'Gegner').slice(0,12),W/2,H/2+40);
     }
+    ctx.restore();
+  }
+  // Map-Duell: Fortschrittsbalken statt Geister (jeder spielt eine andere Map)
+  if(customMap){
+    const prog=Math.max(0,Math.min(1,(START_Y-player.y)/(START_Y-GOAL_Y)));
+    const oppProg=Math.max(0,Math.min(1,(duel.oppProg||0)));
+    ctx.save();
+    ctx.font="8px 'Press Start 2P', monospace";ctx.textAlign='left';
+    const bar=(bx,by,p,col,label)=>{
+      ctx.fillStyle='rgba(0,0,0,.55)';ctx.fillRect(bx,by,10,150);
+      ctx.fillStyle=col;ctx.fillRect(bx+2,by+148-146*p,6,146*p);
+      ctx.strokeStyle='#000';ctx.lineWidth=1;ctx.strokeRect(bx,by,10,150);
+      ctx.fillStyle=col;ctx.fillText(label,bx-2,by-6);
+    };
+    bar(14,110,prog,'#7cfc00','DU');
+    if(mapRun.phase==='race')bar(W-24,110,oppProg,'#ff8a80','GEG');
+    ctx.fillStyle='#fff';ctx.textAlign='center';
+    ctx.fillText(Math.round(prog*100)+'%  ZIEL '+GOAL_M+'m',W/2,H-14);
+    if(mapRun.deaths)ctx.fillText('💀 '+mapRun.deaths,W/2,H-28);
+    ctx.textAlign='left';
     ctx.restore();
   }
   {
