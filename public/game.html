@@ -5004,6 +5004,7 @@ function finishMapDuel(win){
 // ---------- Bauphase / Netzwerk ----------
 function duelBeginBuild(){
   duel.active=true;duel.mapMode=true;
+  applyDuelCfg();
   duel.myMapSent=false;duel.oppMap=null;duel.oppGoalT=0;duel.myGoalT=0;duel.oppProg=0;
   duel.finished=false;duel.raceStarted=false;
   customMap=null;mapRun.phase=null;mapRun.done=false;
@@ -5011,7 +5012,7 @@ function duelBeginBuild(){
   edSetCam(CAM_MAX);
   gameState='editor';showOverlay('editor');
   edValidate();edRefreshUI();
-  edPhaseEl.textContent='MAP BAUEN';
+  edPhaseEl.textContent='MAP BAUEN · ZIEL '+GOAL_M+'m'+(duelCfg.budget==='inf'?' · ∞':'');
 }
 function duelSendMap(){
   if(!ed.verified){edSay('Erst selbst schaffen (▶ TEST), dann senden.',true);return;}
