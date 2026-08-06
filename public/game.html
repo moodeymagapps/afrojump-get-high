@@ -4610,6 +4610,7 @@ function duelLeave(){
   if(duel.channel){try{duel.channel.send({type:'broadcast',event:'bye',payload:{}});}catch(_){}
     try{duel.channel.unsubscribe();}catch(_){}}
   duel.channel=null;duel.active=false;duel.code=null;duel.seed=null;duel.ready=false;duel.round=0;
+  duel.role=null;
   duel.mapMode=false;customMap=null;mapRun.phase=null;mapRun.done=false;
   duelResetRound();
   duelCopyBtn.style.display='none';duelRematchBtn.style.display='none';
