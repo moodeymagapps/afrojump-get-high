@@ -652,7 +652,7 @@ function showOverlay(which){
   const eb=document.getElementById('edBar');
   if(eb)eb.classList.toggle('on',which==='editor');
   const hintEl=document.getElementById('hint');
-  if(hintEl)hintEl.style.display=which==='editor'?'none':'block';
+  if(hintEl)hintEl.style.display=(which==='editor'||customMap)?'none':'block';
   const uiEl=document.getElementById('ui');
   if(uiEl)uiEl.style.display=which==='editor'?'none':'flex';
   powerEl.style.display=which==='editor'?'none':'block';
