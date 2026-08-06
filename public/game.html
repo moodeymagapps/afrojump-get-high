@@ -1559,7 +1559,15 @@ function update(dt){
           if(p.type==='spring'){player.vy=-22;p.springT=1;burst(p.x+p.w/2,p.y,'#ffd54a',6);}
           else if(p.type==='tramp'){player.vy=-30;p.springT=1;burst(p.x+p.w/2,p.y,'#e040fb',10);sfx('pickup');}
           else if(p.type==='goal'){player.vy=-6;}
+          else if(p.type==='boost'){player.vy=-25;p.springT=1;burst(p.x+p.w/2,p.y,'#ffd54a',10);sfx('pickup');}
+          else if(p.type==='tech'){player.vy=-13.5;player.y-=230;burst(p.x+p.w/2,p.y,'#b388ff',18);pushFloat(p.x+p.w/2,p.y-10,'BEAM!','#b388ff');sfx('pickup');}
+          else if(p.type==='slip'){player.vy=-11;player.x+=(player.x<p.x+p.w/2?-16:16);}
+          else if(p.type==='conveyor'){player.vy=-13.5;player.x+=p.dir*24;}
+          else if(p.type==='crate'){player.vy=-16;burst(p.x+p.w/2,p.y+6,'#c98a3c',18);p.dead=true;
+            for(const en of enemies)if(en.plat===p){en.alive=false;en.plat=null;}
+            collectibles.push({x:p.x+p.w/2,y:p.y-14,type:'bag',t:0,taken:false});}
           else{player.vy=-13.5;}
+          if(player.x<12)player.x=12;if(player.x>W-12)player.x=W-12;
           p.bounce=1;
           player.landedT=0.15;
           player.squash=1.35;player.stretch=0.75;
@@ -1583,6 +1591,17 @@ function update(dt){
 
   // purge destroyed brittle platforms (no ghost graphics left behind)
   if(platforms.some(p=>p.dead))platforms=platforms.filter(p=>!p.dead);
+
+  // Lava-Plattformen: Kontakt = Tod (im Duell -> Respawn)
+  for(const p of platforms){
+    if(p.type!=='lava'||p.dead)continue;
+    if(player.x>p.x-6&&player.x<p.x+p.w+6&&player.y+player.r>p.y-2&&player.y-player.r<p.y+p.h+8){
+      if(player.invincible>0){burst(player.x,player.y,'#ff7043',12);}
+      else if(boss&&player.bossLives>0)hurtPlayer();
+      else{burst(player.x,player.y,'#ff5722',24);die();}
+      break;
+    }
+  }
 
   // enemies patrol
   for(const e of enemies){
