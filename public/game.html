@@ -4884,6 +4884,9 @@ pauseGame=function(){_pauseGame();edBackBtn.style.display=(mapRun.phase==='test'
 reset();
 goMenu();
 requestAnimationFrame(loop);
+// kleine Debug-Brücke (nur zum Testen des Editors/Duells)
+window.__afro={ed,duel,mapRun,duelBeginBuild,startMapRun,exitToEditor,
+  get state(){return gameState;},get player(){return player;},get goalY(){return goalY;},get customMap(){return customMap;}};
 })();
 </script>
 </body>
