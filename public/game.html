@@ -4067,7 +4067,7 @@ function loop(t){
     if(player.jetpackT>0)parts.push('🚀 JETPACK '+player.jetpackT.toFixed(1)+'s');
     if(player.gunT>0)parts.push('🔫 GUN '+player.gunT.toFixed(1)+'s');
     if(killCombo>1)parts.push('🔥 COMBO x'+killCombo);
-    if(duel.active)parts.push('⚔ '+(duel.oppName||'Gegner')+': '+duel.oppBest+'m');
+    if(duel.active)parts.push('⚔ '+(duel.oppName||'Gegner')+': '+(customMap?Math.round((duel.oppProg||0)*100)+'%':duel.oppBest+'m'));
   }
   const pTxt=parts.join('  ');
   if(pTxt!==hud.power){hud.power=pTxt;powerEl.textContent=pTxt;}
