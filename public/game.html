@@ -527,9 +527,9 @@ let totalBags=+localStorage.getItem(BK)||0;
 let grant2000=true;
 localStorage.setItem(GK,'1');
 function applyStarterGrant(){return false;}
-const DEFAULT_SKIN='bob';
-let owned=JSON.parse(localStorage.getItem(OK)||'["bob"]');
-// Migration: alter Standard-Skin heißt jetzt "Bob"
+const DEFAULT_SKIN='james';
+let owned=JSON.parse(localStorage.getItem(OK)||'["james"]');
+// Migration: alter Standard-Skin heißt jetzt "James"
 owned=owned.map(id=>id==='revengebird'?'bob':id);
 if(!owned.includes(DEFAULT_SKIN))owned.push(DEFAULT_SKIN);
 let selectedSkin=localStorage.getItem(SK)||DEFAULT_SKIN;
