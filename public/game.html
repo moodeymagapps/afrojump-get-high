@@ -3277,6 +3277,14 @@ function drawCollectible(c){
     ctx.restore();
   }else if(c.type==='jetpack'){
     ctx.save();
+    const jp=sprite('jetpack');
+    if(jp){
+      const hh=40, ww=hh*(jp.width/jp.height);
+      ctx.imageSmoothingEnabled=false;
+      const bob=Math.sin(c.t*4)*1.5;
+      ctx.drawImage(jp,c.x-ww/2,y-hh*0.55+bob,ww,hh);
+      ctx.restore();return;
+    }
     // twin tanks
     ctx.fillStyle='#c62828';ctx.strokeStyle='#111';ctx.lineWidth=1.5;
     roundRect(c.x-9,y-10,7,18,2,true,true);
