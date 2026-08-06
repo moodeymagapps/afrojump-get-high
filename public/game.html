@@ -539,16 +539,16 @@ highEl.textContent='Best: '+highScore+'m';
 // Skins catalog
 const SKINS=[
   // ---- Nur noch die Pixel-Art Community-Skins ----
-  {id:'james',      name:'James',      price:0,    community:true, rarity:'legendary', img:'skins/james.png',      anchorY:0.72},
-  {id:'bob',        name:'Bob',        price:50,   community:true, rarity:'rare',      img:'skins/bob.png',        anchorY:0.72},
-  {id:'ina',        name:'Ina',        price:900,  community:true, rarity:'epic',      img:'skins/ina.png',        anchorY:0.72},
-  {id:'sierrakidd', name:'Sierra Kidd',price:1100, community:true, rarity:'epic',      img:'skins/sierrakidd.jpg', anchorY:0.72},
-  {id:'danjo420',   name:'Danjo420',   price:1100, community:true, rarity:'epic',      img:'skins/danjo420.jpg',   anchorY:0.74},
-  {id:'fabienne',   name:'Fabienne',   price:1300, community:true, rarity:'epic',      img:'skins/fabienne.jpg',   anchorY:0.74},
-  {id:'kosak',      name:'Kosak',      price:1500, community:true, rarity:'epic',      img:'skins/kosak.png',      anchorY:0.72},
-  {id:'yannic',     name:'Yannic',     price:1700, community:true, rarity:'legendary', img:'skins/yannic.jpg',     anchorY:0.72},
-  {id:'stephan',    name:'Stephan',    price:1900, community:true, rarity:'legendary', img:'skins/stephan.png',    anchorY:0.72, bgKey:'white'},
-  {id:'moodey',     name:'Moodey',     price:2000, community:true, rarity:'legendary', img:'skins/moodey.jpg',     anchorY:0.72, bgKey:'white'},
+  {id:'james',      name:'James',      price:0,    community:true, rarity:'legendary', img:'skins/james.png',      anchorY:0.70},
+  {id:'bob',        name:'Bob',        price:50,   community:true, rarity:'rare',      img:'skins/bob.png',        anchorY:0.70},
+  {id:'ina',        name:'Ina',        price:900,  community:true, rarity:'epic',      img:'skins/ina.png',        anchorY:0.70},
+  {id:'sierrakidd', name:'Sierra Kidd',price:1100, community:true, rarity:'epic',      img:'skins/sierrakidd.png', anchorY:0.70},
+  {id:'danjo420',   name:'Danjo420',   price:1100, community:true, rarity:'epic',      img:'skins/danjo420.png',   anchorY:0.70},
+  {id:'fabienne',   name:'Fabienne',   price:1300, community:true, rarity:'epic',      img:'skins/fabienne.png',   anchorY:0.70},
+  {id:'kosak',      name:'Kosak',      price:1500, community:true, rarity:'epic',      img:'skins/kosak.png',      anchorY:0.70},
+  {id:'yannic',     name:'Yannic',     price:1700, community:true, rarity:'legendary', img:'skins/yannic.png',     anchorY:0.70},
+  {id:'stephan',    name:'Stephan',    price:1900, community:true, rarity:'legendary', img:'skins/stephan.png',    anchorY:0.70},
+  {id:'moodey',     name:'Moodey',     price:2000, community:true, rarity:'legendary', img:'skins/moodey.png',     anchorY:0.70},
 ];
 
 // ================= ÖKONOMIE, RARITÄTEN & LOOT =================
@@ -692,23 +692,16 @@ function loadSkinImage(src, bgKey){
   const img=new Image();
   img.onload=()=>{
     try{
-      // Große Uploads vorher verkleinern: Freistellen (Flood-Fill) auf 2000px
-      // Bildern verursacht sonst einen Ruckler beim ersten Anzeigen.
-      const MAXD=320;
-      const sc=Math.min(1,MAXD/Math.max(img.naturalWidth,img.naturalHeight));
+      // Alle Skin-PNGs sind bereits freigestellt & auf Sprite-Größe gebracht.
+      // Kein Runtime-Freistellen mehr: das hat Löcher in dunkle Outlines gestanzt.
       const c=document.createElement('canvas');
-      c.width=Math.max(1,Math.round(img.naturalWidth*sc));
-      c.height=Math.max(1,Math.round(img.naturalHeight*sc));
+      c.width=img.naturalWidth; c.height=img.naturalHeight;
       const g=c.getContext('2d',{willReadFrequently:true});
-      g.imageSmoothingEnabled=sc<1;
-      g.drawImage(img,0,0,c.width,c.height);
-      const data=g.getImageData(0,0,c.width,c.height);
-      removeBackground(data, bgKey);
-      g.putImageData(data,0,0);
-      // trim transparent margins
+      g.imageSmoothingEnabled=false;
+      g.drawImage(img,0,0);
       entry.canvas=trimTransparent(c);
       entry.ready=true;
-    }catch(e){console.warn('skin bg-removal failed',src,e);entry.canvas=null;entry.ready=true;}
+    }catch(e){console.warn('skin load failed',src,e);entry.canvas=null;entry.ready=true;}
   };
   img.onerror=()=>{entry.ready=true;};
   img.src=src;
