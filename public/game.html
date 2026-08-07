@@ -420,13 +420,26 @@ const W=400,H=700;
 let dpr=1;
 function fit(){
   const s=Math.min(window.innerWidth/W,window.innerHeight/H);
-  cv.style.width=(W*s)+'px';cv.style.height=(H*s)+'px';
-  const want=Math.min(3,Math.max(1,(window.devicePixelRatio||1)*s));
-  const nw=Math.round(W*want),nh=Math.round(H*want);
+  // Ganzzahliger Geräte-Pixel-Faktor: dadurch landet jeder Logik-Pixel exakt
+  // auf einem Gitter aus ganzen Geräte-Pixeln -> keine Fransen an Konturen.
+  const want=Math.max(1,Math.min(4,Math.ceil((window.devicePixelRatio||1)*s)));
+  const nw=W*want,nh=H*want;
+  // CSS-Größe auf ganze Geräte-Pixel runden, damit nicht neu resampelt wird.
+  const dev=window.devicePixelRatio||1;
+  const cssW=Math.round(W*s*dev)/dev, cssH=Math.round(H*s*dev)/dev;
+  cv.style.width=cssW+'px';cv.style.height=cssH+'px';
   if(cv.width!==nw||cv.height!==nh){cv.width=nw;cv.height=nh;}
-  dpr=cv.width/W;
+  dpr=want;
   ctx.setTransform(dpr,0,0,dpr,0,0);
   ctx.imageSmoothingEnabled=false;
+}
+// Rundet eine Logik-Koordinate auf das Geräte-Pixel-Gitter (scharfe Kanten).
+function snapPx(v){return Math.round(v*dpr)/dpr;}
+// Zeichnet ein Sprite pixelgenau ausgerichtet.
+function drawSpriteSnapped(g,im,x,y,w,h){
+  g.imageSmoothingEnabled=false;
+  const sw=Math.max(1/dpr,snapPx(w)),sh=Math.max(1/dpr,snapPx(h));
+  g.drawImage(im,snapPx(x),snapPx(y),sw,sh);
 }
 window.addEventListener('resize',fit);
 window.addEventListener('orientationchange',()=>setTimeout(fit,120));
@@ -738,7 +751,7 @@ function drawPlatSprite(key,x,topY,w,opts){
   ctx.save();
   ctx.imageSmoothingEnabled=false;
   if(o.alpha!=null)ctx.globalAlpha=o.alpha;
-  ctx.drawImage(im,x+(w-sw)/2,topY+(o.dy||0),sw,sh);
+  drawSpriteSnapped(ctx,im,x+(w-sw)/2,topY+(o.dy||0),sw,sh);
   ctx.restore();
   return true;
 }
@@ -2468,11 +2481,15 @@ function drawImageSkin(g,s,inv,live){
   const im=entry.canvas;
   // Target render height ~54px (matches vector character silhouette)
   const targetH=54;
-  const sc=targetH/im.height;
-  const w=im.width*sc, h=im.height*sc;
+  // Auf ganze Geräte-Pixel rasten: verhindert halbe Pixel an den Konturen
+  // (Fransen/Doppelkanten) auf Retina- und Nicht-Retina-Displays.
+  const k=(g===ctx?dpr:1);
+  const hDev=Math.max(1,Math.round(targetH*k));
+  const wDev=Math.max(1,Math.round(im.width*(hDev/im.height)));
+  const w=wDev/k, h=hDev/k;
   const anchor=s.anchorY||0.72; // vertical anchor within the image (feet ≈ 0.95)
-  const dx=-w/2;
-  const dy=-h*anchor;
+  const dx=Math.round(-w/2*k)/k;
+  const dy=Math.round(-h*anchor*k)/k;
   g.save();
   g.imageSmoothingEnabled=false;
   if(live){
@@ -3452,6 +3469,18 @@ function drawCollectible(c){
     ctx.beginPath();ctx.arc(c.x+8,y-10,2,0,Math.PI*2);ctx.fill();
     ctx.restore();
   }else if(c.type==='gun'){
+    // Waffen-Pickup nutzt den ausgerüsteten Waffen-Skin
+    const wimg=itemImg(currentWeapon().img);
+    if(wimg){
+      ctx.save();
+      ctx.translate(c.x,y);ctx.rotate(-0.12+Math.sin(c.t*3)*0.05);
+      const hh=26, ww=hh*(wimg.width/wimg.height);
+      drawSpriteSnapped(ctx,wimg,-ww/2,-hh/2+Math.sin(c.t*4)*1.2,ww,hh);
+      ctx.restore();
+      ctx.fillStyle='rgba(255,220,80,'+(0.35+0.35*Math.sin(c.t*8))+')';
+      ctx.beginPath();ctx.arc(c.x+10,y-10,2.4,0,Math.PI*2);ctx.fill();
+      return;
+    }
     ctx.save();ctx.translate(c.x,y);ctx.rotate(-0.2);
     // body
     ctx.fillStyle='#37474f';ctx.strokeStyle='#000';ctx.lineWidth=1.5;
@@ -3469,14 +3498,14 @@ function drawCollectible(c){
     ctx.beginPath();ctx.arc(15,-1,2.5,0,Math.PI*2);ctx.fill();
     ctx.restore();
   }else{
-    // joint
-    const js=sprite('cjoint');
+    // Joint-Pickup nutzt den ausgerüsteten Joint/Konsum-Skin
+    const js=itemImg(currentJoint().img)||sprite('cjoint');
     if(js){
       ctx.save();
       ctx.imageSmoothingEnabled=false;
       const hh=26, ww=hh*(js.width/js.height);
       ctx.translate(c.x,y);ctx.rotate(-0.12+Math.sin(c.t*3)*0.06);
-      ctx.drawImage(js,-ww/2,-hh/2,ww,hh);
+      drawSpriteSnapped(ctx,js,-ww/2,-hh/2,ww,hh);
       ctx.restore();
       ctx.fillStyle='rgba(255,255,255,'+(0.35+0.35*Math.sin(c.t*6))+')';
       ctx.beginPath();ctx.arc(c.x+9,y-11,2.4,0,Math.PI*2);ctx.fill();
@@ -3515,7 +3544,7 @@ function drawEnemy(e){
     else { dh=e.h*1.9; dw=dh*(spr.width/spr.height); }
     ctx.translate(e.x,y+e.h-dh+bob);
     ctx.scale(dir,1);
-    ctx.drawImage(spr,-dw/2,0,dw,dh);
+    drawSpriteSnapped(ctx,spr,-dw/2,0,dw,dh);
     ctx.restore();
     return;
   }
