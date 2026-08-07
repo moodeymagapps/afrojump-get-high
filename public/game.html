@@ -2510,6 +2510,17 @@ function drawJointSprite(g,ox,oy,len,th,col,tip,tilt){
 // Zeichnet den ausgerüsteten Konsum-Gegenstand am Mund (Pixel-Look)
 function drawDevice(g,s){
   const col=s.joint||'#e8d9ac', tip=s.jointTip||'#e03a10', dev=s.dev||'joint';
+  // Pixel-Sprite des ausgerüsteten Konsum-Gegenstands (falls vorhanden)
+  const di=s.devImg?itemImg(s.devImg):null;
+  if(di){
+    g.save();g.imageSmoothingEnabled=false;
+    const h=8, w=di.width*h/di.height;
+    g.drawImage(di,3,-15,w,h);
+    g.globalAlpha=0.5;g.fillStyle='#e8e4dc';
+    g.fillRect(3+w,-19,1.4,1.4);g.fillRect(3+w+1.4,-21.5,1.2,1.2);g.fillRect(3+w-0.4,-23.5,1.6,1.6);
+    g.globalAlpha=1;g.restore();
+    return;
+  }
   const px=(x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(x,y,w,h);};
   const outline=(x,y,w,h)=>{g.fillStyle='#0b0a08';g.fillRect(x-1,y-1,w+2,h+2);};
   g.strokeStyle='#0b0a08';g.lineWidth=1;
