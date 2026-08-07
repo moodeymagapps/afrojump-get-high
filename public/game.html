@@ -3474,7 +3474,8 @@ function drawCollectible(c){
     if(wimg){
       ctx.save();
       ctx.translate(c.x,y);ctx.rotate(-0.12+Math.sin(c.t*3)*0.05);
-      const hh=26, ww=hh*(wimg.width/wimg.height);
+      const sc=Math.min(24/wimg.width,20/wimg.height);
+      const ww=wimg.width*sc, hh=wimg.height*sc;
       drawSpriteSnapped(ctx,wimg,-ww/2,-hh/2+Math.sin(c.t*4)*1.2,ww,hh);
       ctx.restore();
       ctx.fillStyle='rgba(255,220,80,'+(0.35+0.35*Math.sin(c.t*8))+')';
@@ -3503,7 +3504,8 @@ function drawCollectible(c){
     if(js){
       ctx.save();
       ctx.imageSmoothingEnabled=false;
-      const hh=26, ww=hh*(js.width/js.height);
+      const sc=Math.min(22/js.width,18/js.height);
+      const ww=js.width*sc, hh=js.height*sc;
       ctx.translate(c.x,y);ctx.rotate(-0.12+Math.sin(c.t*3)*0.06);
       drawSpriteSnapped(ctx,js,-ww/2,-hh/2,ww,hh);
       ctx.restore();
