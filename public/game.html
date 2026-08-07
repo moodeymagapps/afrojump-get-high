@@ -1664,9 +1664,14 @@ function update(dt){
   if(player.gunT>0){
     shootRequested=true; // auto-fire while the gun is active
     if(player.shootCd<=0){
-      // straight up, always
-      projectiles.push({x:player.x,y:player.y-12,vx:0,vy:-12,life:2});
-      player.shootCd=0.12;
+      // straight up, always — Waffen-Skin bestimmt Rate, Speed, Streuung, Durchschlag
+      const wp=wperk(), sp=-12*(wp.speed||1);
+      projectiles.push({x:player.x,y:player.y-12,vx:0,vy:sp,life:2,pierce:wp.pierce?2:0,blast:wp.blast||0});
+      if(wp.spread){
+        projectiles.push({x:player.x,y:player.y-12,vx:-2.4,vy:sp*0.95,life:2,pierce:0,blast:0});
+        projectiles.push({x:player.x,y:player.y-12,vx: 2.4,vy:sp*0.95,life:2,pierce:0,blast:0});
+      }
+      player.shootCd=0.12*(wp.cd||1);
     }
   }else if(shootRequested){
     if(player.noGunT===undefined||player.noGunT<=0){
@@ -1685,9 +1690,17 @@ function update(dt){
     for(const e of enemies){
       if(!e.alive||e.boss||!e.plat)continue;
       if(Math.abs(pr.x-e.x)<e.w/2+6&&Math.abs(pr.y-(e.y+e.h/2))<e.h/2+8){
-        pr.life=0;e.alive=false;
+        if(pr.pierce>0)pr.pierce--;else pr.life=0;
+        e.alive=false;
         burst(e.x,e.y,'#ffcc00',20);addShake(3,0.12);
         registerKill(e.x,e.y);
+        if(pr.blast){
+          for(const e2 of enemies){
+            if(!e2.alive||e2.boss||!e2.plat)continue;
+            if(Math.hypot(e2.x-e.x,e2.y-e.y)<70){e2.alive=false;burst(e2.x,e2.y,'#c5e1a5',14);registerKill(e2.x,e2.y);}
+          }
+          burst(e.x,e.y,'#33691e',24);addShake(5,0.18);
+        }
         break;
       }
     }
