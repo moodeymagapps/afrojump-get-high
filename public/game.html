@@ -2255,6 +2255,39 @@ function drawPlatform(p){
     tech:{k:'tech'}, rock:{k:'mossrock'}, crate:{k:'crate'},
   };
   const sp=SPR[p.type];
+  if(p.type==='spring'){
+    // Animierte Sprungfeder: Ruhezustand leicht federnd, beim Absprung stark gestaucht
+    const t=performance.now()/1000;
+    const idle=(Math.sin(t*2.2+p.ox*0.05)+1)/2*0.12;            // sanftes Wippen
+    const press=Math.max(0,Math.min(1,p.springT));
+    const comp=Math.min(1,press*press*1.25+idle);                 // 0 = lang, 1 = gestaucht
+    const fi=Math.round(comp*(SPRING_FRAMES.length-1));
+    const key=SPRING_FRAMES[Math.max(0,Math.min(SPRING_FRAMES.length-1,fi))];
+    const im=sprite(key);
+    if(im){
+      const sw=Math.min(p.w,54);
+      const sh=sw*(im.height/im.width);
+      const cx=p.x+p.w/2;
+      ctx.save();
+      ctx.imageSmoothingEnabled=false;
+      // Schatten am Boden
+      ctx.globalAlpha=0.25;ctx.fillStyle='#000';
+      ctx.beginPath();ctx.ellipse(cx,yy+sh-4,sw*0.42,4,0,0,Math.PI*2);ctx.fill();
+      ctx.globalAlpha=1;
+      ctx.drawImage(im,cx-sw/2,yy,sw,sh);
+      ctx.restore();
+      // Energie-Ringe beim Abschuss
+      if(press>0.25){
+        ctx.save();
+        ctx.globalAlpha=(press-0.25)*0.9;
+        ctx.strokeStyle='#ffd54a';ctx.lineWidth=2;
+        const rr=(1-press)*34+8;
+        ctx.beginPath();ctx.ellipse(cx,yy+4,rr,rr*0.4,0,0,Math.PI*2);ctx.stroke();
+        ctx.restore();
+      }
+      ctx.restore();return;
+    }
+  }
   if(sp){
     const dy=(p.springT>0?3:0);
     if(drawPlatSprite(sp.k,p.x,yy+dy,p.w,{wScale:sp.wScale})){
