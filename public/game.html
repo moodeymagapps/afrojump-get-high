@@ -576,6 +576,18 @@ const SKINS=[
   {id:'skullcap',   name:'Captain Skull',price:1000,community:true, rarity:'epic',      img:'skins/skullcap.png',   anchorY:0.70},
   {id:'ducknoir',   name:'Duck Noir',   price:1200, community:true, rarity:'epic',      img:'skins/ducknoir.png',   anchorY:0.70},
   {id:'infernus',   name:'Infernus',    price:2200, community:true, rarity:'legendary', img:'skins/infernus.png',   anchorY:0.70},
+  {id:'ogsmoke',    name:'OG Smoke',    price:600,  community:true, rarity:'epic',      img:'skins/ogsmoke.png',    anchorY:0.70},
+  {id:'astro',      name:'Astro Kush',  price:800,  community:true, rarity:'epic',      img:'skins/astro.png',      anchorY:0.70},
+  {id:'queenkush',  name:'Queen Kush',  price:900,  community:true, rarity:'epic',      img:'skins/queenkush.png',  anchorY:0.70},
+  {id:'baggyboy',   name:'Baggy Boy',   price:1000, community:true, rarity:'epic',      img:'skins/baggyboy.png',   anchorY:0.70},
+  {id:'marley',     name:'Rasta King',  price:1200, community:true, rarity:'legendary', img:'skins/marley.png',     anchorY:0.70},
+  {id:'soldier',    name:'Ranger Ops',  price:1300, community:true, rarity:'epic',      img:'skins/soldier.png',    anchorY:0.70},
+  {id:'bonecoat',   name:'Bone Coat',   price:1400, community:true, rarity:'epic',      img:'skins/bonecoat.png',   anchorY:0.70},
+  {id:'slasher',    name:'Slasher',     price:1500, community:true, rarity:'legendary', img:'skins/slasher.png',    anchorY:0.70},
+  {id:'mafia',      name:'Don Kush',    price:1600, community:true, rarity:'legendary', img:'skins/mafia.png',      anchorY:0.70},
+  {id:'devil',      name:'Lil Devil',   price:1800, community:true, rarity:'legendary', img:'skins/devil.png',      anchorY:0.70},
+  {id:'reaper',     name:'Reaper',      price:2000, community:true, rarity:'legendary', img:'skins/reaper.png',     anchorY:0.70},
+  {id:'vikingskull',name:'Viking Bones',price:2100, community:true, rarity:'legendary', img:'skins/vikingskull.png',anchorY:0.70},
 ];
 
 // ================= ÖKONOMIE, RARITÄTEN & LOOT =================
@@ -605,45 +617,50 @@ const LOOT_ONLY_SKINS=new Set([]);
   }
 })();
 
-// ---- Waffen-Skins (nur aus Loot-Tütchen) ----
+// ---- Waffen-Skins (Pixel-Art Sprites, nur aus Loot-Tütchen) ----
+// perk: cd=Cooldown-Faktor, speed=Kugelgeschwindigkeit, spread=Doppelschuss,
+//       pierce=Durchschlag, gun=extra Waffenzeit (s), blast=Flächenschaden
 const WEAPON_SKINS=[
-  {id:'w_default',name:'Standard',      rarity:'common',   free:true, core:'#fffde7',ring:'#8d8d8d',shape:'bullet'},
-  {id:'w_seed',   name:'Seed Shot',     rarity:'common',   core:'#c5a25a',ring:'#7a5c2a',shape:'seed'},
-  {id:'w_bud',    name:'Bud Blaster',   rarity:'common',   core:'#7cfc00',ring:'#2e7d32',shape:'bud'},
-  {id:'w_smoke',  name:'Smoke Puff',    rarity:'rare',     core:'#e0e0e0',ring:'#9e9e9e',shape:'smoke'},
-  {id:'w_bong',   name:'Bong Bubble',   rarity:'rare',     core:'#b3e5fc',ring:'#0288d1',shape:'bubble'},
-  {id:'w_lighter',name:'Feuerzeug',     rarity:'rare',     core:'#ffd54a',ring:'#ff6a00',shape:'flame'},
-  {id:'w_purple', name:'Purple Haze',   rarity:'epic',     core:'#e1bee7',ring:'#7c4dff',shape:'star'},
-  {id:'w_laser',  name:'Space Laser',   rarity:'epic',     core:'#ffffff',ring:'#00e5ff',shape:'laser'},
-  {id:'w_skunk',  name:'Skunk Bomb',    rarity:'epic',     core:'#c5e1a5',ring:'#33691e',shape:'bomb'},
-  {id:'w_gold',   name:'Golden Nug',    rarity:'legendary',core:'#fff59d',ring:'#ffb300',shape:'bud'},
-  {id:'w_rainbow',name:'Rainbow Blast', rarity:'legendary',core:'RAINBOW',ring:'RAINBOW',shape:'star'},
-  {id:'w_alien',  name:'Alien Kush Ray',rarity:'legendary',core:'#b9f6ca',ring:'#00c853',shape:'laser'},
+  {id:'w_default',  name:'Wasserpistole',    rarity:'common',   free:true, img:'weapons/water.png',    shape:'bubble',core:'#b3e5fc',ring:'#0288d1',perk:{cd:0.92},        ability:'Solides Standardfeuer'},
+  {id:'w_sling',    name:'Steinschleuder',   rarity:'common',   img:'weapons/sling.png',    shape:'seed',  core:'#c5a25a',ring:'#7a5c2a',perk:{speed:1.35},              ability:'Sehr schnelle Kugeln'},
+  {id:'w_banana',   name:'Bananen-Blaster',  rarity:'rare',     img:'weapons/banana.png',   shape:'bud',   core:'#fff176',ring:'#f9a825',perk:{spread:1},                ability:'Doppelschuss (Streuung)'},
+  {id:'w_flare',    name:'Flammenwerfer',    rarity:'rare',     img:'weapons/flare.png',    shape:'flame', core:'#ffd54a',ring:'#ff6a00',perk:{gun:2},                   ability:'+2s Waffen-Dauer'},
+  {id:'w_smg',      name:'Kush-SMG',         rarity:'epic',     img:'weapons/smg.png',      shape:'bullet',core:'#fffde7',ring:'#616161',perk:{cd:0.55},                 ability:'Dauerfeuer'},
+  {id:'w_bombsling',name:'Bomben-Schleuder', rarity:'epic',     img:'weapons/bombsling.png',shape:'bomb',  core:'#c5e1a5',ring:'#33691e',perk:{blast:1},                 ability:'Explosion trifft alles in der Nähe'},
+  {id:'w_chicken',  name:'Huhn-Kanone',      rarity:'legendary',img:'weapons/chicken.png',  shape:'smoke', core:'#ffffff',ring:'#e0e0e0',perk:{pierce:1,cd:0.8,gun:1},   ability:'Durchschlag + mehr Waffenzeit'},
+  {id:'w_crossbow', name:'Armbrust 420',     rarity:'legendary',img:'weapons/crossbow.png', shape:'laser', core:'#ffffff',ring:'#7cfc00',perk:{pierce:1,speed:1.5,cd:0.7},ability:'Pfeil durchbohrt alles'},
 ];
-// ---- Joint-Skins (nur aus Loot-Tütchen) ----
-// dev = Form des Konsum-Gegenstands: joint | blunt | bong | vape | pipe | brownie | cookie | pill | gummy | dab | hookah | cigar
+// ---- Joint-/Konsum-Skins (Pixel-Art Sprites, nur aus Loot-Tütchen) ----
+// perk: inv=extra Unverwundbarkeit (s), bags=extra 🌿 pro Tütchen, jump=Sprungfaktor,
+//       magnet=Sammelradius (px), gun=extra Waffenzeit (s), shield=Startschutz (s)
 const JOINT_SKINS=[
-  {id:'j_default',name:'Classic Joint', rarity:'common',   free:true, dev:'joint', paper:'#e8d9ac',tip:'#e03a10',smoke:'#eeeeee'},
-  {id:'j_brown',  name:'Blunt Wrap',    rarity:'common',   dev:'blunt', paper:'#8d6e63',tip:'#ff8a00',smoke:'#d7ccc8'},
-  {id:'j_slim',   name:'Slim King',     rarity:'common',   dev:'joint', paper:'#fff8e1',tip:'#ff5252',smoke:'#f5f5f5'},
-  {id:'j_pipe',   name:'Apfel-Pfeife',  rarity:'common',   dev:'pipe',  paper:'#8bc34a',tip:'#ff7043',smoke:'#dcedc8'},
-  {id:'j_green',  name:'Green Paper',   rarity:'rare',     dev:'joint', paper:'#a5d6a7',tip:'#ff6a00',smoke:'#c8e6c9'},
-  {id:'j_pink',   name:'Cotton Candy',  rarity:'rare',     dev:'joint', paper:'#f8bbd0',tip:'#ff4081',smoke:'#fce4ec'},
-  {id:'j_ice',    name:'Menthol Ice',   rarity:'rare',     dev:'joint', paper:'#b3e5fc',tip:'#40c4ff',smoke:'#e1f5fe'},
-  {id:'j_vape',   name:'Vaporizer',     rarity:'rare',     dev:'vape',  paper:'#37474f',tip:'#00e5ff',smoke:'#b2ebf2'},
-  {id:'j_brownie',name:'Space Brownie', rarity:'rare',     dev:'brownie',paper:'#5d4037',tip:'#8d6e63',smoke:'#d7ccc8'},
-  {id:'j_cookie', name:'Weed Cookie',   rarity:'rare',     dev:'cookie', paper:'#d7a86e',tip:'#4e342e',smoke:'#f0e0c0'},
-  {id:'j_purple', name:'Purple Cone',   rarity:'epic',     dev:'joint', paper:'#ce93d8',tip:'#7c4dff',smoke:'#ede7f6'},
-  {id:'j_black',  name:'Blackout',      rarity:'epic',     dev:'blunt', paper:'#212121',tip:'#ff1744',smoke:'#616161'},
-  {id:'j_bong',   name:'Glas-Bong',     rarity:'epic',     dev:'bong',  paper:'#8ee6c8',tip:'#ff6a00',smoke:'#e0f7fa'},
-  {id:'j_pill',   name:'Bunte Pille',   rarity:'epic',     dev:'pill',  paper:'RAINBOW',tip:'#ffffff',smoke:'#f8bbd0'},
-  {id:'j_gummy',  name:'THC-Gummibär',  rarity:'epic',     dev:'gummy', paper:'#ff5252',tip:'#ffeb3b',smoke:'#ffcdd2'},
-  {id:'j_hookah', name:'Shisha',        rarity:'epic',     dev:'hookah',paper:'#ffca28',tip:'#ff7043',smoke:'#fff3c4'},
-  {id:'j_dab',    name:'Dab-Rig',       rarity:'legendary',dev:'dab',   paper:'#b388ff',tip:'#ff1744',smoke:'#ede7f6'},
-  {id:'j_cigar',  name:'Kush-Zigarre',  rarity:'legendary',dev:'cigar', paper:'#4e342e',tip:'#ff6a00',smoke:'#efebe9'},
-  {id:'j_gold',   name:'24K Joint',     rarity:'legendary',dev:'joint', paper:'#ffd700',tip:'#fff176',smoke:'#fff9c4'},
-  {id:'j_rainbow',name:'Rainbow Spliff',rarity:'legendary',dev:'joint', paper:'RAINBOW',tip:'#ffffff',smoke:'#ffffff'},
+  {id:'j_default',  name:'Classic Joint',  rarity:'common',   free:true, img:'items/classic.png',   paper:'#e8d9ac',tip:'#e03a10',smoke:'#eeeeee',perk:{},           ability:'Der Klassiker'},
+  {id:'j_herbal',   name:'Herbal Wrap',    rarity:'common',   img:'items/herbal.png',    paper:'#8bc34a',tip:'#ff6a00',smoke:'#dcedc8',perk:{inv:2},               ability:'+2s Unverwundbarkeit'},
+  {id:'j_cbdcone',  name:'CBD Cone',       rarity:'common',   img:'items/cbdcone.png',   paper:'#d7c39a',tip:'#ff8a00',smoke:'#efe6d0',perk:{shield:1.5},          ability:'1,5s Startschutz'},
+  {id:'j_purple',   name:'Purple Haze',    rarity:'rare',     img:'items/purple.png',    paper:'#ce93d8',tip:'#7c4dff',smoke:'#ede7f6',perk:{jump:1.05},           ability:'+5% Sprungkraft'},
+  {id:'j_bongpipe', name:'Glas-Bong',      rarity:'rare',     img:'items/bongpipe.png',  paper:'#8ee6c8',tip:'#ff6a00',smoke:'#e0f7fa',perk:{inv:3},               ability:'+3s Unverwundbarkeit'},
+  {id:'j_cookie',   name:'Weed Cookie',    rarity:'rare',     img:'items/cookie.png',    paper:'#d7a86e',tip:'#4e342e',smoke:'#f0e0c0',perk:{bags:1},              ability:'+1 🌿 pro Tütchen'},
+  {id:'j_honeypipe',name:'Honig-Pfeife',   rarity:'rare',     img:'items/honeypipe.png', paper:'#ffca28',tip:'#ff7043',smoke:'#fff3c4',perk:{magnet:14},           ability:'Magnet: größerer Sammelradius'},
+  {id:'j_stonepipe',name:'Stein-Pfeife',   rarity:'rare',     img:'items/stonepipe.png', paper:'#cfd8dc',tip:'#ff5252',smoke:'#eceff1',perk:{shield:2.5},          ability:'2,5s Startschutz'},
+  {id:'j_woodpipe', name:'Holz-Pfeife',    rarity:'epic',     img:'items/woodpipe.png',  paper:'#8d6e63',tip:'#ff8a00',smoke:'#d7ccc8',perk:{gun:2},              ability:'+2s Waffen-Dauer'},
+  {id:'j_crystal',  name:'Kristall-Pfeife',rarity:'epic',     img:'items/crystal.png',   paper:'#b3e5fc',tip:'#40c4ff',smoke:'#e1f5fe',perk:{jump:1.08,inv:1},     ability:'+8% Sprung & +1s Schutz'},
+  {id:'j_bamboo',   name:'Bambus-Bong',    rarity:'epic',     img:'items/bamboo.png',    paper:'#9ccc65',tip:'#ff6a00',smoke:'#dcedc8',perk:{bags:2},              ability:'+2 🌿 pro Tütchen'},
+  {id:'j_leafwrap', name:'Leaf Blunt',     rarity:'epic',     img:'items/leafwrap.png',  paper:'#7cb342',tip:'#ff7043',smoke:'#e8f5e9',perk:{magnet:22},           ability:'Starker Magnet'},
+  {id:'j_donut',    name:'Donut-Pfeife',   rarity:'epic',     img:'items/donut.png',     paper:'#f8bbd0',tip:'#ff4081',smoke:'#fce4ec',perk:{inv:2,bags:1},        ability:'+2s Schutz & +1 🌿'},
+  {id:'j_cbdbrick', name:'CBD-Brownie',    rarity:'rare',     img:'items/cbdbrick.png',  paper:'#5d4037',tip:'#8d6e63',smoke:'#d7ccc8',perk:{shield:3},            ability:'3s Startschutz'},
+  {id:'j_goldpipe', name:'24K Pfeife',     rarity:'legendary',img:'items/goldpipe.png',  paper:'#ffd700',tip:'#fff176',smoke:'#fff9c4',perk:{bags:3,magnet:16},    ability:'+3 🌿 pro Tütchen & Magnet'},
+  {id:'j_rocket',   name:'Rocket Spliff',  rarity:'legendary',img:'items/rocket.png',    paper:'#ef5350',tip:'#ffd54a',smoke:'#ffffff',perk:{jump:1.12,inv:3,gun:1},ability:'+12% Sprung, +3s Schutz'},
 ];
+// ---- Item-Sprite Loader (freigestellte PNGs) ----
+const ITEM_IMG_CACHE={};
+function itemImg(src){
+  if(!src)return null;
+  let e=ITEM_IMG_CACHE[src];
+  if(!e){e=ITEM_IMG_CACHE[src]={img:new Image(),ok:false};e.img.onload=()=>{e.ok=true;};e.img.src=src;}
+  return e.ok?e.img:null;
+}
+for(const w of WEAPON_SKINS)itemImg(w.img);
+for(const j of JOINT_SKINS)itemImg(j.img);
 // ---- Loot-Tütchen ----
 const LOOT_BOXES=[
   {id:'gram', name:'GRAMM-TÜTCHEN', price:150,  bag:'#9ccc65', odds:{common:0.70,rare:0.25,epic:0.045,legendary:0.005}},
@@ -667,6 +684,16 @@ function persistLoot(){
 }
 function currentWeapon(){return WEAPON_SKINS.find(w=>w.id===selectedWeapon)||WEAPON_SKINS[0];}
 function currentJoint(){return JOINT_SKINS.find(j=>j.id===selectedJoint)||JOINT_SKINS[0];}
+// Alt-Inventar aufräumen (entfernte Skin-IDs) + Fähigkeiten der Items
+(function sanitizeLoot(){
+  const wIds=new Set(WEAPON_SKINS.map(w=>w.id)), jIds=new Set(JOINT_SKINS.map(j=>j.id));
+  ownedWeapons=ownedWeapons.filter(id=>wIds.has(id));if(!ownedWeapons.includes('w_default'))ownedWeapons.push('w_default');
+  ownedJoints=ownedJoints.filter(id=>jIds.has(id));if(!ownedJoints.includes('j_default'))ownedJoints.push('j_default');
+  if(!wIds.has(selectedWeapon))selectedWeapon='w_default';
+  if(!jIds.has(selectedJoint))selectedJoint='j_default';
+})();
+function jperk(){return currentJoint().perk||{};}
+function wperk(){return currentWeapon().perk||{};}
 function rainbowCol(speed){return 'hsl('+((performance.now()/(speed||4))%360)+',90%,60%)';}
 function weaponColors(){
   const w=currentWeapon();
@@ -782,9 +809,8 @@ setTimeout(()=>{try{for(const k in BOSS_IMAGES)loadSkinImage(BOSS_IMAGES[k].src,
 function currentSkin(){
   const base=SKINS.find(s=>s.id===selectedSkin)||SKINS[0];
   const j=currentJoint();
-  if(j.id==='j_default')return base;
   // equipped joint skin recolors the joint of every character skin
-  return Object.assign({},base,{joint:j.paper==='RAINBOW'?rainbowCol(5):j.paper,jointTip:j.tip,dev:j.dev||'joint'});
+  return Object.assign({},base,{joint:j.paper==='RAINBOW'?rainbowCol(5):j.paper,jointTip:j.tip,dev:j.dev||'joint',devImg:j.img});
 }
 function persistShop(){localStorage.setItem(BK,totalBags);localStorage.setItem(OK,JSON.stringify(owned));localStorage.setItem(SK,selectedSkin);}
 const bagsChipEl=document.querySelector('.hudChip.bagsChip');
@@ -845,6 +871,13 @@ function rarBadge(rarity){
 }
 function drawWeaponPreview(g,w,noClear){
   if(!noClear)g.clearRect(0,0,80,80);
+  const wi=itemImg(w.img);
+  if(wi){
+    g.save();g.imageSmoothingEnabled=false;
+    const sc=Math.min(74/wi.width,74/wi.height);
+    g.drawImage(wi,(80-wi.width*sc)/2,(80-wi.height*sc)/2,wi.width*sc,wi.height*sc);
+    g.restore();return;
+  }
   g.save();g.translate(40,40);g.scale(2.2,2.2);
   const core=w.core==='RAINBOW'?rainbowCol(3):w.core, ring=w.ring==='RAINBOW'?rainbowCol(2):w.ring;
   g.shadowColor=ring;g.shadowBlur=6;
@@ -861,6 +894,13 @@ function drawWeaponPreview(g,w,noClear){
 }
 function drawJointPreview(g,j,noClear){
   if(!noClear)g.clearRect(0,0,80,80);
+  const ji=itemImg(j.img);
+  if(ji){
+    g.save();g.imageSmoothingEnabled=false;
+    const sc=Math.min(74/ji.width,74/ji.height);
+    g.drawImage(ji,(80-ji.width*sc)/2,(80-ji.height*sc)/2,ji.width*sc,ji.height*sc);
+    g.restore();return;
+  }
   const paper=j.paper==='RAINBOW'?rainbowCol(5):j.paper;
   g.save();
   g.imageSmoothingEnabled=false;
@@ -938,6 +978,11 @@ function renderLootTab(catalog,ownedList,kind){
     card.appendChild(cv);
     const nm=document.createElement('div');nm.className='name';nm.textContent=it.name;card.appendChild(nm);
     card.appendChild(rarBadge(it.rarity));
+    if(it.ability){
+      const ab=document.createElement('div');
+      ab.style.cssText='font-size:7px;line-height:1.5;color:#9ccc65;margin:2px 4px 0;text-align:center;';
+      ab.textContent='★ '+it.ability;card.appendChild(ab);
+    }
     const pr=document.createElement('div');pr.className='price';pr.textContent=it.free?'Gratis':'🎒 Nur Loot';card.appendChild(pr);
     const btn=document.createElement('button');
     if(isSel){btn.textContent='✓ Aktiv';btn.className='selected';btn.disabled=true;}
@@ -1297,6 +1342,7 @@ function rand(a,b){return a+rnd()*(b-a);}
 function reset(){
   prngState=(duel.active&&duel.seed!==null)?duel.seed|0:null;
   player={x:W/2,y:H-100,vx:0,vy:-14,r:22,facing:1,invincible:0,shootCd:0,alive:true,bossShot:false,squash:1,stretch:1,landedT:0,bossLives:0,hitFlash:0,jetpackT:0,gunT:0};
+  if(jperk().shield){player.invincible=jperk().shield;player.invSrc='spawn';}
   platforms=[];collectibles=[];enemies=[];projectiles=[];particles=[];smokeParticles=[];floatTexts=[];
   cameraY=0;bestY=0;scrollLocked=false;boss=null;nextBossScore=1500;gameOver=false;
   runBags=0;shake={t:0,mag:0};timeScale=1;deathT=0;
@@ -1562,6 +1608,7 @@ function update(dt){
             for(const en of enemies)if(en.plat===p){en.alive=false;en.plat=null;}
             collectibles.push({x:p.x+p.w/2,y:p.y-14,type:'bag',t:0,taken:false});}
           else{player.vy=-13.5;}
+          if(jperk().jump)player.vy*=jperk().jump;   // Joint-Skin Sprung-Bonus
           if(player.x<12)player.x=12;if(player.x>W-12)player.x=W-12;
           p.bounce=1;
           player.landedT=0.15;
@@ -1619,12 +1666,12 @@ function update(dt){
     if(c.y<cameraY-200||c.y>cameraY+H+200){c.t+=dt;continue;}
     if(c.taken)continue;
     c.t+=dt;
-    if(Math.hypot(player.x-c.x,player.y-c.y)<player.r+10){
+    if(Math.hypot(player.x-c.x,player.y-c.y)<player.r+10+(jperk().magnet||0)){
       c.taken=true;
-      if(c.type==='bag'){const gain=2;runBags+=gain;totalBags+=gain;bagsEl.textContent='🌿 '+totalBags;hudPop(bagsChipEl);burst(c.x,c.y,'#7cfc00',18);pushFloat(c.x,c.y-4,'+'+gain+' 🌿','#7cfc00');sfx('pickup');}
-      else if(c.type==='joint'){player.invincible=6;player.invSrc='power';player.vy=-22;burst(c.x,c.y,'#ff69b4',24);pushFloat(c.x,c.y-4,'INVINCIBLE!','#ff69b4');sfx('pickup');}
+      if(c.type==='bag'){const gain=2+(jperk().bags||0);runBags+=gain;totalBags+=gain;bagsEl.textContent='🌿 '+totalBags;hudPop(bagsChipEl);burst(c.x,c.y,'#7cfc00',18);pushFloat(c.x,c.y-4,'+'+gain+' 🌿','#7cfc00');sfx('pickup');}
+      else if(c.type==='joint'){player.invincible=6+(jperk().inv||0);player.invSrc='power';player.vy=-22;burst(c.x,c.y,'#ff69b4',24);pushFloat(c.x,c.y-4,'INVINCIBLE!','#ff69b4');sfx('pickup');}
       else if(c.type==='jetpack'){player.jetpackT=3.0;player.vy=-14;burst(c.x,c.y,'#ff8a00',30);pushFloat(c.x,c.y-4,'JETPACK!','#ff8a00');}
-      else if(c.type==='gun'){player.gunT=5.0;burst(c.x,c.y,'#e0e0e0',22);pushFloat(c.x,c.y-4,'GUN 5s!','#e0e0e0');sfx('pickup');}
+      else if(c.type==='gun'){const gt=5.0+(jperk().gun||0)+(wperk().gun||0);player.gunT=gt;burst(c.x,c.y,'#e0e0e0',22);pushFloat(c.x,c.y-4,'GUN '+Math.round(gt)+'s!','#e0e0e0');sfx('pickup');}
       // gun fires instantly upward on pickup and then keeps auto-firing
       if(c.type==='gun'){player.shootCd=0;shootRequested=true;}
       if(c.type==='bag'){localStorage.setItem(BK,totalBags);questProgress('bags',2);missionProgress('bags',2);}
@@ -1636,9 +1683,14 @@ function update(dt){
   if(player.gunT>0){
     shootRequested=true; // auto-fire while the gun is active
     if(player.shootCd<=0){
-      // straight up, always
-      projectiles.push({x:player.x,y:player.y-12,vx:0,vy:-12,life:2});
-      player.shootCd=0.12;
+      // straight up, always — Waffen-Skin bestimmt Rate, Speed, Streuung, Durchschlag
+      const wp=wperk(), sp=-12*(wp.speed||1);
+      projectiles.push({x:player.x,y:player.y-12,vx:0,vy:sp,life:2,pierce:wp.pierce?2:0,blast:wp.blast||0});
+      if(wp.spread){
+        projectiles.push({x:player.x,y:player.y-12,vx:-2.4,vy:sp*0.95,life:2,pierce:0,blast:0});
+        projectiles.push({x:player.x,y:player.y-12,vx: 2.4,vy:sp*0.95,life:2,pierce:0,blast:0});
+      }
+      player.shootCd=0.12*(wp.cd||1);
     }
   }else if(shootRequested){
     if(player.noGunT===undefined||player.noGunT<=0){
@@ -1657,9 +1709,17 @@ function update(dt){
     for(const e of enemies){
       if(!e.alive||e.boss||!e.plat)continue;
       if(Math.abs(pr.x-e.x)<e.w/2+6&&Math.abs(pr.y-(e.y+e.h/2))<e.h/2+8){
-        pr.life=0;e.alive=false;
+        if(pr.pierce>0)pr.pierce--;else pr.life=0;
+        e.alive=false;
         burst(e.x,e.y,'#ffcc00',20);addShake(3,0.12);
         registerKill(e.x,e.y);
+        if(pr.blast){
+          for(const e2 of enemies){
+            if(!e2.alive||e2.boss||!e2.plat)continue;
+            if(Math.hypot(e2.x-e.x,e2.y-e.y)<70){e2.alive=false;burst(e2.x,e2.y,'#c5e1a5',14);registerKill(e2.x,e2.y);}
+          }
+          burst(e.x,e.y,'#33691e',24);addShake(5,0.18);
+        }
         break;
       }
     }
@@ -2482,6 +2542,17 @@ function drawJointSprite(g,ox,oy,len,th,col,tip,tilt){
 // Zeichnet den ausgerüsteten Konsum-Gegenstand am Mund (Pixel-Look)
 function drawDevice(g,s){
   const col=s.joint||'#e8d9ac', tip=s.jointTip||'#e03a10', dev=s.dev||'joint';
+  // Pixel-Sprite des ausgerüsteten Konsum-Gegenstands (falls vorhanden)
+  const di=s.devImg?itemImg(s.devImg):null;
+  if(di){
+    g.save();g.imageSmoothingEnabled=false;
+    const h=8, w=di.width*h/di.height;
+    g.drawImage(di,3,-15,w,h);
+    g.globalAlpha=0.5;g.fillStyle='#e8e4dc';
+    g.fillRect(3+w,-19,1.4,1.4);g.fillRect(3+w+1.4,-21.5,1.2,1.2);g.fillRect(3+w-0.4,-23.5,1.6,1.6);
+    g.globalAlpha=1;g.restore();
+    return;
+  }
   const px=(x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(x,y,w,h);};
   const outline=(x,y,w,h)=>{g.fillStyle='#0b0a08';g.fillRect(x-1,y-1,w+2,h+2);};
   g.strokeStyle='#0b0a08';g.lineWidth=1;
