@@ -46,7 +46,20 @@
     box-shadow:inset -4px -4px 0 var(--cd), inset 4px 4px 0 var(--cl), 0 6px 0 rgba(0,0,0,.55);
     image-rendering:pixelated;transition:filter .12s, transform .06s;
   }
-  .overlay .btn:active{transform:translateY(4px);box-shadow:inset -4px -4px 0 var(--cd), inset 4px 4px 0 var(--cl), 0 2px 0 rgba(0,0,0,.55);}
+  /* Sanftes Schweben + Tap-Feedback mit weichem Zurückfedern */
+  @keyframes btnFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+  .overlay .btn{
+    animation:btnFloat 2.8s ease-in-out infinite;
+    transition:filter .12s ease, transform .16s cubic-bezier(.34,1.56,.64,1), box-shadow .12s ease;
+  }
+  .overlay .btn:nth-of-type(2n){animation-delay:.35s;}
+  .overlay .btn:nth-of-type(3n){animation-delay:.7s;}
+  @media (hover:hover){
+    .overlay .btn:hover{animation-play-state:paused;transform:translateY(-3px) scale(1.035);filter:brightness(1.12) saturate(1.08);
+      box-shadow:inset -4px -4px 0 var(--cd), inset 4px 4px 0 var(--cl), 0 9px 0 rgba(0,0,0,.55), 0 0 18px color-mix(in srgb, var(--cl) 55%, transparent);}
+  }
+  .overlay .btn:active{animation:none;transform:translateY(4px) scale(.955);box-shadow:inset -4px -4px 0 var(--cd), inset 4px 4px 0 var(--cl), 0 2px 0 rgba(0,0,0,.55);transition-duration:.05s;}
+  @media (prefers-reduced-motion:reduce){.overlay .btn{animation:none;}}
   .overlay .btn:disabled{filter:grayscale(.6) brightness(.75);cursor:not-allowed;}
   .overlay .btn.alt{--c:#7a2fa8;--cd:#3d1257;--cl:#c078e8;}
   .overlay .btn.ghost{--c:#5b6472;--cd:#2b3138;--cl:#9aa5b3;}
