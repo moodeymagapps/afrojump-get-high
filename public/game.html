@@ -3465,6 +3465,18 @@ function drawCollectible(c){
     ctx.beginPath();ctx.arc(c.x+8,y-10,2,0,Math.PI*2);ctx.fill();
     ctx.restore();
   }else if(c.type==='gun'){
+    // Waffen-Pickup nutzt den ausgerüsteten Waffen-Skin
+    const wimg=itemImg(currentWeapon().img);
+    if(wimg){
+      ctx.save();
+      ctx.translate(c.x,y);ctx.rotate(-0.12+Math.sin(c.t*3)*0.05);
+      const hh=26, ww=hh*(wimg.width/wimg.height);
+      drawSpriteSnapped(ctx,wimg,-ww/2,-hh/2+Math.sin(c.t*4)*1.2,ww,hh);
+      ctx.restore();
+      ctx.fillStyle='rgba(255,220,80,'+(0.35+0.35*Math.sin(c.t*8))+')';
+      ctx.beginPath();ctx.arc(c.x+10,y-10,2.4,0,Math.PI*2);ctx.fill();
+      return;
+    }
     ctx.save();ctx.translate(c.x,y);ctx.rotate(-0.2);
     // body
     ctx.fillStyle='#37474f';ctx.strokeStyle='#000';ctx.lineWidth=1.5;
@@ -3482,14 +3494,14 @@ function drawCollectible(c){
     ctx.beginPath();ctx.arc(15,-1,2.5,0,Math.PI*2);ctx.fill();
     ctx.restore();
   }else{
-    // joint
-    const js=sprite('cjoint');
+    // Joint-Pickup nutzt den ausgerüsteten Joint/Konsum-Skin
+    const js=itemImg(currentJoint().img)||sprite('cjoint');
     if(js){
       ctx.save();
       ctx.imageSmoothingEnabled=false;
       const hh=26, ww=hh*(js.width/js.height);
       ctx.translate(c.x,y);ctx.rotate(-0.12+Math.sin(c.t*3)*0.06);
-      ctx.drawImage(js,-ww/2,-hh/2,ww,hh);
+      drawSpriteSnapped(ctx,js,-ww/2,-hh/2,ww,hh);
       ctx.restore();
       ctx.fillStyle='rgba(255,255,255,'+(0.35+0.35*Math.sin(c.t*6))+')';
       ctx.beginPath();ctx.arc(c.x+9,y-11,2.4,0,Math.PI*2);ctx.fill();
