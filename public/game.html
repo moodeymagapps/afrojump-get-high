@@ -1590,6 +1590,7 @@ function update(dt){
             for(const en of enemies)if(en.plat===p){en.alive=false;en.plat=null;}
             collectibles.push({x:p.x+p.w/2,y:p.y-14,type:'bag',t:0,taken:false});}
           else{player.vy=-13.5;}
+          if(jperk().jump)player.vy*=jperk().jump;   // Joint-Skin Sprung-Bonus
           if(player.x<12)player.x=12;if(player.x>W-12)player.x=W-12;
           p.bounce=1;
           player.landedT=0.15;
