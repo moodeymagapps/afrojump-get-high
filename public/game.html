@@ -420,13 +420,26 @@ const W=400,H=700;
 let dpr=1;
 function fit(){
   const s=Math.min(window.innerWidth/W,window.innerHeight/H);
-  cv.style.width=(W*s)+'px';cv.style.height=(H*s)+'px';
-  const want=Math.min(3,Math.max(1,(window.devicePixelRatio||1)*s));
-  const nw=Math.round(W*want),nh=Math.round(H*want);
+  // Ganzzahliger Geräte-Pixel-Faktor: dadurch landet jeder Logik-Pixel exakt
+  // auf einem Gitter aus ganzen Geräte-Pixeln -> keine Fransen an Konturen.
+  const want=Math.max(1,Math.min(4,Math.ceil((window.devicePixelRatio||1)*s)));
+  const nw=W*want,nh=H*want;
+  // CSS-Größe auf ganze Geräte-Pixel runden, damit nicht neu resampelt wird.
+  const dev=window.devicePixelRatio||1;
+  const cssW=Math.round(W*s*dev)/dev, cssH=Math.round(H*s*dev)/dev;
+  cv.style.width=cssW+'px';cv.style.height=cssH+'px';
   if(cv.width!==nw||cv.height!==nh){cv.width=nw;cv.height=nh;}
-  dpr=cv.width/W;
+  dpr=want;
   ctx.setTransform(dpr,0,0,dpr,0,0);
   ctx.imageSmoothingEnabled=false;
+}
+// Rundet eine Logik-Koordinate auf das Geräte-Pixel-Gitter (scharfe Kanten).
+function snapPx(v){return Math.round(v*dpr)/dpr;}
+// Zeichnet ein Sprite pixelgenau ausgerichtet.
+function drawSpriteSnapped(g,im,x,y,w,h){
+  g.imageSmoothingEnabled=false;
+  const sw=Math.max(1/dpr,snapPx(w)),sh=Math.max(1/dpr,snapPx(h));
+  g.drawImage(im,snapPx(x),snapPx(y),sw,sh);
 }
 window.addEventListener('resize',fit);
 window.addEventListener('orientationchange',()=>setTimeout(fit,120));
