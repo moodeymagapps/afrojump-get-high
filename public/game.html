@@ -46,20 +46,7 @@
     box-shadow:inset -4px -4px 0 var(--cd), inset 4px 4px 0 var(--cl), 0 6px 0 rgba(0,0,0,.55);
     image-rendering:pixelated;transition:filter .12s, transform .06s;
   }
-  /* Sanftes Schweben + Tap-Feedback mit weichem Zurückfedern */
-  @keyframes btnFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
-  .overlay .btn{
-    animation:btnFloat 2.8s ease-in-out infinite;
-    transition:filter .12s ease, transform .16s cubic-bezier(.34,1.56,.64,1), box-shadow .12s ease;
-  }
-  .overlay .btn:nth-of-type(2n){animation-delay:.35s;}
-  .overlay .btn:nth-of-type(3n){animation-delay:.7s;}
-  @media (hover:hover){
-    .overlay .btn:hover{animation-play-state:paused;transform:translateY(-3px) scale(1.035);filter:brightness(1.12) saturate(1.08);
-      box-shadow:inset -4px -4px 0 var(--cd), inset 4px 4px 0 var(--cl), 0 9px 0 rgba(0,0,0,.55), 0 0 18px color-mix(in srgb, var(--cl) 55%, transparent);}
-  }
-  .overlay .btn:active{animation:none;transform:translateY(4px) scale(.955);box-shadow:inset -4px -4px 0 var(--cd), inset 4px 4px 0 var(--cl), 0 2px 0 rgba(0,0,0,.55);transition-duration:.05s;}
-  @media (prefers-reduced-motion:reduce){.overlay .btn{animation:none;}}
+  .overlay .btn:active{transform:translateY(4px);box-shadow:inset -4px -4px 0 var(--cd), inset 4px 4px 0 var(--cl), 0 2px 0 rgba(0,0,0,.55);}
   .overlay .btn:disabled{filter:grayscale(.6) brightness(.75);cursor:not-allowed;}
   .overlay .btn.alt{--c:#7a2fa8;--cd:#3d1257;--cl:#c078e8;}
   .overlay .btn.ghost{--c:#5b6472;--cd:#2b3138;--cl:#9aa5b3;}
@@ -1348,52 +1335,14 @@ const duel={active:false,code:null,seed:null,role:null,channel:null,ready:false,
   finished:false,oppName:'Gegner',countdown:0,myRematch:false,oppRematch:false,
   oppOffline:false,lastSeen:0};
 let shake={t:0,mag:0},timeScale=1,deathT=0,bossIndex=0;
-// ---- PowerUps (Pickups mit Timer) --------------------------------------
-const POWERUPS={
-  magnet:{name:'COIN MAGNET', col:'#42a5f5', dur:9,  icon:'U'},
-  shield:{name:'SCHILD',      col:'#26c6da', dur:7,  icon:'O'},
-  x3:    {name:'TRIPLE COINS',col:'#ffd54a', dur:10, icon:'3'},
-  slow:  {name:'SLOW MOTION', col:'#b388ff', dur:6,  icon:'~'},
-  mini:  {name:'MINI MODE',   col:'#80cbc4', dur:9,  icon:'v'},
-  giant: {name:'GIANT MODE',  col:'#ff8a65', dur:8,  icon:'^'},
-  ghost: {name:'GHOST MODE',  col:'#e0e0e0', dur:7,  icon:'#'},
-  dash:  {name:'DASH',        col:'#ff5252', dur:5,  icon:'>'}
-};
-const PW_KINDS=Object.keys(POWERUPS);
-// ---- Zufalls-Events pro Run -------------------------------------------
-const RUN_EVENTS={
-  goldrush:  {name:'GOLD RUSH',    col:'#ffd54a', dur:12},
-  lowgrav:   {name:'LOW GRAVITY',  col:'#b3e5fc', dur:11},
-  doublecoin:{name:'DOUBLE COINS', col:'#7cfc00', dur:14},
-  pixelstorm:{name:'PIXEL STORM',  col:'#e040fb', dur:10}
-};
-let runEvent={kind:null,t:0},eventCd=22;
 let killCombo=0,comboT=0,runKills=0;
-const BOSS_TYPES=['budboss','kingblunt','drgreenthumb',
-  'kushking','evilbong','weeddragon','magicshroom','sheriffkush','policeheli','cactusg',
-  'grimdealer','blazebeast','redeye','ufogrower','angrytree','shroomstoner','ganjawizard'];
+const BOSS_TYPES=['budboss','kingblunt','drgreenthumb','theplug','giantblunt','mutantbush'];
 // Bild-Bosse (Pixel-Art) – Namen + Untertitel wie auf den Artworks
 const BOSS_IMAGES={
   budboss:{src:'/__l5e/assets-v1/23cd3ead-a14b-4f58-a46e-ff04ea7ee915/budboss.png',bg:'white',name:'BUD BOSS',sub:'Der Lord der Blüten'},
-  kingblunt:{src:'/__l5e/assets-v1/bf2f4cc9-c9e3-4980-932a-3ed2711b60f2/kingblunt.png',bg:'white',name:'KING BLUNT',sub:'Der gekrönte Joint'},
-  // Neue Bild-Bosse (bereits freigestellte Pixel-Art PNGs)
-  kushking:{src:'/bosses/kushking.png',bg:null,name:'KUSH KING',sub:'Gekrönter Blüten-Tyrann'},
-  evilbong:{src:'/bosses/evilbong.png',bg:null,name:'EVIL BONG',sub:'Sie raucht zurück'},
-  weeddragon:{src:'/bosses/weeddragon.png',bg:null,name:'WEED DRAGON',sub:'Atmet grünen Rauch'},
-  magicshroom:{src:'/bosses/magicshroom.png',bg:null,name:'MAGIC SHROOM',sub:'Trip ohne Rückfahrschein'},
-  sheriffkush:{src:'/bosses/sheriffkush.png',bg:null,name:'SHERIFF KUSH',sub:'Gesetz im Grünen'},
-  policeheli:{src:'/bosses/policeheli.png',bg:null,name:'POLIZEI HELI',sub:'Razzia aus der Luft'},
-  cactusg:{src:'/bosses/cactusg.png',bg:null,name:'CACTUS G',sub:'Stachelharter Gangster'},
-  grimdealer:{src:'/bosses/grimdealer.png',bg:null,name:'GRIM DEALER',sub:'Letzte Lieferung'},
-  blazebeast:{src:'/bosses/blazebeast.png',bg:null,name:'BLAZE BEAST',sub:'Brennt lichterloh'},
-  redeye:{src:'/bosses/redeye.png',bg:null,name:'RED EYE',sub:'Sieht alles, blinkt nie'},
-  ufogrower:{src:'/bosses/ufogrower.png',bg:null,name:'UFO GROWER',sub:'Anbau aus dem All'},
-  angrytree:{src:'/bosses/angrytree.png',bg:null,name:'ANGRY TREE',sub:'Wurzeln voller Wut'},
-  shroomstoner:{src:'/bosses/shroomstoner.png',bg:null,name:'SHROOM STONER',sub:'Wolke aus Sporen'},
-  ganjawizard:{src:'/bosses/ganjawizard.png',bg:null,name:'GANJA WIZARD',sub:'Magie in Rauchform'}
+  kingblunt:{src:'/__l5e/assets-v1/bf2f4cc9-c9e3-4980-932a-3ed2711b60f2/kingblunt.png',bg:'white',name:'KING BLUNT',sub:'Der gekrönte Joint'}
 };
 const BOSS_NAMES={budboss:'BUD BOSS',kingblunt:'KING BLUNT',drgreenthumb:'DR. GREENTHUMB',theplug:'THE PLUG',giantblunt:'GIANT BLUNT',mutantbush:'MUTANT BUSH'};
-for(const k in BOSS_IMAGES)BOSS_NAMES[k]=BOSS_IMAGES[k].name;
 
 // Seedable RNG — in duel mode both players generate the identical map
 let prngState=null;
@@ -1408,9 +1357,7 @@ function rnd(){
 function rand(a,b){return a+rnd()*(b-a);}
 function reset(){
   prngState=(duel.active&&duel.seed!==null)?duel.seed|0:null;
-  player={x:W/2,y:H-100,vx:0,vy:-14,r:22,facing:1,invincible:0,shootCd:0,alive:true,bossShot:false,squash:1,stretch:1,landedT:0,bossLives:0,hitFlash:0,jetpackT:0,gunT:0,
-    magnetT:0,x3T:0,slowT:0,miniT:0,giantT:0,ghostT:0,dashT:0};
-  runEvent={kind:null,t:0};eventCd=22;
+  player={x:W/2,y:H-100,vx:0,vy:-14,r:22,facing:1,invincible:0,shootCd:0,alive:true,bossShot:false,squash:1,stretch:1,landedT:0,bossLives:0,hitFlash:0,jetpackT:0,gunT:0};
   if(jperk().shield){player.invincible=jperk().shield;player.invSrc='spawn';}
   platforms=[];collectibles=[];enemies=[];projectiles=[];particles=[];smokeParticles=[];floatTexts=[];
   cameraY=0;bestY=0;scrollLocked=false;boss=null;nextBossScore=1500;gameOver=false;
@@ -1516,30 +1463,26 @@ function buildCustomWorld(map,out){
   return out;
 }
 function spawnPlatform(y){
-  const meters=Math.max(0,Math.floor(-y/10));
-  // Adaptive Schwierigkeit: 0 (Start) → 1 (ab ~1200m) – Plattformen schrumpfen,
-  // Gegner werden häufiger/schneller, mehr brüchige & bewegte Plattformen.
-  const D=Math.min(1,meters/1200);
-  const w=rand(55-18*D,80-22*D);
+  const w=rand(55,80);
   const x=rand(10,W-10-w);
+  const meters=Math.max(0,Math.floor(-y/10));
   let type='normal';
   const r0=rnd();
-  if(meters>60&&r0<0.10+0.10*D)type='brittle';
-  else if(meters>40&&r0<0.22+0.06*D)type='spring';
-  else if(meters>30&&r0<0.45+0.18*D)type='moving';
+  if(meters>60&&r0<0.10)type='brittle';
+  else if(meters>40&&r0<0.20)type='spring';
+  else if(meters>30&&r0<0.45)type='moving';
   const p={x:x,y:y,w:w,h:12,vx:0,type,dir:rnd()<.5?-1:1,range:0,ox:x,bounce:0,cracked:0,springT:0};
-  if(type==='moving'){p.range=rand(40,80+30*D);p.vx=rand(0.6,1.4)*(1+0.7*D);}
+  if(type==='moving'){p.range=rand(40,80);p.vx=rand(0.6,1.4);}
   platforms.push(p);
   // collectible
   const r=rnd();
   if(meters>80&&r<0.006){collectibles.push({x:x+w/2,y:y-24,type:'jetpack',t:0,taken:false});}
   else if(meters>40&&r<0.022){collectibles.push({x:x+w/2,y:y-22,type:'gun',t:0,taken:false});}
-  else if(meters>25&&r<0.055){collectibles.push({x:x+w/2,y:y-22,type:'pw',pw:PW_KINDS[Math.floor(rnd()*PW_KINDS.length)],t:0,taken:false});}
   else if(r<0.10){collectibles.push({x:x+w/2,y:y-22,type:'joint',t:0,taken:false});}
-  else if(r<(runEvent.kind==='goldrush'?0.55:0.28)){collectibles.push({x:x+w/2,y:y-18,type:'bag',t:0,taken:false});}
+  else if(r<0.28){collectibles.push({x:x+w/2,y:y-18,type:'bag',t:0,taken:false});}
   // enemy
-  if(meters>20&&rnd()<0.10+0.14*D&&w>52){
-    enemies.push({x:x+w/2,y:y-18,w:34,h:18,vx:(1.2+1.1*D)*(rnd()<.5?-1:1),plat:p,type:rnd()<.5?'car':'cop',alive:true});
+  if(meters>20&&rnd()<0.10&&w>60){
+    enemies.push({x:x+w/2,y:y-18,w:34,h:18,vx:1.2*(rnd()<.5?-1:1),plat:p,type:rnd()<.5?'car':'cop',alive:true});
   }
 }
 
@@ -1585,51 +1528,7 @@ function spawnBoss(){
 function pushFloat(x,y,txt,color){floatTexts.push({x,y,txt,color:color||'#fff',life:0.9});}
 function addShake(mag,dur){shake.mag=Math.max(shake.mag,mag);shake.t=Math.max(shake.t,dur);}
 
-// ============ PowerUps & Events ==========================================
-function givePowerup(kind,x,y){
-  const d=POWERUPS[kind];if(!d)return;
-  const key={magnet:'magnetT',shield:'shield',x3:'x3T',slow:'slowT',mini:'miniT',giant:'giantT',ghost:'ghostT',dash:'dashT'}[kind];
-  if(kind==='shield'){player.invincible=Math.max(player.invincible,d.dur);player.invSrc='power';}
-  else player[key]=Math.max(player[key]||0,d.dur);
-  burst(x,y,d.col,26);
-  pushFloat(x,y-6,d.name+'!',d.col);
-  try{sfx('pickup');}catch(e){}
-  shake.t=Math.max(shake.t,0.12);shake.mag=Math.max(shake.mag||0,4);
-}
-function tickPowerups(dt){
-  for(const k of ['magnetT','x3T','slowT','miniT','giantT','ghostT','dashT'])
-    if(player[k]>0){player[k]-=dt;if(player[k]<0)player[k]=0;}
-  // Größe folgt Mini/Giant Mode (weich interpoliert, Kollision nutzt player.r)
-  const target=player.miniT>0?13:(player.giantT>0?32:22);
-  player.r+=(target-player.r)*0.25;
-  if(player.ghostT>0&&Math.random()<0.5)
-    particles.push({x:player.x+rand(-8,8),y:player.y+rand(-8,8),vx:0,vy:rand(-.4,.4),life:0.35,color:'#e0e0e0'});
-  if(player.magnetT>0&&Math.random()<0.3)
-    particles.push({x:player.x+rand(-20,20),y:player.y+rand(-20,20),vx:0,vy:-1,life:0.3,color:'#42a5f5'});
-}
-function tickRunEvent(dt){
-  if(customMap||duel.active)return; // Duell-Maps bleiben exakt gleich
-  if(runEvent.kind){
-    runEvent.t-=dt;
-    if(runEvent.t<=0){pushFloat(W/2,player.y-70,'EVENT ENDE','#ffffff');runEvent.kind=null;eventCd=rand(20,34);}
-    else if(runEvent.kind==='pixelstorm'&&Math.random()<0.6)
-      particles.push({x:rand(0,W),y:cameraY-10,vx:rand(-1,1),vy:rand(3,6),life:1.2,color:['#e040fb','#00e5ff','#ffd54a'][Math.floor(Math.random()*3)]});
-    return;
-  }
-  if(bestY<150)return;           // erst nach dem Aufwärmen
-  eventCd-=dt;
-  if(eventCd>0)return;
-  const evKeys=Object.keys(RUN_EVENTS);
-  const k=evKeys[Math.floor(Math.random()*evKeys.length)];
-  const e=RUN_EVENTS[k];
-  runEvent={kind:k,t:e.dur};
-  pushFloat(W/2,player.y-80,e.name+'!',e.col);
-  burst(player.x,player.y,e.col,30);
-  shake.t=Math.max(shake.t,0.2);shake.mag=Math.max(shake.mag||0,6);
-}
-
 function update(dt){
-  if(!player)return;
   // Duell-Countdown: beide Spieler starten synchron
   if(duel.active&&duel.countdown>0){
     duel.countdown-=dt;
@@ -1645,10 +1544,7 @@ function update(dt){
     shake.t=Math.max(0,shake.t-dt);
     return;
   }
-  // ---- PowerUp-Timer + Run-Events ---------------------------------------
-  tickPowerups(dt);
-  tickRunEvent(dt);
-  dt*=timeScale*(player.slowT>0?0.55:1);
+  dt*=timeScale;
   if(shake.t>0){shake.t-=dt;if(shake.t<0)shake.t=0;}
   // player movement
   const acc=0.6,maxV=6;
@@ -1669,12 +1565,7 @@ function update(dt){
   if(player.x<0)player.x=W;if(player.x>W)player.x=0;
   if(player.vx<-0.1)player.facing=-1;else if(player.vx>0.1)player.facing=1;
 
-  player.vy+=0.35*(runEvent.kind==='lowgrav'?0.62:1);
-  // Dash: kräftiger Seitenschub, solange Dash aktiv ist
-  if(player.dashT>0&&(keys.l||keys.r||touchLeft||touchRight)){
-    player.x+=((keys.l||touchLeft)?-3.4:3.4);
-    if(Math.random()<0.6)particles.push({x:player.x,y:player.y+rand(-8,8),vx:rand(-.5,.5),vy:rand(-.4,.4),life:0.3,color:'#ff5252'});
-  }
+  player.vy+=0.35;
   if(player.invincible>0){
     player.invincible-=dt;
     if(player.invincible<=0)player.invSrc=null;
@@ -1781,7 +1672,6 @@ function update(dt){
     // player collision
     if(Math.abs(player.x-e.x)<e.w/2+player.r-6&&Math.abs(player.y-e.y-e.h/2)<e.h/2+player.r-6){
       if(player.invincible>0){e.alive=false;burst(e.x,e.y,'#ffcc00');}
-      else if(player.ghostT>0){/* Ghost Mode: durch Gegner hindurch */}
       else if(boss&&player.bossLives>0){e.alive=false;hurtPlayer();}
       else die();
     }
@@ -1792,13 +1682,9 @@ function update(dt){
     if(c.y<cameraY-200||c.y>cameraY+H+200){c.t+=dt;continue;}
     if(c.taken)continue;
     c.t+=dt;
-    if(Math.hypot(player.x-c.x,player.y-c.y)<player.r+10+(jperk().magnet||0)+(player.magnetT>0?95:0)){
+    if(Math.hypot(player.x-c.x,player.y-c.y)<player.r+10+(jperk().magnet||0)){
       c.taken=true;
-      if(c.type==='bag'){
-        let gain=2+(jperk().bags||0);
-        if(player.x3T>0)gain*=3; else if(runEvent.kind==='doublecoin')gain*=2;
-        runBags+=gain;totalBags+=gain;bagsEl.textContent='🌿 '+totalBags;hudPop(bagsChipEl);burst(c.x,c.y,'#7cfc00',18);pushFloat(c.x,c.y-4,'+'+gain+' 🌿','#7cfc00');sfx('pickup');}
-      else if(c.type==='pw'){givePowerup(c.pw||'shield',c.x,c.y);}
+      if(c.type==='bag'){const gain=2+(jperk().bags||0);runBags+=gain;totalBags+=gain;bagsEl.textContent='🌿 '+totalBags;hudPop(bagsChipEl);burst(c.x,c.y,'#7cfc00',18);pushFloat(c.x,c.y-4,'+'+gain+' 🌿','#7cfc00');sfx('pickup');}
       else if(c.type==='joint'){player.invincible=6+(jperk().inv||0);player.invSrc='power';player.vy=-22;burst(c.x,c.y,'#ff69b4',24);pushFloat(c.x,c.y-4,'INVINCIBLE!','#ff69b4');sfx('pickup');}
       else if(c.type==='jetpack'){player.jetpackT=3.0;player.vy=-14;burst(c.x,c.y,'#ff8a00',30);pushFloat(c.x,c.y-4,'JETPACK!','#ff8a00');}
       else if(c.type==='gun'){const gt=5.0+(jperk().gun||0)+(wperk().gun||0);player.gunT=gt;burst(c.x,c.y,'#e0e0e0',22);pushFloat(c.x,c.y-4,'GUN '+Math.round(gt)+'s!','#e0e0e0');sfx('pickup');}
@@ -3518,34 +3404,6 @@ function drawAstronaut(g,r){
 
 function drawCollectible(c){
   const y=c.y-cameraY+Math.sin(c.t*4)*3;
-  if(c.type==='pw'){
-    // PowerUp-Kapsel im Pixelstil: Rahmen + Glow + rotierende Funken
-    const d=POWERUPS[c.pw]||POWERUPS.shield;
-    const s=15, pulse=0.6+0.4*Math.sin(c.t*6);
-    ctx.save();
-    ctx.translate(c.x,y);
-    ctx.globalAlpha=0.25*pulse;
-    ctx.fillStyle=d.col;
-    ctx.beginPath();ctx.arc(0,0,s+7,0,Math.PI*2);ctx.fill();
-    ctx.globalAlpha=1;
-    ctx.fillStyle='#0e1410';ctx.strokeStyle='#000';ctx.lineWidth=2;
-    ctx.fillRect(-s,-s,s*2,s*2);ctx.strokeRect(-s,-s,s*2,s*2);
-    ctx.fillStyle=d.col;
-    ctx.fillRect(-s+3,-s+3,s*2-6,s*2-6);
-    ctx.fillStyle='rgba(255,255,255,0.35)';
-    ctx.fillRect(-s+3,-s+3,s*2-6,4);
-    ctx.fillStyle='#0b0f0c';
-    ctx.font='bold 16px "Press Start 2P",monospace';
-    ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(d.icon,0,1);
-    for(let i=0;i<3;i++){
-      const a=c.t*3+i*2.1;
-      ctx.fillStyle='rgba(255,255,255,'+(0.5*pulse)+')';
-      ctx.fillRect(Math.cos(a)*(s+6)-1.5,Math.sin(a)*(s+6)-1.5,3,3);
-    }
-    ctx.restore();
-    return;
-  }
   if(c.type==='bag'){
     // marijuana baggy — ziplock bag with green buds inside
     ctx.save();
@@ -4672,14 +4530,6 @@ function loop(t){
   let parts=[];
   if(player){
     if(player.invincible>0)parts.push('★ INVINCIBLE '+player.invincible.toFixed(1)+'s');
-    if(player.magnetT>0)parts.push('🧲 MAGNET '+player.magnetT.toFixed(1)+'s');
-    if(player.x3T>0)parts.push('💰 x3 COINS '+player.x3T.toFixed(1)+'s');
-    if(player.slowT>0)parts.push('⏳ SLOW '+player.slowT.toFixed(1)+'s');
-    if(player.miniT>0)parts.push('🔹 MINI '+player.miniT.toFixed(1)+'s');
-    if(player.giantT>0)parts.push('🔶 GIANT '+player.giantT.toFixed(1)+'s');
-    if(player.ghostT>0)parts.push('👻 GHOST '+player.ghostT.toFixed(1)+'s');
-    if(player.dashT>0)parts.push('💨 DASH '+player.dashT.toFixed(1)+'s');
-    if(runEvent.kind)parts.push('✨ '+RUN_EVENTS[runEvent.kind].name+' '+runEvent.t.toFixed(0)+'s');
     if(player.jetpackT>0)parts.push('🚀 JETPACK '+player.jetpackT.toFixed(1)+'s');
     if(player.gunT>0)parts.push('🔫 GUN '+player.gunT.toFixed(1)+'s');
     if(killCombo>1)parts.push('🔥 COMBO x'+killCombo);
