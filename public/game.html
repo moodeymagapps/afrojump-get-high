@@ -605,45 +605,50 @@ const LOOT_ONLY_SKINS=new Set([]);
   }
 })();
 
-// ---- Waffen-Skins (nur aus Loot-Tütchen) ----
+// ---- Waffen-Skins (Pixel-Art Sprites, nur aus Loot-Tütchen) ----
+// perk: cd=Cooldown-Faktor, speed=Kugelgeschwindigkeit, spread=Doppelschuss,
+//       pierce=Durchschlag, gun=extra Waffenzeit (s), blast=Flächenschaden
 const WEAPON_SKINS=[
-  {id:'w_default',name:'Standard',      rarity:'common',   free:true, core:'#fffde7',ring:'#8d8d8d',shape:'bullet'},
-  {id:'w_seed',   name:'Seed Shot',     rarity:'common',   core:'#c5a25a',ring:'#7a5c2a',shape:'seed'},
-  {id:'w_bud',    name:'Bud Blaster',   rarity:'common',   core:'#7cfc00',ring:'#2e7d32',shape:'bud'},
-  {id:'w_smoke',  name:'Smoke Puff',    rarity:'rare',     core:'#e0e0e0',ring:'#9e9e9e',shape:'smoke'},
-  {id:'w_bong',   name:'Bong Bubble',   rarity:'rare',     core:'#b3e5fc',ring:'#0288d1',shape:'bubble'},
-  {id:'w_lighter',name:'Feuerzeug',     rarity:'rare',     core:'#ffd54a',ring:'#ff6a00',shape:'flame'},
-  {id:'w_purple', name:'Purple Haze',   rarity:'epic',     core:'#e1bee7',ring:'#7c4dff',shape:'star'},
-  {id:'w_laser',  name:'Space Laser',   rarity:'epic',     core:'#ffffff',ring:'#00e5ff',shape:'laser'},
-  {id:'w_skunk',  name:'Skunk Bomb',    rarity:'epic',     core:'#c5e1a5',ring:'#33691e',shape:'bomb'},
-  {id:'w_gold',   name:'Golden Nug',    rarity:'legendary',core:'#fff59d',ring:'#ffb300',shape:'bud'},
-  {id:'w_rainbow',name:'Rainbow Blast', rarity:'legendary',core:'RAINBOW',ring:'RAINBOW',shape:'star'},
-  {id:'w_alien',  name:'Alien Kush Ray',rarity:'legendary',core:'#b9f6ca',ring:'#00c853',shape:'laser'},
+  {id:'w_default',  name:'Wasserpistole',    rarity:'common',   free:true, img:'weapons/water.png',    shape:'bubble',core:'#b3e5fc',ring:'#0288d1',perk:{cd:0.92},        ability:'Solides Standardfeuer'},
+  {id:'w_sling',    name:'Steinschleuder',   rarity:'common',   img:'weapons/sling.png',    shape:'seed',  core:'#c5a25a',ring:'#7a5c2a',perk:{speed:1.35},              ability:'Sehr schnelle Kugeln'},
+  {id:'w_banana',   name:'Bananen-Blaster',  rarity:'rare',     img:'weapons/banana.png',   shape:'bud',   core:'#fff176',ring:'#f9a825',perk:{spread:1},                ability:'Doppelschuss (Streuung)'},
+  {id:'w_flare',    name:'Flammenwerfer',    rarity:'rare',     img:'weapons/flare.png',    shape:'flame', core:'#ffd54a',ring:'#ff6a00',perk:{gun:2},                   ability:'+2s Waffen-Dauer'},
+  {id:'w_smg',      name:'Kush-SMG',         rarity:'epic',     img:'weapons/smg.png',      shape:'bullet',core:'#fffde7',ring:'#616161',perk:{cd:0.55},                 ability:'Dauerfeuer'},
+  {id:'w_bombsling',name:'Bomben-Schleuder', rarity:'epic',     img:'weapons/bombsling.png',shape:'bomb',  core:'#c5e1a5',ring:'#33691e',perk:{blast:1},                 ability:'Explosion trifft alles in der Nähe'},
+  {id:'w_chicken',  name:'Huhn-Kanone',      rarity:'legendary',img:'weapons/chicken.png',  shape:'smoke', core:'#ffffff',ring:'#e0e0e0',perk:{pierce:1,cd:0.8,gun:1},   ability:'Durchschlag + mehr Waffenzeit'},
+  {id:'w_crossbow', name:'Armbrust 420',     rarity:'legendary',img:'weapons/crossbow.png', shape:'laser', core:'#ffffff',ring:'#7cfc00',perk:{pierce:1,speed:1.5,cd:0.7},ability:'Pfeil durchbohrt alles'},
 ];
-// ---- Joint-Skins (nur aus Loot-Tütchen) ----
-// dev = Form des Konsum-Gegenstands: joint | blunt | bong | vape | pipe | brownie | cookie | pill | gummy | dab | hookah | cigar
+// ---- Joint-/Konsum-Skins (Pixel-Art Sprites, nur aus Loot-Tütchen) ----
+// perk: inv=extra Unverwundbarkeit (s), bags=extra 🌿 pro Tütchen, jump=Sprungfaktor,
+//       magnet=Sammelradius (px), gun=extra Waffenzeit (s), shield=Startschutz (s)
 const JOINT_SKINS=[
-  {id:'j_default',name:'Classic Joint', rarity:'common',   free:true, dev:'joint', paper:'#e8d9ac',tip:'#e03a10',smoke:'#eeeeee'},
-  {id:'j_brown',  name:'Blunt Wrap',    rarity:'common',   dev:'blunt', paper:'#8d6e63',tip:'#ff8a00',smoke:'#d7ccc8'},
-  {id:'j_slim',   name:'Slim King',     rarity:'common',   dev:'joint', paper:'#fff8e1',tip:'#ff5252',smoke:'#f5f5f5'},
-  {id:'j_pipe',   name:'Apfel-Pfeife',  rarity:'common',   dev:'pipe',  paper:'#8bc34a',tip:'#ff7043',smoke:'#dcedc8'},
-  {id:'j_green',  name:'Green Paper',   rarity:'rare',     dev:'joint', paper:'#a5d6a7',tip:'#ff6a00',smoke:'#c8e6c9'},
-  {id:'j_pink',   name:'Cotton Candy',  rarity:'rare',     dev:'joint', paper:'#f8bbd0',tip:'#ff4081',smoke:'#fce4ec'},
-  {id:'j_ice',    name:'Menthol Ice',   rarity:'rare',     dev:'joint', paper:'#b3e5fc',tip:'#40c4ff',smoke:'#e1f5fe'},
-  {id:'j_vape',   name:'Vaporizer',     rarity:'rare',     dev:'vape',  paper:'#37474f',tip:'#00e5ff',smoke:'#b2ebf2'},
-  {id:'j_brownie',name:'Space Brownie', rarity:'rare',     dev:'brownie',paper:'#5d4037',tip:'#8d6e63',smoke:'#d7ccc8'},
-  {id:'j_cookie', name:'Weed Cookie',   rarity:'rare',     dev:'cookie', paper:'#d7a86e',tip:'#4e342e',smoke:'#f0e0c0'},
-  {id:'j_purple', name:'Purple Cone',   rarity:'epic',     dev:'joint', paper:'#ce93d8',tip:'#7c4dff',smoke:'#ede7f6'},
-  {id:'j_black',  name:'Blackout',      rarity:'epic',     dev:'blunt', paper:'#212121',tip:'#ff1744',smoke:'#616161'},
-  {id:'j_bong',   name:'Glas-Bong',     rarity:'epic',     dev:'bong',  paper:'#8ee6c8',tip:'#ff6a00',smoke:'#e0f7fa'},
-  {id:'j_pill',   name:'Bunte Pille',   rarity:'epic',     dev:'pill',  paper:'RAINBOW',tip:'#ffffff',smoke:'#f8bbd0'},
-  {id:'j_gummy',  name:'THC-Gummibär',  rarity:'epic',     dev:'gummy', paper:'#ff5252',tip:'#ffeb3b',smoke:'#ffcdd2'},
-  {id:'j_hookah', name:'Shisha',        rarity:'epic',     dev:'hookah',paper:'#ffca28',tip:'#ff7043',smoke:'#fff3c4'},
-  {id:'j_dab',    name:'Dab-Rig',       rarity:'legendary',dev:'dab',   paper:'#b388ff',tip:'#ff1744',smoke:'#ede7f6'},
-  {id:'j_cigar',  name:'Kush-Zigarre',  rarity:'legendary',dev:'cigar', paper:'#4e342e',tip:'#ff6a00',smoke:'#efebe9'},
-  {id:'j_gold',   name:'24K Joint',     rarity:'legendary',dev:'joint', paper:'#ffd700',tip:'#fff176',smoke:'#fff9c4'},
-  {id:'j_rainbow',name:'Rainbow Spliff',rarity:'legendary',dev:'joint', paper:'RAINBOW',tip:'#ffffff',smoke:'#ffffff'},
+  {id:'j_default',  name:'Classic Joint',  rarity:'common',   free:true, img:'items/classic.png',   paper:'#e8d9ac',tip:'#e03a10',smoke:'#eeeeee',perk:{},           ability:'Der Klassiker'},
+  {id:'j_herbal',   name:'Herbal Wrap',    rarity:'common',   img:'items/herbal.png',    paper:'#8bc34a',tip:'#ff6a00',smoke:'#dcedc8',perk:{inv:2},               ability:'+2s Unverwundbarkeit'},
+  {id:'j_cbdcone',  name:'CBD Cone',       rarity:'common',   img:'items/cbdcone.png',   paper:'#d7c39a',tip:'#ff8a00',smoke:'#efe6d0',perk:{shield:1.5},          ability:'1,5s Startschutz'},
+  {id:'j_purple',   name:'Purple Haze',    rarity:'rare',     img:'items/purple.png',    paper:'#ce93d8',tip:'#7c4dff',smoke:'#ede7f6',perk:{jump:1.05},           ability:'+5% Sprungkraft'},
+  {id:'j_bongpipe', name:'Glas-Bong',      rarity:'rare',     img:'items/bongpipe.png',  paper:'#8ee6c8',tip:'#ff6a00',smoke:'#e0f7fa',perk:{inv:3},               ability:'+3s Unverwundbarkeit'},
+  {id:'j_cookie',   name:'Weed Cookie',    rarity:'rare',     img:'items/cookie.png',    paper:'#d7a86e',tip:'#4e342e',smoke:'#f0e0c0',perk:{bags:1},              ability:'+1 🌿 pro Tütchen'},
+  {id:'j_honeypipe',name:'Honig-Pfeife',   rarity:'rare',     img:'items/honeypipe.png', paper:'#ffca28',tip:'#ff7043',smoke:'#fff3c4',perk:{magnet:14},           ability:'Magnet: größerer Sammelradius'},
+  {id:'j_stonepipe',name:'Stein-Pfeife',   rarity:'rare',     img:'items/stonepipe.png', paper:'#cfd8dc',tip:'#ff5252',smoke:'#eceff1',perk:{shield:2.5},          ability:'2,5s Startschutz'},
+  {id:'j_woodpipe', name:'Holz-Pfeife',    rarity:'epic',     img:'items/woodpipe.png',  paper:'#8d6e63',tip:'#ff8a00',smoke:'#d7ccc8',perk:{gun:2},              ability:'+2s Waffen-Dauer'},
+  {id:'j_crystal',  name:'Kristall-Pfeife',rarity:'epic',     img:'items/crystal.png',   paper:'#b3e5fc',tip:'#40c4ff',smoke:'#e1f5fe',perk:{jump:1.08,inv:1},     ability:'+8% Sprung & +1s Schutz'},
+  {id:'j_bamboo',   name:'Bambus-Bong',    rarity:'epic',     img:'items/bamboo.png',    paper:'#9ccc65',tip:'#ff6a00',smoke:'#dcedc8',perk:{bags:2},              ability:'+2 🌿 pro Tütchen'},
+  {id:'j_leafwrap', name:'Leaf Blunt',     rarity:'epic',     img:'items/leafwrap.png',  paper:'#7cb342',tip:'#ff7043',smoke:'#e8f5e9',perk:{magnet:22},           ability:'Starker Magnet'},
+  {id:'j_donut',    name:'Donut-Pfeife',   rarity:'epic',     img:'items/donut.png',     paper:'#f8bbd0',tip:'#ff4081',smoke:'#fce4ec',perk:{inv:2,bags:1},        ability:'+2s Schutz & +1 🌿'},
+  {id:'j_cbdbrick', name:'CBD-Brownie',    rarity:'rare',     img:'items/cbdbrick.png',  paper:'#5d4037',tip:'#8d6e63',smoke:'#d7ccc8',perk:{shield:3},            ability:'3s Startschutz'},
+  {id:'j_goldpipe', name:'24K Pfeife',     rarity:'legendary',img:'items/goldpipe.png',  paper:'#ffd700',tip:'#fff176',smoke:'#fff9c4',perk:{bags:3,magnet:16},    ability:'+3 🌿 pro Tütchen & Magnet'},
+  {id:'j_rocket',   name:'Rocket Spliff',  rarity:'legendary',img:'items/rocket.png',    paper:'#ef5350',tip:'#ffd54a',smoke:'#ffffff',perk:{jump:1.12,inv:3,gun:1},ability:'+12% Sprung, +3s Schutz'},
 ];
+// ---- Item-Sprite Loader (freigestellte PNGs) ----
+const ITEM_IMG_CACHE={};
+function itemImg(src){
+  if(!src)return null;
+  let e=ITEM_IMG_CACHE[src];
+  if(!e){e=ITEM_IMG_CACHE[src]={img:new Image(),ok:false};e.img.onload=()=>{e.ok=true;};e.img.src=src;}
+  return e.ok?e.img:null;
+}
+for(const w of WEAPON_SKINS)itemImg(w.img);
+for(const j of JOINT_SKINS)itemImg(j.img);
 // ---- Loot-Tütchen ----
 const LOOT_BOXES=[
   {id:'gram', name:'GRAMM-TÜTCHEN', price:150,  bag:'#9ccc65', odds:{common:0.70,rare:0.25,epic:0.045,legendary:0.005}},
