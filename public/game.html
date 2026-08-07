@@ -751,7 +751,7 @@ function drawPlatSprite(key,x,topY,w,opts){
   ctx.save();
   ctx.imageSmoothingEnabled=false;
   if(o.alpha!=null)ctx.globalAlpha=o.alpha;
-  ctx.drawImage(im,x+(w-sw)/2,topY+(o.dy||0),sw,sh);
+  drawSpriteSnapped(ctx,im,x+(w-sw)/2,topY+(o.dy||0),sw,sh);
   ctx.restore();
   return true;
 }
