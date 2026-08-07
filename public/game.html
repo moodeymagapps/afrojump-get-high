@@ -2481,11 +2481,15 @@ function drawImageSkin(g,s,inv,live){
   const im=entry.canvas;
   // Target render height ~54px (matches vector character silhouette)
   const targetH=54;
-  const sc=targetH/im.height;
-  const w=im.width*sc, h=im.height*sc;
+  // Auf ganze Geräte-Pixel rasten: verhindert halbe Pixel an den Konturen
+  // (Fransen/Doppelkanten) auf Retina- und Nicht-Retina-Displays.
+  const k=(g===ctx?dpr:1);
+  const hDev=Math.max(1,Math.round(targetH*k));
+  const wDev=Math.max(1,Math.round(im.width*(hDev/im.height)));
+  const w=wDev/k, h=hDev/k;
   const anchor=s.anchorY||0.72; // vertical anchor within the image (feet ≈ 0.95)
-  const dx=-w/2;
-  const dy=-h*anchor;
+  const dx=Math.round(-w/2*k)/k;
+  const dy=Math.round(-h*anchor*k)/k;
   g.save();
   g.imageSmoothingEnabled=false;
   if(live){
