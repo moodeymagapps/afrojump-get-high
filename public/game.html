@@ -978,6 +978,11 @@ function renderLootTab(catalog,ownedList,kind){
     card.appendChild(cv);
     const nm=document.createElement('div');nm.className='name';nm.textContent=it.name;card.appendChild(nm);
     card.appendChild(rarBadge(it.rarity));
+    if(it.ability){
+      const ab=document.createElement('div');
+      ab.style.cssText='font-size:7px;line-height:1.5;color:#9ccc65;margin:2px 4px 0;text-align:center;';
+      ab.textContent='★ '+it.ability;card.appendChild(ab);
+    }
     const pr=document.createElement('div');pr.className='price';pr.textContent=it.free?'Gratis':'🎒 Nur Loot';card.appendChild(pr);
     const btn=document.createElement('button');
     if(isSel){btn.textContent='✓ Aktiv';btn.className='selected';btn.disabled=true;}
