@@ -797,9 +797,8 @@ setTimeout(()=>{try{for(const k in BOSS_IMAGES)loadSkinImage(BOSS_IMAGES[k].src,
 function currentSkin(){
   const base=SKINS.find(s=>s.id===selectedSkin)||SKINS[0];
   const j=currentJoint();
-  if(j.id==='j_default')return base;
   // equipped joint skin recolors the joint of every character skin
-  return Object.assign({},base,{joint:j.paper==='RAINBOW'?rainbowCol(5):j.paper,jointTip:j.tip,dev:j.dev||'joint'});
+  return Object.assign({},base,{joint:j.paper==='RAINBOW'?rainbowCol(5):j.paper,jointTip:j.tip,dev:j.dev||'joint',devImg:j.img});
 }
 function persistShop(){localStorage.setItem(BK,totalBags);localStorage.setItem(OK,JSON.stringify(owned));localStorage.setItem(SK,selectedSkin);}
 const bagsChipEl=document.querySelector('.hudChip.bagsChip');
