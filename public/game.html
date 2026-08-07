@@ -712,6 +712,9 @@ const SPRITE_FILES={
   jetpack:'plats/jetpack.png',
   cop:'sprites/cop.png', copcar:'sprites/copcar.png', cjoint:'sprites/joint.png',
 };
+// Sprungfeder-Animation: s0 = voll ausgefahren … s11 = maximal zusammengedrückt
+const SPRING_FRAMES=[];
+for(let i=0;i<12;i++){SPRITE_FILES['spring'+i]='spring/s'+i+'.png';SPRING_FRAMES.push('spring'+i);}
 const spriteCache={};
 function sprite(key){
   const src=SPRITE_FILES[key];
