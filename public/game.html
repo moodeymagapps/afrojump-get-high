@@ -2447,17 +2447,6 @@ function drawImageSkin(g,s,inv,live){
     g.translate(0,bob);
     g.rotate(lean);
     g.drawImage(im,dx,dy,w,h);
-    if(inv>0){
-      g.globalCompositeOperation='source-atop';
-      g.fillStyle='hsla('+((performance.now()/2)%360)+',90%,60%,0.35)';
-      g.fillRect(dx,dy,w,h);
-    }
-  }else if(inv>0){
-    // subtle rainbow tint via composite
-    g.drawImage(im,dx,dy,w,h);
-    g.globalCompositeOperation='source-atop';
-    g.fillStyle='hsla('+((performance.now()/2)%360)+',90%,60%,0.35)';
-    g.fillRect(dx,dy,w,h);
   }else{
     g.drawImage(im,dx,dy,w,h);
   }
