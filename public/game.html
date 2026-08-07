@@ -672,6 +672,16 @@ function persistLoot(){
 }
 function currentWeapon(){return WEAPON_SKINS.find(w=>w.id===selectedWeapon)||WEAPON_SKINS[0];}
 function currentJoint(){return JOINT_SKINS.find(j=>j.id===selectedJoint)||JOINT_SKINS[0];}
+// Alt-Inventar aufräumen (entfernte Skin-IDs) + Fähigkeiten der Items
+(function sanitizeLoot(){
+  const wIds=new Set(WEAPON_SKINS.map(w=>w.id)), jIds=new Set(JOINT_SKINS.map(j=>j.id));
+  ownedWeapons=ownedWeapons.filter(id=>wIds.has(id));if(!ownedWeapons.includes('w_default'))ownedWeapons.push('w_default');
+  ownedJoints=ownedJoints.filter(id=>jIds.has(id));if(!ownedJoints.includes('j_default'))ownedJoints.push('j_default');
+  if(!wIds.has(selectedWeapon))selectedWeapon='w_default';
+  if(!jIds.has(selectedJoint))selectedJoint='j_default';
+})();
+function jperk(){return currentJoint().perk||{};}
+function wperk(){return currentWeapon().perk||{};}
 function rainbowCol(speed){return 'hsl('+((performance.now()/(speed||4))%360)+',90%,60%)';}
 function weaponColors(){
   const w=currentWeapon();
