@@ -1325,6 +1325,7 @@ function rand(a,b){return a+rnd()*(b-a);}
 function reset(){
   prngState=(duel.active&&duel.seed!==null)?duel.seed|0:null;
   player={x:W/2,y:H-100,vx:0,vy:-14,r:22,facing:1,invincible:0,shootCd:0,alive:true,bossShot:false,squash:1,stretch:1,landedT:0,bossLives:0,hitFlash:0,jetpackT:0,gunT:0};
+  if(jperk().shield){player.invincible=jperk().shield;player.invSrc='spawn';}
   platforms=[];collectibles=[];enemies=[];projectiles=[];particles=[];smokeParticles=[];floatTexts=[];
   cameraY=0;bestY=0;scrollLocked=false;boss=null;nextBossScore=1500;gameOver=false;
   runBags=0;shake={t:0,mag:0};timeScale=1;deathT=0;
