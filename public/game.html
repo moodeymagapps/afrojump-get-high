@@ -3544,7 +3544,7 @@ function drawEnemy(e){
     else { dh=e.h*1.9; dw=dh*(spr.width/spr.height); }
     ctx.translate(e.x,y+e.h-dh+bob);
     ctx.scale(dir,1);
-    ctx.drawImage(spr,-dw/2,0,dw,dh);
+    drawSpriteSnapped(ctx,spr,-dw/2,0,dw,dh);
     ctx.restore();
     return;
   }
