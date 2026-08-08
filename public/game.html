@@ -5647,5 +5647,120 @@ window.__afro={ed,duel,mapRun,duelBeginBuild,startMapRun,exitToEditor,
   sp.addEventListener('pointerdown',hide,{once:true});
 })();
 </script>
+<script>
+/* --- Vollbild / App-Modus (rein visuell, kein Gameplay-Eingriff) --- */
+(function(){
+  var doc=document, root=doc.documentElement;
+  var ua=navigator.userAgent||'';
+  var isIOS=/iPad|iPhone|iPod/.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1);
+  var isAndroid=/Android/.test(ua);
+  var standalone=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true
+    ||(window.top!==window.self&&(function(){try{return window.top.matchMedia('(display-mode: standalone)').matches;}catch(e){return false;}})());
+
+  function fsTarget(){
+    // Im iframe das Frame-Element des Eltern-Dokuments nutzen (same-origin),
+    // damit das komplette Spiel formatfüllend läuft.
+    try{ if(window.frameElement) return window.frameElement; }catch(e){}
+    return root;
+  }
+  function fsSupported(){
+    var t=fsTarget();
+    return !!(t&&(t.requestFullscreen||t.webkitRequestFullscreen))&&
+      !!(doc.fullscreenEnabled||doc.webkitFullscreenEnabled||true);
+  }
+  function fsActive(){
+    try{ if(doc.fullscreenElement||doc.webkitFullscreenElement) return true; }catch(e){}
+    try{ if(window.top!==window.self&&(window.top.document.fullscreenElement||window.top.document.webkitFullscreenElement)) return true; }catch(e){}
+    return false;
+  }
+  function enter(){
+    var t=fsTarget();
+    try{
+      var p=(t.requestFullscreen&&t.requestFullscreen({navigationUI:'hide'}))||(t.webkitRequestFullscreen&&t.webkitRequestFullscreen());
+      if(p&&p.catch)p.catch(function(){});
+    }catch(e){}
+    if(screen.orientation&&screen.orientation.lock){try{screen.orientation.lock('portrait').catch(function(){});}catch(e){}}
+  }
+  function exit(){
+    try{
+      var d=doc; try{ if(window.top!==window.self&&(window.top.document.fullscreenElement||window.top.document.webkitFullscreenElement)) d=window.top.document; }catch(e){}
+      var p=(d.exitFullscreen&&d.exitFullscreen())||(d.webkitExitFullscreen&&d.webkitExitFullscreen());
+      if(p&&p.catch)p.catch(function(){});
+    }catch(e){}
+  }
+  function toggle(){ fsActive()?exit():enter(); }
+
+  var fsBtn=doc.getElementById('fsBtn'), menuFs=doc.getElementById('menuFs');
+  var supported=fsSupported()&&!(isIOS&&!root.requestFullscreen);
+  function sync(){
+    var on=fsActive();
+    if(fsBtn){fsBtn.textContent=on?'⤢':'⛶';fsBtn.title=on?'Vollbild beenden':'Vollbild';}
+    if(menuFs)menuFs.textContent=on?'⤢ Vollbild beenden':'⛶ Vollbild';
+    // Canvas neu einpassen (nutzt vorhandenen resize-Handler des Spiels)
+    setTimeout(function(){window.dispatchEvent(new Event('resize'));},60);
+    setTimeout(function(){window.dispatchEvent(new Event('resize'));},360);
+  }
+  if(!supported||standalone){
+    // iOS Safari kennt kein echtes Element-Vollbild -> Button ausblenden
+    if(!supported){ if(fsBtn)fsBtn.style.display='none'; if(menuFs)menuFs.style.display='none'; }
+    else if(standalone){ if(fsBtn)fsBtn.style.display='none'; }
+  }
+  if(fsBtn)fsBtn.addEventListener('click',toggle);
+  if(menuFs)menuFs.addEventListener('click',toggle);
+  ['fullscreenchange','webkitfullscreenchange'].forEach(function(ev){
+    doc.addEventListener(ev,sync);
+    try{ if(window.top!==window.self) window.top.document.addEventListener(ev,sync); }catch(e){}
+  });
+  sync();
+
+  /* Zoom/Scroll unterbinden (Pinch, Doppeltipp, Gummiband) */
+  doc.addEventListener('gesturestart',function(e){e.preventDefault();},{passive:false});
+  doc.addEventListener('gesturechange',function(e){e.preventDefault();},{passive:false});
+  doc.addEventListener('touchmove',function(e){if(e.touches.length>1)e.preventDefault();},{passive:false});
+  var lastTap=0;
+  doc.addEventListener('touchend',function(e){
+    var now=Date.now();
+    if(now-lastTap<320)e.preventDefault();
+    lastTap=now;
+  },{passive:false});
+  window.addEventListener('wheel',function(e){if(e.ctrlKey)e.preventDefault();},{passive:false});
+
+  /* Größe/Safe-Areas nachziehen (Adressleiste ein-/ausblenden auf Mobile) */
+  if(window.visualViewport){
+    visualViewport.addEventListener('resize',function(){window.dispatchEvent(new Event('resize'));});
+    visualViewport.addEventListener('scroll',function(){window.scrollTo(0,0);});
+  }
+
+  /* Erster Start: kurze Erklärung je Gerät */
+  var KEY='afroJumpHowto2';
+  var howto=doc.getElementById('howto');
+  if(howto){
+    var steps=doc.getElementById('howtoSteps'), title=doc.getElementById('howtoTitle');
+    var fsRow=doc.getElementById('howtoFs');
+    function build(){
+      var list;
+      if(isIOS){
+        title.textContent='ALS APP INSTALLIEREN';
+        list=['Unten in Safari auf „Teilen“ tippen (Pfeil-Symbol).','„Zum Home-Bildschirm“ auswählen.','Afro Jump vom Home-Bildschirm starten – ohne Browser-Leisten.'];
+      }else if(isAndroid){
+        title.textContent='VOLLBILD &amp; APP-MODUS';
+        title.textContent='VOLLBILD & APP-MODUS';
+        list=['Für Vollbild oben rechts auf ⛶ tippen.','In Chrome auf ⋮ tippen und „App installieren“ / „Zum Startbildschirm“ wählen.','Danach startet das Spiel wie eine echte App.'];
+      }else{
+        title.textContent='VOLLBILD & APP-MODUS';
+        list=['Klick auf ⛶ (oben rechts) oder „Vollbild“ im Menü.','Mit ESC verlässt du das Vollbild wieder.','Chrome: Symbol in der Adressleiste installiert das Spiel als App.'];
+      }
+      steps.innerHTML='';
+      list.forEach(function(t){var li=doc.createElement('li');li.textContent=t;steps.appendChild(li);});
+      if(fsRow)fsRow.style.display=(supported&&!standalone)?'block':'none';
+    }
+    function close(){howto.classList.remove('show');try{localStorage.setItem(KEY,'1');}catch(e){}}
+    var seen=false; try{seen=localStorage.getItem(KEY)==='1';}catch(e){}
+    if(!seen&&!standalone){ build(); setTimeout(function(){howto.classList.add('show');},2000); }
+    doc.getElementById('howtoClose').addEventListener('click',close);
+    if(fsRow)fsRow.addEventListener('click',function(){enter();close();});
+  }
+})();
+</script>
 </body>
 </html>
