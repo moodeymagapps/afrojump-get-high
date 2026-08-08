@@ -408,6 +408,19 @@
     #edPal button.on,.skinCard.selected,#boxLabel{animation:none!important;}
     .overlay .btn:hover,.skinCard:hover,.boxCard:hover,.lbRow:hover{transform:none!important;}
   }
+  /* Buttons im Vollbild-Hinweis im gleichen Pixel-Stil */
+  #howto .btn{
+    --c:#4f9d20;--cd:#254c0c;--cl:#8fd94a;
+    display:block;width:100%;box-sizing:border-box;position:relative;margin:7px 0;padding:14px 16px;font-size:11px;
+    font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;
+    letter-spacing:1px;border:none;color:#fff;cursor:pointer;line-height:1.5;text-shadow:2px 2px 0 rgba(0,0,0,.75);
+    background:linear-gradient(rgba(255,255,255,.16),rgba(255,255,255,0) 42%,rgba(0,0,0,.22)),var(--c);
+    clip-path:polygon(0 8px,8px 8px,8px 0,calc(100% - 8px) 0,calc(100% - 8px) 8px,100% 8px,100% calc(100% - 8px),calc(100% - 8px) calc(100% - 8px),calc(100% - 8px) 100%,8px 100%,8px calc(100% - 8px),0 calc(100% - 8px));
+    box-shadow:inset -4px -4px 0 var(--cd), inset 4px 4px 0 var(--cl), 0 6px 0 rgba(0,0,0,.55);
+    image-rendering:pixelated;transition:filter .12s, transform .06s;
+  }
+  #howto .btn:active{transform:translateY(4px) scale(.965);box-shadow:inset -4px -4px 0 var(--cd), inset 4px 4px 0 var(--cl), 0 2px 0 rgba(0,0,0,.55);}
+  #howto .btn.v-slate{--c:#5b6472;--cd:#2b3138;--cl:#9aa5b3;}
 </style>
 </head>
 <body>
