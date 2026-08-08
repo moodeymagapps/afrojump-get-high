@@ -177,7 +177,7 @@
   #edMsg{font-family:'VT323',monospace;font-size:14px;color:#ffd54a;min-height:16px;letter-spacing:1px;text-align:center;}
 
   /* ================= MODERN HUD / UI POLISH ================= */
-  #ui{top:10px;left:10px;right:10px;font-size:9px;align-items:flex-start;}
+  #ui{top:calc(10px + env(safe-area-inset-top));left:calc(10px + env(safe-area-inset-left));right:calc(10px + env(safe-area-inset-right));font-size:9px;align-items:flex-start;}
   #ui .stats{gap:5px;}
   .hudChip{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:12px;
     background:linear-gradient(180deg,rgba(28,20,48,.82),rgba(10,8,20,.86));
@@ -2044,7 +2044,7 @@ function die(){
   if(duel.active)duelSendEnd();
   setTimeout(()=>showOverlay('gameover'),500);
 }
-document.getElementById('restart').onclick=()=>startGame();
+document.getElementById('restart').onclick=()=>{playWipe();startGame();};
 
 // ---------- RENDER ----------
 function biomeColors(m){
