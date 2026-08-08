@@ -47,6 +47,41 @@
     image-rendering:pixelated;transition:filter .12s, transform .06s;
   }
   .overlay .btn:active{transform:translateY(4px);box-shadow:inset -4px -4px 0 var(--cd), inset 4px 4px 0 var(--cl), 0 2px 0 rgba(0,0,0,.55);}
+  .overlay .btn{transition:filter .12s ease, transform .09s cubic-bezier(.2,1.6,.4,1);}
+  .overlay .btn:active{transform:translateY(4px) scale(.965);}
+  /* Buttons erscheinen nacheinander (kurzer Fade + Scale-In) */
+  @keyframes btnIn{from{opacity:0;transform:translateY(10px) scale(.94)}to{opacity:1;transform:none}}
+  #menu .btn,#over .btn,#pause .btn{animation:btnIn .22s cubic-bezier(.2,1.4,.4,1) both;}
+  #menu .btn:nth-of-type(1),#over .btn:nth-of-type(1),#pause .btn:nth-of-type(1){animation-delay:.02s}
+  #menu .btn:nth-of-type(2),#over .btn:nth-of-type(2),#pause .btn:nth-of-type(2){animation-delay:.06s}
+  #menu .btn:nth-of-type(3),#over .btn:nth-of-type(3),#pause .btn:nth-of-type(3){animation-delay:.1s}
+  #menu .btn:nth-of-type(4),#over .btn:nth-of-type(4),#pause .btn:nth-of-type(4){animation-delay:.14s}
+  #menu .btn:nth-of-type(5){animation-delay:.18s}
+  #menu .btn:nth-of-type(6){animation-delay:.22s}
+  #menu .btn:nth-of-type(7){animation-delay:.26s}
+  /* dezente Menü-Hintergrundbewegung */
+  #menu::before{content:'';position:absolute;inset:-20%;pointer-events:none;
+    background:radial-gradient(closest-side,rgba(124,252,0,.10),transparent 70%);
+    animation:menuGlow 9s ease-in-out infinite;will-change:transform,opacity;}
+  @keyframes menuGlow{0%,100%{transform:translate3d(-6%,-4%,0) scale(1);opacity:.55}50%{transform:translate3d(6%,5%,0) scale(1.12);opacity:.9}}
+  #over .overCard,#menu>*{position:relative;}
+  /* Game-Over smooth einblenden */
+  @keyframes overIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+  #over{animation:ovIn .2s ease-out;}
+  #over h1{animation:overIn .28s cubic-bezier(.2,1.5,.4,1) both;}
+  /* Splash Screen */
+  #splash{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    background:radial-gradient(circle at 50% 40%,#1c1330,#07060d 75%);transition:opacity .32s ease, transform .32s ease;will-change:opacity,transform;}
+  #splash img{width:min(72%,320px);image-rendering:pixelated;animation:splashPop .58s cubic-bezier(.18,1.7,.35,1) both;filter:drop-shadow(0 8px 0 rgba(0,0,0,.5));}
+  #splash .sTag{margin-top:14px;font-family:'Press Start 2P',monospace;font-size:9px;letter-spacing:2px;color:#7cfc00;opacity:0;animation:splashTag .4s ease-out .34s both;text-shadow:2px 2px 0 #000;}
+  #splash.hide{opacity:0;transform:scale(1.04);pointer-events:none;}
+  @keyframes splashPop{0%{opacity:0;transform:scale(.7)}60%{opacity:1;transform:scale(1.06)}100%{opacity:1;transform:scale(1)}}
+  @keyframes splashTag{from{opacity:0;transform:translateY(6px)}to{opacity:.85;transform:none}}
+  /* Screen-Transition beim Start ins Spiel */
+  #wipe{position:fixed;inset:0;z-index:55;pointer-events:none;opacity:0;background:radial-gradient(circle at 50% 55%,rgba(124,252,0,.28),rgba(6,5,12,.92) 70%);}
+  #wipe.go{animation:wipeGo .38s ease-out;}
+  @keyframes wipeGo{0%{opacity:0;transform:scale(1.08)}30%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.98)}}
+  @media (prefers-reduced-motion:reduce){#menu::before,#menu .btn,#over .btn,#pause .btn,#splash img,#splash .sTag,#wipe.go{animation:none;}}
   .overlay .btn:disabled{filter:grayscale(.6) brightness(.75);cursor:not-allowed;}
   .overlay .btn.alt{--c:#7a2fa8;--cd:#3d1257;--cl:#c078e8;}
   .overlay .btn.ghost{--c:#5b6472;--cd:#2b3138;--cl:#9aa5b3;}
@@ -142,7 +177,7 @@
   #edMsg{font-family:'VT323',monospace;font-size:14px;color:#ffd54a;min-height:16px;letter-spacing:1px;text-align:center;}
 
   /* ================= MODERN HUD / UI POLISH ================= */
-  #ui{top:10px;left:10px;right:10px;font-size:9px;align-items:flex-start;}
+  #ui{top:calc(10px + env(safe-area-inset-top));left:calc(10px + env(safe-area-inset-left));right:calc(10px + env(safe-area-inset-right));font-size:9px;align-items:flex-start;}
   #ui .stats{gap:5px;}
   .hudChip{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:12px;
     background:linear-gradient(180deg,rgba(28,20,48,.82),rgba(10,8,20,.86));
@@ -409,6 +444,8 @@
     <button class="btn ghost" id="duelClose">🏠 Zurück</button>
   </div>
 </div>
+<div id="wipe"></div>
+<div id="splash"><img src="/__l5e/assets-v1/69274bbc-7857-4d3d-a4d3-4747a688e509/afro-jump-logo.png" alt="Afro Jump"><div class="sTag">GET HIGH!</div></div>
 <audio id="bgm" src="/audio/afro_jump.mp3" loop preload="auto"></audio>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
@@ -1306,7 +1343,8 @@ document.addEventListener('visibilitychange',()=>{
     last=performance.now();acc=0;
   }
 });
-document.getElementById('menuPlay').onclick=()=>startGame();
+document.getElementById('menuPlay').onclick=()=>{playWipe();startGame();};
+function playWipe(){const w=document.getElementById('wipe');if(!w)return;w.classList.remove('go');void w.offsetWidth;w.classList.add('go');setTimeout(()=>w.classList.remove('go'),400);}
 document.getElementById('menuShop').onclick=()=>openShop('menu');
 document.getElementById('pauseResume').onclick=()=>resumeGame();
 document.getElementById('pauseShop').onclick=()=>openShop('paused');
@@ -1627,6 +1665,8 @@ function update(dt){
           if(jperk().jump)player.vy*=jperk().jump;   // Joint-Skin Sprung-Bonus
           if(player.x<12)player.x=12;if(player.x>W-12)player.x=W-12;
           p.bounce=1;
+          if(p.type!=='spring'&&p.type!=='tramp'&&p.type!=='boost'&&p.type!=='crate')
+            burst(p.x+p.w/2,p.y+2,'rgba(230,230,255,0.85)',5); // rein kosmetischer Staub
           player.landedT=0.15;
           player.squash=1.35;player.stretch=0.75;
           if(p.type==='brittle'){
@@ -2004,7 +2044,7 @@ function die(){
   if(duel.active)duelSendEnd();
   setTimeout(()=>showOverlay('gameover'),500);
 }
-document.getElementById('restart').onclick=()=>startGame();
+document.getElementById('restart').onclick=()=>{playWipe();startGame();};
 
 // ---------- RENDER ----------
 function biomeColors(m){
@@ -5450,6 +5490,17 @@ requestAnimationFrame(loop);
 // kleine Debug-Brücke (nur zum Testen des Editors/Duells)
 window.__afro={ed,duel,mapRun,duelBeginBuild,startMapRun,exitToEditor,
   get state(){return gameState;},get player(){return player;},get goalY(){return goalY;},get customMap(){return customMap;}};
+})();
+</script>
+
+<script>
+/* --- Splash Screen (nur visuell) --- */
+(function(){
+  var sp=document.getElementById('splash');
+  if(!sp)return;
+  var t=setTimeout(hide,1500);
+  function hide(){clearTimeout(t);sp.classList.add('hide');setTimeout(function(){sp.remove();},380);}
+  sp.addEventListener('pointerdown',hide,{once:true});
 })();
 </script>
 </body>
