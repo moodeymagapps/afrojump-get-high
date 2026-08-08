@@ -5658,9 +5658,8 @@ window.__afro={ed,duel,mapRun,duelBeginBuild,startMapRun,exitToEditor,
     ||(window.top!==window.self&&(function(){try{return window.top.matchMedia('(display-mode: standalone)').matches;}catch(e){return false;}})());
 
   function fsTarget(){
-    // Im iframe das Frame-Element des Eltern-Dokuments nutzen (same-origin),
-    // damit das komplette Spiel formatfüllend läuft.
-    try{ if(window.frameElement) return window.frameElement; }catch(e){}
+    // Das eigene Dokument geht in Vollbild; das iframe hat allow="fullscreen",
+    // dadurch füllt das Spiel den kompletten Bildschirm.
     return root;
   }
   function fsSupported(){
@@ -5743,7 +5742,6 @@ window.__afro={ed,duel,mapRun,duelBeginBuild,startMapRun,exitToEditor,
         title.textContent='ALS APP INSTALLIEREN';
         list=['Unten in Safari auf „Teilen“ tippen (Pfeil-Symbol).','„Zum Home-Bildschirm“ auswählen.','Afro Jump vom Home-Bildschirm starten – ohne Browser-Leisten.'];
       }else if(isAndroid){
-        title.textContent='VOLLBILD &amp; APP-MODUS';
         title.textContent='VOLLBILD & APP-MODUS';
         list=['Für Vollbild oben rechts auf ⛶ tippen.','In Chrome auf ⋮ tippen und „App installieren“ / „Zum Startbildschirm“ wählen.','Danach startet das Spiel wie eine echte App.'];
       }else{
