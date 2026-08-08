@@ -444,6 +444,8 @@
     <button class="btn ghost" id="duelClose">🏠 Zurück</button>
   </div>
 </div>
+<div id="wipe"></div>
+<div id="splash"><img src="/__l5e/assets-v1/69274bbc-7857-4d3d-a4d3-4747a688e509/afro-jump-logo.png" alt="Afro Jump"><div class="sTag">GET HIGH!</div></div>
 <audio id="bgm" src="/audio/afro_jump.mp3" loop preload="auto"></audio>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
@@ -1341,7 +1343,8 @@ document.addEventListener('visibilitychange',()=>{
     last=performance.now();acc=0;
   }
 });
-document.getElementById('menuPlay').onclick=()=>startGame();
+document.getElementById('menuPlay').onclick=()=>{playWipe();startGame();};
+function playWipe(){const w=document.getElementById('wipe');if(!w)return;w.classList.remove('go');void w.offsetWidth;w.classList.add('go');setTimeout(()=>w.classList.remove('go'),400);}
 document.getElementById('menuShop').onclick=()=>openShop('menu');
 document.getElementById('pauseResume').onclick=()=>resumeGame();
 document.getElementById('pauseShop').onclick=()=>openShop('paused');
@@ -1662,6 +1665,8 @@ function update(dt){
           if(jperk().jump)player.vy*=jperk().jump;   // Joint-Skin Sprung-Bonus
           if(player.x<12)player.x=12;if(player.x>W-12)player.x=W-12;
           p.bounce=1;
+          if(p.type!=='spring'&&p.type!=='tramp'&&p.type!=='boost'&&p.type!=='crate')
+            burst(p.x+p.w/2,p.y+2,'rgba(230,230,255,0.85)',5); // rein kosmetischer Staub
           player.landedT=0.15;
           player.squash=1.35;player.stretch=0.75;
           if(p.type==='brittle'){
@@ -5485,6 +5490,17 @@ requestAnimationFrame(loop);
 // kleine Debug-Brücke (nur zum Testen des Editors/Duells)
 window.__afro={ed,duel,mapRun,duelBeginBuild,startMapRun,exitToEditor,
   get state(){return gameState;},get player(){return player;},get goalY(){return goalY;},get customMap(){return customMap;}};
+})();
+</script>
+
+<script>
+/* --- Splash Screen (nur visuell) --- */
+(function(){
+  var sp=document.getElementById('splash');
+  if(!sp)return;
+  var t=setTimeout(hide,1500);
+  function hide(){clearTimeout(t);sp.classList.add('hide');setTimeout(function(){sp.remove();},380);}
+  sp.addEventListener('pointerdown',hide,{once:true});
 })();
 </script>
 </body>
