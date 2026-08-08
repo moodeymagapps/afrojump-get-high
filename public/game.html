@@ -2,13 +2,26 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+<meta name="theme-color" content="#0a0a0a" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <title>Afro Jump</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 <style>
-  html,body{margin:0;padding:0;height:100%;background:#0a0a0a;overflow:hidden;font-family:'VT323','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;color:#fff;touch-action:none;user-select:none;-webkit-user-select:none;image-rendering:pixelated;}
+  html,body{margin:0;padding:0;height:100%;background:#0a0a0a;overflow:hidden;overscroll-behavior:none;-webkit-overflow-scrolling:auto;-webkit-tap-highlight-color:transparent;font-family:'VT323','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;color:#fff;touch-action:none;user-select:none;-webkit-user-select:none;image-rendering:pixelated;}
+  html,body{width:100%;height:100dvh;}
+  /* Vollbild-/Install-Hinweis (erster Start) */
+  #howto{position:fixed;inset:0;z-index:58;display:none;flex-direction:column;align-items:center;justify-content:center;padding:calc(22px + env(safe-area-inset-top)) 20px calc(22px + env(safe-area-inset-bottom));box-sizing:border-box;background:linear-gradient(rgba(8,6,16,.92),rgba(8,6,16,.97));font-family:'VT323',monospace;text-align:center;}
+  #howto.show{display:flex;animation:ovIn .2s ease-out;}
+  #howto .card{width:min(94%,360px);background:linear-gradient(rgba(255,255,255,.06),rgba(255,255,255,0)),#151024;padding:18px 16px;box-sizing:border-box;
+    box-shadow:inset -4px -4px 0 #0a0714, inset 4px 4px 0 rgba(124,252,0,.35), 0 6px 0 rgba(0,0,0,.55);animation:ovPop .26s cubic-bezier(.2,1.4,.4,1) both;}
+  #howto h2{font-family:'Press Start 2P',monospace;font-size:12px;color:#7cfc00;margin:0 0 10px;letter-spacing:1px;text-shadow:2px 2px 0 #000;}
+  #howto ol{margin:0;padding:0 0 0 18px;text-align:left;font-size:19px;line-height:1.45;letter-spacing:.5px;color:#e9e6ff;}
+  #howto .hint{font-size:16px;opacity:.7;margin-top:10px;letter-spacing:.5px;}
   #wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;}
   canvas{background:#87ceeb;display:block;box-shadow:0 0 40px #000a, 0 0 0 4px #2b1a0a, 0 0 0 8px #7cfc00;touch-action:none;image-rendering:pixelated;}
   #ui{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;align-items:flex-start;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;text-shadow:2px 2px 0 #000;pointer-events:none;font-size:10px;gap:8px;}
@@ -395,6 +408,19 @@
     #edPal button.on,.skinCard.selected,#boxLabel{animation:none!important;}
     .overlay .btn:hover,.skinCard:hover,.boxCard:hover,.lbRow:hover{transform:none!important;}
   }
+  /* Buttons im Vollbild-Hinweis im gleichen Pixel-Stil */
+  #howto .btn{
+    --c:#4f9d20;--cd:#254c0c;--cl:#8fd94a;
+    display:block;width:100%;box-sizing:border-box;position:relative;margin:7px 0;padding:14px 16px;font-size:11px;
+    font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;
+    letter-spacing:1px;border:none;color:#fff;cursor:pointer;line-height:1.5;text-shadow:2px 2px 0 rgba(0,0,0,.75);
+    background:linear-gradient(rgba(255,255,255,.16),rgba(255,255,255,0) 42%,rgba(0,0,0,.22)),var(--c);
+    clip-path:polygon(0 8px,8px 8px,8px 0,calc(100% - 8px) 0,calc(100% - 8px) 8px,100% 8px,100% calc(100% - 8px),calc(100% - 8px) calc(100% - 8px),calc(100% - 8px) 100%,8px 100%,8px calc(100% - 8px),0 calc(100% - 8px));
+    box-shadow:inset -4px -4px 0 var(--cd), inset 4px 4px 0 var(--cl), 0 6px 0 rgba(0,0,0,.55);
+    image-rendering:pixelated;transition:filter .12s, transform .06s;
+  }
+  #howto .btn:active{transform:translateY(4px) scale(.965);box-shadow:inset -4px -4px 0 var(--cd), inset 4px 4px 0 var(--cl), 0 2px 0 rgba(0,0,0,.55);}
+  #howto .btn.v-slate{--c:#5b6472;--cd:#2b3138;--cl:#9aa5b3;}
 </style>
 </head>
 <body>
@@ -405,7 +431,7 @@
       <div class="hudChip"><span class="ic">⬆</span><div id="score">Höhe: 0m</div></div>
       <div class="hudChip"><span class="ic">★</span><div id="high">Best: 0m</div></div>
     </div>
-    <div class="right"><div class="hudChip bagsChip"><div id="bags">🌿 0</div></div><button id="muteBtn" title="Musik">🔊</button><button id="pauseBtn" title="Pause">❚❚</button></div>
+    <div class="right"><div class="hudChip bagsChip"><div id="bags">🌿 0</div></div><button id="fsBtn" class="pxBtn" title="Vollbild">⛶</button><button id="muteBtn" title="Musik">🔊</button><button id="pauseBtn" title="Pause">❚❚</button></div>
   </div>
   <div id="power"></div>
   <div id="settings" class="overlay">
@@ -430,6 +456,7 @@
     <button class="btn v-red" id="menuDuel">⚔ Map-Duell (1v1)</button>
     <button class="btn v-slate" id="menuAccount">👤 Account</button>
     <button class="btn v-slate" id="menuSettings">⚙ Einstellungen</button>
+    <button class="btn v-slate" id="menuFs">⛶ Vollbild</button>
     <p id="menuAcctStatus" style="font-size:14px;opacity:.7;margin-top:4px;letter-spacing:1px;"></p>
   </div>
   <div id="pause" class="overlay">
@@ -554,6 +581,15 @@
 </div>
 <div id="wipe"></div>
 <div id="splash"><img src="/__l5e/assets-v1/69274bbc-7857-4d3d-a4d3-4747a688e509/afro-jump-logo.png" alt="Afro Jump"><div class="sTag">GET HIGH!</div></div>
+<div id="howto">
+  <div class="card">
+    <h2 id="howtoTitle">VOLLBILD &amp; APP-MODUS</h2>
+    <ol id="howtoSteps"></ol>
+    <div class="hint">So läuft Afro Jump ohne Browser-Leisten – wie eine echte App.</div>
+    <button class="btn v-green" id="howtoFs" style="margin-top:12px;">⛶ Jetzt Vollbild</button>
+    <button class="btn v-slate" id="howtoClose">✓ Alles klar</button>
+  </div>
+</div>
 <audio id="bgm" src="/audio/afro_jump.mp3" loop preload="auto"></audio>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
@@ -5609,6 +5645,119 @@ window.__afro={ed,duel,mapRun,duelBeginBuild,startMapRun,exitToEditor,
   var t=setTimeout(hide,1500);
   function hide(){clearTimeout(t);sp.classList.add('hide');setTimeout(function(){sp.remove();},380);}
   sp.addEventListener('pointerdown',hide,{once:true});
+})();
+</script>
+<script>
+/* --- Vollbild / App-Modus (rein visuell, kein Gameplay-Eingriff) --- */
+(function(){
+  var doc=document, root=doc.documentElement;
+  var ua=navigator.userAgent||'';
+  var isIOS=/iPad|iPhone|iPod/.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1);
+  var isAndroid=/Android/.test(ua);
+  var standalone=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true
+    ||(window.top!==window.self&&(function(){try{return window.top.matchMedia('(display-mode: standalone)').matches;}catch(e){return false;}})());
+
+  function fsTarget(){
+    // Das eigene Dokument geht in Vollbild; das iframe hat allow="fullscreen",
+    // dadurch füllt das Spiel den kompletten Bildschirm.
+    return root;
+  }
+  function fsSupported(){
+    var t=fsTarget();
+    return !!(t&&(t.requestFullscreen||t.webkitRequestFullscreen))&&
+      !!(doc.fullscreenEnabled||doc.webkitFullscreenEnabled||true);
+  }
+  function fsActive(){
+    try{ if(doc.fullscreenElement||doc.webkitFullscreenElement) return true; }catch(e){}
+    try{ if(window.top!==window.self&&(window.top.document.fullscreenElement||window.top.document.webkitFullscreenElement)) return true; }catch(e){}
+    return false;
+  }
+  function enter(){
+    var t=fsTarget();
+    try{
+      var p=(t.requestFullscreen&&t.requestFullscreen({navigationUI:'hide'}))||(t.webkitRequestFullscreen&&t.webkitRequestFullscreen());
+      if(p&&p.catch)p.catch(function(){});
+    }catch(e){}
+    if(screen.orientation&&screen.orientation.lock){try{screen.orientation.lock('portrait').catch(function(){});}catch(e){}}
+  }
+  function exit(){
+    try{
+      var d=doc; try{ if(window.top!==window.self&&(window.top.document.fullscreenElement||window.top.document.webkitFullscreenElement)) d=window.top.document; }catch(e){}
+      var p=(d.exitFullscreen&&d.exitFullscreen())||(d.webkitExitFullscreen&&d.webkitExitFullscreen());
+      if(p&&p.catch)p.catch(function(){});
+    }catch(e){}
+  }
+  function toggle(){ fsActive()?exit():enter(); }
+
+  var fsBtn=doc.getElementById('fsBtn'), menuFs=doc.getElementById('menuFs');
+  var supported=fsSupported()&&!(isIOS&&!root.requestFullscreen);
+  function sync(){
+    var on=fsActive();
+    if(fsBtn){fsBtn.textContent=on?'⤢':'⛶';fsBtn.title=on?'Vollbild beenden':'Vollbild';}
+    if(menuFs)menuFs.textContent=on?'⤢ Vollbild beenden':'⛶ Vollbild';
+    // Canvas neu einpassen (nutzt vorhandenen resize-Handler des Spiels)
+    setTimeout(function(){window.dispatchEvent(new Event('resize'));},60);
+    setTimeout(function(){window.dispatchEvent(new Event('resize'));},360);
+  }
+  if(!supported||standalone){
+    // iOS Safari kennt kein echtes Element-Vollbild -> Button ausblenden
+    if(!supported){ if(fsBtn)fsBtn.style.display='none'; if(menuFs)menuFs.style.display='none'; }
+    else if(standalone){ if(fsBtn)fsBtn.style.display='none'; }
+  }
+  if(fsBtn)fsBtn.addEventListener('click',toggle);
+  if(menuFs)menuFs.addEventListener('click',toggle);
+  ['fullscreenchange','webkitfullscreenchange'].forEach(function(ev){
+    doc.addEventListener(ev,sync);
+    try{ if(window.top!==window.self) window.top.document.addEventListener(ev,sync); }catch(e){}
+  });
+  sync();
+
+  /* Zoom/Scroll unterbinden (Pinch, Doppeltipp, Gummiband) */
+  doc.addEventListener('gesturestart',function(e){e.preventDefault();},{passive:false});
+  doc.addEventListener('gesturechange',function(e){e.preventDefault();},{passive:false});
+  doc.addEventListener('touchmove',function(e){if(e.touches.length>1)e.preventDefault();},{passive:false});
+  var lastTap=0;
+  doc.addEventListener('touchend',function(e){
+    var now=Date.now();
+    if(now-lastTap<320)e.preventDefault();
+    lastTap=now;
+  },{passive:false});
+  window.addEventListener('wheel',function(e){if(e.ctrlKey)e.preventDefault();},{passive:false});
+
+  /* Größe/Safe-Areas nachziehen (Adressleiste ein-/ausblenden auf Mobile) */
+  if(window.visualViewport){
+    visualViewport.addEventListener('resize',function(){window.dispatchEvent(new Event('resize'));});
+    visualViewport.addEventListener('scroll',function(){window.scrollTo(0,0);});
+  }
+
+  /* Erster Start: kurze Erklärung je Gerät */
+  var KEY='afroJumpHowto2';
+  var howto=doc.getElementById('howto');
+  if(howto){
+    var steps=doc.getElementById('howtoSteps'), title=doc.getElementById('howtoTitle');
+    var fsRow=doc.getElementById('howtoFs');
+    function build(){
+      var list;
+      if(isIOS){
+        title.textContent='ALS APP INSTALLIEREN';
+        list=['Unten in Safari auf „Teilen“ tippen (Pfeil-Symbol).','„Zum Home-Bildschirm“ auswählen.','Afro Jump vom Home-Bildschirm starten – ohne Browser-Leisten.'];
+      }else if(isAndroid){
+        title.textContent='VOLLBILD & APP-MODUS';
+        list=['Für Vollbild oben rechts auf ⛶ tippen.','In Chrome auf ⋮ tippen und „App installieren“ / „Zum Startbildschirm“ wählen.','Danach startet das Spiel wie eine echte App.'];
+      }else{
+        title.textContent='VOLLBILD & APP-MODUS';
+        list=['Klick auf ⛶ (oben rechts) oder „Vollbild“ im Menü.','Mit ESC verlässt du das Vollbild wieder.','Chrome: Symbol in der Adressleiste installiert das Spiel als App.'];
+      }
+      steps.innerHTML='';
+      list.forEach(function(t){var li=doc.createElement('li');li.textContent=t;steps.appendChild(li);});
+      if(fsRow)fsRow.style.display=(supported&&!standalone)?'block':'none';
+    }
+    function close(){howto.classList.remove('show');try{localStorage.setItem(KEY,'1');}catch(e){}}
+    var seen=false; try{seen=localStorage.getItem(KEY)==='1';}catch(e){}
+    if(!seen&&!standalone){ build(); setTimeout(function(){howto.classList.add('show');},2000); }
+    doc.getElementById('howtoClose').addEventListener('click',close);
+    if(fsRow)fsRow.addEventListener('click',function(){enter();close();});
+  }
 })();
 </script>
 </body>
