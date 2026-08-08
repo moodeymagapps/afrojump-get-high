@@ -12,12 +12,16 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   return (
-    <div className="fixed inset-0 bg-black">
+    <div
+      className="fixed inset-0 overflow-hidden bg-black"
+      style={{ height: "100dvh", overscrollBehavior: "none", touchAction: "none" }}
+    >
       <iframe
         src="/game.html"
         title="Afro Jump"
         className="w-full h-full border-0"
-        allow="fullscreen"
+        allow="fullscreen; autoplay; clipboard-write"
+        allowFullScreen
       />
     </div>
   );
