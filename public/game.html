@@ -421,6 +421,94 @@
   }
   #howto .btn:active{transform:translateY(4px) scale(.965);box-shadow:inset -4px -4px 0 var(--cd), inset 4px 4px 0 var(--cl), 0 2px 0 rgba(0,0,0,.55);}
   #howto .btn.v-slate{--c:#5b6472;--cd:#2b3138;--cl:#9aa5b3;}
+
+  /* ================= FINAL PIXEL POLISH (nur Optik) =================
+     Ziel: konsistente Pixel-Kanten, gleiche Abstände, keine Glas-/App-Optik,
+     kurze snappy Animationen, weniger Dauer-Effekte (FPS/Touch bleiben frei). */
+
+  /* --- 1. Zurück zum Pixel-Look: keine Glaseffekte, keine runden Ecken --- */
+  .hudChip,#pauseBtn,#muteBtn,.pxBtn,#power,#edTop,#edPal button,#edRow button,
+  #duelCfg,#duelCfg .cfgBtns button,#edScroll{
+    border-radius:0!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}
+  .hudChip{background:#2b1a0a;border:none;
+    box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #4a2c73;
+    padding:6px 9px;gap:6px;text-shadow:2px 2px 0 #000;}
+  .hudChip.bagsChip{box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #7cfc00;}
+  .hudChip.rec{box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #ffd54a;border:none;}
+  #power{background:#2b1a0a;border:none;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #ffd54a;
+    padding:5px 9px;}
+  #pauseBtn,#muteBtn,.pxBtn{width:38px;height:38px;background:#2b1a0a;border:none;
+    box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #7cfc00, 0 3px 0 #000;}
+  #pauseBtn:active,#muteBtn:active,.pxBtn:active{transform:translateY(2px);
+    box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #7cfc00, 0 1px 0 #000;}
+  #edBar{backdrop-filter:none;-webkit-backdrop-filter:none;border-top:3px solid #000;
+    background:linear-gradient(rgba(10,8,20,.55),rgba(8,6,16,.97));}
+  #edTop{background:#2b1a0a;border:none;box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #4a2c73;}
+  #edPal button{width:50px;height:48px;background:#2b1a0a;border:none;
+    box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #4a2c73, 0 3px 0 #000;}
+  #edPal button.on{background:#0d3d00;box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #7cfc00, 0 3px 0 #000;}
+  #edRow button{background:#455a64;border:none;
+    box-shadow:inset -2px -2px 0 #263238, inset 2px 2px 0 #90a4ae, 0 3px 0 #000;}
+  #edTest{background:#ffb300!important;color:#111!important;
+    box-shadow:inset -2px -2px 0 #b47a00, inset 2px 2px 0 #ffe082, 0 3px 0 #000!important;}
+  #edSend{background:#4caf50!important;
+    box-shadow:inset -2px -2px 0 #1b5e20, inset 2px 2px 0 #a5d6a7, 0 3px 0 #000!important;}
+  #edSend:disabled{background:#4a1414!important;color:#c99!important;box-shadow:inset -2px -2px 0 #200, inset 2px 2px 0 #7a2a2a!important;}
+  #duelCfg{background:#1b1230;border:none;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #4a2c73;}
+  #duelCfg .cfgBtns button{background:#2b1a0a;border:none;
+    box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #4a2c73;}
+  #duelCfg .cfgBtns button.on{background:#0d3d00;color:#7cfc00;
+    box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #7cfc00;}
+
+  /* --- 2. Konsistente Abstände & Ausrichtung --- */
+  #ui .stats{gap:6px;}
+  #ui .right{gap:6px;align-items:center;}
+  #shop .head,.tabs,.skinGrid,#duelJoinRow,#account .card,#duelCfg{max-width:360px;}
+  .tabs{gap:6px;margin-bottom:12px;}
+  .skinGrid{gap:12px;}
+  .skinCard,.boxCard{padding:10px;gap:6px;}
+  .skinCard .name{min-height:24px;display:flex;align-items:center;justify-content:center;}
+  .skinCard button,.boxCard button{padding:8px 6px;}
+  .overlay .btn{margin:6px 0;}
+  #menu .btn,#pause .btn,#over .btn,#settings .btn{width:270px;}
+  .overlay h1,.overlay h2,.overlay p{text-align:center;}
+  #shopClose{padding:9px 12px;}
+
+  /* --- 3. Weniger Dauer-Effekte / weniger Glow (Performance + Ruhe) --- */
+  #menu .btn::after,#menu .tag,#splash::after,.boxCard canvas,
+  #account .quest .bar::after,.skinCard.selected,.hudChip.hot,#fireBtn.on{animation:none!important;}
+  #menu::before{animation-duration:14s;opacity:.5;}
+  .skinCard.selected{box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #7cfc00;}
+  .hudChip.hot{box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #8dff3c;}
+  #fireBtn{box-shadow:inset -4px -4px 0 #7f1010, inset 4px 4px 0 #ff8a80, 0 5px 0 #7f1010;}
+  .overlay .btn:hover::after{opacity:.45;left:10%;transition:left .25s ease,opacity .2s ease;}
+
+  /* --- 4. Snappy Menü-/Screen-Übergänge --- */
+  @keyframes uiIn{from{opacity:0;transform:translateY(6px) scale(.985)}to{opacity:1;transform:none}}
+  .overlay{animation:ovIn .14s ease-out;}
+  .overlay>*{animation:uiIn .16s cubic-bezier(.2,1.5,.4,1);}
+  #menu .btn,#over .btn,#pause .btn{animation-duration:.18s;}
+  .skinCard,.boxCard,#account .card,.lbRow{animation-duration:.2s;}
+
+  /* --- 5. Einheitliches Press-/Hover-Feedback (Touch first) --- */
+  .overlay .btn,.skinCard button,.boxCard button,.tabs button,#shopClose,#duelJoinBtn,
+  #edPal button,#edRow button,#pauseBtn,#muteBtn,.pxBtn,#duelCfg .cfgBtns button{
+    -webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+  .skinCard button:active:not(:disabled),.boxCard button:active:not(:disabled),
+  .tabs button:active,#shopClose:active,#duelJoinBtn:active,#duelCfg .cfgBtns button:active{
+    transform:translateY(2px) scale(.98);}
+  .overlay .btn:active{transform:translateY(4px) scale(.97);}
+  .overlay .btn:disabled{filter:grayscale(.7) brightness(.7);transform:none!important;}
+  .overlay .btn:disabled::after{display:none;}
+
+  /* --- 6. Keine Layout-Shifts durch Animationen --- */
+  .skinCard:hover,.boxCard:hover{transform:none;filter:brightness(1.06);}
+  .lbRow:hover{transform:none;filter:brightness(1.06);}
+  .skinCard:hover canvas,.skinCard:hover .thumb{transform:scale(1.04);}
+  @media (hover:none){
+    .overlay .btn:hover,.skinCard:hover,.boxCard:hover,.lbRow:hover,
+    #pauseBtn:hover,#muteBtn:hover,.pxBtn:hover,#edPal button:hover{transform:none;filter:none;}
+  }
 </style>
 </head>
 <body>
