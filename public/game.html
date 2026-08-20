@@ -509,7 +509,62 @@
     .overlay .btn:hover,.skinCard:hover,.boxCard:hover,.lbRow:hover,
     #pauseBtn:hover,#muteBtn:hover,.pxBtn:hover,#edPal button:hover{transform:none;filter:none;}
   }
+
+  /* ================= HUD FLOW & MICRO-ANIMATIONS (v2, nur Optik) ================= */
+  /* Chips laufen leicht versetzt ein */
+  @keyframes chipIn{from{opacity:0;transform:translateY(-8px) scale(.94)}to{opacity:1;transform:none}}
+  #ui .stats .hudChip{animation:chipIn .26s cubic-bezier(.2,1.5,.4,1) both;}
+  #ui .stats .hudChip:nth-child(2){animation-delay:.05s;}
+  #ui .right>*{animation:chipIn .26s cubic-bezier(.2,1.5,.4,1) both;}
+  #ui .right>*:nth-child(2){animation-delay:.04s}
+  #ui .right>*:nth-child(3){animation-delay:.08s}
+  #ui .right>*:nth-child(4){animation-delay:.12s}
+
+  /* Baggy-Zähler: aufsteigende Zahl + Delta-Popup */
+  .bagsWrap{position:relative;}
+  .bagDelta{position:absolute;right:2px;top:100%;margin-top:3px;font-size:8px;color:#8dff3c;
+    text-shadow:2px 2px 0 #000;pointer-events:none;animation:bagDelta .8s ease-out forwards;white-space:nowrap;}
+  @keyframes bagDelta{0%{opacity:0;transform:translateY(-4px)}18%{opacity:1;transform:translateY(0)}
+    100%{opacity:0;transform:translateY(9px)}}
+
+  /* Power-Ups als eigene Chips mit ablaufender Leiste */
+  #power{display:flex;flex-wrap:wrap;gap:5px;background:none!important;box-shadow:none!important;padding:0!important;}
+  .pwChip{position:relative;display:flex;align-items:center;gap:5px;padding:5px 8px;font-size:8px;
+    background:#2b1a0a;color:#ffe9a8;text-shadow:2px 2px 0 #000;line-height:1;
+    box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #ffd54a;
+    animation:chipIn .2s cubic-bezier(.2,1.5,.4,1) both;overflow:hidden;}
+  .pwChip.out{animation:chipOut .16s ease-in forwards;}
+  @keyframes chipOut{to{opacity:0;transform:translateY(-6px) scale(.92)}}
+  .pwChip .pwBar{position:absolute;left:0;bottom:0;height:3px;background:#ffd54a;
+    transition:width .1s linear;box-shadow:0 0 6px rgba(255,213,74,.6);}
+  .pwChip.g{box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #7cfc00;color:#dfffc4;}
+  .pwChip.g .pwBar{background:#7cfc00;}
+  .pwChip.r{box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #ff8a80;color:#ffd7d4;}
+  .pwChip.r .pwBar{background:#ff6b64;}
+  .pwChip.low{animation:pwLow .5s steps(2) infinite;}
+  @keyframes pwLow{0%,100%{filter:brightness(1)}50%{filter:brightness(1.5)}}
+
+  /* Press-Ripple für alle Buttons */
+  .rip{position:absolute;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%) scale(0);
+    background:radial-gradient(circle,rgba(255,255,255,.55),rgba(255,255,255,0) 70%);
+    animation:rip .42s ease-out forwards;z-index:5;}
+  @keyframes rip{to{transform:translate(-50%,-50%) scale(1);opacity:0}}
+  .overlay .btn,.skinCard button,.boxCard button,.tabs button,#shopClose,#duelJoinBtn,
+  #edPal button,#edRow button,#pauseBtn,#muteBtn,.pxBtn,#duelCfg .cfgBtns button{overflow:hidden;position:relative;}
+  /* kurzer "Kick" beim Klick */
+  @keyframes btnKick{0%{transform:translateY(4px) scale(.96)}60%{transform:translateY(-2px) scale(1.03)}100%{transform:none}}
+  .kick{animation:btnKick .22s cubic-bezier(.2,1.5,.4,1);}
+
+  /* Overlays sauber ausblenden statt hart wegschalten */
+  @keyframes ovOut{to{opacity:0;transform:scale(.985)}}
+  .overlay.closing{animation:ovOut .13s ease-in forwards;pointer-events:none;}
+
+  @media (prefers-reduced-motion:reduce){
+    #ui .stats .hudChip,#ui .right>*,.pwChip,.pwChip.low,.bagDelta,.rip,.kick,.overlay.closing{
+      animation:none!important;}
+  }
 </style>
+
 </head>
 <body>
 <div id="wrap">
