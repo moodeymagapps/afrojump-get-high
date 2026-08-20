@@ -509,7 +509,62 @@
     .overlay .btn:hover,.skinCard:hover,.boxCard:hover,.lbRow:hover,
     #pauseBtn:hover,#muteBtn:hover,.pxBtn:hover,#edPal button:hover{transform:none;filter:none;}
   }
+
+  /* ================= HUD FLOW & MICRO-ANIMATIONS (v2, nur Optik) ================= */
+  /* Chips laufen leicht versetzt ein */
+  @keyframes chipIn{from{opacity:0;transform:translateY(-8px) scale(.94)}to{opacity:1;transform:none}}
+  #ui .stats .hudChip{animation:chipIn .26s cubic-bezier(.2,1.5,.4,1) both;}
+  #ui .stats .hudChip:nth-child(2){animation-delay:.05s;}
+  #ui .right>*{animation:chipIn .26s cubic-bezier(.2,1.5,.4,1) both;}
+  #ui .right>*:nth-child(2){animation-delay:.04s}
+  #ui .right>*:nth-child(3){animation-delay:.08s}
+  #ui .right>*:nth-child(4){animation-delay:.12s}
+
+  /* Baggy-Zähler: aufsteigende Zahl + Delta-Popup */
+  .bagsWrap{position:relative;}
+  .bagDelta{position:absolute;right:2px;top:100%;margin-top:3px;font-size:8px;color:#8dff3c;
+    text-shadow:2px 2px 0 #000;pointer-events:none;animation:bagDelta .8s ease-out forwards;white-space:nowrap;}
+  @keyframes bagDelta{0%{opacity:0;transform:translateY(-4px)}18%{opacity:1;transform:translateY(0)}
+    100%{opacity:0;transform:translateY(9px)}}
+
+  /* Power-Ups als eigene Chips mit ablaufender Leiste */
+  #power{display:flex;flex-wrap:wrap;gap:5px;background:none!important;box-shadow:none!important;padding:0!important;}
+  .pwChip{position:relative;display:flex;align-items:center;gap:5px;padding:5px 8px;font-size:8px;
+    background:#2b1a0a;color:#ffe9a8;text-shadow:2px 2px 0 #000;line-height:1;
+    box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #ffd54a;
+    animation:chipIn .2s cubic-bezier(.2,1.5,.4,1) both;overflow:hidden;}
+  .pwChip.out{animation:chipOut .16s ease-in forwards;}
+  @keyframes chipOut{to{opacity:0;transform:translateY(-6px) scale(.92)}}
+  .pwChip .pwBar{position:absolute;left:0;bottom:0;height:3px;background:#ffd54a;
+    transition:width .1s linear;box-shadow:0 0 6px rgba(255,213,74,.6);}
+  .pwChip.g{box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #7cfc00;color:#dfffc4;}
+  .pwChip.g .pwBar{background:#7cfc00;}
+  .pwChip.r{box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #ff8a80;color:#ffd7d4;}
+  .pwChip.r .pwBar{background:#ff6b64;}
+  .pwChip.low{animation:pwLow .5s steps(2) infinite;}
+  @keyframes pwLow{0%,100%{filter:brightness(1)}50%{filter:brightness(1.5)}}
+
+  /* Press-Ripple für alle Buttons */
+  .rip{position:absolute;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%) scale(0);
+    background:radial-gradient(circle,rgba(255,255,255,.55),rgba(255,255,255,0) 70%);
+    animation:rip .42s ease-out forwards;z-index:5;}
+  @keyframes rip{to{transform:translate(-50%,-50%) scale(1);opacity:0}}
+  .overlay .btn,.skinCard button,.boxCard button,.tabs button,#shopClose,#duelJoinBtn,
+  #edPal button,#edRow button,#pauseBtn,#muteBtn,.pxBtn,#duelCfg .cfgBtns button{overflow:hidden;position:relative;}
+  /* kurzer "Kick" beim Klick */
+  @keyframes btnKick{0%{transform:translateY(4px) scale(.96)}60%{transform:translateY(-2px) scale(1.03)}100%{transform:none}}
+  .kick{animation:btnKick .22s cubic-bezier(.2,1.5,.4,1);}
+
+  /* Overlays sauber ausblenden statt hart wegschalten */
+  @keyframes ovOut{to{opacity:0;transform:scale(.985)}}
+  .overlay.closing{animation:ovOut .13s ease-in forwards;pointer-events:none;}
+
+  @media (prefers-reduced-motion:reduce){
+    #ui .stats .hudChip,#ui .right>*,.pwChip,.pwChip.low,.bagDelta,.rip,.kick,.overlay.closing{
+      animation:none!important;}
+  }
 </style>
+
 </head>
 <body>
 <div id="wrap">
@@ -519,7 +574,7 @@
       <div class="hudChip"><span class="ic">⬆</span><div id="score">Höhe: 0m</div></div>
       <div class="hudChip"><span class="ic">★</span><div id="high">Best: 0m</div></div>
     </div>
-    <div class="right"><div class="hudChip bagsChip"><div id="bags">🌿 0</div></div><button id="fsBtn" class="pxBtn" title="Vollbild">⛶</button><button id="muteBtn" title="Musik">🔊</button><button id="pauseBtn" title="Pause">❚❚</button></div>
+    <div class="right"><div class="bagsWrap"><div class="hudChip bagsChip"><div id="bags">🌿 0</div></div></div><button id="fsBtn" class="pxBtn" title="Vollbild">⛶</button><button id="muteBtn" title="Musik">🔊</button><button id="pauseBtn" title="Pause">❚❚</button></div>
   </div>
   <div id="power"></div>
   <div id="settings" class="overlay">
@@ -1107,33 +1162,68 @@ function hudPop(el){
   el.classList.add('pop');
   setTimeout(()=>el.classList.remove('pop'),360);
 }
+let bagsShown=null,bagsTween=null;
+function bagDelta(d){
+  const w=document.querySelector('.bagsWrap');if(!w||!d)return;
+  const el=document.createElement('div');el.className='bagDelta';
+  el.textContent=(d>0?'+':'')+d+' 🌿';el.style.color=d>0?'#8dff3c':'#ff8a80';
+  w.appendChild(el);setTimeout(()=>el.remove(),820);
+}
+function writeBags(v){
+  bagsEl.textContent='🌿 '+v;menuBags.textContent='🌿 '+v+' Baggys';shopBags.textContent='🌿 '+v;
+}
 function updateBagsUI(anim){
-  bagsEl.textContent='🌿 '+totalBags;menuBags.textContent='🌿 '+totalBags+' Baggys';shopBags.textContent='🌿 '+totalBags;
-  if(anim)hudPop(bagsChipEl);
+  const target=totalBags;
+  if(bagsShown===null){bagsShown=target;writeBags(target);return;}
+  const diff=target-bagsShown;
+  if(diff===0){writeBags(target);return;}
+  if(anim){hudPop(bagsChipEl);bagDelta(diff);}
+  // Zahl weich hochzählen (max ~0.4s)
+  if(bagsTween)clearInterval(bagsTween);
+  const from=bagsShown,t0=performance.now(),dur=Math.min(420,120+Math.abs(diff)*4);
+  bagsTween=setInterval(()=>{
+    const k=Math.min(1,(performance.now()-t0)/dur);
+    bagsShown=Math.round(from+diff*(1-Math.pow(1-k,3)));
+    writeBags(bagsShown);
+    if(k>=1){clearInterval(bagsTween);bagsTween=null;bagsShown=target;writeBags(target);}
+  },33);
 }
 
 // Game state machine
 let gameState='menu'; // 'menu' | 'playing' | 'paused' | 'shop' | 'gameover'
 let shopReturn='menu'; // where to return from shop
+// Overlays sanft ein-/ausblenden (rein optisch, kein Zustandswechsel)
+function setOv(el,show){
+  if(!el)return;
+  if(show){
+    if(el._ovT){clearTimeout(el._ovT);el._ovT=null;}
+    el.classList.remove('closing');
+    if(el.style.display!=='flex')el.style.display='flex';
+    return;
+  }
+  if(el.style.display==='none'||el._ovT)return;
+  el.classList.add('closing');
+  el._ovT=setTimeout(()=>{el._ovT=null;el.classList.remove('closing');el.style.display='none';},130);
+}
 function showOverlay(which){
-  menuEl.style.display=which==='menu'?'flex':'none';
-  pauseEl.style.display=which==='paused'?'flex':'none';
-  shopEl.style.display=which==='shop'?'flex':'none';
-  overEl.style.display=which==='gameover'?'flex':'none';
+  setOv(menuEl,which==='menu');
+  setOv(pauseEl,which==='paused');
+  setOv(shopEl,which==='shop');
+  setOv(overEl,which==='gameover');
   const dEl=document.getElementById('duel'),aEl=document.getElementById('account');
-  if(dEl&&which!=='duel')dEl.style.display='none';
-  if(aEl&&which!=='account')aEl.style.display='none';
+  if(dEl&&which!=='duel')setOv(dEl,false);
+  if(aEl&&which!=='account')setOv(aEl,false);
   const bEl=document.getElementById('board');
-  if(bEl&&which!=='board')bEl.style.display='none';
+  if(bEl&&which!=='board')setOv(bEl,false);
   const stEl=document.getElementById('settings');
-  if(stEl)stEl.style.display='none';
+  if(stEl)setOv(stEl,false);
   const eb=document.getElementById('edBar');
   if(eb)eb.classList.toggle('on',which==='editor');
   const hintEl=document.getElementById('hint');
   if(hintEl)hintEl.style.display=(which==='editor'||customMap)?'none':'block';
   const uiEl=document.getElementById('ui');
   if(uiEl)uiEl.style.display=which==='editor'?'none':'flex';
-  powerEl.style.display=which==='editor'?'none':'block';
+  powerEl.style.display=which==='editor'?'none':'flex';
   pauseBtn.style.display=which==='playing'?'flex':'none';
 }
 function goMenu(){gameState='menu';menuHigh.textContent='Best: '+highScore+'m';updateBagsUI();showOverlay('menu');}
@@ -4770,6 +4860,56 @@ function render(){
   }
 }
 
+// ---------- HUD: Power-Chips (eigene Elemente + Restzeit-Leiste) ----------
+const pwChips=new Map();
+function renderPowerChips(list){
+  const seen=new Set();
+  for(const it of list){
+    seen.add(it.k);
+    let c=pwChips.get(it.k);
+    if(!c){
+      c=document.createElement('div');
+      c.className='pwChip'+(it.c?' '+it.c:'');
+      c.innerHTML='<span class="pwTxt"></span><span class="pwBar"></span>';
+      powerEl.appendChild(c);pwChips.set(it.k,c);
+    }
+    const txt=c.firstChild;
+    if(txt.textContent!==it.t)txt.textContent=it.t;
+    const bar=c.lastChild,w=Math.max(0,Math.min(100,it.f*100)).toFixed(0)+'%';
+    if(bar.dataset.w!==w){bar.dataset.w=w;bar.style.width=w;}
+    const low=it.f<=.25;
+    if(low!==(c.dataset.low==='1')){c.dataset.low=low?'1':'0';c.classList.toggle('low',low);}
+  }
+  for(const [k,c] of pwChips){
+    if(seen.has(k))continue;
+    pwChips.delete(k);
+    c.classList.add('out');
+    setTimeout(()=>c.remove(),180);
+  }
+}
+
+// ---------- Press-Feedback: Ripple + Kick für alle Buttons ----------
+const RIPPLE_SEL='.overlay .btn,.skinCard button,.boxCard button,.tabs button,#shopClose,#duelJoinBtn,'+
+  '#edPal button,#edRow button,#pauseBtn,#muteBtn,.pxBtn,#duelCfg .cfgBtns button';
+document.addEventListener('pointerdown',e=>{
+  const b=e.target&&e.target.closest?e.target.closest(RIPPLE_SEL):null;
+  if(!b||b.disabled)return;
+  const r=b.getBoundingClientRect(),d=Math.max(r.width,r.height)*1.8;
+  const rip=document.createElement('span');
+  rip.className='rip';
+  rip.style.width=rip.style.height=d+'px';
+  rip.style.left=(e.clientX-r.left)+'px';
+  rip.style.top=(e.clientY-r.top)+'px';
+  b.appendChild(rip);
+  setTimeout(()=>rip.remove(),440);
+},{passive:true});
+document.addEventListener('click',e=>{
+  const b=e.target&&e.target.closest?e.target.closest(RIPPLE_SEL):null;
+  if(!b||b.disabled)return;
+  b.classList.remove('kick');void b.offsetWidth;b.classList.add('kick');
+  setTimeout(()=>b.classList.remove('kick'),240);
+},{passive:true});
+
 // ---------- loop: feste Physik-Zeitschritte (gleiche Geschwindigkeit auf 60/90/120 Hz) ----------
 const STEP=1/60;
 let last=performance.now(),acc=0;
@@ -4801,19 +4941,13 @@ function loop(t){
   if(rec!==hud.rec){hud.rec=rec;highChipEl.classList.toggle('rec',rec);if(rec)hudPop(highChipEl);}
   let parts=[];
   if(player){
-    if(player.invincible>0)parts.push('★ INVINCIBLE '+player.invincible.toFixed(1)+'s');
-    if(player.jetpackT>0)parts.push('🚀 JETPACK '+player.jetpackT.toFixed(1)+'s');
-    if(player.gunT>0)parts.push('🔫 GUN '+player.gunT.toFixed(1)+'s');
-    if(killCombo>1)parts.push('🔥 COMBO x'+killCombo);
-    if(duel.active)parts.push('⚔ '+(duel.oppName||'Gegner')+': '+(customMap?Math.round((duel.oppProg||0)*100)+'%':duel.oppBest+'m'));
+    if(player.invincible>0)parts.push({k:'inv',t:'★ SCHUTZ '+player.invincible.toFixed(1)+'s',f:Math.min(1,player.invincible/6),c:''});
+    if(player.jetpackT>0)parts.push({k:'jet',t:'🚀 JETPACK '+player.jetpackT.toFixed(1)+'s',f:Math.min(1,player.jetpackT/5),c:'g'});
+    if(player.gunT>0)parts.push({k:'gun',t:'🔫 WAFFE '+player.gunT.toFixed(1)+'s',f:Math.min(1,player.gunT/5),c:'r'});
+    if(killCombo>1)parts.push({k:'combo',t:'🔥 COMBO x'+killCombo,f:1,c:'r'});
+    if(duel.active)parts.push({k:'duel',t:'⚔ '+(duel.oppName||'Gegner')+': '+(customMap?Math.round((duel.oppProg||0)*100)+'%':duel.oppBest+'m'),f:1,c:''});
   }
-  const pTxt=parts.join('  ');
-  if(pTxt!==hud.power){
-    const wasEmpty=!hud.power;
-    hud.power=pTxt;powerEl.textContent=pTxt;
-    if(pTxt&&wasEmpty){powerEl.classList.remove('in');void powerEl.offsetWidth;powerEl.classList.add('in');}
-    if(!pTxt)powerEl.classList.remove('in');
-  }
+  renderPowerChips(parts);
   const hot=!!(player&&(player.invincible>0||player.jetpackT>0||player.gunT>0)&&gameState==='playing');
   if(hot!==hud.hot){hud.hot=hot;if(bagsChipEl)bagsChipEl.classList.toggle('hot',hot);}
   const wantFire=!!(player&&player.gunT>0&&gameState==='playing');
