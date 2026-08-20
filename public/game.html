@@ -1192,25 +1192,38 @@ function updateBagsUI(anim){
 // Game state machine
 let gameState='menu'; // 'menu' | 'playing' | 'paused' | 'shop' | 'gameover'
 let shopReturn='menu'; // where to return from shop
+// Overlays sanft ein-/ausblenden (rein optisch, kein Zustandswechsel)
+function setOv(el,show){
+  if(!el)return;
+  if(show){
+    if(el._ovT){clearTimeout(el._ovT);el._ovT=null;}
+    el.classList.remove('closing');
+    if(el.style.display!=='flex')el.style.display='flex';
+    return;
+  }
+  if(el.style.display==='none'||el._ovT)return;
+  el.classList.add('closing');
+  el._ovT=setTimeout(()=>{el._ovT=null;el.classList.remove('closing');el.style.display='none';},130);
+}
 function showOverlay(which){
-  menuEl.style.display=which==='menu'?'flex':'none';
-  pauseEl.style.display=which==='paused'?'flex':'none';
-  shopEl.style.display=which==='shop'?'flex':'none';
-  overEl.style.display=which==='gameover'?'flex':'none';
+  setOv(menuEl,which==='menu');
+  setOv(pauseEl,which==='paused');
+  setOv(shopEl,which==='shop');
+  setOv(overEl,which==='gameover');
   const dEl=document.getElementById('duel'),aEl=document.getElementById('account');
-  if(dEl&&which!=='duel')dEl.style.display='none';
-  if(aEl&&which!=='account')aEl.style.display='none';
+  if(dEl&&which!=='duel')setOv(dEl,false);
+  if(aEl&&which!=='account')setOv(aEl,false);
   const bEl=document.getElementById('board');
-  if(bEl&&which!=='board')bEl.style.display='none';
+  if(bEl&&which!=='board')setOv(bEl,false);
   const stEl=document.getElementById('settings');
-  if(stEl)stEl.style.display='none';
+  if(stEl)setOv(stEl,false);
   const eb=document.getElementById('edBar');
   if(eb)eb.classList.toggle('on',which==='editor');
   const hintEl=document.getElementById('hint');
   if(hintEl)hintEl.style.display=(which==='editor'||customMap)?'none':'block';
   const uiEl=document.getElementById('ui');
   if(uiEl)uiEl.style.display=which==='editor'?'none':'flex';
-  powerEl.style.display=which==='editor'?'none':'block';
+  powerEl.style.display=which==='editor'?'none':'flex';
   pauseBtn.style.display=which==='playing'?'flex':'none';
 }
 function goMenu(){gameState='menu';menuHigh.textContent='Best: '+highScore+'m';updateBagsUI();showOverlay('menu');}
