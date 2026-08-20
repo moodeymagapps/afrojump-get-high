@@ -1162,9 +1162,31 @@ function hudPop(el){
   el.classList.add('pop');
   setTimeout(()=>el.classList.remove('pop'),360);
 }
+let bagsShown=null,bagsTween=null;
+function bagDelta(d){
+  const w=document.querySelector('.bagsWrap');if(!w||!d)return;
+  const el=document.createElement('div');el.className='bagDelta';
+  el.textContent=(d>0?'+':'')+d+' 🌿';el.style.color=d>0?'#8dff3c':'#ff8a80';
+  w.appendChild(el);setTimeout(()=>el.remove(),820);
+}
+function writeBags(v){
+  bagsEl.textContent='🌿 '+v;menuBags.textContent='🌿 '+v+' Baggys';shopBags.textContent='🌿 '+v;
+}
 function updateBagsUI(anim){
-  bagsEl.textContent='🌿 '+totalBags;menuBags.textContent='🌿 '+totalBags+' Baggys';shopBags.textContent='🌿 '+totalBags;
-  if(anim)hudPop(bagsChipEl);
+  const target=totalBags;
+  if(bagsShown===null){bagsShown=target;writeBags(target);return;}
+  const diff=target-bagsShown;
+  if(diff===0){writeBags(target);return;}
+  if(anim){hudPop(bagsChipEl);bagDelta(diff);}
+  // Zahl weich hochzählen (max ~0.4s)
+  if(bagsTween)clearInterval(bagsTween);
+  const from=bagsShown,t0=performance.now(),dur=Math.min(420,120+Math.abs(diff)*4);
+  bagsTween=setInterval(()=>{
+    const k=Math.min(1,(performance.now()-t0)/dur);
+    bagsShown=Math.round(from+diff*(1-Math.pow(1-k,3)));
+    writeBags(bagsShown);
+    if(k>=1){clearInterval(bagsTween);bagsTween=null;bagsShown=target;writeBags(target);}
+  },33);
 }
 
 // Game state machine
@@ -4825,6 +4847,56 @@ function render(){
   }
 }
 
+// ---------- HUD: Power-Chips (eigene Elemente + Restzeit-Leiste) ----------
+const pwChips=new Map();
+function renderPowerChips(list){
+  const seen=new Set();
+  for(const it of list){
+    seen.add(it.k);
+    let c=pwChips.get(it.k);
+    if(!c){
+      c=document.createElement('div');
+      c.className='pwChip'+(it.c?' '+it.c:'');
+      c.innerHTML='<span class="pwTxt"></span><span class="pwBar"></span>';
+      powerEl.appendChild(c);pwChips.set(it.k,c);
+    }
+    const txt=c.firstChild;
+    if(txt.textContent!==it.t)txt.textContent=it.t;
+    const bar=c.lastChild,w=Math.max(0,Math.min(100,it.f*100)).toFixed(0)+'%';
+    if(bar.dataset.w!==w){bar.dataset.w=w;bar.style.width=w;}
+    const low=it.f<=.25;
+    if(low!==(c.dataset.low==='1')){c.dataset.low=low?'1':'0';c.classList.toggle('low',low);}
+  }
+  for(const [k,c] of pwChips){
+    if(seen.has(k))continue;
+    pwChips.delete(k);
+    c.classList.add('out');
+    setTimeout(()=>c.remove(),180);
+  }
+}
+
+// ---------- Press-Feedback: Ripple + Kick für alle Buttons ----------
+const RIPPLE_SEL='.overlay .btn,.skinCard button,.boxCard button,.tabs button,#shopClose,#duelJoinBtn,'+
+  '#edPal button,#edRow button,#pauseBtn,#muteBtn,.pxBtn,#duelCfg .cfgBtns button';
+document.addEventListener('pointerdown',e=>{
+  const b=e.target&&e.target.closest?e.target.closest(RIPPLE_SEL):null;
+  if(!b||b.disabled)return;
+  const r=b.getBoundingClientRect(),d=Math.max(r.width,r.height)*1.8;
+  const rip=document.createElement('span');
+  rip.className='rip';
+  rip.style.width=rip.style.height=d+'px';
+  rip.style.left=(e.clientX-r.left)+'px';
+  rip.style.top=(e.clientY-r.top)+'px';
+  b.appendChild(rip);
+  setTimeout(()=>rip.remove(),440);
+},{passive:true});
+document.addEventListener('click',e=>{
+  const b=e.target&&e.target.closest?e.target.closest(RIPPLE_SEL):null;
+  if(!b||b.disabled)return;
+  b.classList.remove('kick');void b.offsetWidth;b.classList.add('kick');
+  setTimeout(()=>b.classList.remove('kick'),240);
+},{passive:true});
+
 // ---------- loop: feste Physik-Zeitschritte (gleiche Geschwindigkeit auf 60/90/120 Hz) ----------
 const STEP=1/60;
 let last=performance.now(),acc=0;
@@ -4856,19 +4928,13 @@ function loop(t){
   if(rec!==hud.rec){hud.rec=rec;highChipEl.classList.toggle('rec',rec);if(rec)hudPop(highChipEl);}
   let parts=[];
   if(player){
-    if(player.invincible>0)parts.push('★ INVINCIBLE '+player.invincible.toFixed(1)+'s');
-    if(player.jetpackT>0)parts.push('🚀 JETPACK '+player.jetpackT.toFixed(1)+'s');
-    if(player.gunT>0)parts.push('🔫 GUN '+player.gunT.toFixed(1)+'s');
-    if(killCombo>1)parts.push('🔥 COMBO x'+killCombo);
-    if(duel.active)parts.push('⚔ '+(duel.oppName||'Gegner')+': '+(customMap?Math.round((duel.oppProg||0)*100)+'%':duel.oppBest+'m'));
+    if(player.invincible>0)parts.push({k:'inv',t:'★ SCHUTZ '+player.invincible.toFixed(1)+'s',f:Math.min(1,player.invincible/6),c:''});
+    if(player.jetpackT>0)parts.push({k:'jet',t:'🚀 JETPACK '+player.jetpackT.toFixed(1)+'s',f:Math.min(1,player.jetpackT/5),c:'g'});
+    if(player.gunT>0)parts.push({k:'gun',t:'🔫 WAFFE '+player.gunT.toFixed(1)+'s',f:Math.min(1,player.gunT/5),c:'r'});
+    if(killCombo>1)parts.push({k:'combo',t:'🔥 COMBO x'+killCombo,f:1,c:'r'});
+    if(duel.active)parts.push({k:'duel',t:'⚔ '+(duel.oppName||'Gegner')+': '+(customMap?Math.round((duel.oppProg||0)*100)+'%':duel.oppBest+'m'),f:1,c:''});
   }
-  const pTxt=parts.join('  ');
-  if(pTxt!==hud.power){
-    const wasEmpty=!hud.power;
-    hud.power=pTxt;powerEl.textContent=pTxt;
-    if(pTxt&&wasEmpty){powerEl.classList.remove('in');void powerEl.offsetWidth;powerEl.classList.add('in');}
-    if(!pTxt)powerEl.classList.remove('in');
-  }
+  renderPowerChips(parts);
   const hot=!!(player&&(player.invincible>0||player.jetpackT>0||player.gunT>0)&&gameState==='playing');
   if(hot!==hud.hot){hud.hot=hot;if(bagsChipEl)bagsChipEl.classList.toggle('hot',hot);}
   const wantFire=!!(player&&player.gunT>0&&gameState==='playing');
