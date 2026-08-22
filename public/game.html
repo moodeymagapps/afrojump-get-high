@@ -2279,7 +2279,12 @@ function update(dt){
   if(particles.length)particles=particles.filter(p=>p.life>0);
   for(const f of floatTexts){f.y-=40*dt;f.life-=dt;}
   if(floatTexts.length)floatTexts=floatTexts.filter(f=>f.life>0);
+  updateJuice(dt);
+  // Bewegungs-Trail beim schnellen Steigen / Jetpack
+  if(player.jetpackT>0||player.vy<-15){if((frameCount=(frameCount+1)%2)===0)pushTrail();}
 }
+let frameCount=0;
+
 
 const MAX_PARTICLES=280;
 function burst(x,y,color,n=14){
