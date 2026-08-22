@@ -2286,8 +2286,27 @@ function burst(x,y,color,n=14){
   const room=MAX_PARTICLES-particles.length;
   if(room<=0)return;
   const cnt=Math.min(n,room);
-  for(let i=0;i<cnt;i++)particles.push({x,y,vx:rand(-3,3),vy:rand(-4,1),life:0.8,color});
+  for(let i=0;i<cnt;i++)particles.push({x,y,vx:rand(-3,3),vy:rand(-4,1),life:0.8,color,sz:rand(1.6,3.2)});
 }
+
+// ---------- Juice-Layer (rein kosmetisch): Ringe, Bewegungs-Trail, Screen-Flash ----------
+let rings=[],trail=[],flash={a:0,c:'255,255,255'};
+function addRing(x,y,color,r0,r1,life){
+  if(rings.length>16)return;
+  const l=life||0.4;
+  rings.push({x,y,c:color,r0:r0||6,r1:r1||46,life:l,max:l});
+}
+function addFlash(color,a){flash.c=color;flash.a=Math.min(0.5,Math.max(flash.a,a));}
+function pushTrail(){
+  if(trail.length>12)return;
+  trail.push({x:player.x,y:player.y,f:player.facing,st:player.stretch,sq:player.squash,life:0.24});
+}
+function updateJuice(dt){
+  if(rings.length){for(const r of rings)r.life-=dt;rings=rings.filter(r=>r.life>0);}
+  if(trail.length){for(const t of trail)t.life-=dt;trail=trail.filter(t=>t.life>0);}
+  if(flash.a>0)flash.a=Math.max(0,flash.a-dt*3);
+}
+
 // Kill feedback: combo chain gives bonus baggys and juicy text
 function registerKill(x,y){
   runKills++;
