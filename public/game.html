@@ -1989,8 +1989,10 @@ function update(dt){
           p.bounce=1;
           if(p.type!=='spring'&&p.type!=='tramp'&&p.type!=='boost'&&p.type!=='crate')
             burst(p.x+p.w/2,p.y+2,'rgba(230,230,255,0.85)',5); // rein kosmetischer Staub
+          addRing(player.x,p.y+2,'255,255,255',4,26,0.26); // Landungs-Schockwelle
           player.landedT=0.15;
           player.squash=1.35;player.stretch=0.75;
+
           if(p.type==='brittle'){
             p.cracked++;
             if(p.cracked>=2){
