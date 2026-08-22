@@ -2337,7 +2337,10 @@ function hurtPlayer(){
     if(player.invSrc!=='power'){player.invincible=Math.max(player.invincible,1.5);player.invSrc='hit';}
     player.hitFlash=0.4;
     burst(player.x,player.y,'#ff5252',18);
+    addRing(player.x,player.y,'255,82,82',8,70,0.36);
+    addFlash('255,60,60',0.22);
     addShake(8,0.3);
+
     sfx('hurt');
     if(player.bossLives<=0){pushFloat(player.x,player.y-20,'LAST LIFE!','#ff5252');}
     else pushFloat(player.x,player.y-20,'-1 ♥ ('+player.bossLives+' left)','#ff5252');
