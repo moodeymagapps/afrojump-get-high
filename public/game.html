@@ -2801,11 +2801,36 @@ function roundRect(x,y,w,h,r,fill,stroke){
 
 function drawPlayer(){
   const x=player.x,y=player.y-cameraY;
+  // Bewegungs-Trail (Nachbilder) – nur bei schnellem Steigen/Jetpack gefüllt
+  if(trail.length){
+    ctx.save();
+    for(const t of trail){
+      const k=Math.max(0,t.life/0.24);
+      ctx.globalAlpha=k*0.22;
+      ctx.save();
+      ctx.translate(t.x,t.y-cameraY+(1-t.sq)*18);
+      ctx.scale(t.f*t.st*(0.94+k*0.06),t.sq);
+      drawAfroCharacter(ctx,currentSkin(),0,false);
+      ctx.restore();
+    }
+    ctx.restore();
+    ctx.globalAlpha=1;
+  }
+  // sanftes Bodenlicht / Rim-Glow, damit der Skin klarer vom Hintergrund abhebt
   ctx.save();
-  ctx.translate(x,y+(1-player.squash)*18);
+  const gg=ctx.createRadialGradient(x,y,2,x,y,player.r+22);
+  gg.addColorStop(0,'rgba(255,255,255,0.16)');
+  gg.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle=gg;ctx.beginPath();ctx.arc(x,y,player.r+22,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+  ctx.save();
+  // dezenter Idle-Bob, wenn der Charakter am Scheitelpunkt schwebt
+  const bob=Math.abs(player.vy)<3?Math.sin(performance.now()/240)*1.2:0;
+  ctx.translate(x,y+bob+(1-player.squash)*18);
   ctx.scale(player.facing*player.stretch,player.squash);
   drawAfroCharacter(ctx,currentSkin(),player.invincible,true);
   ctx.restore();
+
 
   // smoke – weicher Ausklang statt harter Kreise
   if(smokeParticles.length){
