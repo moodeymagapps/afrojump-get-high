@@ -1721,7 +1721,7 @@ function reset(){
   if(jperk().shield){player.invincible=jperk().shield;player.invSrc='spawn';}
   platforms=[];collectibles=[];enemies=[];projectiles=[];particles=[];smokeParticles=[];floatTexts=[];
   cameraY=0;bestY=0;scrollLocked=false;boss=null;nextBossScore=1500;gameOver=false;
-  runBags=0;shake={t:0,mag:0};timeScale=1;deathT=0;
+  runBags=0;shake={t:0,mag:0};timeScale=1;deathT=0;rings=[];trail=[];flash={a:0,c:'255,255,255'};
   killCombo=0;comboT=0;runKills=0;bossIndex=0;
   duel.myBest=0;duel.oppBest=0;duel.oppDead=false;duel.oppY=null;duel.oppX=W/2;duel.finished=false;
   stopBossMusic();
