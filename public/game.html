@@ -2048,10 +2048,11 @@ function update(dt){
     c.t+=dt;
     if(Math.hypot(player.x-c.x,player.y-c.y)<player.r+10+(jperk().magnet||0)){
       c.taken=true;
-      if(c.type==='bag'){const gain=2+(jperk().bags||0);runBags+=gain;totalBags+=gain;bagsEl.textContent='🌿 '+totalBags;hudPop(bagsChipEl);burst(c.x,c.y,'#7cfc00',18);pushFloat(c.x,c.y-4,'+'+gain+' 🌿','#7cfc00');sfx('pickup');}
-      else if(c.type==='joint'){player.invincible=6+(jperk().inv||0);player.invSrc='power';player.vy=-22;burst(c.x,c.y,'#ff69b4',24);pushFloat(c.x,c.y-4,'INVINCIBLE!','#ff69b4');sfx('pickup');}
-      else if(c.type==='jetpack'){player.jetpackT=3.0;player.vy=-14;burst(c.x,c.y,'#ff8a00',30);pushFloat(c.x,c.y-4,'JETPACK!','#ff8a00');}
-      else if(c.type==='gun'){const gt=5.0+(jperk().gun||0)+(wperk().gun||0);player.gunT=gt;burst(c.x,c.y,'#e0e0e0',22);pushFloat(c.x,c.y-4,'GUN '+Math.round(gt)+'s!','#e0e0e0');sfx('pickup');}
+      if(c.type==='bag'){const gain=2+(jperk().bags||0);runBags+=gain;totalBags+=gain;bagsEl.textContent='🌿 '+totalBags;hudPop(bagsChipEl);burst(c.x,c.y,'#7cfc00',18);addRing(c.x,c.y,'124,252,0',5,30,0.3);pushFloat(c.x,c.y-4,'+'+gain+' 🌿','#7cfc00');sfx('pickup');}
+      else if(c.type==='joint'){player.invincible=6+(jperk().inv||0);player.invSrc='power';player.vy=-22;burst(c.x,c.y,'#ff69b4',24);addRing(c.x,c.y,'255,105,180',6,64,0.42);addFlash('255,105,180',0.16);addShake(3,0.14);pushFloat(c.x,c.y-4,'INVINCIBLE!','#ff69b4');sfx('pickup');}
+      else if(c.type==='jetpack'){player.jetpackT=3.0;player.vy=-14;burst(c.x,c.y,'#ff8a00',30);addRing(c.x,c.y,'255,138,0',6,64,0.42);addFlash('255,170,60',0.16);addShake(3,0.14);pushFloat(c.x,c.y-4,'JETPACK!','#ff8a00');}
+      else if(c.type==='gun'){const gt=5.0+(jperk().gun||0)+(wperk().gun||0);player.gunT=gt;burst(c.x,c.y,'#e0e0e0',22);addRing(c.x,c.y,'235,235,235',6,56,0.38);addFlash('255,255,255',0.12);pushFloat(c.x,c.y-4,'GUN '+Math.round(gt)+'s!','#e0e0e0');sfx('pickup');}
+
       // gun fires instantly upward on pickup and then keeps auto-firing
       if(c.type==='gun'){player.shootCd=0;shootRequested=true;}
       if(c.type==='bag'){localStorage.setItem(BK,totalBags);questProgress('bags',2);missionProgress('bags',2);}
