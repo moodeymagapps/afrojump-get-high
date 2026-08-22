@@ -4958,10 +4958,16 @@ function render(){
     ctx.textAlign='left';
   }
   ctx.restore();
+  // kurzer Screen-Flash bei starken Aktionen (Power-Ups, Treffer)
+  if(flash.a>0){
+    ctx.fillStyle='rgba('+flash.c+','+flash.a.toFixed(3)+')';
+    ctx.fillRect(0,0,W,H);
+  }
   // death fade
   if(gameOver&&deathT<0.5){
     ctx.fillStyle='rgba(0,0,0,'+(deathT*1.4)+')';ctx.fillRect(0,0,W,H);
   }
+
 }
 
 // ---------- HUD: Power-Chips (eigene Elemente + Restzeit-Leiste) ----------
