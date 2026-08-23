@@ -1265,7 +1265,7 @@ function goMenu(){gameState='menu';menuHigh.textContent='Best: '+highScore+'m';u
 function startGame(){reset();gameState='playing';showOverlay('playing');tryPlayMusic();}
 function pauseGame(){if(gameState!=='playing')return;gameState='paused';showOverlay('paused');stopMusic();stopBossMusic();}
 function resumeGame(){if(gameState!=='paused')return;gameState='playing';showOverlay('playing');last=performance.now();if(!boss)tryPlayMusic();}
-function openShop(from){shopReturn=from;gameState='shop';renderShop();updateBagsUI();showOverlay('shop');}
+function openShop(from){shopReturn=from;carTouched.skins=carTouched.weapons=carTouched.joints=false;gameState='shop';renderShop();updateBagsUI();showOverlay('shop');}
 function closeShop(){
   if(typeof openBoxEl!=='undefined'&&openBoxEl){openBoxEl.style.display='none';boxAnim=null;}
   if(shopReturn==='paused'){gameState='paused';showOverlay('paused');}
@@ -1326,6 +1326,7 @@ function drawJointPreview(g,j,noClear){
 function makeCard(){const c=document.createElement('div');c.className='skinCard';return c;}
 // ---- Carousel-Index pro Kategorie ----
 const carIdx={skins:0,weapons:0,joints:0};
+const carTouched={};
 let carDir=1;
 function renderShop(){
   skinGrid.innerHTML='';
@@ -1439,7 +1440,6 @@ function renderCarousel(cfg){
 
   skinGrid.appendChild(wrap);
 }
-const carTouched={};
 
 // ---- Loot-Tütchen Tab ----
 function drawBaggy(g,cx,cy,scale,col,openAmt,shake){
@@ -1468,6 +1468,7 @@ function drawBaggy(g,cx,cy,scale,col,openAmt,shake){
   g.restore();
 }
 function renderBoxes(){
+  skinGrid.style.display='grid';
   skinGrid.style.gridTemplateColumns='1fr';
   for(const b of LOOT_BOXES){
     const card=document.createElement('div');card.className='boxCard';
