@@ -117,6 +117,41 @@
   #shopBags{font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:11px;color:#7cfc00;}
   #shopClose{background:#c62828;border:none;color:#fff;padding:8px 12px;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:11px;cursor:pointer;box-shadow:inset -2px -2px 0 #7f1010, inset 2px 2px 0 #ff8a80, 0 3px 0 #7f1010;}
   .skinGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:360px;padding-bottom:20px;}
+  /* ---- Kosmetik-Carousel ---- */
+  .carWrap{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:360px;padding-bottom:20px;overflow:hidden;}
+  .carRow{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;}
+  .carArrow{flex:0 0 auto;width:52px;height:72px;border:none;cursor:pointer;background:#2b1a0a;color:#ffd54f;
+    font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:16px;
+    box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #7a4f12, 0 4px 0 #000;
+    transition:transform .1s ease,filter .15s ease;}
+  .carArrow:hover{filter:brightness(1.15);}
+  .carArrow:active{transform:translateY(3px) scale(.94);}
+  .carStage{flex:1 1 auto;min-width:0;display:flex;align-items:center;justify-content:center;
+    height:190px;background:#150e26;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #4a2c73;position:relative;overflow:hidden;}
+  .carStage.eq{box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #7cfc00, 0 0 14px rgba(124,252,0,.35);}
+  .carStage canvas{width:160px;height:160px;image-rendering:pixelated;object-fit:contain;background:transparent;}
+  .carStage.locked canvas{filter:grayscale(1) brightness(.55);}
+  .carLock{position:absolute;top:6px;right:8px;font-size:18px;filter:drop-shadow(0 2px 0 #000);}
+  .carEq{position:absolute;top:6px;left:8px;font-family:'Press Start 2P',monospace;font-size:7px;color:#7cfc00;text-shadow:1px 1px 0 #000;}
+  .carSlide{animation:carIn .18s ease-out both;}
+  @keyframes carIn{from{opacity:0;transform:translateX(var(--carDir,28px)) scale(.94);}to{opacity:1;transform:translateX(0) scale(1);}}
+  .carDots{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;}
+  .carDots i{width:6px;height:6px;background:#4a2c73;display:block;}
+  .carDots i.on{background:#7cfc00;}
+  .carInfo{text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;}
+  .carName{font-family:'Press Start 2P',monospace;font-size:13px;color:#fff;text-shadow:2px 2px 0 #000;letter-spacing:.5px;line-height:1.5;}
+  .carRar{font-family:'Press Start 2P',monospace;font-size:8px;letter-spacing:1px;}
+  .carPrice{font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:10px;color:#7cfc00;}
+  .carDesc{font-family:'Press Start 2P',monospace;font-size:7px;line-height:1.7;color:#9ccc65;max-width:300px;}
+  .carAct{width:100%;padding:14px 10px;border:none;cursor:pointer;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;
+    font-size:10px;letter-spacing:1px;background:#4caf50;color:#fff;
+    box-shadow:inset -3px -3px 0 #1b5e20, inset 3px 3px 0 #a5d6a7, 0 4px 0 #1b5e20;transition:transform .1s ease,filter .15s ease;}
+  .carAct:hover:not(:disabled){filter:brightness(1.12);}
+  .carAct:active:not(:disabled){transform:translateY(3px);}
+  .carAct.eq{background:#7cfc00;color:#111;box-shadow:inset -3px -3px 0 #3d7d00, inset 3px 3px 0 #d4ffb3, 0 4px 0 #3d7d00;}
+  .carAct.lock{background:#4a1414;color:#e6a;box-shadow:inset -3px -3px 0 #200, inset 3px 3px 0 #7a2a2a, 0 4px 0 #200;}
+  .carAct:disabled{cursor:not-allowed;}
+  @media (max-width:420px){.carArrow{width:46px;height:84px;}.carStage{height:170px;}.carStage canvas{width:140px;height:140px;}.carName{font-size:11px;}}
   .skinCard{background:#1b1230;border:none;padding:8px;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #4a2c73;image-rendering:pixelated;}
   .skinCard.selected{background:#0d3d00;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #7cfc00, 0 0 12px rgba(124,252,0,.5);}
   .skinCard canvas,.skinCard .thumb{background:linear-gradient(#87ceeb,#c9e9f6);width:80px;height:80px;box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 rgba(255,255,255,.4);image-rendering:pixelated;object-fit:contain;}
