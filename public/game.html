@@ -677,7 +677,6 @@
     <p id="duelResult" style="color:#ffd54a;font-size:18px;"></p>
   </div>
   <div id="hint">← → / A D bewegen · Schießen nur mit aufgesammelter Waffe 🔫 · Mobile: Tap links/rechts</div>
-  <button id="fireBtn" title="Feuer">🔫</button>
   <div id="edBar">
     <div id="edTop"><span id="edPhase">MAP BAUEN</span><span id="edBudget"></span></div>
     <div id="edPal"></div>
@@ -5134,8 +5133,6 @@ function loop(t){
   renderPowerChips(parts);
   const hot=!!(player&&(player.invincible>0||player.jetpackT>0||player.gunT>0)&&gameState==='playing');
   if(hot!==hud.hot){hud.hot=hot;if(bagsChipEl)bagsChipEl.classList.toggle('hot',hot);}
-  const wantFire=!!(player&&player.gunT>0&&gameState==='playing');
-  if(wantFire!==hud.fire){hud.fire=wantFire;fireBtn.classList.toggle('on',wantFire);}
   // quest live tracking
   if(gameState==='playing'){
     if(bestY>questSessionHeight){questProgress('height',bestY-questSessionHeight);questSessionHeight=bestY;}
@@ -5144,12 +5141,8 @@ function loop(t){
 }
 
 // ---------- Fire button, Account, Daily, Quests, Cloud Sync ----------
-const fireBtn=document.getElementById('fireBtn');
 const accountEl=document.getElementById('account');
 let questSessionHeight=0;
-function fireTap(e){e.preventDefault();e.stopPropagation();if(gameState==='playing')shootRequested=true;}
-fireBtn.addEventListener('touchstart',fireTap,{passive:false});
-fireBtn.addEventListener('mousedown',fireTap);
 
 // Menu extras
 document.getElementById('menuDaily').onclick=()=>openAccount();
