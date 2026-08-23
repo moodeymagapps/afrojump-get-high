@@ -117,6 +117,41 @@
   #shopBags{font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:11px;color:#7cfc00;}
   #shopClose{background:#c62828;border:none;color:#fff;padding:8px 12px;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:11px;cursor:pointer;box-shadow:inset -2px -2px 0 #7f1010, inset 2px 2px 0 #ff8a80, 0 3px 0 #7f1010;}
   .skinGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:360px;padding-bottom:20px;}
+  /* ---- Kosmetik-Carousel ---- */
+  .carWrap{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:360px;padding-bottom:20px;overflow:hidden;}
+  .carRow{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;}
+  .carArrow{flex:0 0 auto;width:52px;height:72px;border:none;cursor:pointer;background:#2b1a0a;color:#ffd54f;
+    font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:16px;
+    box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #7a4f12, 0 4px 0 #000;
+    transition:transform .1s ease,filter .15s ease;}
+  .carArrow:hover{filter:brightness(1.15);}
+  .carArrow:active{transform:translateY(3px) scale(.94);}
+  .carStage{flex:1 1 auto;min-width:0;display:flex;align-items:center;justify-content:center;
+    height:190px;background:#150e26;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #4a2c73;position:relative;overflow:hidden;}
+  .carStage.eq{box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #7cfc00, 0 0 14px rgba(124,252,0,.35);}
+  .carStage canvas{width:160px;height:160px;image-rendering:pixelated;object-fit:contain;background:transparent;}
+  .carStage.locked canvas{filter:grayscale(1) brightness(.55);}
+  .carLock{position:absolute;top:6px;right:8px;font-size:18px;filter:drop-shadow(0 2px 0 #000);}
+  .carEq{position:absolute;top:6px;left:8px;font-family:'Press Start 2P',monospace;font-size:7px;color:#7cfc00;text-shadow:1px 1px 0 #000;}
+  .carSlide{animation:carIn .18s ease-out both;}
+  @keyframes carIn{from{opacity:0;transform:translateX(var(--carDir,28px)) scale(.94);}to{opacity:1;transform:translateX(0) scale(1);}}
+  .carDots{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;}
+  .carDots i{width:6px;height:6px;background:#4a2c73;display:block;}
+  .carDots i.on{background:#7cfc00;}
+  .carInfo{text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;}
+  .carName{font-family:'Press Start 2P',monospace;font-size:13px;color:#fff;text-shadow:2px 2px 0 #000;letter-spacing:.5px;line-height:1.5;}
+  .carRar{font-family:'Press Start 2P',monospace;font-size:8px;letter-spacing:1px;}
+  .carPrice{font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:10px;color:#7cfc00;}
+  .carDesc{font-family:'Press Start 2P',monospace;font-size:7px;line-height:1.7;color:#9ccc65;max-width:300px;}
+  .carAct{width:100%;padding:14px 10px;border:none;cursor:pointer;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;
+    font-size:10px;letter-spacing:1px;background:#4caf50;color:#fff;
+    box-shadow:inset -3px -3px 0 #1b5e20, inset 3px 3px 0 #a5d6a7, 0 4px 0 #1b5e20;transition:transform .1s ease,filter .15s ease;}
+  .carAct:hover:not(:disabled){filter:brightness(1.12);}
+  .carAct:active:not(:disabled){transform:translateY(3px);}
+  .carAct.eq{background:#7cfc00;color:#111;box-shadow:inset -3px -3px 0 #3d7d00, inset 3px 3px 0 #d4ffb3, 0 4px 0 #3d7d00;}
+  .carAct.lock{background:#4a1414;color:#e6a;box-shadow:inset -3px -3px 0 #200, inset 3px 3px 0 #7a2a2a, 0 4px 0 #200;}
+  .carAct:disabled{cursor:not-allowed;}
+  @media (max-width:420px){.carArrow{width:46px;height:84px;}.carStage{height:170px;}.carStage canvas{width:140px;height:140px;}.carName{font-size:11px;}}
   .skinCard{background:#1b1230;border:none;padding:8px;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #4a2c73;image-rendering:pixelated;}
   .skinCard.selected{background:#0d3d00;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #7cfc00, 0 0 12px rgba(124,252,0,.5);}
   .skinCard canvas,.skinCard .thumb{background:linear-gradient(#87ceeb,#c9e9f6);width:80px;height:80px;box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 rgba(255,255,255,.4);image-rendering:pixelated;object-fit:contain;}
@@ -1230,7 +1265,7 @@ function goMenu(){gameState='menu';menuHigh.textContent='Best: '+highScore+'m';u
 function startGame(){reset();gameState='playing';showOverlay('playing');tryPlayMusic();}
 function pauseGame(){if(gameState!=='playing')return;gameState='paused';showOverlay('paused');stopMusic();stopBossMusic();}
 function resumeGame(){if(gameState!=='paused')return;gameState='playing';showOverlay('playing');last=performance.now();if(!boss)tryPlayMusic();}
-function openShop(from){shopReturn=from;gameState='shop';renderShop();updateBagsUI();showOverlay('shop');}
+function openShop(from){shopReturn=from;carTouched.skins=carTouched.weapons=carTouched.joints=false;gameState='shop';renderShop();updateBagsUI();showOverlay('shop');}
 function closeShop(){
   if(typeof openBoxEl!=='undefined'&&openBoxEl){openBoxEl.style.display='none';boxAnim=null;}
   if(shopReturn==='paused'){gameState='paused';showOverlay('paused');}
@@ -1289,86 +1324,121 @@ function drawJointPreview(g,j,noClear){
   g.globalAlpha=1;
 }
 function makeCard(){const c=document.createElement('div');c.className='skinCard';return c;}
+// ---- Carousel-Index pro Kategorie ----
+const carIdx={skins:0,weapons:0,joints:0};
+const carTouched={};
+let carDir=1;
 function renderShop(){
   skinGrid.innerHTML='';
   skinGrid.style.gridTemplateColumns=shopTab==='boxes'?'1fr':'1fr 1fr';
   for(const b of document.querySelectorAll('#shopTabs button'))b.classList.toggle('on',b.dataset.tab===shopTab);
   if(shopTab==='boxes')return renderBoxes();
-  if(shopTab==='weapons')return renderLootTab(WEAPON_SKINS,ownedWeapons,'weapon');
-  if(shopTab==='joints')return renderLootTab(JOINT_SKINS,ownedJoints,'joint');
+  skinGrid.style.display='block';
+  if(shopTab==='weapons')return renderCarousel({
+    key:'weapons',
+    list:WEAPON_SKINS,
+    isOwned:it=>ownedWeapons.includes(it.id),
+    isEquipped:it=>selectedWeapon===it.id,
+    priceText:it=>it.free?'Gratis':'🎒 Nur aus Tütchen',
+    lockText:it=>'🔒 Nur aus Tütchen',
+    draw:(g,it)=>drawWeaponPreview(g,it),
+    equip:it=>{selectedWeapon=it.id;persistLoot();}
+  });
+  if(shopTab==='joints')return renderCarousel({
+    key:'joints',
+    list:JOINT_SKINS,
+    isOwned:it=>ownedJoints.includes(it.id),
+    isEquipped:it=>selectedJoint===it.id,
+    priceText:it=>it.free?'Gratis':'🎒 Nur aus Tütchen',
+    lockText:it=>'🔒 Nur aus Tütchen',
+    draw:(g,it)=>drawJointPreview(g,it),
+    equip:it=>{selectedJoint=it.id;persistLoot();}
+  });
   const list=SKINS.filter(s=>!s.lootOnly||owned.includes(s.id));
-  for(const s of list){
-    const card=document.createElement('div');
-    card.className='skinCard'+(s.id===selectedSkin?' selected':'');
-    if(s.img){
-      const entry=loadSkinImage(s.img,s.bgKey);
-      const cvS=document.createElement('canvas');cvS.width=80;cvS.height=80;
-      const drawIt=()=>{
-        const g=cvS.getContext('2d');
-        g.imageSmoothingEnabled=false;
-        g.clearRect(0,0,80,80);
-        if(entry.canvas){
-          const im=entry.canvas;
-          const sc=Math.min(76/im.width,76/im.height);
-          const w=im.width*sc,h=im.height*sc;
-          g.drawImage(im,(80-w)/2,(80-h)/2,w,h);
-        }
-      };
-      if(entry.ready)drawIt();else{const t=setInterval(()=>{if(entry.ready){clearInterval(t);drawIt();}},60);}
-      card.appendChild(cvS);
-    }else{
-      const cvS=document.createElement('canvas');cvS.width=80;cvS.height=80;
-      drawSkinPreview(cvS.getContext('2d'),s);
-      card.appendChild(cvS);
-    }
-    const nm=document.createElement('div');nm.className='name';nm.textContent=s.name;card.appendChild(nm);
-    card.appendChild(rarBadge(s.rarity));
-    const pr=document.createElement('div');pr.className='price';
-    pr.textContent=s.lootOnly?'🎒 Loot':(s.price===0?'Gratis':('🌿 '+s.price));card.appendChild(pr);
-    const btn=document.createElement('button');
-    const isOwned=owned.includes(s.id);
-    const isSel=s.id===selectedSkin;
-    if(isSel){btn.textContent='✓ Aktiv';btn.className='selected';btn.disabled=true;}
-    else if(isOwned){btn.textContent='Auswählen';btn.className='owned';btn.onclick=()=>{selectedSkin=s.id;persistShop();renderShop();};}
-    else{btn.textContent='Kaufen';btn.disabled=totalBags<s.price;btn.onclick=()=>{
-      if(totalBags<s.price)return;
-      totalBags-=s.price;owned.push(s.id);selectedSkin=s.id;persistShop();updateBagsUI();renderShop();
-    };}
-    card.appendChild(btn);
-    skinGrid.appendChild(card);
-  }
+  renderCarousel({
+    key:'skins',
+    list,
+    isOwned:s=>owned.includes(s.id),
+    isEquipped:s=>selectedSkin===s.id,
+    priceText:s=>s.lootOnly?'🎒 Loot':(s.price===0?'Gratis':('🌿 '+s.price)),
+    lockText:s=>s.lootOnly?'🔒 Nur aus Tütchen':('🔒 GESPERRT – 🌿 '+s.price),
+    canBuy:s=>!s.lootOnly&&totalBags>=s.price,
+    buyText:s=>'🌿 KAUFEN – '+s.price,
+    buy:s=>{if(totalBags<s.price)return;totalBags-=s.price;owned.push(s.id);selectedSkin=s.id;persistShop();updateBagsUI();},
+    draw:(g,s,cv)=>drawSkinIntoCanvas(g,s,cv),
+    equip:s=>{selectedSkin=s.id;persistShop();}
+  });
 }
-
-// ---- Waffen/Joint Tabs (Loot-Inhalte) ----
-function renderLootTab(catalog,ownedList,kind){
-  for(const it of catalog){
-    const card=makeCard();
-    const isOwned=ownedList.includes(it.id);
-    const isSel=kind==='weapon'?selectedWeapon===it.id:selectedJoint===it.id;
-    if(isSel)card.classList.add('selected');
-    const cv=document.createElement('canvas');cv.width=80;cv.height=80;
-    const g=cv.getContext('2d');
-    if(kind==='weapon')drawWeaponPreview(g,it);else drawJointPreview(g,it);
-    if(!isOwned){cv.style.filter='grayscale(1) brightness(.5)';}
-    card.appendChild(cv);
-    const nm=document.createElement('div');nm.className='name';nm.textContent=it.name;card.appendChild(nm);
-    card.appendChild(rarBadge(it.rarity));
-    if(it.ability){
-      const ab=document.createElement('div');
-      ab.style.cssText='font-size:7px;line-height:1.5;color:#9ccc65;margin:2px 4px 0;text-align:center;';
-      ab.textContent='★ '+it.ability;card.appendChild(ab);
-    }
-    const pr=document.createElement('div');pr.className='price';pr.textContent=it.free?'Gratis':'🎒 Nur Loot';card.appendChild(pr);
-    const btn=document.createElement('button');
-    if(isSel){btn.textContent='✓ Aktiv';btn.className='selected';btn.disabled=true;}
-    else if(isOwned){btn.textContent='Auswählen';btn.className='owned';btn.onclick=()=>{
-      if(kind==='weapon')selectedWeapon=it.id;else selectedJoint=it.id;
-      persistLoot();renderShop();
-    };}
-    else{btn.textContent='🔒 Tütchen';btn.disabled=true;}
-    card.appendChild(btn);
-    skinGrid.appendChild(card);
+function drawSkinIntoCanvas(g,s,cv){
+  g.imageSmoothingEnabled=false;g.clearRect(0,0,80,80);
+  if(s.img){
+    const entry=loadSkinImage(s.img,s.bgKey);
+    const drawIt=()=>{
+      if(!entry.canvas)return;
+      const im=entry.canvas,sc=Math.min(76/im.width,76/im.height);
+      const w=im.width*sc,h=im.height*sc;
+      g.imageSmoothingEnabled=false;g.clearRect(0,0,80,80);
+      g.drawImage(im,(80-w)/2,(80-h)/2,w,h);
+    };
+    if(entry.ready)drawIt();
+    else{const t=setInterval(()=>{if(entry.ready){clearInterval(t);if(cv.isConnected)drawIt();}},60);setTimeout(()=>clearInterval(t),6000);}
+  }else drawSkinPreview(g,s);
+}
+function renderCarousel(cfg){
+  const list=cfg.list;
+  if(!list.length)return;
+  // Beim Öffnen auf das ausgerüstete Item springen
+  if(carIdx[cfg.key]==null||carIdx[cfg.key]>=list.length)carIdx[cfg.key]=0;
+  if(!cfg._noSnap){
+    const eq=list.findIndex(it=>cfg.isEquipped(it));
+    if(eq>=0&&!carTouched[cfg.key]){carIdx[cfg.key]=eq;carTouched[cfg.key]=true;}
   }
+  const i=carIdx[cfg.key];
+  const it=list[i];
+  const owned_=cfg.isOwned(it),eq=cfg.isEquipped(it);
+
+  const wrap=document.createElement('div');wrap.className='carWrap';
+  const row=document.createElement('div');row.className='carRow';
+  const mk=(txt,dir)=>{
+    const b=document.createElement('button');b.className='carArrow';b.textContent=txt;
+    b.setAttribute('aria-label',dir<0?'Vorheriges':'Nächstes');
+    b.onclick=()=>{carDir=dir;carIdx[cfg.key]=(i+dir+list.length)%list.length;renderShop();};
+    return b;
+  };
+  const stage=document.createElement('div');
+  stage.className='carStage carSlide'+(eq?' eq':'')+(owned_?'':' locked');
+  stage.style.setProperty('--carDir',(carDir>0?28:-28)+'px');
+  const cv=document.createElement('canvas');cv.width=80;cv.height=80;
+  stage.appendChild(cv);
+  cfg.draw(cv.getContext('2d'),it,cv);
+  if(!owned_){const lk=document.createElement('div');lk.className='carLock';lk.textContent='🔒';stage.appendChild(lk);}
+  if(eq){const e=document.createElement('div');e.className='carEq';e.textContent='AKTIV';stage.appendChild(e);}
+  row.appendChild(mk('◀',-1));row.appendChild(stage);row.appendChild(mk('▶',1));
+  wrap.appendChild(row);
+
+  const dots=document.createElement('div');dots.className='carDots';
+  for(let k=0;k<list.length;k++){const d=document.createElement('i');if(k===i)d.className='on';dots.appendChild(d);}
+  wrap.appendChild(dots);
+
+  const info=document.createElement('div');info.className='carInfo';
+  const nm=document.createElement('div');nm.className='carName';nm.textContent=it.name;info.appendChild(nm);
+  const r=RARITY[it.rarity]||RARITY.common;
+  const rr=document.createElement('div');rr.className='carRar';rr.style.color=r.color;rr.textContent=r.name;info.appendChild(rr);
+  const pr=document.createElement('div');pr.className='carPrice';pr.textContent=cfg.priceText(it);info.appendChild(pr);
+  if(it.ability){const ab=document.createElement('div');ab.className='carDesc';ab.textContent='★ '+it.ability;info.appendChild(ab);}
+  wrap.appendChild(info);
+
+  const btn=document.createElement('button');btn.className='carAct';
+  if(eq){btn.textContent='✓ AUSGERÜSTET';btn.classList.add('eq');btn.disabled=true;}
+  else if(owned_){btn.textContent='AUSRÜSTEN';btn.onclick=()=>{cfg.equip(it);renderShop();};}
+  else if(cfg.buy&&!it.lootOnly){
+    btn.textContent=cfg.buyText(it);
+    if(!cfg.canBuy(it)){btn.classList.add('lock');btn.textContent=cfg.lockText(it);btn.disabled=true;}
+    else btn.onclick=()=>{cfg.buy(it);renderShop();};
+  }else{btn.classList.add('lock');btn.textContent=cfg.lockText(it);btn.disabled=true;}
+  wrap.appendChild(btn);
+
+  skinGrid.appendChild(wrap);
 }
 
 // ---- Loot-Tütchen Tab ----
@@ -1398,6 +1468,7 @@ function drawBaggy(g,cx,cy,scale,col,openAmt,shake){
   g.restore();
 }
 function renderBoxes(){
+  skinGrid.style.display='grid';
   skinGrid.style.gridTemplateColumns='1fr';
   for(const b of LOOT_BOXES){
     const card=document.createElement('div');card.className='boxCard';
