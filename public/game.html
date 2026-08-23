@@ -5134,8 +5134,6 @@ function loop(t){
   renderPowerChips(parts);
   const hot=!!(player&&(player.invincible>0||player.jetpackT>0||player.gunT>0)&&gameState==='playing');
   if(hot!==hud.hot){hud.hot=hot;if(bagsChipEl)bagsChipEl.classList.toggle('hot',hot);}
-  const wantFire=!!(player&&player.gunT>0&&gameState==='playing');
-  if(wantFire!==hud.fire){hud.fire=wantFire;fireBtn.classList.toggle('on',wantFire);}
   // quest live tracking
   if(gameState==='playing'){
     if(bestY>questSessionHeight){questProgress('height',bestY-questSessionHeight);questSessionHeight=bestY;}
