@@ -1324,87 +1324,122 @@ function drawJointPreview(g,j,noClear){
   g.globalAlpha=1;
 }
 function makeCard(){const c=document.createElement('div');c.className='skinCard';return c;}
+// ---- Carousel-Index pro Kategorie ----
+const carIdx={skins:0,weapons:0,joints:0};
+let carDir=1;
 function renderShop(){
   skinGrid.innerHTML='';
   skinGrid.style.gridTemplateColumns=shopTab==='boxes'?'1fr':'1fr 1fr';
   for(const b of document.querySelectorAll('#shopTabs button'))b.classList.toggle('on',b.dataset.tab===shopTab);
   if(shopTab==='boxes')return renderBoxes();
-  if(shopTab==='weapons')return renderLootTab(WEAPON_SKINS,ownedWeapons,'weapon');
-  if(shopTab==='joints')return renderLootTab(JOINT_SKINS,ownedJoints,'joint');
+  skinGrid.style.display='block';
+  if(shopTab==='weapons')return renderCarousel({
+    key:'weapons',
+    list:WEAPON_SKINS,
+    isOwned:it=>ownedWeapons.includes(it.id),
+    isEquipped:it=>selectedWeapon===it.id,
+    priceText:it=>it.free?'Gratis':'🎒 Nur aus Tütchen',
+    lockText:it=>'🔒 Nur aus Tütchen',
+    draw:(g,it)=>drawWeaponPreview(g,it),
+    equip:it=>{selectedWeapon=it.id;persistLoot();}
+  });
+  if(shopTab==='joints')return renderCarousel({
+    key:'joints',
+    list:JOINT_SKINS,
+    isOwned:it=>ownedJoints.includes(it.id),
+    isEquipped:it=>selectedJoint===it.id,
+    priceText:it=>it.free?'Gratis':'🎒 Nur aus Tütchen',
+    lockText:it=>'🔒 Nur aus Tütchen',
+    draw:(g,it)=>drawJointPreview(g,it),
+    equip:it=>{selectedJoint=it.id;persistLoot();}
+  });
   const list=SKINS.filter(s=>!s.lootOnly||owned.includes(s.id));
-  for(const s of list){
-    const card=document.createElement('div');
-    card.className='skinCard'+(s.id===selectedSkin?' selected':'');
-    if(s.img){
-      const entry=loadSkinImage(s.img,s.bgKey);
-      const cvS=document.createElement('canvas');cvS.width=80;cvS.height=80;
-      const drawIt=()=>{
-        const g=cvS.getContext('2d');
-        g.imageSmoothingEnabled=false;
-        g.clearRect(0,0,80,80);
-        if(entry.canvas){
-          const im=entry.canvas;
-          const sc=Math.min(76/im.width,76/im.height);
-          const w=im.width*sc,h=im.height*sc;
-          g.drawImage(im,(80-w)/2,(80-h)/2,w,h);
-        }
-      };
-      if(entry.ready)drawIt();else{const t=setInterval(()=>{if(entry.ready){clearInterval(t);drawIt();}},60);}
-      card.appendChild(cvS);
-    }else{
-      const cvS=document.createElement('canvas');cvS.width=80;cvS.height=80;
-      drawSkinPreview(cvS.getContext('2d'),s);
-      card.appendChild(cvS);
-    }
-    const nm=document.createElement('div');nm.className='name';nm.textContent=s.name;card.appendChild(nm);
-    card.appendChild(rarBadge(s.rarity));
-    const pr=document.createElement('div');pr.className='price';
-    pr.textContent=s.lootOnly?'🎒 Loot':(s.price===0?'Gratis':('🌿 '+s.price));card.appendChild(pr);
-    const btn=document.createElement('button');
-    const isOwned=owned.includes(s.id);
-    const isSel=s.id===selectedSkin;
-    if(isSel){btn.textContent='✓ Aktiv';btn.className='selected';btn.disabled=true;}
-    else if(isOwned){btn.textContent='Auswählen';btn.className='owned';btn.onclick=()=>{selectedSkin=s.id;persistShop();renderShop();};}
-    else{btn.textContent='Kaufen';btn.disabled=totalBags<s.price;btn.onclick=()=>{
-      if(totalBags<s.price)return;
-      totalBags-=s.price;owned.push(s.id);selectedSkin=s.id;persistShop();updateBagsUI();renderShop();
-    };}
-    card.appendChild(btn);
-    skinGrid.appendChild(card);
-  }
+  renderCarousel({
+    key:'skins',
+    list,
+    isOwned:s=>owned.includes(s.id),
+    isEquipped:s=>selectedSkin===s.id,
+    priceText:s=>s.lootOnly?'🎒 Loot':(s.price===0?'Gratis':('🌿 '+s.price)),
+    lockText:s=>s.lootOnly?'🔒 Nur aus Tütchen':('🔒 GESPERRT – 🌿 '+s.price),
+    canBuy:s=>!s.lootOnly&&totalBags>=s.price,
+    buyText:s=>'🌿 KAUFEN – '+s.price,
+    buy:s=>{if(totalBags<s.price)return;totalBags-=s.price;owned.push(s.id);selectedSkin=s.id;persistShop();updateBagsUI();},
+    draw:(g,s,cv)=>drawSkinIntoCanvas(g,s,cv),
+    equip:s=>{selectedSkin=s.id;persistShop();}
+  });
 }
+function drawSkinIntoCanvas(g,s,cv){
+  g.imageSmoothingEnabled=false;g.clearRect(0,0,80,80);
+  if(s.img){
+    const entry=loadSkinImage(s.img,s.bgKey);
+    const drawIt=()=>{
+      if(!entry.canvas)return;
+      const im=entry.canvas,sc=Math.min(76/im.width,76/im.height);
+      const w=im.width*sc,h=im.height*sc;
+      g.imageSmoothingEnabled=false;g.clearRect(0,0,80,80);
+      g.drawImage(im,(80-w)/2,(80-h)/2,w,h);
+    };
+    if(entry.ready)drawIt();
+    else{const t=setInterval(()=>{if(entry.ready){clearInterval(t);if(cv.isConnected)drawIt();}},60);setTimeout(()=>clearInterval(t),6000);}
+  }else drawSkinPreview(g,s);
+}
+function renderCarousel(cfg){
+  const list=cfg.list;
+  if(!list.length)return;
+  // Beim Öffnen auf das ausgerüstete Item springen
+  if(carIdx[cfg.key]==null||carIdx[cfg.key]>=list.length)carIdx[cfg.key]=0;
+  if(!cfg._noSnap){
+    const eq=list.findIndex(it=>cfg.isEquipped(it));
+    if(eq>=0&&!carTouched[cfg.key]){carIdx[cfg.key]=eq;carTouched[cfg.key]=true;}
+  }
+  const i=carIdx[cfg.key];
+  const it=list[i];
+  const owned_=cfg.isOwned(it),eq=cfg.isEquipped(it);
 
-// ---- Waffen/Joint Tabs (Loot-Inhalte) ----
-function renderLootTab(catalog,ownedList,kind){
-  for(const it of catalog){
-    const card=makeCard();
-    const isOwned=ownedList.includes(it.id);
-    const isSel=kind==='weapon'?selectedWeapon===it.id:selectedJoint===it.id;
-    if(isSel)card.classList.add('selected');
-    const cv=document.createElement('canvas');cv.width=80;cv.height=80;
-    const g=cv.getContext('2d');
-    if(kind==='weapon')drawWeaponPreview(g,it);else drawJointPreview(g,it);
-    if(!isOwned){cv.style.filter='grayscale(1) brightness(.5)';}
-    card.appendChild(cv);
-    const nm=document.createElement('div');nm.className='name';nm.textContent=it.name;card.appendChild(nm);
-    card.appendChild(rarBadge(it.rarity));
-    if(it.ability){
-      const ab=document.createElement('div');
-      ab.style.cssText='font-size:7px;line-height:1.5;color:#9ccc65;margin:2px 4px 0;text-align:center;';
-      ab.textContent='★ '+it.ability;card.appendChild(ab);
-    }
-    const pr=document.createElement('div');pr.className='price';pr.textContent=it.free?'Gratis':'🎒 Nur Loot';card.appendChild(pr);
-    const btn=document.createElement('button');
-    if(isSel){btn.textContent='✓ Aktiv';btn.className='selected';btn.disabled=true;}
-    else if(isOwned){btn.textContent='Auswählen';btn.className='owned';btn.onclick=()=>{
-      if(kind==='weapon')selectedWeapon=it.id;else selectedJoint=it.id;
-      persistLoot();renderShop();
-    };}
-    else{btn.textContent='🔒 Tütchen';btn.disabled=true;}
-    card.appendChild(btn);
-    skinGrid.appendChild(card);
-  }
+  const wrap=document.createElement('div');wrap.className='carWrap';
+  const row=document.createElement('div');row.className='carRow';
+  const mk=(txt,dir)=>{
+    const b=document.createElement('button');b.className='carArrow';b.textContent=txt;
+    b.setAttribute('aria-label',dir<0?'Vorheriges':'Nächstes');
+    b.onclick=()=>{carDir=dir;carIdx[cfg.key]=(i+dir+list.length)%list.length;renderShop();};
+    return b;
+  };
+  const stage=document.createElement('div');
+  stage.className='carStage carSlide'+(eq?' eq':'')+(owned_?'':' locked');
+  stage.style.setProperty('--carDir',(carDir>0?28:-28)+'px');
+  const cv=document.createElement('canvas');cv.width=80;cv.height=80;
+  stage.appendChild(cv);
+  cfg.draw(cv.getContext('2d'),it,cv);
+  if(!owned_){const lk=document.createElement('div');lk.className='carLock';lk.textContent='🔒';stage.appendChild(lk);}
+  if(eq){const e=document.createElement('div');e.className='carEq';e.textContent='AKTIV';stage.appendChild(e);}
+  row.appendChild(mk('◀',-1));row.appendChild(stage);row.appendChild(mk('▶',1));
+  wrap.appendChild(row);
+
+  const dots=document.createElement('div');dots.className='carDots';
+  for(let k=0;k<list.length;k++){const d=document.createElement('i');if(k===i)d.className='on';dots.appendChild(d);}
+  wrap.appendChild(dots);
+
+  const info=document.createElement('div');info.className='carInfo';
+  const nm=document.createElement('div');nm.className='carName';nm.textContent=it.name;info.appendChild(nm);
+  const r=RARITY[it.rarity]||RARITY.common;
+  const rr=document.createElement('div');rr.className='carRar';rr.style.color=r.color;rr.textContent=r.name;info.appendChild(rr);
+  const pr=document.createElement('div');pr.className='carPrice';pr.textContent=cfg.priceText(it);info.appendChild(pr);
+  if(it.ability){const ab=document.createElement('div');ab.className='carDesc';ab.textContent='★ '+it.ability;info.appendChild(ab);}
+  wrap.appendChild(info);
+
+  const btn=document.createElement('button');btn.className='carAct';
+  if(eq){btn.textContent='✓ AUSGERÜSTET';btn.classList.add('eq');btn.disabled=true;}
+  else if(owned_){btn.textContent='AUSRÜSTEN';btn.onclick=()=>{cfg.equip(it);renderShop();};}
+  else if(cfg.buy&&!it.lootOnly){
+    btn.textContent=cfg.buyText(it);
+    if(!cfg.canBuy(it)){btn.classList.add('lock');btn.textContent=cfg.lockText(it);btn.disabled=true;}
+    else btn.onclick=()=>{cfg.buy(it);renderShop();};
+  }else{btn.classList.add('lock');btn.textContent=cfg.lockText(it);btn.disabled=true;}
+  wrap.appendChild(btn);
+
+  skinGrid.appendChild(wrap);
 }
+const carTouched={};
 
 // ---- Loot-Tütchen Tab ----
 function drawBaggy(g,cx,cy,scale,col,openAmt,shake){
