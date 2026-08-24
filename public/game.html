@@ -1184,6 +1184,7 @@ setTimeout(()=>{try{for(const k in BOSS_IMAGES)loadSkinImage(BOSS_IMAGES[k].src,
 function currentSkin(){
   const base=SKINS.find(s=>s.id===selectedSkin)||SKINS[0];
   const j=currentJoint();
+  if(base.id==='fussel')return Object.assign({},base,{dev:'bone',devImg:null});
   // equipped joint skin recolors the joint of every character skin
   return Object.assign({},base,{joint:j.paper==='RAINBOW'?rainbowCol(5):j.paper,jointTip:j.tip,dev:j.dev||'joint',devImg:j.img});
 }
@@ -3146,6 +3147,13 @@ function drawJointSprite(g,ox,oy,len,th,col,tip,tilt){
 // Zeichnet den ausgerüsteten Konsum-Gegenstand am Mund (Pixel-Look)
 function drawDevice(g,s){
   const col=s.joint||'#e8d9ac', tip=s.jointTip||'#e03a10', dev=s.dev||'joint';
+  if(dev==='bone'){
+    g.save();g.translate(4,-15);g.rotate(-0.28);
+    g.fillStyle='#f4e4bd';g.strokeStyle='#2b1a10';g.lineWidth=1;
+    g.fillRect(0,-1.5,10,3);g.strokeRect(0,-1.5,10,3);
+    for(const x of [0,10])for(const y of [-2,2]){g.beginPath();g.arc(x,y,2,0,Math.PI*2);g.fill();g.stroke();}
+    g.restore();return;
+  }
   // Pixel-Sprite des ausgerüsteten Konsum-Gegenstands (falls vorhanden)
   const di=s.devImg?itemImg(s.devImg):null;
   if(di){
