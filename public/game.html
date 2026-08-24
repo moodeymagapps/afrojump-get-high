@@ -3929,6 +3929,17 @@ function drawAstronaut(g,r){
 function drawCollectible(c){
   const y=c.y-cameraY+Math.sin(c.t*4)*3;
   if(c.type==='bag'){
+    if(selectedSkin==='fussel'){
+      // Fussel sammelt Pfoten statt Weed-Baggys (gleicher Wert und Hitbox).
+      ctx.save();ctx.translate(c.x,y);ctx.rotate(Math.sin(c.t*3)*0.08);
+      ctx.fillStyle='#9b572d';ctx.strokeStyle='#2c170d';ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.ellipse(0,4,7.5,6.5,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+      for(const [px,py,r] of [[-7,-4,3.2],[-2,-8,3.3],[4,-8,3.3],[8,-3,3.1]]){
+        ctx.beginPath();ctx.arc(px,py,r,0,Math.PI*2);ctx.fill();ctx.stroke();
+      }
+      ctx.fillStyle='rgba(255,208,145,.45)';ctx.beginPath();ctx.ellipse(-2,2,3,2.2,-.25,0,Math.PI*2);ctx.fill();
+      ctx.restore();return;
+    }
     // marijuana baggy — ziplock bag with green buds inside
     ctx.save();
     // ziplock top strip
@@ -4023,6 +4034,15 @@ function drawCollectible(c){
     ctx.beginPath();ctx.arc(15,-1,2.5,0,Math.PI*2);ctx.fill();
     ctx.restore();
   }else{
+    if(selectedSkin==='fussel'){
+      // Fussels persönliches Joint-Pickup: ein animiert schwebender Knochen.
+      ctx.save();ctx.translate(c.x,y);ctx.rotate(-0.18+Math.sin(c.t*3)*0.08);
+      ctx.fillStyle='#f4e4bd';ctx.strokeStyle='#392719';ctx.lineWidth=1.5;
+      ctx.fillRect(-8,-3,16,6);ctx.strokeRect(-8,-3,16,6);
+      for(const x of [-9,9])for(const yy of [-3,3]){ctx.beginPath();ctx.arc(x,yy,3.5,0,Math.PI*2);ctx.fill();ctx.stroke();}
+      ctx.fillStyle='rgba(255,255,255,.55)';ctx.fillRect(-6,-2,10,1.3);
+      ctx.restore();return;
+    }
     // Joint-Pickup nutzt den ausgerüsteten Joint/Konsum-Skin
     const js=itemImg(currentJoint().img)||sprite('cjoint');
     if(js){
