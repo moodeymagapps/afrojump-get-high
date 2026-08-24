@@ -959,6 +959,7 @@ const SKINS=[
   {id:'devil',      name:'Lil Devil',   price:1800, community:true, rarity:'legendary', img:'skins/devil.png',      anchorY:0.70},
   {id:'reaper',     name:'Reaper',      price:2000, community:true, rarity:'legendary', img:'skins/reaper.png',     anchorY:0.70},
   {id:'vikingskull',name:'Viking Bones',price:2100, community:true, rarity:'legendary', img:'skins/vikingskull.png',anchorY:0.70},
+  {id:'fussel',     name:'Fussel',      price:800,  community:true, rarity:'legendary', img:'/__l5e/assets-v1/1ad94750-4ea0-40f3-9b32-8b6014bc6333/fussel-atlas.png',anchorY:0.88,frames:8,frameW:320,frameH:250,bgKey:'atlas'},
 ];
 
 // ================= ÖKONOMIE, RARITÄTEN & LOOT =================
@@ -1127,7 +1128,7 @@ function loadSkinImage(src, bgKey){
       const g=c.getContext('2d',{willReadFrequently:true});
       g.imageSmoothingEnabled=false;
       g.drawImage(img,0,0);
-      entry.canvas=trimTransparent(c);
+       entry.canvas=bgKey==='atlas'?c:trimTransparent(c);
       entry.ready=true;
     }catch(e){console.warn('skin load failed',src,e);entry.canvas=null;entry.ready=true;}
   };
@@ -1374,10 +1375,14 @@ function drawSkinIntoCanvas(g,s,cv){
     const entry=loadSkinImage(s.img,s.bgKey);
     const drawIt=()=>{
       if(!entry.canvas)return;
-      const im=entry.canvas,sc=Math.min(76/im.width,76/im.height);
-      const w=im.width*sc,h=im.height*sc;
+       const im=entry.canvas,sw=s.frameW||im.width,sh=s.frameH||im.height;
+       const frame=s.frames?Math.floor(performance.now()/210)%s.frames:0;
+       const sx=(frame%4)*sw,sy=Math.floor(frame/4)*sh;
+       const sc=Math.min(76/sw,76/sh);
+       const w=sw*sc,h=sh*sc;
       g.imageSmoothingEnabled=false;g.clearRect(0,0,80,80);
-      g.drawImage(im,(80-w)/2,(80-h)/2,w,h);
+       g.drawImage(im,sx,sy,sw,sh,(80-w)/2,(80-h)/2,w,h);
+       if(s.frames&&cv.isConnected)requestAnimationFrame(drawIt);
     };
     if(entry.ready)drawIt();
     else{const t=setInterval(()=>{if(entry.ready){clearInterval(t);if(cv.isConnected)drawIt();}},60);setTimeout(()=>clearInterval(t),6000);}
@@ -2990,14 +2995,21 @@ function drawShield(x,y,inv,src){
 function drawImageSkin(g,s,inv,live){
   const entry=loadSkinImage(s.img,s.bgKey);
   if(!entry.canvas)return;
-  const im=entry.canvas;
+   const im=entry.canvas;
+   const sw=s.frameW||im.width,sh=s.frameH||im.height;
+   let frame=0;
+   if(s.frames){
+     const moving=live&&player&&Math.abs(player.vx)>0.35;
+     frame=(moving?4:0)+(Math.floor(performance.now()/(moving?105:240))%4);
+   }
+   const sx=(frame%4)*sw,sy=Math.floor(frame/4)*sh;
   // Target render height ~54px (matches vector character silhouette)
   const targetH=54;
   // Auf ganze Geräte-Pixel rasten: verhindert halbe Pixel an den Konturen
   // (Fransen/Doppelkanten) auf Retina- und Nicht-Retina-Displays.
   const k=(g===ctx?dpr:1);
   const hDev=Math.max(1,Math.round(targetH*k));
-  const wDev=Math.max(1,Math.round(im.width*(hDev/im.height)));
+   const wDev=Math.max(1,Math.round(sw*(hDev/sh)));
   const w=wDev/k, h=hDev/k;
   const anchor=s.anchorY||0.72; // vertical anchor within the image (feet ≈ 0.95)
   const dx=Math.round(-w/2*k)/k;
@@ -3013,9 +3025,9 @@ function drawImageSkin(g,s,inv,live){
     const bob=Math.sin(t*8.4)*0.45;
     g.translate(0,bob);
     g.rotate(lean);
-    g.drawImage(im,dx,dy,w,h);
+     g.drawImage(im,sx,sy,sw,sh,dx,dy,w,h);
   }else{
-    g.drawImage(im,dx,dy,w,h);
+     g.drawImage(im,sx,sy,sw,sh,dx,dy,w,h);
   }
   g.restore();
 }
