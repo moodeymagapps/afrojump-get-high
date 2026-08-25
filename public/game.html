@@ -1504,6 +1504,29 @@ function renderCarousel(cfg){
   if(it.ability){const ab=document.createElement('div');ab.className='carDesc';ab.textContent='★ '+it.ability;info.appendChild(ab);}
   wrap.appendChild(info);
 
+  if(cfg.stats){
+    const st=cfg.stats(it);
+    const panel=document.createElement('div');panel.className='carPanel';
+    for(const b of st.bars){
+      const row2=document.createElement('div');row2.className='statRow';
+      const lb=document.createElement('span');lb.className='lb';lb.textContent=b.lb;
+      const bar=document.createElement('div');bar.className='statBar';
+      const fill=document.createElement('i');
+      fill.style.background=b.v>=0.75?'#7cfc00':(b.v>=0.4?'#ffd54a':'#ff8a65');
+      bar.appendChild(fill);
+      const vl=document.createElement('span');vl.className='vl';vl.textContent=b.txt;
+      row2.appendChild(lb);row2.appendChild(bar);row2.appendChild(vl);panel.appendChild(row2);
+      requestAnimationFrame(()=>{fill.style.width=Math.round(b.v*100)+'%';});
+    }
+    if(st.good.length||st.bad.length){
+      const chips=document.createElement('div');chips.className='chips';
+      for(const g2 of st.good){const c=document.createElement('b');c.textContent='+ '+g2;chips.appendChild(c);}
+      for(const b2 of st.bad){const c=document.createElement('b');c.className='bad';c.textContent='– '+b2;chips.appendChild(c);}
+      panel.appendChild(chips);
+    }
+    wrap.appendChild(panel);
+  }
+
   const btn=document.createElement('button');btn.className='carAct';
   if(eq){btn.textContent='✓ AUSGERÜSTET';btn.classList.add('eq');btn.disabled=true;}
   else if(owned_){btn.textContent='AUSRÜSTEN';btn.onclick=()=>{cfg.equip(it);renderShop();};}
