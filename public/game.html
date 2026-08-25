@@ -1389,7 +1389,8 @@ function renderShop(){
   });
 }
 function drawSkinIntoCanvas(g,s,cv){
-  g.imageSmoothingEnabled=false;g.clearRect(0,0,80,80);
+  const S=cv.width||80, PAD=Math.round(S*0.03);
+  g.imageSmoothingEnabled=false;g.clearRect(0,0,S,S);
   if(s.img){
     const entry=loadSkinImage(s.img,s.bgKey);
     const drawIt=()=>{
@@ -1397,15 +1398,65 @@ function drawSkinIntoCanvas(g,s,cv){
        const im=entry.canvas,sw=s.frameW||im.width,sh=s.frameH||im.height;
        const frame=s.frames?Math.floor(performance.now()/210)%s.frames:0;
        const sx=(frame%4)*sw,sy=Math.floor(frame/4)*sh;
-       const sc=Math.min(76/sw,76/sh);
-       const w=sw*sc,h=sh*sc;
-      g.imageSmoothingEnabled=false;g.clearRect(0,0,80,80);
-       g.drawImage(im,sx,sy,sw,sh,(80-w)/2,(80-h)/2,w,h);
+       const box=S-PAD*2;
+       const sc=Math.min(box/sw,box/sh);
+       const w=Math.round(sw*sc),h=Math.round(sh*sc);
+      g.imageSmoothingEnabled=false;g.clearRect(0,0,S,S);
+       g.drawImage(im,sx,sy,sw,sh,Math.round((S-w)/2),Math.round((S-h)/2),w,h);
        if(s.frames&&cv.isConnected)requestAnimationFrame(drawIt);
     };
     if(entry.ready)drawIt();
     else{const t=setInterval(()=>{if(entry.ready){clearInterval(t);if(cv.isConnected)drawIt();}},60);setTimeout(()=>clearInterval(t),6000);}
-  }else drawSkinPreview(g,s);
+  }else{g.save();g.scale(S/80,S/80);drawSkinPreview(g,s);g.restore();}
+}
+// ---- Stat-/Vorteils-Aufbereitung (nur vorhandene Perk-Werte) ----
+const clamp01=v=>Math.max(0.06,Math.min(1,v));
+function weaponStats(it){
+  const p=it.perk||{};
+  const cd=p.cd||1, sp=p.speed||1;
+  const power=1+(p.pierce?1:0)+(p.blast?1:0)+(p.spread?1:0);
+  return {
+    bars:[
+      {lb:'FEUERRATE',v:clamp01((1/cd-0.85)/1.1),txt:(1/cd).toFixed(2)+'x'},
+      {lb:'KUGELSPEED',v:clamp01((sp-0.9)/0.7),txt:sp.toFixed(2)+'x'},
+      {lb:'WIRKUNG',v:clamp01(power/3),txt:power+'/3'},
+      {lb:'DAUER',v:clamp01((5+(p.gun||0))/7),txt:(5+(p.gun||0))+'s'},
+    ],
+    good:[
+      p.cd&&p.cd<=0.6?'DAUERFEUER':(p.cd&&p.cd<0.85?'HOHE FEUERRATE':null),
+      p.speed>=1.3?'SEHR SCHNELL':null,
+      p.spread?'DOPPELSCHUSS':null,
+      p.pierce?'DURCHSCHLAG':null,
+      p.blast?'FLAECHENSCHADEN':null,
+      p.gun?'+'+p.gun+'S WAFFENZEIT':null,
+    ].filter(Boolean),
+    bad:[
+      (!p.cd||p.cd>0.85)&&!p.spread?'MITTLERE FEUERRATE':null,
+      sp<1.1&&!p.blast?'NORMALE FLUGBAHN':null,
+      !p.pierce&&!p.blast?'TRIFFT NUR 1 ZIEL':null,
+    ].filter(Boolean),
+  };
+}
+function jointStats(it){
+  const p=it.perk||{};
+  return {
+    bars:[
+      {lb:'SCHUTZZEIT',v:clamp01((p.inv||0)/3),txt:'+'+(p.inv||0)+'s'},
+      {lb:'STARTSCHILD',v:clamp01((p.shield||0)/3),txt:'+'+(p.shield||0)+'s'},
+      {lb:'BAGGY-BONUS',v:clamp01((p.bags||0)/3),txt:'+'+(p.bags||0)+' 🌿'},
+      {lb:'MAGNET',v:clamp01((p.magnet||0)/22),txt:(p.magnet||0)+'px'},
+      {lb:'SPRUNGKRAFT',v:clamp01(((p.jump||1)-1)/0.12),txt:'+'+Math.round(((p.jump||1)-1)*100)+'%'},
+    ],
+    good:[
+      p.inv?'+'+p.inv+'S UNVERWUNDBAR':null,
+      p.shield?p.shield+'S STARTSCHUTZ':null,
+      p.bags?'+'+p.bags+' 🌿 PRO TUETCHEN':null,
+      p.magnet?'SAMMEL-MAGNET':null,
+      p.jump?'+'+Math.round((p.jump-1)*100)+'% SPRUNG':null,
+      p.gun?'+'+p.gun+'S WAFFENZEIT':null,
+    ].filter(Boolean),
+    bad:Object.keys(p).length?[]:['KEINE BONI'],
+  };
 }
 function renderCarousel(cfg){
   const list=cfg.list;
