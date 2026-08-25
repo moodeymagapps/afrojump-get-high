@@ -1361,6 +1361,8 @@ function renderShop(){
     priceText:it=>it.free?'Gratis':'🎒 Nur aus Tütchen',
     lockText:it=>'🔒 Nur aus Tütchen',
     draw:(g,it)=>drawWeaponPreview(g,it),
+    stats:weaponStats,
+    idle:true,
     equip:it=>{selectedWeapon=it.id;persistLoot();}
   });
   if(shopTab==='joints')return renderCarousel({
@@ -1371,6 +1373,8 @@ function renderShop(){
     priceText:it=>it.free?'Gratis':'🎒 Nur aus Tütchen',
     lockText:it=>'🔒 Nur aus Tütchen',
     draw:(g,it)=>drawJointPreview(g,it),
+    stats:jointStats,
+    idle:true,
     equip:it=>{selectedJoint=it.id;persistLoot();}
   });
   const list=SKINS.filter(s=>!s.lootOnly||owned.includes(s.id));
@@ -1385,6 +1389,7 @@ function renderShop(){
     buyText:s=>'🌿 KAUFEN – '+s.price,
     buy:s=>{if(totalBags<s.price)return;totalBags-=s.price;owned.push(s.id);selectedSkin=s.id;persistShop();updateBagsUI();},
     draw:(g,s,cv)=>drawSkinIntoCanvas(g,s,cv),
+    big:true, canvasSize:160, idle:true,
     equip:s=>{selectedSkin=s.id;persistShop();}
   });
 }
