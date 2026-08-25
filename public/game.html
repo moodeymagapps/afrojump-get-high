@@ -1480,9 +1480,11 @@ function renderCarousel(cfg){
     return b;
   };
   const stage=document.createElement('div');
-  stage.className='carStage carSlide'+(eq?' eq':'')+(owned_?'':' locked');
+  stage.className='carStage carSlide'+(eq?' eq':'')+(owned_?'':' locked')+(cfg.big?' big':'');
   stage.style.setProperty('--carDir',(carDir>0?28:-28)+'px');
-  const cv=document.createElement('canvas');cv.width=80;cv.height=80;
+  const cs=cfg.canvasSize||80;
+  const cv=document.createElement('canvas');cv.width=cs;cv.height=cs;
+  if(cfg.idle)cv.className='idle';
   stage.appendChild(cv);
   cfg.draw(cv.getContext('2d'),it,cv);
   if(!owned_){const lk=document.createElement('div');lk.className='carLock';lk.textContent='🔒';stage.appendChild(lk);}
