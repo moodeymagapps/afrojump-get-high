@@ -131,18 +131,35 @@
   .carStage.eq{box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #7cfc00, 0 0 14px rgba(124,252,0,.35);}
   .carStage canvas{width:160px;height:160px;image-rendering:pixelated;object-fit:contain;background:transparent;}
   .carStage.locked canvas{filter:grayscale(1) brightness(.55);}
+  .carStage.big{height:236px;}
+  .carStage.big canvas{width:210px;height:210px;}
+  .carStage canvas.idle{animation:carIdle 2.6s ease-in-out infinite;}
+  @keyframes carIdle{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-5px) scale(1.02);}}
+  @media (prefers-reduced-motion:reduce){.carStage canvas.idle{animation:none;}}
   .carLock{position:absolute;top:6px;right:8px;font-size:18px;filter:drop-shadow(0 2px 0 #000);}
   .carEq{position:absolute;top:6px;left:8px;font-family:'Press Start 2P',monospace;font-size:7px;color:#7cfc00;text-shadow:1px 1px 0 #000;}
   .carSlide{animation:carIn .18s ease-out both;}
   @keyframes carIn{from{opacity:0;transform:translateX(var(--carDir,28px)) scale(.94);}to{opacity:1;transform:translateX(0) scale(1);}}
   .carDots{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;}
-  .carDots i{width:6px;height:6px;background:#4a2c73;display:block;}
-  .carDots i.on{background:#7cfc00;}
+  .carDots i{width:6px;height:6px;background:#4a2c73;display:block;transition:background .15s ease,transform .15s ease;}
+  .carDots i.on{background:#7cfc00;transform:scale(1.35);}
   .carInfo{text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;}
   .carName{font-family:'Press Start 2P',monospace;font-size:13px;color:#fff;text-shadow:2px 2px 0 #000;letter-spacing:.5px;line-height:1.5;}
   .carRar{font-family:'Press Start 2P',monospace;font-size:8px;letter-spacing:1px;}
   .carPrice{font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:10px;color:#7cfc00;}
   .carDesc{font-family:'Press Start 2P',monospace;font-size:7px;line-height:1.7;color:#9ccc65;max-width:300px;}
+  /* Stat-Panel */
+  .carPanel{width:100%;background:#150e26;padding:10px 12px;display:flex;flex-direction:column;gap:7px;
+    box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #3a2360, 0 4px 0 #000;animation:carIn .18s ease-out both;}
+  .statRow{display:flex;align-items:center;gap:7px;}
+  .statRow .lb{font-family:'Press Start 2P',monospace;font-size:6.5px;color:#cfc3e8;letter-spacing:.5px;flex:0 0 92px;text-align:left;}
+  .statBar{flex:1 1 auto;height:9px;background:#0b0716;box-shadow:inset 2px 2px 0 #000;position:relative;overflow:hidden;}
+  .statBar i{display:block;height:100%;width:0;background:#7cfc00;transition:width .3s cubic-bezier(.2,.9,.2,1);}
+  .statRow .vl{font-family:'Press Start 2P',monospace;font-size:6.5px;color:#fff;flex:0 0 44px;text-align:right;}
+  .chips{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;}
+  .chips b{font-family:'Press Start 2P',monospace;font-size:6.5px;font-weight:400;letter-spacing:.5px;padding:5px 6px;line-height:1.2;
+    background:#0d3d00;color:#a8ff6a;box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #3f7d1f;}
+  .chips b.bad{background:#3d1010;color:#ff9c8f;box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #7a2a2a;}
   .carAct{width:100%;padding:14px 10px;border:none;cursor:pointer;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;
     font-size:10px;letter-spacing:1px;background:#4caf50;color:#fff;
     box-shadow:inset -3px -3px 0 #1b5e20, inset 3px 3px 0 #a5d6a7, 0 4px 0 #1b5e20;transition:transform .1s ease,filter .15s ease;}
@@ -151,7 +168,8 @@
   .carAct.eq{background:#7cfc00;color:#111;box-shadow:inset -3px -3px 0 #3d7d00, inset 3px 3px 0 #d4ffb3, 0 4px 0 #3d7d00;}
   .carAct.lock{background:#4a1414;color:#e6a;box-shadow:inset -3px -3px 0 #200, inset 3px 3px 0 #7a2a2a, 0 4px 0 #200;}
   .carAct:disabled{cursor:not-allowed;}
-  @media (max-width:420px){.carArrow{width:46px;height:84px;}.carStage{height:170px;}.carStage canvas{width:140px;height:140px;}.carName{font-size:11px;}}
+  @media (max-width:420px){.carArrow{width:46px;height:84px;}.carStage{height:170px;}.carStage canvas{width:140px;height:140px;}
+    .carStage.big{height:212px;}.carStage.big canvas{width:186px;height:186px;}.carName{font-size:11px;}}
   .skinCard{background:#1b1230;border:none;padding:8px;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #4a2c73;image-rendering:pixelated;}
   .skinCard.selected{background:#0d3d00;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #7cfc00, 0 0 12px rgba(124,252,0,.5);}
   .skinCard canvas,.skinCard .thumb{background:linear-gradient(#87ceeb,#c9e9f6);width:80px;height:80px;box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 rgba(255,255,255,.4);image-rendering:pixelated;object-fit:contain;}
@@ -1343,6 +1361,8 @@ function renderShop(){
     priceText:it=>it.free?'Gratis':'🎒 Nur aus Tütchen',
     lockText:it=>'🔒 Nur aus Tütchen',
     draw:(g,it)=>drawWeaponPreview(g,it),
+    stats:weaponStats,
+    idle:true,
     equip:it=>{selectedWeapon=it.id;persistLoot();}
   });
   if(shopTab==='joints')return renderCarousel({
@@ -1353,6 +1373,8 @@ function renderShop(){
     priceText:it=>it.free?'Gratis':'🎒 Nur aus Tütchen',
     lockText:it=>'🔒 Nur aus Tütchen',
     draw:(g,it)=>drawJointPreview(g,it),
+    stats:jointStats,
+    idle:true,
     equip:it=>{selectedJoint=it.id;persistLoot();}
   });
   const list=SKINS.filter(s=>!s.lootOnly||owned.includes(s.id));
@@ -1367,11 +1389,13 @@ function renderShop(){
     buyText:s=>'🌿 KAUFEN – '+s.price,
     buy:s=>{if(totalBags<s.price)return;totalBags-=s.price;owned.push(s.id);selectedSkin=s.id;persistShop();updateBagsUI();},
     draw:(g,s,cv)=>drawSkinIntoCanvas(g,s,cv),
+    big:true, canvasSize:160, idle:true,
     equip:s=>{selectedSkin=s.id;persistShop();}
   });
 }
 function drawSkinIntoCanvas(g,s,cv){
-  g.imageSmoothingEnabled=false;g.clearRect(0,0,80,80);
+  const S=cv.width||80, PAD=Math.round(S*0.03);
+  g.imageSmoothingEnabled=false;g.clearRect(0,0,S,S);
   if(s.img){
     const entry=loadSkinImage(s.img,s.bgKey);
     const drawIt=()=>{
@@ -1379,15 +1403,65 @@ function drawSkinIntoCanvas(g,s,cv){
        const im=entry.canvas,sw=s.frameW||im.width,sh=s.frameH||im.height;
        const frame=s.frames?Math.floor(performance.now()/210)%s.frames:0;
        const sx=(frame%4)*sw,sy=Math.floor(frame/4)*sh;
-       const sc=Math.min(76/sw,76/sh);
-       const w=sw*sc,h=sh*sc;
-      g.imageSmoothingEnabled=false;g.clearRect(0,0,80,80);
-       g.drawImage(im,sx,sy,sw,sh,(80-w)/2,(80-h)/2,w,h);
+       const box=S-PAD*2;
+       const sc=Math.min(box/sw,box/sh);
+       const w=Math.round(sw*sc),h=Math.round(sh*sc);
+      g.imageSmoothingEnabled=false;g.clearRect(0,0,S,S);
+       g.drawImage(im,sx,sy,sw,sh,Math.round((S-w)/2),Math.round((S-h)/2),w,h);
        if(s.frames&&cv.isConnected)requestAnimationFrame(drawIt);
     };
     if(entry.ready)drawIt();
     else{const t=setInterval(()=>{if(entry.ready){clearInterval(t);if(cv.isConnected)drawIt();}},60);setTimeout(()=>clearInterval(t),6000);}
-  }else drawSkinPreview(g,s);
+  }else{g.save();g.scale(S/80,S/80);drawSkinPreview(g,s);g.restore();}
+}
+// ---- Stat-/Vorteils-Aufbereitung (nur vorhandene Perk-Werte) ----
+const clamp01=v=>Math.max(0.06,Math.min(1,v));
+function weaponStats(it){
+  const p=it.perk||{};
+  const cd=p.cd||1, sp=p.speed||1;
+  const power=1+(p.pierce?1:0)+(p.blast?1:0)+(p.spread?1:0);
+  return {
+    bars:[
+      {lb:'FEUERRATE',v:clamp01((1/cd-0.85)/1.1),txt:(1/cd).toFixed(2)+'x'},
+      {lb:'KUGELSPEED',v:clamp01((sp-0.9)/0.7),txt:sp.toFixed(2)+'x'},
+      {lb:'WIRKUNG',v:clamp01(power/3),txt:power+'/3'},
+      {lb:'DAUER',v:clamp01((5+(p.gun||0))/7),txt:(5+(p.gun||0))+'s'},
+    ],
+    good:[
+      p.cd&&p.cd<=0.6?'DAUERFEUER':(p.cd&&p.cd<0.85?'HOHE FEUERRATE':null),
+      p.speed>=1.3?'SEHR SCHNELL':null,
+      p.spread?'DOPPELSCHUSS':null,
+      p.pierce?'DURCHSCHLAG':null,
+      p.blast?'FLAECHENSCHADEN':null,
+      p.gun?'+'+p.gun+'S WAFFENZEIT':null,
+    ].filter(Boolean),
+    bad:[
+      (!p.cd||p.cd>0.85)&&!p.spread?'MITTLERE FEUERRATE':null,
+      sp<1.1&&!p.blast?'NORMALE FLUGBAHN':null,
+      !p.pierce&&!p.blast?'TRIFFT NUR 1 ZIEL':null,
+    ].filter(Boolean),
+  };
+}
+function jointStats(it){
+  const p=it.perk||{};
+  return {
+    bars:[
+      {lb:'SCHUTZZEIT',v:clamp01((p.inv||0)/3),txt:'+'+(p.inv||0)+'s'},
+      {lb:'STARTSCHILD',v:clamp01((p.shield||0)/3),txt:'+'+(p.shield||0)+'s'},
+      {lb:'BAGGY-BONUS',v:clamp01((p.bags||0)/3),txt:'+'+(p.bags||0)+' 🌿'},
+      {lb:'MAGNET',v:clamp01((p.magnet||0)/22),txt:(p.magnet||0)+'px'},
+      {lb:'SPRUNGKRAFT',v:clamp01(((p.jump||1)-1)/0.12),txt:'+'+Math.round(((p.jump||1)-1)*100)+'%'},
+    ],
+    good:[
+      p.inv?'+'+p.inv+'S UNVERWUNDBAR':null,
+      p.shield?p.shield+'S STARTSCHUTZ':null,
+      p.bags?'+'+p.bags+' 🌿 PRO TUETCHEN':null,
+      p.magnet?'SAMMEL-MAGNET':null,
+      p.jump?'+'+Math.round((p.jump-1)*100)+'% SPRUNG':null,
+      p.gun?'+'+p.gun+'S WAFFENZEIT':null,
+    ].filter(Boolean),
+    bad:Object.keys(p).length?[]:['KEINE BONI'],
+  };
 }
 function renderCarousel(cfg){
   const list=cfg.list;
@@ -1411,9 +1485,11 @@ function renderCarousel(cfg){
     return b;
   };
   const stage=document.createElement('div');
-  stage.className='carStage carSlide'+(eq?' eq':'')+(owned_?'':' locked');
+  stage.className='carStage carSlide'+(eq?' eq':'')+(owned_?'':' locked')+(cfg.big?' big':'');
   stage.style.setProperty('--carDir',(carDir>0?28:-28)+'px');
-  const cv=document.createElement('canvas');cv.width=80;cv.height=80;
+  const cs=cfg.canvasSize||80;
+  const cv=document.createElement('canvas');cv.width=cs;cv.height=cs;
+  if(cfg.idle)cv.className='idle';
   stage.appendChild(cv);
   cfg.draw(cv.getContext('2d'),it,cv);
   if(!owned_){const lk=document.createElement('div');lk.className='carLock';lk.textContent='🔒';stage.appendChild(lk);}
@@ -1432,6 +1508,29 @@ function renderCarousel(cfg){
   const pr=document.createElement('div');pr.className='carPrice';pr.textContent=cfg.priceText(it);info.appendChild(pr);
   if(it.ability){const ab=document.createElement('div');ab.className='carDesc';ab.textContent='★ '+it.ability;info.appendChild(ab);}
   wrap.appendChild(info);
+
+  if(cfg.stats){
+    const st=cfg.stats(it);
+    const panel=document.createElement('div');panel.className='carPanel';
+    for(const b of st.bars){
+      const row2=document.createElement('div');row2.className='statRow';
+      const lb=document.createElement('span');lb.className='lb';lb.textContent=b.lb;
+      const bar=document.createElement('div');bar.className='statBar';
+      const fill=document.createElement('i');
+      fill.style.background=b.v>=0.75?'#7cfc00':(b.v>=0.4?'#ffd54a':'#ff8a65');
+      bar.appendChild(fill);
+      const vl=document.createElement('span');vl.className='vl';vl.textContent=b.txt;
+      row2.appendChild(lb);row2.appendChild(bar);row2.appendChild(vl);panel.appendChild(row2);
+      requestAnimationFrame(()=>{fill.style.width=Math.round(b.v*100)+'%';});
+    }
+    if(st.good.length||st.bad.length){
+      const chips=document.createElement('div');chips.className='chips';
+      for(const g2 of st.good){const c=document.createElement('b');c.textContent='+ '+g2;chips.appendChild(c);}
+      for(const b2 of st.bad){const c=document.createElement('b');c.className='bad';c.textContent='– '+b2;chips.appendChild(c);}
+      panel.appendChild(chips);
+    }
+    wrap.appendChild(panel);
+  }
 
   const btn=document.createElement('button');btn.className='carAct';
   if(eq){btn.textContent='✓ AUSGERÜSTET';btn.classList.add('eq');btn.disabled=true;}
