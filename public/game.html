@@ -131,18 +131,35 @@
   .carStage.eq{box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #7cfc00, 0 0 14px rgba(124,252,0,.35);}
   .carStage canvas{width:160px;height:160px;image-rendering:pixelated;object-fit:contain;background:transparent;}
   .carStage.locked canvas{filter:grayscale(1) brightness(.55);}
+  .carStage.big{height:236px;}
+  .carStage.big canvas{width:210px;height:210px;}
+  .carStage canvas.idle{animation:carIdle 2.6s ease-in-out infinite;}
+  @keyframes carIdle{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-5px) scale(1.02);}}
+  @media (prefers-reduced-motion:reduce){.carStage canvas.idle{animation:none;}}
   .carLock{position:absolute;top:6px;right:8px;font-size:18px;filter:drop-shadow(0 2px 0 #000);}
   .carEq{position:absolute;top:6px;left:8px;font-family:'Press Start 2P',monospace;font-size:7px;color:#7cfc00;text-shadow:1px 1px 0 #000;}
   .carSlide{animation:carIn .18s ease-out both;}
   @keyframes carIn{from{opacity:0;transform:translateX(var(--carDir,28px)) scale(.94);}to{opacity:1;transform:translateX(0) scale(1);}}
   .carDots{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;}
-  .carDots i{width:6px;height:6px;background:#4a2c73;display:block;}
-  .carDots i.on{background:#7cfc00;}
+  .carDots i{width:6px;height:6px;background:#4a2c73;display:block;transition:background .15s ease,transform .15s ease;}
+  .carDots i.on{background:#7cfc00;transform:scale(1.35);}
   .carInfo{text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;}
   .carName{font-family:'Press Start 2P',monospace;font-size:13px;color:#fff;text-shadow:2px 2px 0 #000;letter-spacing:.5px;line-height:1.5;}
   .carRar{font-family:'Press Start 2P',monospace;font-size:8px;letter-spacing:1px;}
   .carPrice{font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:10px;color:#7cfc00;}
   .carDesc{font-family:'Press Start 2P',monospace;font-size:7px;line-height:1.7;color:#9ccc65;max-width:300px;}
+  /* Stat-Panel */
+  .carPanel{width:100%;background:#150e26;padding:10px 12px;display:flex;flex-direction:column;gap:7px;
+    box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #3a2360, 0 4px 0 #000;animation:carIn .18s ease-out both;}
+  .statRow{display:flex;align-items:center;gap:7px;}
+  .statRow .lb{font-family:'Press Start 2P',monospace;font-size:6.5px;color:#cfc3e8;letter-spacing:.5px;flex:0 0 92px;text-align:left;}
+  .statBar{flex:1 1 auto;height:9px;background:#0b0716;box-shadow:inset 2px 2px 0 #000;position:relative;overflow:hidden;}
+  .statBar i{display:block;height:100%;width:0;background:#7cfc00;transition:width .3s cubic-bezier(.2,.9,.2,1);}
+  .statRow .vl{font-family:'Press Start 2P',monospace;font-size:6.5px;color:#fff;flex:0 0 44px;text-align:right;}
+  .chips{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;}
+  .chips b{font-family:'Press Start 2P',monospace;font-size:6.5px;font-weight:400;letter-spacing:.5px;padding:5px 6px;line-height:1.2;
+    background:#0d3d00;color:#a8ff6a;box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #3f7d1f;}
+  .chips b.bad{background:#3d1010;color:#ff9c8f;box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #7a2a2a;}
   .carAct{width:100%;padding:14px 10px;border:none;cursor:pointer;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;
     font-size:10px;letter-spacing:1px;background:#4caf50;color:#fff;
     box-shadow:inset -3px -3px 0 #1b5e20, inset 3px 3px 0 #a5d6a7, 0 4px 0 #1b5e20;transition:transform .1s ease,filter .15s ease;}
@@ -151,7 +168,8 @@
   .carAct.eq{background:#7cfc00;color:#111;box-shadow:inset -3px -3px 0 #3d7d00, inset 3px 3px 0 #d4ffb3, 0 4px 0 #3d7d00;}
   .carAct.lock{background:#4a1414;color:#e6a;box-shadow:inset -3px -3px 0 #200, inset 3px 3px 0 #7a2a2a, 0 4px 0 #200;}
   .carAct:disabled{cursor:not-allowed;}
-  @media (max-width:420px){.carArrow{width:46px;height:84px;}.carStage{height:170px;}.carStage canvas{width:140px;height:140px;}.carName{font-size:11px;}}
+  @media (max-width:420px){.carArrow{width:46px;height:84px;}.carStage{height:170px;}.carStage canvas{width:140px;height:140px;}
+    .carStage.big{height:212px;}.carStage.big canvas{width:186px;height:186px;}.carName{font-size:11px;}}
   .skinCard{background:#1b1230;border:none;padding:8px;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #4a2c73;image-rendering:pixelated;}
   .skinCard.selected{background:#0d3d00;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #7cfc00, 0 0 12px rgba(124,252,0,.5);}
   .skinCard canvas,.skinCard .thumb{background:linear-gradient(#87ceeb,#c9e9f6);width:80px;height:80px;box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 rgba(255,255,255,.4);image-rendering:pixelated;object-fit:contain;}
