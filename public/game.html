@@ -4160,6 +4160,21 @@ function drawCollectible(c){
     ctx.beginPath();ctx.arc(15,-1,2.5,0,Math.PI*2);ctx.fill();
     ctx.restore();
   }else{
+    if(MOUSE_SKINS.has(selectedSkin)){
+      // Bubi/Bebi: Mehlwurm-Pickup (nur Optik, identische Funktion)
+      const wi=itemImg(MEALWORM_IMG);
+      if(wi){
+        ctx.save();ctx.imageSmoothingEnabled=false;
+        const sc=Math.min(24/wi.width,20/wi.height);
+        const ww=wi.width*sc,hh=wi.height*sc;
+        ctx.translate(c.x,y);ctx.rotate(-0.1+Math.sin(c.t*3)*0.08);
+        drawSpriteSnapped(ctx,wi,-ww/2,-hh/2,ww,hh);
+        ctx.restore();
+        ctx.fillStyle='rgba(255,255,255,'+(0.3+0.3*Math.sin(c.t*6))+')';
+        ctx.beginPath();ctx.arc(c.x+9,y-10,2.2,0,Math.PI*2);ctx.fill();
+        return;
+      }
+    }
     if(selectedSkin==='fussel'){
       // Fussels persönliches Joint-Pickup: ein animiert schwebender Knochen.
       ctx.save();ctx.translate(c.x,y);ctx.rotate(-0.18+Math.sin(c.t*3)*0.08);
