@@ -1205,6 +1205,8 @@ function currentSkin(){
   const base=SKINS.find(s=>s.id===selectedSkin)||SKINS[0];
   const j=currentJoint();
   if(base.id==='fussel')return Object.assign({},base,{dev:'bone',devImg:null});
+  // Bubi/Bebi tragen einen Mehlwurm statt eines Joints (rein optisch)
+  if(MOUSE_SKINS.has(base.id))return Object.assign({},base,{dev:'worm',devImg:MEALWORM_IMG});
   // equipped joint skin recolors the joint of every character skin
   return Object.assign({},base,{joint:j.paper==='RAINBOW'?rainbowCol(5):j.paper,jointTip:j.tip,dev:j.dev||'joint',devImg:j.img});
 }
