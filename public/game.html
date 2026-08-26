@@ -978,7 +978,12 @@ const SKINS=[
   {id:'reaper',     name:'Reaper',      price:2000, community:true, rarity:'legendary', img:'skins/reaper.png',     anchorY:0.70},
   {id:'vikingskull',name:'Viking Bones',price:2100, community:true, rarity:'legendary', img:'skins/vikingskull.png',anchorY:0.70},
   {id:'fussel',     name:'Fussel',      price:800,  community:true, rarity:'legendary', img:'/__l5e/assets-v1/1ad94750-4ea0-40f3-9b32-8b6014bc6333/fussel-atlas.png',anchorY:0.88,frames:8,frameW:320,frameH:250,bgKey:'atlas'},
+  {id:'bubi',       name:'Bubi',        price:900,  community:true, rarity:'legendary', img:'/__l5e/assets-v1/0d932b0c-c6bc-4130-9118-3954d4d3e222/bubi-atlas.png',anchorY:0.88,frames:8,frameW:320,frameH:250,bgKey:'atlas'},
+  {id:'bebi',       name:'Bebi',        price:900,  community:true, rarity:'legendary', img:'/__l5e/assets-v1/418ee147-9c65-4884-9d13-54683c841d97/bebi-atlas.png',anchorY:0.88,frames:8,frameW:320,frameH:250,bgKey:'atlas'},
 ];
+// Maus-Skins: nur optische Item-Varianten (Käse statt Baggy, Mehlwurm statt Joint)
+const MOUSE_SKINS=new Set(['bubi','bebi']);
+const MEALWORM_IMG='/__l5e/assets-v1/03c8413a-6af7-4df2-b5de-08b91f2b4a78/mealworm.png';
 
 // ================= ÖKONOMIE, RARITÄTEN & LOOT =================
 // Rarity colors/labels used by shop cards and the loot animation
@@ -1203,6 +1208,8 @@ function currentSkin(){
   const base=SKINS.find(s=>s.id===selectedSkin)||SKINS[0];
   const j=currentJoint();
   if(base.id==='fussel')return Object.assign({},base,{dev:'bone',devImg:null});
+  // Bubi/Bebi tragen einen Mehlwurm statt eines Joints (rein optisch)
+  if(MOUSE_SKINS.has(base.id))return Object.assign({},base,{dev:'worm',devImg:MEALWORM_IMG});
   // equipped joint skin recolors the joint of every character skin
   return Object.assign({},base,{joint:j.paper==='RAINBOW'?rainbowCol(5):j.paper,jointTip:j.tip,dev:j.dev||'joint',devImg:j.img});
 }
@@ -4036,6 +4043,18 @@ function drawAstronaut(g,r){
 function drawCollectible(c){
   const y=c.y-cameraY+Math.sin(c.t*4)*3;
   if(c.type==='bag'){
+    if(MOUSE_SKINS.has(selectedSkin)){
+      // Bubi/Bebi sammeln Käse statt Weed-Baggys (gleicher Wert und Hitbox).
+      ctx.save();ctx.translate(c.x,y);ctx.rotate(Math.sin(c.t*3)*0.06);
+      ctx.strokeStyle='#7a4a10';ctx.lineWidth=1.5;
+      ctx.fillStyle='#ffcf3d';
+      ctx.beginPath();ctx.moveTo(-11,7);ctx.lineTo(11,7);ctx.lineTo(11,0);ctx.lineTo(-2,-9);ctx.closePath();ctx.fill();ctx.stroke();
+      ctx.fillStyle='#ffe487';
+      ctx.beginPath();ctx.moveTo(-11,7);ctx.lineTo(11,0);ctx.lineTo(11,-1.5);ctx.lineTo(-2,-9);ctx.closePath();ctx.fill();
+      ctx.fillStyle='#e8a91d';
+      for(const [hx,hy,r] of [[-4,3,2.1],[3,2,1.7],[7,4,1.3],[-8,5,1.2]]){ctx.beginPath();ctx.arc(hx,hy,r,0,Math.PI*2);ctx.fill();}
+      ctx.restore();return;
+    }
     if(selectedSkin==='fussel'){
       // Fussel sammelt Pfoten statt Weed-Baggys (gleicher Wert und Hitbox).
       ctx.save();ctx.translate(c.x,y);ctx.rotate(Math.sin(c.t*3)*0.08);
@@ -4141,6 +4160,21 @@ function drawCollectible(c){
     ctx.beginPath();ctx.arc(15,-1,2.5,0,Math.PI*2);ctx.fill();
     ctx.restore();
   }else{
+    if(MOUSE_SKINS.has(selectedSkin)){
+      // Bubi/Bebi: Mehlwurm-Pickup (nur Optik, identische Funktion)
+      const wi=itemImg(MEALWORM_IMG);
+      if(wi){
+        ctx.save();ctx.imageSmoothingEnabled=false;
+        const sc=Math.min(24/wi.width,20/wi.height);
+        const ww=wi.width*sc,hh=wi.height*sc;
+        ctx.translate(c.x,y);ctx.rotate(-0.1+Math.sin(c.t*3)*0.08);
+        drawSpriteSnapped(ctx,wi,-ww/2,-hh/2,ww,hh);
+        ctx.restore();
+        ctx.fillStyle='rgba(255,255,255,'+(0.3+0.3*Math.sin(c.t*6))+')';
+        ctx.beginPath();ctx.arc(c.x+9,y-10,2.2,0,Math.PI*2);ctx.fill();
+        return;
+      }
+    }
     if(selectedSkin==='fussel'){
       // Fussels persönliches Joint-Pickup: ein animiert schwebender Knochen.
       ctx.save();ctx.translate(c.x,y);ctx.rotate(-0.18+Math.sin(c.t*3)*0.08);
