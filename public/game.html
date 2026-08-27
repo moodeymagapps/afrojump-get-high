@@ -84,9 +84,13 @@
   #over h1{animation:overIn .28s cubic-bezier(.2,1.5,.4,1) both;}
   /* Splash Screen */
   #splash{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;
-    background:radial-gradient(circle at 50% 40%,#1c1330,#07060d 75%);transition:opacity .32s ease, transform .32s ease;will-change:opacity,transform;}
-  #splash img{width:min(72%,320px);image-rendering:pixelated;animation:splashPop .58s cubic-bezier(.18,1.7,.35,1) both;filter:drop-shadow(0 8px 0 rgba(0,0,0,.5));}
-  #splash .sTag{margin-top:14px;font-family:'Press Start 2P',monospace;font-size:9px;letter-spacing:2px;color:#7cfc00;opacity:0;animation:splashTag .4s ease-out .34s both;text-shadow:2px 2px 0 #000;}
+    background:#07060d;transition:opacity .32s ease, transform .32s ease;will-change:opacity,transform;overflow:hidden;}
+  #splash::before{content:'';position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(to bottom,rgba(7,6,13,.55),rgba(7,6,13,.88)),url('/__l5e/assets-v1/5b50de1a-bbfe-490b-9628-fc8f03c25d33/afro-jump-keyart.jpg') center/cover no-repeat;
+    animation:splashArt 1.1s ease-out both;}
+  @keyframes splashArt{from{opacity:0;transform:scale(1.08)}to{opacity:1;transform:scale(1)}}
+  #splash img{position:relative;width:min(72%,320px);image-rendering:pixelated;animation:splashPop .58s cubic-bezier(.18,1.7,.35,1) both;filter:drop-shadow(0 8px 0 rgba(0,0,0,.5));}
+  #splash .sTag{position:relative;margin-top:14px;font-family:'Press Start 2P',monospace;font-size:10px;letter-spacing:3px;color:#8dff2b;opacity:0;animation:splashTag .4s ease-out .34s both;text-shadow:2px 2px 0 #000,0 0 14px rgba(124,252,0,.55);}
   #splash.hide{opacity:0;transform:scale(1.04);pointer-events:none;}
   @keyframes splashPop{0%{opacity:0;transform:scale(.7)}60%{opacity:1;transform:scale(1.06)}100%{opacity:1;transform:scale(1)}}
   @keyframes splashTag{from{opacity:0;transform:translateY(6px)}to{opacity:.85;transform:none}}
@@ -642,7 +646,7 @@
   </div>
   <div id="menu" class="overlay">
     <img class="logoImg" src="/__l5e/assets-v1/69274bbc-7857-4d3d-a4d3-4747a688e509/afro-jump-logo.png" alt="Afro Jump">
-    <div class="tag">Doodle-Style Highscore Game</div>
+    <div class="tag">JUMP HIGH.</div>
     <p id="menuHigh">Best: 0m</p>
     <p id="menuBags">🌿 0 Baggys</p>
     <button class="btn v-green" id="menuPlay">▶ Spielen</button>
@@ -775,7 +779,7 @@
   </div>
 </div>
 <div id="wipe"></div>
-<div id="splash"><img src="/__l5e/assets-v1/69274bbc-7857-4d3d-a4d3-4747a688e509/afro-jump-logo.png" alt="Afro Jump"><div class="sTag">GET HIGH!</div></div>
+<div id="splash"><img src="/__l5e/assets-v1/69274bbc-7857-4d3d-a4d3-4747a688e509/afro-jump-logo.png" alt="Afro Jump"><div class="sTag">JUMP HIGH.</div></div>
 <div id="howto">
   <div class="card">
     <h2 id="howtoTitle">VOLLBILD &amp; APP-MODUS</h2>
