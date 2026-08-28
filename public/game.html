@@ -704,7 +704,8 @@
   #menu .mChips p#menuBags{color:#ffd766;box-shadow:inset -3px -3px 0 #05040a, inset 3px 3px 0 rgba(255,213,74,.5), 0 3px 0 rgba(0,0,0,.6);}
   #menu #menuPlay{width:100%;min-width:0;margin:2px 0 0;}
   #menu .mGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:100%;}
-  #menu .mUtil{display:grid;grid-template-columns:1fr 1fr auto;gap:9px;width:100%;align-items:stretch;}
+  #menu .mUtil{display:grid;grid-template-columns:1fr;gap:9px;width:100%;}
+  #menu .btn.sm.tiny{padding:10px 8px;font-size:7.5px;opacity:.92;}
   #menu .mUtil .btn.sm{padding:11px 8px;font-size:8px;}
   #menu .btn{width:auto;}
   #menu #menuAcctStatus{margin:2px 0 0;font-size:14px;opacity:.7;text-align:center;}
@@ -774,10 +775,12 @@
         <button class="btn v-purple sm" id="menuBoard">🏆 RANGLISTE</button>
         <button class="btn v-red sm" id="menuDuel">⚔ MAP-DUELL<br>(1v1)</button>
       </div>
-      <div class="mUtil">
+      <div class="mGrid">
         <button class="btn v-slate sm" id="menuAccount">👤 ACCOUNT</button>
-        <button class="btn v-slate sm" id="menuSettings">⚙ EINSTELLUNGEN</button>
-        <button class="btn v-slate icon" id="menuFs" title="Vollbild">⛶</button>
+        <button class="btn v-slate sm" id="menuSettings">⚙ EINSTELL.</button>
+      </div>
+      <div class="mUtil">
+        <button class="btn v-slate sm tiny" id="menuFs" title="Vollbild">⛶ VOLLBILD</button>
       </div>
       <p id="menuAcctStatus"></p>
     </div>
