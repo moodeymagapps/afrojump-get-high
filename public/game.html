@@ -119,7 +119,6 @@
   #shop .head{display:flex;justify-content:space-between;width:100%;max-width:360px;align-items:center;margin-bottom:12px;}
   #shop h2{margin:0;color:#7cfc00;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:14px;text-shadow:2px 2px 0 #000;}
   #shopBags{font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:11px;color:#7cfc00;}
-  #shopClose{background:#c62828;border:none;color:#fff;padding:8px 12px;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:11px;cursor:pointer;box-shadow:inset -2px -2px 0 #7f1010, inset 2px 2px 0 #ff8a80, 0 3px 0 #7f1010;}
   .skinGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:360px;padding-bottom:20px;}
   /* ---- Kosmetik-Carousel ---- */
   .carWrap{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:360px;padding-bottom:20px;overflow:hidden;}
@@ -529,7 +528,6 @@
   .overlay .btn{margin:6px 0;}
   #menu .btn,#pause .btn,#over .btn,#settings .btn{width:270px;}
   .overlay h1,.overlay h2,.overlay p{text-align:center;}
-  #shopClose{padding:9px 12px;}
 
   /* --- 3. Weniger Dauer-Effekte / weniger Glow (Performance + Ruhe) --- */
   #menu .btn::after,#menu .tag,#splash::after,.boxCard canvas,
@@ -5374,7 +5372,7 @@ function renderPowerChips(list){
 }
 
 // ---------- Press-Feedback: Ripple + Kick für alle Buttons ----------
-const RIPPLE_SEL='.overlay .btn,.skinCard button,.boxCard button,.tabs button,#shopClose,#duelJoinBtn,'+
+const RIPPLE_SEL='.overlay .btn,.skinCard button,.boxCard button,.tabs button,#shopClose,#accountClose,#boardClose,.carAct,.carArrow,#duelJoinBtn,'+
   '#edPal button,#edRow button,#pauseBtn,#muteBtn,.pxBtn,#duelCfg .cfgBtns button';
 document.addEventListener('pointerdown',e=>{
   const b=e.target&&e.target.closest?e.target.closest(RIPPLE_SEL):null;
