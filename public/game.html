@@ -762,19 +762,27 @@
     <button class="btn v-green" id="settingsClose">✓ Fertig</button>
   </div>
   <div id="menu" class="overlay">
-    <img class="logoImg" src="/__l5e/assets-v1/69274bbc-7857-4d3d-a4d3-4747a688e509/afro-jump-logo.png" alt="Afro Jump">
-    <div class="tag">JUMP HIGH.</div>
-    <p id="menuHigh">Best: 0m</p>
-    <p id="menuBags">🌿 0 Baggys</p>
-    <button class="btn v-green" id="menuPlay">▶ Spielen</button>
-    <button class="btn v-purple" id="menuShop">🛍 Shop</button>
-    <button class="btn v-blue" id="menuDaily">🎁 Täglich &amp; Aufgaben</button>
-    <button class="btn v-gold" id="menuBoard">🏆 Rangliste</button>
-    <button class="btn v-red" id="menuDuel">⚔ Map-Duell (1v1)</button>
-    <button class="btn v-slate" id="menuAccount">👤 Account</button>
-    <button class="btn v-slate" id="menuSettings">⚙ Einstellungen</button>
-    <button class="btn v-slate" id="menuFs">⛶ Vollbild</button>
-    <p id="menuAcctStatus" style="font-size:14px;opacity:.7;margin-top:4px;letter-spacing:1px;"></p>
+    <div class="mWrap">
+      <img class="logoImg" src="/__l5e/assets-v1/69274bbc-7857-4d3d-a4d3-4747a688e509/afro-jump-logo.png" alt="Afro Jump">
+      <div class="tag">JUMP HIGH.</div>
+      <div class="mChips">
+        <p id="menuHigh">Best: 0m</p>
+        <p id="menuBags">🌿 0 Baggys</p>
+      </div>
+      <button class="btn v-green primary" id="menuPlay">▶ SPIELEN</button>
+      <div class="mGrid">
+        <button class="btn v-gold sm" id="menuShop">🛍 SHOP</button>
+        <button class="btn v-blue sm" id="menuDaily">🎁 TÄGLICH<br>&amp; AUFGABEN</button>
+        <button class="btn v-purple sm" id="menuBoard">🏆 RANGLISTE</button>
+        <button class="btn v-red sm" id="menuDuel">⚔ MAP-DUELL<br>(1v1)</button>
+      </div>
+      <div class="mUtil">
+        <button class="btn v-slate sm" id="menuAccount">👤 ACCOUNT</button>
+        <button class="btn v-slate sm" id="menuSettings">⚙ EINSTELLUNGEN</button>
+        <button class="btn v-slate icon" id="menuFs" title="Vollbild">⛶</button>
+      </div>
+      <p id="menuAcctStatus"></p>
+    </div>
   </div>
   <div id="pause" class="overlay">
     <img class="logoImg sm" src="/__l5e/assets-v1/69274bbc-7857-4d3d-a4d3-4747a688e509/afro-jump-logo.png" alt="Afro Jump">
