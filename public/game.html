@@ -620,6 +620,123 @@
     #ui .stats .hudChip,#ui .right>*,.pwChip,.pwChip.low,.bagDelta,.rip,.kick,.overlay.closing{
       animation:none!important;}
   }
+  /* =====================================================================
+     AFRO JUMP UI 2.0 – einheitliche Pixel-Art-Design-Sprache
+     (nur Optik/Layout – keine Gameplay-Logik)
+     ===================================================================== */
+  :root{
+    --uiGreen:#4f9d20;--uiGreenD:#1e4409;--uiGreenL:#9dea52;
+    --uiInk:#0b0912;
+  }
+  /* Basis für ALLE interaktiven Pixel-Buttons im Spiel */
+  .overlay .btn,
+  .tabs button,
+  .carAct,.carArrow,
+  .skinCard button,.boxCard button,
+  #duelJoinBtn,#duelCfg .cfgBtns button,
+  #edUndo,#edClear,#edTest,#edSend,
+  .btn.icon{
+    --c:#4f9d20;--cd:#1e4409;--cl:#9dea52;
+    position:relative;border:none;cursor:pointer;color:#fff;
+    font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;
+    letter-spacing:1px;text-shadow:2px 2px 0 rgba(0,0,0,.8);
+    background:
+      linear-gradient(rgba(255,255,255,.18),rgba(255,255,255,0) 45%,rgba(0,0,0,.26)),
+      var(--c);
+    box-shadow:
+      inset -4px -4px 0 var(--cd), inset 4px 4px 0 var(--cl),
+      0 0 0 4px #05040a, 0 6px 0 rgba(0,0,0,.6);
+    clip-path:polygon(0 8px,8px 8px,8px 0,calc(100% - 8px) 0,calc(100% - 8px) 8px,100% 8px,100% calc(100% - 8px),calc(100% - 8px) calc(100% - 8px),calc(100% - 8px) 100%,8px 100%,8px calc(100% - 8px),0 calc(100% - 8px));
+    image-rendering:pixelated;overflow:hidden;
+    transition:filter .12s ease, transform .1s cubic-bezier(.2,1.6,.4,1), box-shadow .12s ease;
+  }
+  .overlay .btn:hover:not(:disabled),.tabs button:hover,.carAct:hover:not(:disabled),
+  .carArrow:hover,#duelJoinBtn:hover,.btn.icon:hover{filter:brightness(1.1);}
+  .overlay .btn:active:not(:disabled),.tabs button:active,.carAct:active:not(:disabled),
+  .carArrow:active,.skinCard button:active:not(:disabled),.boxCard button:active:not(:disabled),
+  #duelJoinBtn:active,#duelCfg .cfgBtns button:active,
+  #edUndo:active,#edClear:active,#edTest:active,#edSend:active:not(:disabled),.btn.icon:active{
+    transform:translateY(4px) scale(.965);
+    box-shadow:inset -4px -4px 0 var(--cd), inset 4px 4px 0 var(--cl), 0 0 0 4px #05040a, 0 2px 0 rgba(0,0,0,.6);
+    filter:brightness(1.25);
+  }
+  .overlay .btn:disabled,.carAct:disabled,.skinCard button:disabled,.boxCard button:disabled,#edSend:disabled{
+    filter:grayscale(.7) brightness(.7);cursor:not-allowed;transform:none!important;}
+  /* Farbvarianten (Funktion = Farbe) */
+  .btn.v-green,.tabs button.on,#edTest{--c:#4f9d20;--cd:#1e4409;--cl:#9dea52;}
+  .btn.v-purple{--c:#7a2fa8;--cd:#340f4c;--cl:#c078e8;}
+  .btn.v-blue{--c:#1f5fa8;--cd:#0a2547;--cl:#67aef2;}
+  .btn.v-gold,.boxCard button{--c:#c99012;--cd:#5e3d02;--cl:#ffd766;color:#1a1206;text-shadow:2px 2px 0 rgba(255,255,255,.25);}
+  .btn.v-red,#duelJoinBtn{--c:#b52a26;--cd:#520d0b;--cl:#f2726c;}
+  .btn.v-slate,.btn.ghost,.tabs button,.carArrow,#edUndo,#edClear,#duelCfg .cfgBtns button{--c:#5b6472;--cd:#242a33;--cl:#9aa5b3;}
+  .btn.alt{--c:#7a2fa8;--cd:#340f4c;--cl:#c078e8;}
+  .carAct.eq{--c:#7cfc00;--cd:#2f6300;--cl:#d8ffb0;color:#0d1a00;text-shadow:none;}
+  .carAct.lock,.skinCard button:disabled{--c:#4a1414;--cd:#1c0505;--cl:#8c3230;}
+  #edSend{--c:#4f9d20;--cd:#1e4409;--cl:#9dea52;}
+  /* Größen */
+  .overlay .btn{margin:6px 0;padding:14px 18px;font-size:11px;min-width:200px;line-height:1.5;}
+  .overlay .btn.primary{padding:20px 18px;font-size:15px;}
+  .overlay .btn.sm{padding:13px 8px;font-size:8.5px;min-width:0;width:100%;margin:0;line-height:1.5;}
+  .overlay .btn.icon{padding:0;width:44px;height:44px;min-width:0;font-size:12px;margin:0;
+    display:flex;align-items:center;justify-content:center;}
+  .tabs button{padding:10px 4px;font-size:8px;box-shadow:inset -3px -3px 0 var(--cd), inset 3px 3px 0 var(--cl), 0 0 0 3px #05040a, 0 4px 0 rgba(0,0,0,.6);}
+  .tabs{gap:8px;}
+  .tabs button.on{color:#eaffd6;}
+  .carAct{font-size:10px;padding:15px 10px;}
+  .carArrow{color:#ffd54f;font-size:16px;}
+  .skinCard button,.boxCard button{font-size:8px;padding:9px 6px;
+    box-shadow:inset -3px -3px 0 var(--cd), inset 3px 3px 0 var(--cl), 0 0 0 3px #05040a, 0 3px 0 rgba(0,0,0,.6);}
+  #duelJoinBtn,#duelCfg .cfgBtns button,#edUndo,#edClear,#edTest,#edSend{font-size:9px;padding:11px 10px;}
+
+  /* ---------- Hauptmenü: kompaktes Mobile-Game-Layout ---------- */
+  #menu{justify-content:flex-start;gap:0;
+    padding:calc(14px + env(safe-area-inset-top)) 16px calc(14px + env(safe-area-inset-bottom));}
+  #menu::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+    background:linear-gradient(rgba(7,6,13,.72),rgba(7,6,13,.93)),
+      url('/__l5e/assets-v1/5b50de1a-bbfe-490b-9628-fc8f03c25d33/afro-jump-keyart.jpg') center/cover no-repeat;}
+  #menu>*{z-index:1;}
+  #menu .mWrap{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;
+    width:100%;max-width:360px;margin:auto;gap:12px;animation:ovPop .22s ease-out both;}
+  #menu .logoImg{width:min(80%,290px);margin:0 auto;}
+  #menu .tag{margin:0;font-size:8px;opacity:.85;}
+  #menu .mChips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+  #menu .mChips p{margin:0;font-family:'Press Start 2P',monospace;font-size:8px;letter-spacing:1px;
+    padding:8px 10px;background:rgba(10,8,20,.72);color:#dfffc4;
+    box-shadow:inset -3px -3px 0 #05040a, inset 3px 3px 0 rgba(124,252,0,.5), 0 3px 0 rgba(0,0,0,.6);}
+  #menu .mChips p#menuBags{color:#ffd766;box-shadow:inset -3px -3px 0 #05040a, inset 3px 3px 0 rgba(255,213,74,.5), 0 3px 0 rgba(0,0,0,.6);}
+  #menu #menuPlay{width:100%;min-width:0;margin:2px 0 0;}
+  #menu .mGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:100%;}
+  #menu .mUtil{display:grid;grid-template-columns:1fr auto;gap:9px;width:100%;align-items:stretch;}
+  #menu .mUtil .btn.sm{padding:11px 8px;font-size:8px;}
+  #menu .btn{width:auto;}
+  #menu #menuAcctStatus{margin:2px 0 0;font-size:14px;opacity:.7;text-align:center;}
+  /* gestaffeltes Einlaufen */
+  #menu .mWrap>*{animation:btnIn .24s cubic-bezier(.2,1.4,.4,1) both;}
+  #menu .mWrap>*:nth-child(1){animation-delay:.02s}
+  #menu .mWrap>*:nth-child(2){animation-delay:.05s}
+  #menu .mWrap>*:nth-child(3){animation-delay:.08s}
+  #menu .mWrap>*:nth-child(4){animation-delay:.11s}
+  #menu .mWrap>*:nth-child(5){animation-delay:.14s}
+  #menu .mWrap>*:nth-child(6){animation-delay:.17s}
+  #menu .mGrid .btn{animation:btnIn .22s cubic-bezier(.2,1.4,.4,1) both;}
+  #menu .mGrid .btn:nth-child(1){animation-delay:.14s}
+  #menu .mGrid .btn:nth-child(2){animation-delay:.17s}
+  #menu .mGrid .btn:nth-child(3){animation-delay:.2s}
+  #menu .mGrid .btn:nth-child(4){animation-delay:.23s}
+  #menu .mGrid .btn:nth-child(5){animation-delay:.26s}
+  #menu .mGrid .btn:nth-child(6){animation-delay:.29s}
+  @media (max-height:660px){
+    #menu .logoImg{width:min(62%,220px);}
+    #menu .mWrap{gap:9px;}
+    #menu .overlay .btn.primary,#menu #menuPlay{padding:16px 14px;font-size:13px;}
+  }
+  @media (prefers-reduced-motion:reduce){#menu .mWrap,#menu .mWrap>*,#menu .mGrid .btn{animation:none!important;}}
+
+  /* ---------- Overlay-Kopfzeilen (Shop/Account/Rangliste) ---------- */
+  .overlay .head{padding-top:env(safe-area-inset-top);}
+  #shop,#account,#board,#duel{padding:calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom));}
+  #pause,#over,#settings{padding:calc(18px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom));}
+  #pause .btn,#over .btn,#settings .btn{width:min(100%,270px);}
 </style>
 
 </head>
