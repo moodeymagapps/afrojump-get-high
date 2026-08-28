@@ -706,7 +706,7 @@
   #menu .mChips p#menuBags{color:#ffd766;box-shadow:inset -3px -3px 0 #05040a, inset 3px 3px 0 rgba(255,213,74,.5), 0 3px 0 rgba(0,0,0,.6);}
   #menu #menuPlay{width:100%;min-width:0;margin:2px 0 0;}
   #menu .mGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:100%;}
-  #menu .mUtil{display:grid;grid-template-columns:1fr auto;gap:9px;width:100%;align-items:stretch;}
+  #menu .mUtil{display:grid;grid-template-columns:1fr 1fr auto;gap:9px;width:100%;align-items:stretch;}
   #menu .mUtil .btn.sm{padding:11px 8px;font-size:8px;}
   #menu .btn{width:auto;}
   #menu #menuAcctStatus{margin:2px 0 0;font-size:14px;opacity:.7;text-align:center;}
@@ -795,7 +795,7 @@
   <div id="shop" class="overlay">
     <div class="head">
       <h2>🛍 Shop</h2>
-      <div><span id="shopBags">🌿 0</span> &nbsp; <button id="shopClose">✕</button></div>
+      <div><span id="shopBags">🌿 0</span> &nbsp; <button id="shopClose" class="btn icon v-red">✕</button></div>
     </div>
     <div class="tabs" id="shopTabs">
       <button data-tab="skins" class="on">🧑 SKINS</button>
@@ -839,7 +839,7 @@
   <div id="account" class="overlay">
     <div class="head" style="display:flex;justify-content:space-between;width:100%;max-width:360px;align-items:center;margin-bottom:12px;">
       <h2 style="margin:0;color:#7cfc00;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:13px;text-shadow:2px 2px 0 #000;">👤 ACCOUNT</h2>
-      <button id="accountClose" style="background:#c62828;border:none;color:#fff;padding:8px 12px;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:11px;cursor:pointer;box-shadow:inset -2px -2px 0 #7f1010, inset 2px 2px 0 #ff8a80, 0 3px 0 #7f1010;">✕</button>
+      <button id="accountClose" class="btn icon v-red">✕</button>
     </div>
     <div id="authCard" class="card">
       <h3>Anmelden / Registrieren</h3>
@@ -878,7 +878,7 @@
   <div id="board" class="overlay">
     <div class="head" style="display:flex;justify-content:space-between;width:100%;max-width:360px;align-items:center;margin-bottom:12px;">
       <h2 style="margin:0;color:#ffd54a;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:13px;text-shadow:2px 2px 0 #000;">🏆 RANGLISTE</h2>
-      <button id="boardClose" style="background:#c62828;border:none;color:#fff;padding:8px 12px;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:11px;cursor:pointer;box-shadow:inset -2px -2px 0 #7f1010, inset 2px 2px 0 #ff8a80, 0 3px 0 #7f1010;">✕</button>
+      <button id="boardClose" class="btn icon v-red">✕</button>
     </div>
     <div id="boardList" style="width:100%;max-width:360px;"></div>
     <div id="boardMsg" style="font-family:'VT323','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:16px;opacity:.8;margin-top:6px;text-align:center;max-width:340px;"></div>
