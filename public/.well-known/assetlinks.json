@@ -3,6 +3,6 @@
       "target": {
         "namespace": "android_app",
         "package_name": "app.afrojumper.twa",
-        "sha256_cert_fingerprints": ["01:AB:55:F7:31:E6:E2:C2:DB:53:4C:42:6B:25:54:FD:FD:CC:37:6F:CB:45:46:84:27:60:A6:D9:A7:69:FE:BC"]
+        "sha256_cert_fingerprints": ["EE:F7:DD:BB:31:20:85:04:07:10:73:28:80:FB:00:7F:59:E1:FF:4C:FE:5A:1D:A0:4A:03:04:C5:19:90:6C:92"]
       }
     }]
