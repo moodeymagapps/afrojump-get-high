@@ -1051,7 +1051,7 @@ const HK='afroJumpHigh',BK='afroJumpBags',OK='afroJumpOwned',SK='afroJumpSkin',M
 const GK='afroJumpGrant2k';
 let muted=localStorage.getItem(MK)==='1';
 bgm.volume=0.55;
-function updateMuteUI(){muteBtn.textContent=muted?'🔇':'🔊';}
+function updateMuteUI(){muteBtn.textContent=muted?'🔇':'🔊';muteBtn.classList.toggle('off',!!muted);}
 function tryPlayMusic(){if(!muted){bgm.play().catch(()=>{});}}
 function stopMusic(){try{bgm.pause();}catch(e){}}
 muteBtn.onclick=(e)=>{e.stopPropagation();muted=!muted;localStorage.setItem(MK,muted?'1':'0');updateMuteUI();if(muted){stopMusic();stopBossMusic();}else{if(!boss)tryPlayMusic();}};
@@ -1705,7 +1705,7 @@ function renderCarousel(cfg){
   const wrap=document.createElement('div');wrap.className='carWrap';
   const row=document.createElement('div');row.className='carRow';
   const mk=(txt,dir)=>{
-    const b=document.createElement('button');b.className='carArrow';b.textContent=txt;
+    const b=document.createElement('button');b.className='carArrow'+(dir<0?' prev':' next');b.textContent=txt;
     b.setAttribute('aria-label',dir<0?'Vorheriges':'Nächstes');
     b.onclick=()=>{carDir=dir;carIdx[cfg.key]=(i+dir+list.length)%list.length;renderShop();};
     return b;
