@@ -736,6 +736,98 @@
   #shop,#account,#board,#duel{padding:calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom));}
   #pause,#over,#settings{padding:calc(18px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom));}
   #pause .btn,#over .btn,#settings .btn{width:min(100%,270px);}
+  /* =====================================================================
+     AFRO JUMP UI 3.0 – Original Pixel-Art-Button-Sprites
+     (nur Optik – keine Gameplay-Logik)
+     ===================================================================== */
+  :root{
+    --sBarGreen:url('/__l5e/assets-v1/7b350c4e-e1f3-4abd-a82f-4bd6293740b1/ui_bar_green.png');
+    --sBarGold:url('/__l5e/assets-v1/2d14780f-8950-4754-a1a1-9aaeafcb7969/ui_bar_gold.png');
+    --sBarBlue:url('/__l5e/assets-v1/719cf5a9-b00f-4791-b8d5-9fb7d2f73397/ui_bar_blue.png');
+    --sBarPurple:url('/__l5e/assets-v1/60340b12-71d4-4d18-9c4c-b8f0bd80e265/ui_bar_purple.png');
+    --sBarRed:url('/__l5e/assets-v1/d01ae2fe-a1e6-4062-8c98-141808a3e6fc/ui_bar_red.png');
+    --sBarGray:url('/__l5e/assets-v1/cf933aaa-999f-4ad5-865d-600302e15433/ui_bar_gray.png');
+    --sIcClose:url('/__l5e/assets-v1/b74fbdb5-b556-46a0-ad68-da7998167ffa/ui_ic_close.png');
+    --sIcCheck:url('/__l5e/assets-v1/df22451d-75c0-4d4f-8bc4-a613acea5924/ui_ic_check.png');
+    --sIcLeft:url('/__l5e/assets-v1/29b54877-06b6-4776-9806-59328dd090f8/ui_ic_left.png');
+    --sIcRight:url('/__l5e/assets-v1/ec229be6-c740-4c0c-9181-03a8b5dd26c9/ui_ic_right.png');
+    --sIcPause:url('/__l5e/assets-v1/129e1a09-2d03-4065-a5b4-15bdc5261362/ui_ic_pause.png');
+    --sIcPlay:url('/__l5e/assets-v1/36aec07c-86a0-490c-b30e-18200fffda14/ui_ic_play.png');
+    --sIcRestart:url('/__l5e/assets-v1/67d1cde7-ef9c-4ef4-bcbc-b6359af9ab51/ui_ic_restart.png');
+    --sIcGear:url('/__l5e/assets-v1/079363a5-5084-4de9-9b3a-c5f4ad697d83/ui_ic_gear.png');
+    --sIcHome:url('/__l5e/assets-v1/3cd27d58-b7a5-4513-9be3-7b4d7d71f6c8/ui_ic_home.png');
+    --sIcBack:url('/__l5e/assets-v1/3d6c1e86-87b6-4e14-abd5-0aaad7499838/ui_ic_back.png');
+    --sIcMenu:url('/__l5e/assets-v1/1a116bf3-c8fd-4d18-80ab-16913bf30840/ui_ic_menu.png');
+    --sIcSound:url('/__l5e/assets-v1/a117da00-be34-436c-87ab-524c4cdfc0ba/ui_ic_sound.png');
+    --sIcSoundOff:url('/__l5e/assets-v1/436138e0-3e5b-4483-b3cf-8914cb4c225d/ui_ic_soundoff.png');
+    --sIcTrophy:url('/__l5e/assets-v1/189abb05-ddd1-40e1-8a3e-87100aff4f9b/ui_ic_trophy.png');
+  }
+  /* ---- Text-Buttons: Original-Balken-Sprites ---- */
+  .overlay .btn:not(.icon),
+  .tabs button,.carAct,.skinCard button,.boxCard button,
+  #duelJoinBtn,#duelCfg .cfgBtns button,
+  #edTest,#edSend,#edUndo,#edClear{
+    background:var(--sBar,var(--sBarGray)) center center/100% 100% no-repeat!important;
+    box-shadow:none!important;clip-path:none!important;border:none!important;
+    image-rendering:pixelated;
+    display:inline-flex;align-items:center;justify-content:center;text-align:center;
+    color:#fff!important;text-shadow:2px 2px 0 #000,-2px 2px 0 #000,2px -2px 0 #000,-2px -2px 0 #000;
+    font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;
+  }
+  .overlay .btn:not(.icon){min-height:58px;padding:12px 12% 4px;font-size:10px;line-height:1.45;}
+  .overlay .btn.primary{min-height:74px;padding:16px 12% 6px;font-size:14px;}
+  .overlay .btn.sm{min-height:52px;padding:11px 10% 3px;font-size:8.5px;}
+  .tabs button{min-height:44px;padding:10px 8% 2px;font-size:8px;}
+  .carAct{min-height:56px;padding:12px 10% 4px;font-size:10px;}
+  .skinCard button,.boxCard button{min-height:40px;padding:9px 8% 2px;font-size:8px;}
+  #duelJoinBtn,#duelCfg .cfgBtns button,#edTest,#edSend,#edUndo,#edClear{
+    min-height:44px;padding:10px 8% 2px;font-size:9px;background-color:transparent!important;}
+  /* Farbzuordnung -> Sprite */
+  .btn.v-green,.tabs button.on,#edTest,.carAct.eq,#edSend,.skinCard button{--sBar:var(--sBarGreen);}
+  .btn.v-gold,.boxCard button{--sBar:var(--sBarGold);}
+  .btn.v-blue{--sBar:var(--sBarBlue);}
+  .btn.v-purple,.btn.alt{--sBar:var(--sBarPurple);}
+  .btn.v-red,#duelJoinBtn,.carAct.lock,.skinCard button:disabled{--sBar:var(--sBarRed);}
+  .btn.v-slate,.btn.ghost,.tabs button,.carAct,#edUndo,#edClear,#duelCfg .cfgBtns button{--sBar:var(--sBarGray);}
+  .overlay .btn:hover:not(:disabled),.tabs button:hover,.carAct:hover:not(:disabled){filter:brightness(1.12);}
+  .overlay .btn:active:not(:disabled),.tabs button:active,.carAct:active:not(:disabled),
+  .skinCard button:active:not(:disabled),.boxCard button:active:not(:disabled),
+  #duelJoinBtn:active,#edTest:active,#edSend:active:not(:disabled){
+    transform:translateY(3px) scale(.97);box-shadow:none!important;filter:brightness(1.2);}
+  .overlay .btn:disabled,.carAct:disabled,.skinCard button:disabled,.boxCard button:disabled,#edSend:disabled{
+    filter:grayscale(.55) brightness(.72);}
+  /* ---- Icon-Buttons: Original-Icon-Sprites ---- */
+  .btn.icon,.carArrow,#pauseBtn,#muteBtn,#fsBtn{
+    background:var(--sIc,var(--sIcClose)) center center/contain no-repeat!important;
+    box-shadow:none!important;clip-path:none!important;border:none!important;
+    font-size:0!important;color:transparent!important;image-rendering:pixelated;
+    transition:transform .1s ease,filter .12s ease;}
+  .btn.icon:active,.carArrow:active,#pauseBtn:active,#muteBtn:active,#fsBtn:active{
+    transform:translateY(2px) scale(.94);filter:brightness(1.2);box-shadow:none!important;}
+  .overlay .btn.icon{width:48px;height:42px;}
+  #shopClose,#accountClose,#boardClose,.btn.icon.v-red{--sIc:var(--sIcClose);}
+  .carArrow{--sIc:var(--sIcLeft);width:54px;height:66px;}
+  .carArrow.next{--sIc:var(--sIcRight);}
+  #pauseBtn{--sIc:var(--sIcPause);width:42px;height:38px;background-color:transparent!important;}
+  #muteBtn{--sIc:var(--sIcSound);width:40px;height:38px;background-color:transparent!important;}
+  #muteBtn.off{--sIc:var(--sIcSoundOff);}
+  #fsBtn{--sIc:var(--sIcMenu);width:42px;height:36px;background-color:transparent!important;}
+  /* ---- Hauptmenü: fertige Sprite-Buttons + neuer Hintergrund ---- */
+  #menu::after{background:#0c1408 url('/__l5e/assets-v1/24bf8db3-240f-4909-8ea9-5bdb340eda73/ui_menu_bg.jpg') center center/cover no-repeat!important;}
+  #menu::before{display:none;}
+  #menu .mWrap{max-width:400px;gap:10px;}
+  #menu .logoImg{display:none;}
+  #menu .tag{display:none;}
+  .mSprite{background:none!important;border:none;padding:0;margin:0;cursor:pointer;display:block;
+    width:100%;line-height:0;-webkit-tap-highlight-color:transparent;
+    transition:transform .1s cubic-bezier(.2,1.6,.4,1),filter .12s ease;}
+  .mSprite img{width:100%;height:auto;display:block;image-rendering:pixelated;
+    filter:drop-shadow(0 4px 0 rgba(0,0,0,.55));}
+  .mSprite:hover{filter:brightness(1.08);}
+  .mSprite:active{transform:translateY(3px) scale(.975);filter:brightness(1.18);}
+  #menu .mGrid{gap:8px;}
+  #menu .mChips p{font-size:8px;}
+  @media (max-width:330px){#menu .mGrid{grid-template-columns:1fr;}}
 </style>
 
 </head>
@@ -768,16 +860,14 @@
         <p id="menuHigh">Best: 0m</p>
         <p id="menuBags">🌿 0 Baggys</p>
       </div>
-      <button class="btn v-green primary" id="menuPlay">▶ SPIELEN</button>
+      <button class="mSprite" id="menuPlay" aria-label="Spielen"><img src="/__l5e/assets-v1/f129af28-20bc-401f-9272-47b3328d0bee/ui_m_play.png" alt="Spielen"></button>
       <div class="mGrid">
-        <button class="btn v-gold sm" id="menuShop">🛍 SHOP</button>
-        <button class="btn v-blue sm" id="menuDaily">🎁 TÄGLICH<br>&amp; AUFGABEN</button>
-        <button class="btn v-purple sm" id="menuBoard">🏆 RANGLISTE</button>
-        <button class="btn v-red sm" id="menuDuel">⚔ MAP-DUELL<br>(1v1)</button>
-      </div>
-      <div class="mGrid">
-        <button class="btn v-slate sm" id="menuAccount">👤 ACCOUNT</button>
-        <button class="btn v-slate sm" id="menuSettings">⚙ EINSTELL.</button>
+        <button class="mSprite" id="menuShop" aria-label="Shop"><img src="/__l5e/assets-v1/49c2f7d3-9b6a-4193-8c19-e70c682da4c9/ui_m_shop.png" alt="Shop"></button>
+        <button class="mSprite" id="menuDaily" aria-label="Täglich &amp; Aufgaben"><img src="/__l5e/assets-v1/a06ac07c-36c8-46a2-a1d9-d1d82b334d44/ui_m_daily.png" alt="Täglich und Aufgaben"></button>
+        <button class="mSprite" id="menuBoard" aria-label="Rangliste"><img src="/__l5e/assets-v1/0cfba60d-e3c2-4cf3-b135-d5e650702f1b/ui_m_rank.png" alt="Rangliste"></button>
+        <button class="mSprite" id="menuDuel" aria-label="Map-Duell 1v1"><img src="/__l5e/assets-v1/b33b6766-031d-476c-9487-6d9231c16455/ui_m_duel.png" alt="Map-Duell"></button>
+        <button class="mSprite" id="menuAccount" aria-label="Account"><img src="/__l5e/assets-v1/2abdab3f-85d9-4914-80a8-367794f6318c/ui_m_account.png" alt="Account"></button>
+        <button class="mSprite" id="menuSettings" aria-label="Einstellungen"><img src="/__l5e/assets-v1/8a66b654-c522-430a-b1cc-3c9f4cff5c43/ui_m_settings.png" alt="Einstellungen"></button>
       </div>
       <div class="mUtil">
         <button class="btn v-slate sm tiny" id="menuFs" title="Vollbild">⛶ VOLLBILD</button>
@@ -786,12 +876,11 @@
     </div>
   </div>
   <div id="pause" class="overlay">
-    <img class="logoImg sm" src="/__l5e/assets-v1/69274bbc-7857-4d3d-a4d3-4747a688e509/afro-jump-logo.png" alt="Afro Jump">
     <h1>PAUSE</h1>
-    <button class="btn v-green" id="pauseResume">▶ Weiter</button>
-    <button class="btn v-purple" id="pauseShop">🛍 Shop</button>
-    <button class="btn v-blue" id="pauseSettings">⚙ Einstellungen</button>
-    <button class="btn v-slate" id="pauseQuit">↺ Neustart</button>
+    <button class="btn v-green" id="pauseResume">WEITER</button>
+    <button class="btn v-gold" id="pauseShop">SHOP</button>
+    <button class="btn v-blue" id="pauseSettings">EINSTELLUNGEN</button>
+    <button class="btn v-slate" id="pauseQuit">NEUSTART</button>
   </div>
   <div id="shop" class="overlay">
     <div class="head">
@@ -962,7 +1051,7 @@ const HK='afroJumpHigh',BK='afroJumpBags',OK='afroJumpOwned',SK='afroJumpSkin',M
 const GK='afroJumpGrant2k';
 let muted=localStorage.getItem(MK)==='1';
 bgm.volume=0.55;
-function updateMuteUI(){muteBtn.textContent=muted?'🔇':'🔊';}
+function updateMuteUI(){muteBtn.textContent=muted?'🔇':'🔊';muteBtn.classList.toggle('off',!!muted);}
 function tryPlayMusic(){if(!muted){bgm.play().catch(()=>{});}}
 function stopMusic(){try{bgm.pause();}catch(e){}}
 muteBtn.onclick=(e)=>{e.stopPropagation();muted=!muted;localStorage.setItem(MK,muted?'1':'0');updateMuteUI();if(muted){stopMusic();stopBossMusic();}else{if(!boss)tryPlayMusic();}};
@@ -1616,7 +1705,7 @@ function renderCarousel(cfg){
   const wrap=document.createElement('div');wrap.className='carWrap';
   const row=document.createElement('div');row.className='carRow';
   const mk=(txt,dir)=>{
-    const b=document.createElement('button');b.className='carArrow';b.textContent=txt;
+    const b=document.createElement('button');b.className='carArrow'+(dir<0?' prev':' next');b.textContent=txt;
     b.setAttribute('aria-label',dir<0?'Vorheriges':'Nächstes');
     b.onclick=()=>{carDir=dir;carIdx[cfg.key]=(i+dir+list.length)%list.length;renderShop();};
     return b;
