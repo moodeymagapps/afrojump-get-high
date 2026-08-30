@@ -41,12 +41,11 @@
       setTimeout(boot, 250);
       return;
     }
-    const wrap = gameCv.parentElement || document.getElementById("wrap") || document.body;
+    const wrap = gameCv.parentElement || document.body;
     const ov = document.createElement("canvas");
     ov.id = "planeOverlay";
     ov.style.cssText =
-      "position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4;image-rendering:pixelated;";
-    if (!wrap.style.position) wrap.style.position = "relative";
+      "position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:3;image-rendering:pixelated;";
     wrap.appendChild(ov);
     const g = ov.getContext("2d");
 
@@ -57,6 +56,8 @@
       ov.height = Math.max(1, Math.round(r.height * dpr));
       ov.style.width = r.width + "px";
       ov.style.height = r.height + "px";
+      ov.style.left = gameCv.offsetLeft + "px";
+      ov.style.top = gameCv.offsetTop + "px";
       g.setTransform(dpr, 0, 0, dpr, 0, 0);
       g.imageSmoothingEnabled = false;
     }
@@ -75,7 +76,10 @@
       const pause = document.getElementById("pause");
       const shop = document.getElementById("shop");
       function vis(el) {
-        return el && (el.style.display === "flex" || el.classList.contains("show"));
+        if (!el) return false;
+        const s = window.getComputedStyle(el);
+        if (s.display === "none" || s.visibility === "hidden") return false;
+        return el.style.display === "flex" || el.classList.contains("show");
       }
       if (vis(over) || vis(pause) || vis(shop) || vis(menu)) return false;
       return true;
