@@ -10,6 +10,18 @@
     p161: "/planes/plane_161.png",
     merz: "/planes/plane_merz.png",
   };
+  const LABELS = {
+    palestine: "Free Palestine",
+    fckafd: "FCKAFD",
+    p161: "161",
+    merz: "MERZLECKEIER",
+  };
+  const COLORS = {
+    palestine: [#0a7a3e, #fff, #000],
+    fckafd: ["#0b1d4a", "#f5c518"],
+    p161: ["#c41212", "#fff"],
+    merz: ["#f3e6c4", "#b11", "#111"],
+  };
 
   const KEYS = Object.keys(SRCS);
   const imgs = {};
@@ -62,9 +74,9 @@
       const over = document.getElementById("over");
       const pause = document.getElementById("pause");
       const shop = document.getElementById("shop");
-      const vis = function (el) {
+      function vis(el) {
         return el && (el.style.display === "flex" || el.classList.contains("show"));
-      };
+      }
       if (vis(over) || vis(pause) || vis(shop) || vis(menu)) return false;
       return true;
     }
@@ -81,9 +93,10 @@
       const H = ov.getBoundingClientRect().height;
       if (W < 40 || H < 40) return;
       const dir = Math.random() < 0.5 ? 1 : -1;
+      const ready = im && im.complete && im.naturalWidth > 8;
       const targetW = Math.min(300, Math.max(170, W * 0.68));
-      const nw = im.naturalWidth || 280;
-      const nh = im.naturalHeight || 70;
+      const nw = ready ? im.naturalWidth : 280;
+      const nh = ready ? im.naturalHeight : 72;
       const scale = targetW / Math.max(1, nw);
       const pw = nw * scale;
       const ph = nh * scale;
@@ -97,6 +110,18 @@
         h: ph,
         bob: Math.random() * Math.PI * 2,
       });
+    }
+
+    function drawFallback(p, yy) {
+      const c = COLORS[p.key] || ["#222", "#fff"];
+      g.fillStyle = "#c9c9c9";
+      g.fillRect(p.x, yy + p.h * 0.35, p.w * 0.28, p.h * 0.22);
+      g.fillStyle = c[0];
+      g.fillRect(p.x + p.w * 0.32, yy + p.h * 0.18, p.w * 0.66, p.h * 0.64);
+      g.fillStyle = c[1] || "#fff";
+      g.font = "bold " + Math.max(10, Math.floor(p.h * 0.28)) + "px monospace";
+      g.textBaseline = "middle";
+      g.fillText(LABELS[p.key] || p.key, p.x + p.w * 0.36, yy + p.h * 0.5, p.w * 0.58);
     }
 
     function tick() {
@@ -131,17 +156,19 @@
         p.bob += 0.04;
         const yy = p.y + Math.sin(p.bob) * 5;
         const im = imgs[p.key];
-        if (im && im.complete && im.naturalWidth) {
-          g.save();
-          if (p.vx < 0) {
-            g.translate(p.x + p.w / 2, yy + p.h / 2);
-            g.scale(-1, 1);
-            g.drawImage(im, -p.w / 2, -p.h / 2, p.w, p.h);
-          } else {
-            g.drawImage(im, p.x, yy, p.w, p.h);
-          }
-          g.restore();
+        g.save();
+        if (p.vx < 0) {
+          g.translate(p.x + p.w / 2, yy + p.h / 2);
+          g.scale(-1, 1);
+          g.translate(-p.w / 2, -p.h / 2);
+          if (im && im.complete && im.naturalWidth > 8) g.drawImage(im, 0, 0, p.w, p.h);
+          else drawFallback({ key: p.key, x: 0, y: 0, w: p.w, h: p.h }, 0);
+        } else if (im && im.complete && im.naturalWidth > 8) {
+          g.drawImage(im, p.x, yy, p.w, p.h);
+        } else {
+          drawFallback(p, yy);
         }
+        g.restore();
         if (p.x > W + p.w + 40 || p.x < -p.w - 40) planes.splice(i, 1);
       }
       requestAnimationFrame(tick);
