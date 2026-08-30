@@ -30,32 +30,44 @@ export const Route = createFileRoute("/")({
 function Index() {
   const frameRef = useRef<HTMLIFrameElement>(null);
 
-  function injectBannerPlanes() {
+  function inject(id: string, src: string) {
     try {
       const doc = frameRef.current?.contentDocument;
-      if (!doc || doc.getElementById("bannerPlanesScript")) return;
+      if (!doc || doc.getElementById(id)) return;
       const s = doc.createElement("script");
-      s.id = "bannerPlanesScript";
-      s.src = "/banner-planes.js";
+      s.id = id;
+      s.src = src;
       doc.body.appendChild(s);
     } catch {
       /* ignore */
     }
   }
 
+  function injectAll() {
+    inject("bannerPlanesScript", "/banner-planes.js");
+    inject("skyPropsScript", "/sky-props.js");
+    inject("deathQuotesScript", "/death-quotes.js");
+  }
+
   return (
     <div
-      className="fixed inset-0 overflow-hidden bg-black"
-      style={{ height: "100dvh", overscrollBehavior: "none", touchAction: "none" }}
+      className="fixed inset-0 overflow-hidden"
+      style={{
+        height: "100dvh",
+        background: "#0b1a0b",
+        overscrollBehavior: "none",
+        touchAction: "none",
+      }}
     >
       <iframe
         ref={frameRef}
         src="/game.html"
         title="Afro Jump"
         className="w-full h-full border-0"
+        style={{ background: "#0b1a0b" }}
         allow="fullscreen; autoplay; clipboard-write"
         allowFullScreen
-        onLoad={injectBannerPlanes}
+        onLoad={injectAll}
       />
     </div>
   );
