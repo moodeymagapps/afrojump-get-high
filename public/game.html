@@ -1021,6 +1021,7 @@ const W=400,H=700;
 // bleibt exakt 400x700 (Physik/Levelgen/Kollisionen unverändert) und sitzt
 // mittig -> Desktop 16:9 landscape, Mobile weiterhin 9:16 portrait.
 let dpr=1,bgW=W,bgOX=0;
+var bgDirty=false;
 function fit(){
   const vw=window.innerWidth,vh=window.innerHeight;
   // Höhe füllen; auf schmalen (Portrait-)Screens zusätzlich Breite begrenzen.
@@ -2866,6 +2867,7 @@ function sstep(v,a,b){const t=Math.min(1,Math.max(0,(v-a)/(b-a)));return t*t*(3-
 let bgPuffs=[],bgPuffMark=-1;
 function bgPuff(x,y,r){bgPuffs.push({x,y,r,t:1});}
 function drawBg(){
+  if (bgDirty) { bgVig = null; bgGradKey = ''; bgDirty = false; }
   // Kontinuierliche Höhe (gleiche Berechnung wie die Anzeige: -cameraY/10),
   // dadurch bewegt sich die Welt stufenlos statt in Score-Sprüngen.
   const m=Math.max(0,-cameraY/10);
