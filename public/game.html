@@ -1039,7 +1039,7 @@ function fit(){
   const dev=window.devicePixelRatio||1;
   const cssW=Math.round(logicW*scale*dev)/dev, cssH=Math.round(H*scale*dev)/dev;
   cv.style.width=cssW+'px';cv.style.height=cssH+'px';
-  if(cv.width!==nw||cv.height!==nh){cv.width=nw;cv.height=nh;bgVig=null;bgGradKey='';}
+  if(cv.width!==nw||cv.height!==nh){cv.width=nw;cv.height=nh;bgDirty=true;}
   dpr=want;
   applyBaseTransform();
   ctx.imageSmoothingEnabled=false;
