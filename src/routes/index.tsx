@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useRef } from "react";
 
 const KEY_ART =
   "https://afrojumper.app/__l5e/assets-v1/0ddacadd-adb6-40df-9701-fe9168b6a5f6/afro-jump-keyart-og.jpg";
@@ -27,17 +28,34 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const frameRef = useRef<HTMLIFrameElement>(null);
+
+  function injectBannerPlanes() {
+    try {
+      const doc = frameRef.current?.contentDocument;
+      if (!doc || doc.getElementById("bannerPlanesScript")) return;
+      const s = doc.createElement("script");
+      s.id = "bannerPlanesScript";
+      s.src = "/banner-planes.js";
+      doc.body.appendChild(s);
+    } catch {
+      /* ignore */
+    }
+  }
+
   return (
     <div
       className="fixed inset-0 overflow-hidden bg-black"
       style={{ height: "100dvh", overscrollBehavior: "none", touchAction: "none" }}
     >
       <iframe
+        ref={frameRef}
         src="/game.html"
         title="Afro Jump"
         className="w-full h-full border-0"
         allow="fullscreen; autoplay; clipboard-write"
         allowFullScreen
+        onLoad={injectBannerPlanes}
       />
     </div>
   );
