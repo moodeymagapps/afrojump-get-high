@@ -816,7 +816,11 @@
   #menu::after{background:#0c1408 url('/__l5e/assets-v1/24bf8db3-240f-4909-8ea9-5bdb340eda73/ui_menu_bg.jpg') center center/cover no-repeat!important;}
   #menu::before{display:none;}
   #menu .mWrap{max-width:400px;gap:10px;}
-  #menu .logoImg{display:none;}
+  /* Logo wieder prominent oben, skaliert sauber auf allen Handygrößen */
+  #menu .logoImg{display:block;width:min(74%,300px);max-height:22vh;object-fit:contain;
+    margin:0 auto 2px;filter:drop-shadow(0 5px 0 rgba(0,0,0,.55)) drop-shadow(0 0 16px rgba(124,252,0,.28));}
+  @media (max-height:680px){#menu .logoImg{width:min(60%,230px);max-height:16vh;}}
+  @media (max-height:560px){#menu .logoImg{width:min(52%,200px);max-height:13vh;}}
   #menu .tag{display:none;}
   .mSprite{background:none!important;border:none;padding:0;margin:0;cursor:pointer;display:block;
     width:100%;line-height:0;-webkit-tap-highlight-color:transparent;
@@ -1012,22 +1016,36 @@ const cv=document.getElementById('c'),ctx=cv.getContext('2d',{alpha:false});
 const W=400,H=700;
 // Hi-DPI: interne Auflösung an das Display anpassen -> scharfe Pixel, alle
 // Zeichenkoordinaten bleiben im 400x700-Logikraum.
-let dpr=1;
+// bgW = logische Breite der Leinwand (>= W). Auf breiten Bildschirmen wird die
+// Leinwand breiter und der Hintergrund füllt sie komplett aus; das Spielfeld
+// bleibt exakt 400x700 (Physik/Levelgen/Kollisionen unverändert) und sitzt
+// mittig -> Desktop 16:9 landscape, Mobile weiterhin 9:16 portrait.
+let dpr=1,bgW=W,bgOX=0;
 function fit(){
-  const s=Math.min(window.innerWidth/W,window.innerHeight/H);
+  const vw=window.innerWidth,vh=window.innerHeight;
+  // Höhe füllen; auf schmalen (Portrait-)Screens zusätzlich Breite begrenzen.
+  const s=Math.min(vh/H,Math.max(vw/W,vh/H));
+  const sFit=Math.min(vw/W,vh/H);
+  const wide=vw/vh>W/H;            // breiter als 4:7 -> Desktop/Landscape
+  const scale=wide?vh/H:sFit;
+  // Logische Breite so wählen, dass die volle Bildschirmbreite genutzt wird.
+  const logicW=wide?Math.min(1400,Math.max(W,Math.round(vw/scale))):W;
+  bgW=logicW;bgOX=(logicW-W)/2;
   // Ganzzahliger Geräte-Pixel-Faktor: dadurch landet jeder Logik-Pixel exakt
   // auf einem Gitter aus ganzen Geräte-Pixeln -> keine Fransen an Konturen.
-  const want=Math.max(1,Math.min(4,Math.ceil((window.devicePixelRatio||1)*s)));
-  const nw=W*want,nh=H*want;
+  const want=Math.max(1,Math.min(4,Math.ceil((window.devicePixelRatio||1)*scale)));
+  const nw=logicW*want,nh=H*want;
   // CSS-Größe auf ganze Geräte-Pixel runden, damit nicht neu resampelt wird.
   const dev=window.devicePixelRatio||1;
-  const cssW=Math.round(W*s*dev)/dev, cssH=Math.round(H*s*dev)/dev;
+  const cssW=Math.round(logicW*scale*dev)/dev, cssH=Math.round(H*scale*dev)/dev;
   cv.style.width=cssW+'px';cv.style.height=cssH+'px';
-  if(cv.width!==nw||cv.height!==nh){cv.width=nw;cv.height=nh;}
+  if(cv.width!==nw||cv.height!==nh){cv.width=nw;cv.height=nh;bgDirty=true;}
   dpr=want;
-  ctx.setTransform(dpr,0,0,dpr,0,0);
+  applyBaseTransform();
   ctx.imageSmoothingEnabled=false;
 }
+// Basistransform: Spiellogik zeichnet weiter in 0..400, wird aber zentriert.
+function applyBaseTransform(){ctx.setTransform(dpr,0,0,dpr,Math.round(bgOX*dpr),0);ctx.imageSmoothingEnabled=false;}
 // Rundet eine Logik-Koordinate auf das Geräte-Pixel-Gitter (scharfe Kanten).
 function snapPx(v){return Math.round(v*dpr)/dpr;}
 // Zeichnet ein Sprite pixelgenau ausgerichtet.
@@ -2843,39 +2861,68 @@ function nebulaSprite(variant){
   nebulaCache[variant]=c;return c;
 }
 
+// --- Höhen-Helfer: weiche Übergänge, damit nie ein harter Szenenwechsel entsteht ---
+function sstep(v,a,b){const t=Math.min(1,Math.max(0,(v-a)/(b-a)));return t*t*(3-2*t);}
+let bgPuffs=[],bgPuffMark=-1;
+function bgPuff(x,y,r){bgPuffs.push({x,y,r,t:1});}
 function drawBg(){
-  const m=bestY;
+  // Kontinuierliche Höhe (gleiche Berechnung wie die Anzeige: -cameraY/10),
+  // dadurch bewegt sich die Welt stufenlos statt in Score-Sprüngen.
+  const m=Math.max(0,-cameraY/10);
+  const BW=(typeof bgW==='number'&&bgW>W)?bgW:W;
+  const OX=(BW-W)/2;
+  ctx.save();
+  ctx.translate(-OX,0);
   const cols=biomeColors(m);
   // Gradient cachen: nur bei Farbwechsel neu bauen (spart Arbeit pro Frame)
-  const key=cols[0]+cols[1];
+  const key=cols[0]+cols[1]+'|'+BW;
   if(bgGradKey!==key){
     const g=ctx.createLinearGradient(0,0,0,H);
     g.addColorStop(0,cols[0]);g.addColorStop(1,cols[1]);
     bgGrad=g;bgGradKey=key;
   }
-  ctx.fillStyle=bgGrad;ctx.fillRect(0,0,W,H);
+  ctx.fillStyle=bgGrad;ctx.fillRect(0,0,BW,H);
 
-  // Sun/moon — sun in day, moon at dusk+
-  if(m<600){
-    ctx.fillStyle='#fff4a3';
-    ctx.beginPath();ctx.arc(W-60,80,26,0,Math.PI*2);ctx.fill();
+  // Horizontglühen: dicht über der Stadt warm, verschwindet mit der Höhe
+  const horizA=Math.max(0,1-sstep(m,200,2200));
+  if(horizA>0.01){
+    ctx.save();ctx.globalAlpha=0.35*horizA;
+    const hg=ctx.createLinearGradient(0,H*0.55,0,H);
+    hg.addColorStop(0,'rgba(255,140,60,0)');
+    hg.addColorStop(1,'rgba(255,150,70,0.85)');
+    ctx.fillStyle=hg;ctx.fillRect(0,H*0.55,BW,H*0.45);
+    ctx.restore();
+  }
+
+  // Sonne sinkt langsam, Mond steigt auf — beides überblendet
+  const sunA=Math.max(0,1-sstep(m,250,900));
+  if(sunA>0.01){
+    const sy=80+sstep(m,0,900)*260;
+    ctx.save();ctx.globalAlpha=sunA;
     ctx.fillStyle='rgba(255,244,163,0.25)';
-    ctx.beginPath();ctx.arc(W-60,80,40,0,Math.PI*2);ctx.fill();
-  } else if(m>=600&&m<1400){
-    // moon
+    ctx.beginPath();ctx.arc(BW-60,sy,40,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#fff4a3';
+    ctx.beginPath();ctx.arc(BW-60,sy,26,0,Math.PI*2);ctx.fill();
+    ctx.restore();
+  }
+  const moonA=sstep(m,600,1200);
+  if(moonA>0.01){
+    ctx.save();ctx.globalAlpha=moonA;
     ctx.fillStyle='#f5f1d6';
     ctx.beginPath();ctx.arc(70,90,22,0,Math.PI*2);ctx.fill();
     ctx.fillStyle='rgba(200,190,160,0.6)';
     ctx.beginPath();ctx.arc(66,86,4,0,Math.PI*2);ctx.arc(78,94,3,0,Math.PI*2);ctx.arc(64,98,2.5,0,Math.PI*2);ctx.fill();
+    ctx.restore();
   }
 
-  // Stars — appear from dusk onward, denser deeper in space
-  if(m>700){
-    const starA=Math.min(1,(m-700)/500);
-    for(let i=0;i<80;i++){
-      const sx=((i*97)%W);
-      const sy=(((i*53)+(cameraY*0.15))%H+H)%H;
-      ctx.globalAlpha=starA*(0.4+((i*13)%60)/100);
+  // Sterne — erscheinen langsam ab Dämmerung, nahezu statisch (kaum Parallax)
+  const starA=sstep(m,500,1800);
+  if(starA>0.01){
+    const cnt=BW>520?110:80;
+    for(let i=0;i<cnt;i++){
+      const sx=((i*97)%BW);
+      const sy=(((i*53)+(cameraY*0.05))%H+H)%H;
+      ctx.globalAlpha=starA*(0.35+((i*13)%60)/100);
       const tw=0.5+0.5*Math.sin(performance.now()/400+i);
       ctx.fillStyle=i%17===0?'#ffd27a':'#fff';
       const sz=i%23===0?2.5:1.5;
@@ -2896,173 +2943,217 @@ function drawBg(){
   }
 
   // Distant planets in space
-  if(m>2000){
-    const planets=[[60,140,18,'#c97b2a','#8a4a10'],[W-70,260,26,'#6ac0e0','#2d6b85'],[100,420,14,'#c95cff','#5a1a8a']];
+  const planA=sstep(m,1800,2600);
+  if(planA>0.01){
+    ctx.save();ctx.globalAlpha=planA;
+    const planets=[[60,140,18,'#c97b2a','#8a4a10'],[BW-70,260,26,'#6ac0e0','#2d6b85'],[BW*0.4,420,14,'#c95cff','#5a1a8a']];
     for(const p of planets){
       const py=(p[1]+cameraY*0.05)%700; const y=((py%H)+H)%H;
       ctx.fillStyle=p[3];ctx.beginPath();ctx.arc(p[0],y,p[2],0,Math.PI*2);ctx.fill();
       ctx.fillStyle=p[4];ctx.beginPath();ctx.arc(p[0]-p[2]*0.3,y-p[2]*0.3,p[2]*0.6,0,Math.PI*2);ctx.fill();
-      // ring on middle planet
       if(p===planets[1]){
         ctx.strokeStyle='rgba(200,180,120,0.7)';ctx.lineWidth=2;
         ctx.beginPath();ctx.ellipse(p[0],y,p[2]*1.8,p[2]*0.4,0.3,0,Math.PI*2);ctx.stroke();
       }
     }
+    ctx.restore();
   }
 
   // Nebula clouds (deep space)
-  if(m>3000){
+  const nebA=sstep(m,2800,3400);
+  if(nebA>0.01){
+    ctx.save();ctx.globalAlpha=nebA;
     for(let i=0;i<4;i++){
-      const nx=((i*173+cameraY*0.08)%(W+200))-100;
+      const nx=((i*173+cameraY*0.08)%(BW+200))-100;
       const ny=((((i*137)+cameraY*0.04)%H)+H)%H;
-      const x=((nx%W)+W)%W;
-      const spr=nebulaSprite(i%2);
-      ctx.drawImage(spr,x-80,ny-80);
+      const x=((nx%BW)+BW)%BW;
+      ctx.drawImage(nebulaSprite(i%2),x-80,ny-80);
     }
+    ctx.restore();
   }
 
-  // Clouds — fade out with altitude, back layer + front layer
-  if(m<1600){
-    const cloudA=Math.max(0,1-m/1600);
-    // back layer (small, slow)
-    ctx.fillStyle='rgba(255,255,255,'+(0.5*cloudA)+')';
-    for(let i=0;i<5;i++){
-      const cx=(i*167+cameraY*0.15)%(W+120)-60;
-      const cy=((i*211)+cameraY*0.08)%H;
-      drawCloud(((cx%W)+W)%W,((cy%H)+H)%H,14+((i*5)%10));
+  // ---- Wolkenschichten: drei Bänder mit eigener Parallax-Geschwindigkeit ----
+  // Jede Schicht hat ihr eigenes Höhenfenster -> der Spieler steigt wirklich
+  // durch die Wolkendecke hindurch statt nur durch einen Ausblend-Effekt.
+  const layers=[
+    {sp:0.10,sx:0.010,n:5,r:12,a:0.40,lo:0,hi:1400,seed:167,vs:211},   // fern
+    {sp:0.24,sx:0.018,n:5,r:20,a:0.55,lo:120,hi:2400,seed:137,vs:191}, // mittel
+    {sp:0.46,sx:0.030,n:4,r:28,a:0.70,lo:500,hi:3400,seed:113,vs:173}, // nah
+  ];
+  const drift=performance.now()/1000;
+  for(const L of layers){
+    const a=L.a*Math.max(0,1-sstep(m,L.hi*0.62,L.hi))*sstep(m,L.lo-1,L.lo+220);
+    if(a<=0.01)continue;
+    ctx.fillStyle='rgba(255,255,255,'+a.toFixed(3)+')';
+    for(let i=0;i<L.n;i++){
+      const cx=(i*L.seed+cameraY*L.sp+drift*L.sx*60)%(BW+140)-70;
+      const cy=((i*L.vs)+cameraY*(L.sp*0.55))%H;
+      drawCloud(((cx%BW)+BW)%BW,((cy%H)+H)%H,L.r+((i*5)%10));
     }
-    // front layer (big, faster)
-    ctx.fillStyle='rgba(255,255,255,'+(0.85*cloudA)+')';
-    for(let i=0;i<6;i++){
-      const cx=(i*137+cameraY*0.35)%(W+120)-60;
-      const cy=((i*191)+cameraY*0.18)%H;
-      drawCloud(((cx%W)+W)%W,((cy%H)+H)%H,20+((i*7)%15));
+  }
+  // Pixel-Puffs, wenn der Spieler eine Wolkendecke durchstößt (rein optisch)
+  const band=Math.floor(m/260);
+  if(m>240&&m<3200&&band!==bgPuffMark){
+    bgPuffMark=band;
+    for(let i=0;i<10;i++)bgPuff(OX+40+Math.random()*(W-80),H*0.32+Math.random()*80,3+Math.random()*4);
+  }
+  if(bgPuffs.length){
+    for(let i=bgPuffs.length-1;i>=0;i--){
+      const p=bgPuffs[i];p.t-=0.02;p.y+=1.1;p.x+=Math.sin(p.t*6)*0.4;
+      if(p.t<=0){bgPuffs.splice(i,1);continue;}
+      ctx.fillStyle='rgba(255,255,255,'+(0.35*p.t).toFixed(3)+')';
+      ctx.fillRect(p.x|0,p.y|0,(p.r*p.t+1)|0,(p.r*p.t+1)|0);
     }
   }
 
   // Hot air balloons at low altitude
-  if(m<900){
+  const balA=Math.max(0,1-sstep(m,500,1000));
+  if(balA>0.01){
+    ctx.save();ctx.globalAlpha=balA;
     for(let i=0;i<2;i++){
-      const bx=((i*233+cameraY*0.25)%(W+80))-40;
+      const bx=((i*233+cameraY*0.25)%(BW+80))-40;
       const by=((i*171+120)%H);
-      const x=((bx%W)+W)%W,y=((by%H)+H)%H;
-      // balloon
-      const cols=['#e74c3c','#f39c12'];
-      ctx.fillStyle=cols[i%2];ctx.strokeStyle='#000';ctx.lineWidth=1;
+      const x=((bx%BW)+BW)%BW,y=((by%H)+H)%H;
+      const bc=['#e74c3c','#f39c12'];
+      ctx.fillStyle=bc[i%2];ctx.strokeStyle='#000';ctx.lineWidth=1;
       ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();ctx.stroke();
-      // stripe
       ctx.fillStyle='#fff';ctx.fillRect(x-1,y-10,2,20);
-      // basket
       ctx.fillStyle='#8a5a2a';ctx.fillRect(x-4,y+12,8,5);ctx.strokeRect(x-4,y+12,8,5);
-      // ropes
       ctx.strokeStyle='#333';ctx.beginPath();ctx.moveTo(x-4,y+12);ctx.lineTo(x-6,y+7);ctx.moveTo(x+4,y+12);ctx.lineTo(x+6,y+7);ctx.stroke();
     }
+    ctx.restore();
   }
 
   // Birds — daytime
-  if(m<800){
+  const birdA=Math.max(0,1-sstep(m,400,900));
+  if(birdA>0.01){
+    ctx.save();ctx.globalAlpha=birdA;
     ctx.strokeStyle='#222';ctx.lineWidth=2;
     const flap=Math.sin(performance.now()/200)*2;
     for(let i=0;i<4;i++){
-      const bx=((i*173+cameraY*0.5)%(W+60))-30;
+      const bx=((i*173+cameraY*0.5)%(BW+60))-30;
       const by=((i*97)%H);
-      const x=((bx%W)+W)%W,y=((by%H)+H)%H;
+      const x=((bx%BW)+BW)%BW,y=((by%H)+H)%H;
       ctx.beginPath();ctx.moveTo(x-7,y);ctx.quadraticCurveTo(x-3,y-4-flap,x,y);ctx.quadraticCurveTo(x+3,y-4-flap,x+7,y);ctx.stroke();
     }
+    ctx.restore();
   }
 
-  // City skyline (near ground)
-  if(m<600){
-    const skyA=Math.max(0,1-m/600);
-    // back skyline
-    ctx.fillStyle='rgba(60,60,90,'+(0.5*skyA)+')';
-    for(let i=0;i<12;i++){
-      const hx=i*38-10; const hh=40+((i*47)%50);
-      ctx.fillRect(hx,H-60-hh,36,hh+60);
+  // ---- Stadt: sinkt mit steigender Höhe nach unten, schrumpft und verblasst ----
+  // drop schiebt die Skyline aus dem Bild, sc verkleinert sie -> "über der Stadt".
+  const drop=sstep(m,0,2600)*(H*0.78);
+  const sc=1/(1+m/750);
+  const cityA=Math.max(0,1-sstep(m,1600,4200)*0.94);
+  if(cityA>0.02){
+    ctx.save();
+    ctx.translate(0,drop);
+    const gy=H-20;                       // Straßenniveau
+    const sk=(bh)=>gy-bh*sc;             // Dachhöhe skaliert
+    // Lichtdunst über der Stadt
+    ctx.globalAlpha=0.22*cityA;
+    ctx.fillStyle='#ffb85c';
+    ctx.fillRect(0,gy-120*sc,BW,120*sc+30);
+    ctx.globalAlpha=1;
+    // hintere Skyline (langsam, klein)
+    const bo=(cameraY*0.06)%76;
+    ctx.fillStyle='rgba(60,60,90,'+(0.45*cityA).toFixed(3)+')';
+    for(let i=-1;i<Math.ceil(BW/38)+2;i++){
+      const hx=i*38-10+bo, bh=(40+((i*47+470)%50));
+      ctx.fillRect(hx,sk(bh)-40*sc,36,bh*sc+80);
     }
-    // front houses w/ windows
-    ctx.fillStyle='rgba(40,40,60,'+(0.8*skyA)+')';
-    for(let i=0;i<8;i++){
-      const hx=i*55; const hh=30+((i*37)%40);
-      ctx.fillRect(hx,H-40-hh,50,hh+40);
-      // roof triangle on some
-      if(i%3===0){
-        ctx.beginPath();ctx.moveTo(hx-2,H-40-hh);ctx.lineTo(hx+25,H-50-hh);ctx.lineTo(hx+52,H-40-hh);ctx.closePath();ctx.fill();
+    // vordere Häuser mit Fenstern (mittlere Parallax)
+    const fo=(cameraY*0.12)%110;
+    for(let i=-1;i<Math.ceil(BW/55)+2;i++){
+      const hx=i*55+fo, bh=(30+((i*37+370)%40));
+      const top=sk(bh);
+      ctx.fillStyle='rgba(40,40,60,'+(0.78*cityA).toFixed(3)+')';
+      ctx.fillRect(hx,top,50,gy-top+40);
+      if(((i%3)+3)%3===0){
+        ctx.beginPath();ctx.moveTo(hx-2,top);ctx.lineTo(hx+25,top-10*sc);ctx.lineTo(hx+52,top);ctx.closePath();ctx.fill();
       }
-      ctx.fillStyle='rgba(255,213,74,'+(0.9*skyA)+')';
-      for(let w=0;w<2;w++)for(let hv=0;hv<Math.floor(hh/12);hv++){
-        // occasional dark window
-        if(((i*3+w+hv)%5)!==0) ctx.fillRect(hx+8+w*22,H-40-hh+6+hv*12,6,6);
+      // Fenster werden mit der Höhe zu winzigen Lichtpunkten
+      const wS=Math.max(1,6*sc);
+      ctx.fillStyle='rgba(255,213,74,'+(0.85*cityA).toFixed(3)+')';
+      const rows=Math.max(1,Math.floor((bh*sc)/(12*sc)));
+      for(let w=0;w<2;w++)for(let hv=0;hv<rows;hv++){
+        if((((i*3+w+hv)%5)+5)%5!==0) ctx.fillRect(hx+8+w*22,top+6*sc+hv*12*sc,wS,wS);
       }
-      ctx.fillStyle='rgba(40,40,60,'+(0.8*skyA)+')';
     }
-    // ground line
-    ctx.fillStyle='rgba(30,30,40,'+(0.9*skyA)+')';
-    ctx.fillRect(0,H-20,W,20);
+    // Straße
+    ctx.fillStyle='rgba(30,30,40,'+(0.9*cityA).toFixed(3)+')';
+    ctx.fillRect(0,gy,BW,40);
+    ctx.restore();
   }
 
-  // Mountain range mid-altitude
-  if(m>=400&&m<1200){
-    const mtA=Math.min(1,(m-400)/300)*Math.max(0,1-(m-800)/400);
-    ctx.fillStyle='rgba(60,50,80,'+(0.6*mtA)+')';
+  // Mountain range mid-altitude — sinkt ebenfalls langsam mit
+  const mtA=sstep(m,350,700)*Math.max(0,1-sstep(m,1000,1800));
+  if(mtA>0.01){
+    ctx.save();
+    ctx.translate(0,sstep(m,300,2400)*H*0.55);
+    ctx.fillStyle='rgba(60,50,80,'+(0.6*mtA).toFixed(3)+')';
     ctx.beginPath();ctx.moveTo(0,H);
     const off=(cameraY*0.1);
-    for(let i=0;i<=8;i++){
-      const px=i*(W/8);
+    const segs=Math.max(8,Math.round(BW/50));
+    for(let i=0;i<=segs;i++){
+      const px=i*(BW/segs);
       const py=H-80-((Math.sin(i*1.7+off*0.01)*30)+(i%3)*20);
       ctx.lineTo(px,py);
     }
-    ctx.lineTo(W,H);ctx.closePath();ctx.fill();
-    // snow caps
-    ctx.fillStyle='rgba(255,255,255,'+(0.7*mtA)+')';
-    for(let i=1;i<8;i++){
-      const px=i*(W/8);
+    ctx.lineTo(BW,H);ctx.closePath();ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,'+(0.7*mtA).toFixed(3)+')';
+    for(let i=1;i<segs;i++){
+      const px=i*(BW/segs);
       const py=H-80-((Math.sin(i*1.7+off*0.01)*30)+(i%3)*20);
       ctx.beginPath();ctx.moveTo(px-8,py+8);ctx.lineTo(px,py);ctx.lineTo(px+8,py+8);ctx.closePath();ctx.fill();
     }
+    ctx.restore();
   }
 
   // UFO in space
   if(m>2200){
-    const ux=(W/2)+Math.sin(performance.now()/1500)*120;
+    const ux=(BW/2)+Math.sin(performance.now()/1500)*120;
     const uy=100+Math.cos(performance.now()/2000)*30;
     ctx.fillStyle='#888';ctx.strokeStyle='#000';ctx.lineWidth=1;
     ctx.beginPath();ctx.ellipse(ux,uy,22,6,0,0,Math.PI*2);ctx.fill();ctx.stroke();
     ctx.fillStyle='#7ff';ctx.beginPath();ctx.arc(ux,uy-4,8,Math.PI,0);ctx.fill();ctx.stroke();
-    // beam
     ctx.fillStyle='rgba(150,255,255,0.15)';
     ctx.beginPath();ctx.moveTo(ux-8,uy+4);ctx.lineTo(ux+8,uy+4);ctx.lineTo(ux+20,uy+50);ctx.lineTo(ux-20,uy+50);ctx.closePath();ctx.fill();
-    // lights
     for(let i=-2;i<=2;i++){
       ctx.fillStyle=(performance.now()%400<200)?'#ff6':'#f36';
       ctx.fillRect(ux+i*7-1,uy+3,2,2);
     }
   }
 
-  // ---- Atmosphäre: zusätzliche Parallax-Dunstebene, weiches Licht und Vignette ----
-  // ferne Dunstschicht (bewegt sich langsamer als alles andere -> mehr Tiefe)
+  // ---- Atmosphäre: ferne Dunstebene, weiches Licht, Vignette ----
   ctx.save();
   ctx.globalAlpha=0.10;
   ctx.fillStyle='#ffffff';
   for(let i=0;i<3;i++){
     const hy=((((i*263)+cameraY*0.03)%H)+H)%H;
-    ctx.beginPath();ctx.ellipse(W*(0.2+i*0.3),hy,W*0.55,26,0,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.ellipse(BW*(0.2+i*0.3),hy,BW*0.55,26,0,0,Math.PI*2);ctx.fill();
   }
   ctx.restore();
-  // weicher Lichtabfall von oben + Vignette unten (einmal pro Frame, sehr günstig)
-  if(!bgVig||bgVigH!==H){
-    const v=ctx.createRadialGradient(W/2,H*0.42,H*0.28,W/2,H*0.5,H*0.85);
+  if(!bgVig||bgVigH!==H||bgVigW!==BW){
+    const v=ctx.createRadialGradient(BW/2,H*0.42,H*0.28,BW/2,H*0.5,Math.max(BW,H)*0.8);
     v.addColorStop(0,'rgba(0,0,0,0)');
     v.addColorStop(1,'rgba(0,0,0,0.30)');
-    bgVig=v;bgVigH=H;
+    bgVig=v;bgVigH=H;bgVigW=BW;
   }
-  ctx.fillStyle=bgVig;ctx.fillRect(0,0,W,H);
+  ctx.fillStyle=bgVig;ctx.fillRect(0,0,BW,H);
   ctx.save();
   ctx.globalAlpha=0.06;ctx.fillStyle='#ffffff';
-  ctx.fillRect(0,0,W,H*0.28);
+  ctx.fillRect(0,0,BW,H*0.28);
+  ctx.restore();
+  // Spielbereich leicht hervorheben, damit Plattformen/Spieler dominant bleiben
+  if(OX>0){
+    ctx.save();
+    ctx.globalAlpha=0.30;ctx.fillStyle='#000';
+    ctx.fillRect(0,0,OX,H);ctx.fillRect(OX+W,0,OX+2,H);
+    ctx.restore();
+  }
   ctx.restore();
 }
-let bgVig=null,bgVigH=0;
+let bgVig=null,bgVigH=0,bgVigW=0;
 
 function drawCloud(x,y,r){
   ctx.beginPath();
@@ -6392,7 +6483,7 @@ pauseGame=function(){_pauseGame();edBackBtn.style.display=(mapRun.phase==='test'
   let down=null,moved=false;
   const toLogic=(e)=>{
     const r=cv.getBoundingClientRect();
-    return {x:(e.clientX-r.left)/r.width*W,y:(e.clientY-r.top)/r.height*H};
+    return {x:(e.clientX-r.left)/r.width*bgW-bgOX,y:(e.clientY-r.top)/r.height*H};
   };
   cv.addEventListener('pointerdown',e=>{
     if(gameState!=='editor')return;
