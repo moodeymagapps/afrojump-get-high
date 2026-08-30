@@ -1012,22 +1012,36 @@ const cv=document.getElementById('c'),ctx=cv.getContext('2d',{alpha:false});
 const W=400,H=700;
 // Hi-DPI: interne Auflösung an das Display anpassen -> scharfe Pixel, alle
 // Zeichenkoordinaten bleiben im 400x700-Logikraum.
-let dpr=1;
+// bgW = logische Breite der Leinwand (>= W). Auf breiten Bildschirmen wird die
+// Leinwand breiter und der Hintergrund füllt sie komplett aus; das Spielfeld
+// bleibt exakt 400x700 (Physik/Levelgen/Kollisionen unverändert) und sitzt
+// mittig -> Desktop 16:9 landscape, Mobile weiterhin 9:16 portrait.
+let dpr=1,bgW=W,bgOX=0;
 function fit(){
-  const s=Math.min(window.innerWidth/W,window.innerHeight/H);
+  const vw=window.innerWidth,vh=window.innerHeight;
+  // Höhe füllen; auf schmalen (Portrait-)Screens zusätzlich Breite begrenzen.
+  const s=Math.min(vh/H,Math.max(vw/W,vh/H));
+  const sFit=Math.min(vw/W,vh/H);
+  const wide=vw/vh>W/H;            // breiter als 4:7 -> Desktop/Landscape
+  const scale=wide?vh/H:sFit;
+  // Logische Breite so wählen, dass die volle Bildschirmbreite genutzt wird.
+  const logicW=wide?Math.min(1400,Math.max(W,Math.round(vw/scale))):W;
+  bgW=logicW;bgOX=(logicW-W)/2;
   // Ganzzahliger Geräte-Pixel-Faktor: dadurch landet jeder Logik-Pixel exakt
   // auf einem Gitter aus ganzen Geräte-Pixeln -> keine Fransen an Konturen.
-  const want=Math.max(1,Math.min(4,Math.ceil((window.devicePixelRatio||1)*s)));
-  const nw=W*want,nh=H*want;
+  const want=Math.max(1,Math.min(4,Math.ceil((window.devicePixelRatio||1)*scale)));
+  const nw=logicW*want,nh=H*want;
   // CSS-Größe auf ganze Geräte-Pixel runden, damit nicht neu resampelt wird.
   const dev=window.devicePixelRatio||1;
-  const cssW=Math.round(W*s*dev)/dev, cssH=Math.round(H*s*dev)/dev;
+  const cssW=Math.round(logicW*scale*dev)/dev, cssH=Math.round(H*scale*dev)/dev;
   cv.style.width=cssW+'px';cv.style.height=cssH+'px';
-  if(cv.width!==nw||cv.height!==nh){cv.width=nw;cv.height=nh;}
+  if(cv.width!==nw||cv.height!==nh){cv.width=nw;cv.height=nh;bgVig=null;bgGradKey='';}
   dpr=want;
-  ctx.setTransform(dpr,0,0,dpr,0,0);
+  applyBaseTransform();
   ctx.imageSmoothingEnabled=false;
 }
+// Basistransform: Spiellogik zeichnet weiter in 0..400, wird aber zentriert.
+function applyBaseTransform(){ctx.setTransform(dpr,0,0,dpr,Math.round(bgOX*dpr),0);ctx.imageSmoothingEnabled=false;}
 // Rundet eine Logik-Koordinate auf das Geräte-Pixel-Gitter (scharfe Kanten).
 function snapPx(v){return Math.round(v*dpr)/dpr;}
 // Zeichnet ein Sprite pixelgenau ausgerichtet.
