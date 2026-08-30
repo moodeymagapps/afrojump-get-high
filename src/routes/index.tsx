@@ -38,6 +38,12 @@ function Index() {
       s.id = "bannerPlanesScript";
       s.src = "/banner-planes.js";
       doc.body.appendChild(s);
+if (!doc.getElementById("bgMusicScript")) {
+  const s2 = doc.createElement("script");
+  s2.id = "bgMusicScript";
+  s2.src = "/bg-music-pause.js";
+  doc.body.appendChild(s2);
+}
     } catch {
       /* ignore */
     }
