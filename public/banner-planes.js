@@ -17,10 +17,10 @@
     merz: "MERZLECKEIER",
   };
   const COLORS = {
-    palestine: [#0a7a3e, #fff, #000],
+    palestine: ["#0a7a3e", "#fff"],
     fckafd: ["#0b1d4a", "#f5c518"],
     p161: ["#c41212", "#fff"],
-    merz: ["#f3e6c4", "#b11", "#111"],
+    merz: ["#f3e6c4", "#b11"],
   };
 
   const KEYS = Object.keys(SRCS);
