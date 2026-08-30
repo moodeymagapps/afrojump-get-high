@@ -6479,7 +6479,7 @@ pauseGame=function(){_pauseGame();edBackBtn.style.display=(mapRun.phase==='test'
   let down=null,moved=false;
   const toLogic=(e)=>{
     const r=cv.getBoundingClientRect();
-    return {x:(e.clientX-r.left)/r.width*W,y:(e.clientY-r.top)/r.height*H};
+    return {x:(e.clientX-r.left)/r.width*bgW-bgOX,y:(e.clientY-r.top)/r.height*H};
   };
   cv.addEventListener('pointerdown',e=>{
     if(gameState!=='editor')return;
