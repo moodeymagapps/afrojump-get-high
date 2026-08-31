@@ -116,7 +116,7 @@ function patchGameHtml(html: string) {
   if (!out.includes("var __W=0")) {
     out = out.replace(
       "function reset(){\n  prngState=",
-      "function reset(){\n  var __W=0;try{var loc=(parent&&parent.location)||location;var raw=((loc.search||'')+'&'+String(loc.hash||'').replace('#','')).replace(/^[?&#]+/,'');var s=new URLSearchParams(raw);if(s.get('dev')==='moodey')__W=Math.floor(+(s.get('warp')||s.get('m')||0)||0);}catch(e){}\n  prngState="
+      "function reset(){\n  var __W=0;try{var loc=(parent&&parent.location)||location;var raw=((loc.search||'')+'&'+String(loc.hash||'').replace('#','')).replace(/^[?&#]+/,'');var s=new URLSearchParams(raw);if(s.get('dev')==='moodey')__W=Math.floor(+(s.get('warp')||s.get('m')||0)||0);}catch(e){}window.__afroDevRun=!!__W;\n  prngState="
     );
     out = out.replace(
       "player={x:W/2,y:H-100,vx:0,vy:-14",
@@ -135,6 +135,14 @@ function patchGameHtml(html: string) {
       "platforms.push({x:W/2-40,y:__W?(-__W*10+40):H-40,w:80,h:12,vx:0,type:'normal',dir:1,range:0,ox:W/2-40,bounce:0,cracked:0});"
     );
   }
+  out = out.replace(
+    "if(bestY>highScore){highScore=bestY;localStorage.setItem(HK,highScore);}",
+    "if(bestY>highScore&&!window.__afroDevRun){highScore=bestY;localStorage.setItem(HK,highScore);}"
+  );
+  out = out.replace(
+    "const rec=gameState==='playing'&&bestY>highScore&&highScore>0;",
+    "const rec=gameState==='playing'&&bestY>highScore&&highScore>0&&!window.__afroDevRun;"
+  );
 
   const inject =
     "<style id=\"afroSafeFill\">" +
@@ -160,7 +168,7 @@ function Index() {
       if (!doc.getElementById("afroFxScript")) {
         const s = doc.createElement("script");
         s.id = "afroFxScript";
-        s.src = "/afro-fx.js?v=warp14";
+        s.src = "/afro-fx.js?v=warp15";
         doc.body.appendChild(s);
       }
       if (!doc.getElementById("bgMusicScript")) {
@@ -178,7 +186,7 @@ function Index() {
     const frame = frameRef.current;
     if (!frame) return;
     let cancelled = false;
-    fetch("/game.html?v=warp14", { cache: "no-store" })
+    fetch("/game.html?v=warp15", { cache: "no-store" })
       .then((r) => r.text())
       .then((html) => {
         if (cancelled || !frame) return;
@@ -186,7 +194,7 @@ function Index() {
       })
       .catch(() => {
         if (!cancelled && frame && !frame.getAttribute("src")) {
-          frame.src = "/game.html?v=warp14";
+          frame.src = "/game.html?v=warp15";
         }
       });
     return () => {
