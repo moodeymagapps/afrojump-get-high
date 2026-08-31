@@ -83,10 +83,6 @@ function patchGameHtml(html: string) {
     "planeNextM=m+200+Math.random()*200"
   );
   out = out.replace(
-    "    if(m>=planeNextM||planeT<=0){\n      planeSpawn();\n      planeNextM=m+200+Math.random()*300;\n      planeT=12+Math.random()*6;",
-    "    if(m>=planeNextM||planeT<=0){\n      planeSpawn();\n      planeNextM=m+200+Math.random()*200;\n      planeT=16+Math.random()*8;"
-  );
-  out = out.replace(
     "const w=W*(0.28+Math.random()*0.14),h=w*0.3;",
     "const w=W*(0.32+Math.random()*0.08),h=w*0.30;"
   );
@@ -117,6 +113,18 @@ function patchGameHtml(html: string) {
     "const birdA=0;"
   );
 
+  const warp =
+    "function afroWarp(meters){meters=Math.max(0,Math.floor(+meters||0));const worldY=-meters*10;cameraY=worldY-H*0.42;bestY=Math.max(bestY||0,meters);if(player){player.y=worldY;player.vy=-10;player.vx=0;player.x=W/2;player.alive=true;player.invincible=Math.max(player.invincible||0,4);player.invSrc='dev';}platforms=[];collectibles=[];enemies=enemies&&enemies.filter?enemies.filter(e=>e&&e.boss):[];let py=worldY+90;for(let i=0;i<28;i++){py-=65;try{spawnPlatform(py);}catch(e){}}try{nextBossScore=Math.max(nextBossScore||0,meters+500);}catch(e){}try{skyReset();planeReset();}catch(e){}gameOver=false;}\n" +
+    "window.afroWarp=afroWarp;\n" +
+    "window.addEventListener('keydown',function(e){if(!e)return;if(e.key==='Home'){e.preventDefault();afroWarp(10000);}else if(e.key==='PageUp'){e.preventDefault();afroWarp((bestY||0)+500);}else if(e.key==='PageDown'){e.preventDefault();afroWarp(Math.max(0,(bestY||0)-500));}});\n" +
+    "(function(){try{var q=new URLSearchParams((parent&&parent.location&&parent.location.search)||location.search||'');var w=q.get('warp')||q.get('m');if(w){window.__afroWarpTo=+w;setTimeout(function(){if(window.afroWarp)afroWarp(window.__afroWarpTo);},900);}}catch(e){}})();\n";
+  if (!out.includes("function afroWarp")) {
+    out = out.replace(
+      "function planeReset(){plane=null;planeNextM=200+Math.random()*300;planeT=12+Math.random()*6;}",
+      "function planeReset(){plane=null;planeNextM=200+Math.random()*300;planeT=12+Math.random()*6;}\n" + warp
+    );
+  }
+
   const inject =
     "<style id=\"afroSafeFill\">" +
     "html,body,#wrap{background:#0b1a0b!important;min-height:100dvh!important;min-height:-webkit-fill-available!important;}" +
@@ -141,7 +149,7 @@ function Index() {
       if (!doc.getElementById("afroFxScript")) {
         const s = doc.createElement("script");
         s.id = "afroFxScript";
-        s.src = "/afro-fx.js?v=planes9";
+        s.src = "/afro-fx.js?v=warp10";
         doc.body.appendChild(s);
       }
       if (!doc.getElementById("bgMusicScript")) {
@@ -159,7 +167,7 @@ function Index() {
     const frame = frameRef.current;
     if (!frame) return;
     let cancelled = false;
-    fetch("/game.html?v=planes9", { cache: "no-store" })
+    fetch("/game.html?v=warp10", { cache: "no-store" })
       .then((r) => r.text())
       .then((html) => {
         if (cancelled || !frame) return;
@@ -167,7 +175,7 @@ function Index() {
       })
       .catch(() => {
         if (!cancelled && frame && !frame.getAttribute("src")) {
-          frame.src = "/game.html?v=planes9";
+          frame.src = "/game.html?v=warp10";
         }
       });
     return () => {
