@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
-<meta name="theme-color" content="#0a0a0a" />
+<meta name="theme-color" content="#0b1a0b" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -12,8 +12,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 <style>
-  html,body{margin:0;padding:0;height:100%;background:#0a0a0a;overflow:hidden;overscroll-behavior:none;-webkit-overflow-scrolling:auto;-webkit-tap-highlight-color:transparent;font-family:'VT323','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;color:#fff;touch-action:none;user-select:none;-webkit-user-select:none;image-rendering:pixelated;}
+  html,body{margin:0;padding:0;height:100%;background:#0b1a0b;overflow:hidden;overscroll-behavior:none;-webkit-overflow-scrolling:auto;-webkit-tap-highlight-color:transparent;font-family:'VT323','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;color:#fff;touch-action:none;user-select:none;-webkit-user-select:none;image-rendering:pixelated;}
   html,body{width:100%;height:100dvh;}
+  #wrap,iframe{background:#0b1a0b;}
   /* Vollbild-/Install-Hinweis (erster Start) */
   #howto{position:fixed;inset:0;z-index:58;display:none;flex-direction:column;align-items:center;justify-content:center;padding:calc(22px + env(safe-area-inset-top)) 20px calc(22px + env(safe-area-inset-bottom));box-sizing:border-box;background:linear-gradient(rgba(8,6,16,.92),rgba(8,6,16,.97));font-family:'VT323',monospace;text-align:center;}
   #howto.show{display:flex;animation:ovIn .2s ease-out;}
@@ -22,8 +23,8 @@
   #howto h2{font-family:'Press Start 2P',monospace;font-size:12px;color:#7cfc00;margin:0 0 10px;letter-spacing:1px;text-shadow:2px 2px 0 #000;}
   #howto ol{margin:0;padding:0 0 0 18px;text-align:left;font-size:19px;line-height:1.45;letter-spacing:.5px;color:#e9e6ff;}
   #howto .hint{font-size:16px;opacity:.7;margin-top:10px;letter-spacing:.5px;}
-  #wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;}
-  canvas{background:#87ceeb;display:block;box-shadow:0 0 40px #000a, 0 0 0 4px #2b1a0a, 0 0 0 8px #7cfc00;touch-action:none;image-rendering:pixelated;}
+  #wrap{position:fixed;inset:0;background:#0b1a0b;display:flex;align-items:center;justify-content:center;}
+  canvas{background:#0b1a0b;display:block;box-shadow:0 0 40px #000a, 0 0 0 4px #2b1a0a, 0 0 0 8px #7cfc00;touch-action:none;image-rendering:pixelated;}
   #ui{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;align-items:flex-start;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;text-shadow:2px 2px 0 #000;pointer-events:none;font-size:10px;gap:8px;}
   #ui .stats{display:flex;flex-direction:column;gap:2px;}
   #ui .right{display:flex;align-items:center;gap:8px;pointer-events:auto;}
@@ -909,6 +910,7 @@
   <div id="over" class="overlay">
     <img class="logoImg sm" src="/__l5e/assets-v1/69274bbc-7857-4d3d-a4d3-4747a688e509/afro-jump-logo.png" alt="Afro Jump">
     <h1>GAME OVER</h1>
+    <p id="deathLine" style="color:#7cfc00;font-size:19px;max-width:320px;line-height:1.25;margin:0 0 8px;"></p>
     <p id="finalScore"></p>
     <p id="finalHigh"></p>
     <p id="finalBags"></p>
@@ -1361,6 +1363,98 @@ function sprite(key){
   return e.ok?e.img:null;
 }
 for(const k in SPRITE_FILES)sprite(k);
+// ---------- Deko-Medien: transparentes WebM mit PNG-Fallback ----------
+const mediaCache={};
+function media(base){
+  let m=mediaCache[base];
+  if(!m){
+    m=mediaCache[base]={el:null,ready:false,dead:false};
+    const png=()=>{const i=new Image();i.onload=()=>{m.el=i;m.ready=true;};i.onerror=()=>{m.dead=true;};i.src='/'+base+'.png';};
+    try{
+      const v=document.createElement('video');
+      v.muted=true;v.loop=true;v.playsInline=true;v.autoplay=true;v.preload='auto';
+      v.setAttribute('muted','');v.setAttribute('playsinline','');
+      v.addEventListener('loadeddata',()=>{m.el=v;m.ready=true;v.play().catch(()=>{});});
+      v.addEventListener('error',png,{once:true});
+      v.src='/'+base+'.webm';
+      v.play().catch(()=>{});
+    }catch(e){png();}
+  }
+  return m;
+}
+function drawMedia(g,base,x,y,w,h,alpha,flip){
+  const m=media(base);
+  if(!m.ready||!m.el)return false;
+  g.save();
+  g.imageSmoothingEnabled=false;
+  if(alpha!=null)g.globalAlpha=alpha;
+  if(flip){g.translate(x+w,y);g.scale(-1,1);g.drawImage(m.el,0,0,w,h);}
+  else g.drawImage(m.el,Math.round(x),Math.round(y),Math.round(w),Math.round(h));
+  g.restore();
+  return true;
+}
+// ---------- Pixel-Sky-Props (rein dekorativ, hinter dem Gameplay) ----------
+const SKY_COMMON=['cloud','cloud_bank'];
+const SKY_BIRDS=['bird','birds','leaves'];
+let skyProps=[],skyNextT=1.2,skyRareM=420,skyLastCam=0;
+function skyReset(){skyProps=[];skyNextT=1.2;skyRareM=420;skyLastCam=cameraY||0;}
+function skySpawn(m){
+  let base;
+  const r=Math.random();
+  if(m>2600&&r<0.35)base='stars';
+  else if(r<0.62)base=SKY_COMMON[Math.floor(Math.random()*SKY_COMMON.length)];
+  else base=SKY_BIRDS[Math.floor(Math.random()*SKY_BIRDS.length)];
+  const rare=(m>=skyRareM)&&Math.random()<0.5;
+  if(rare){base=Math.random()<0.5?'balloon':'blimp';skyRareM=m+400+Math.random()*400;}
+  const wf=rare?(0.18+Math.random()*0.10):(base==='stars'?0.5:0.24+Math.random()*0.2);
+  const w=W*wf,h=w*0.62;
+  const dir=Math.random()<0.5?1:-1;
+  skyProps.push({base,x:dir>0?-w:W,y:20+Math.random()*(H*0.55),w,h,
+    vx:dir*(8+Math.random()*12),alpha:0.5+Math.random()*0.15,par:0.15});
+}
+function drawSkyProps(dt){
+  const m=Math.max(0,Math.round((bestY||0)));
+  const camD=(cameraY||0)-skyLastCam;skyLastCam=cameraY||0;
+  skyNextT-=dt;
+  if(skyNextT<=0){skyNextT=3+Math.random()*5;if(skyProps.length<2)skySpawn(m);}
+  for(const sp of skyProps){
+    sp.x+=sp.vx*dt;
+    sp.y-=camD*sp.par;
+    if(sp.base==='stars'&&m<=2200)sp.alpha=Math.max(0,sp.alpha-dt*0.4);
+    drawMedia(ctx,'sky/'+sp.base,sp.x,sp.y,sp.w,sp.h,sp.alpha);
+  }
+  skyProps=skyProps.filter(sp=>sp.alpha>0.02&&sp.x>-sp.w*2&&sp.x<W+sp.w*2&&sp.y>-sp.h*2&&sp.y<H+sp.h*2);
+}
+// ---------- Banner-Flugzeuge (Deko, keine Kollision) ----------
+const PLANE_FILES=['fckafd','p161','merz','palestine'];
+let plane=null,planeNextM=200+Math.random()*300,planeT=12+Math.random()*6;
+function planeReset(){plane=null;planeNextM=200+Math.random()*300;planeT=12+Math.random()*6;}
+function planeSpawn(){
+  const base=PLANE_FILES[Math.floor(Math.random()*PLANE_FILES.length)];
+  const w=W*(0.28+Math.random()*0.14),h=w*0.3;
+  const dir=Math.random()<0.5?1:-1;
+  const dur=4+Math.random()*3;
+  plane={base,dir,w,h,y:30+Math.random()*(H*0.35),
+    x:dir>0?-w:W,vx:dir*((W+w*2)/dur),t:0};
+}
+function drawPlanes(dt){
+  const m=Math.max(0,Math.round((bestY||0)));
+  if(!plane){
+    planeT-=dt;
+    if(m>=planeNextM||planeT<=0){
+      planeSpawn();
+      planeNextM=m+200+Math.random()*300;
+      planeT=12+Math.random()*6;
+    }
+  }
+  if(plane){
+    plane.t+=dt;
+    plane.x+=plane.vx*dt;
+    const bob=Math.sin(plane.t*1.8)*3;
+    drawMedia(ctx,'planes/'+plane.base,plane.x,plane.y+bob,plane.w,plane.h,0.95,plane.dir<0);
+    if(plane.x>W+plane.w*1.2||plane.x<-plane.w*2.2)plane=null;
+  }
+}
 // Zeichnet ein Plattform-Sprite: Oberkante = Kollisionskante, Breite = Plattformbreite
 function drawPlatSprite(key,x,topY,w,opts){
   const im=sprite(key);
@@ -1504,7 +1598,25 @@ function setOv(el,show){
   el.classList.add('closing');
   el._ovT=setTimeout(()=>{el._ovT=null;el.classList.remove('closing');el.style.display='none';},130);
 }
+// ---------- Lustige Death-/Fail-Sprüche ----------
+const DEATH_LINES=[
+  'Hahaha war das Weed zu stark?','Bro ist im Kushkoma','Nach jedem High kommt ein Tief',
+  'Skill-Issue, kein Strain-Issue','Der Joint hat dich gedroppt','Afro landed… poorly',
+  'Baggys eingesammelt, Würde verloren','Zu high zum Springen','Die Plattform war eine Halluzination',
+  'Cops 1 – Du 0','Respawn in 3… 2… noch ein Zug','Das war kein Flow, das war ein Fall',
+  'Mutterpflanze schämt sich','Bongzilla hat ausgeatmet. Du auch.','Game Over, aber der Vibe bleibt'
+];
+let lastDeathLine=-1;
+function setDeathLine(){
+  const el=document.getElementById('deathLine');
+  if(!el)return;
+  let i=lastDeathLine;
+  while(i===lastDeathLine&&DEATH_LINES.length>1)i=Math.floor(Math.random()*DEATH_LINES.length);
+  lastDeathLine=i;
+  el.textContent=DEATH_LINES[i];
+}
 function showOverlay(which){
+  if(which==='gameover')setDeathLine();
   setOv(menuEl,which==='menu');
   setOv(pauseEl,which==='paused');
   setOv(shopEl,which==='shop');
@@ -2142,6 +2254,7 @@ function reset(){
   platforms=[];collectibles=[];enemies=[];projectiles=[];particles=[];smokeParticles=[];floatTexts=[];
   cameraY=0;bestY=0;scrollLocked=false;boss=null;nextBossScore=1500;gameOver=false;
   runBags=0;shake={t:0,mag:0};timeScale=1;deathT=0;rings=[];trail=[];flash={a:0,c:'255,255,255'};
+  skyReset();planeReset();
   killCombo=0;comboT=0;runKills=0;bossIndex=0;
   duel.myBest=0;duel.oppBest=0;duel.oppDead=false;duel.oppY=null;duel.oppX=W/2;duel.finished=false;
   stopBossMusic();
@@ -3451,7 +3564,44 @@ function drawImageSkin(g,s,inv,live){
   g.restore();
 }
 
+// ---------- Animierte Skin-Sheets (384x256, 4x2, Zelle 96x128) ----------
+const SHEET_SKINS=['kosak','danjo420','moodey','yannic','revengebird','fabienne','alex','ina','stephan'];
+const sheetCache={};
+function skinSheet(id){
+  if(SHEET_SKINS.indexOf(id)<0)return null;
+  let e=sheetCache[id];
+  if(!e){
+    e=sheetCache[id]={img:new Image(),ok:false};
+    e.img.onload=()=>{e.ok=true;};
+    e.img.onerror=()=>{e.ok=false;e.dead=true;};
+    e.img.src='skins/sheets/'+id+'.png';
+  }
+  return e.ok?e.img:null;
+}
+function drawSheetSkin(g,sh,s,inv,live){
+  const CW=96,CH=128;
+  let col=0;
+  if(live&&player){
+    if(player.landedT>0)col=1;
+    else if(player.vy<0)col=2;
+    else if(player.vy>2)col=3;
+    else col=0;
+  }
+  const row=(live&&(inv>0||player&&player.invincible>0))?1:0;
+  const targetH=62;
+  const k=(g===ctx?dpr:1);
+  const hDev=Math.max(1,Math.round(targetH*k));
+  const wDev=Math.max(1,Math.round(CW*(hDev/CH)));
+  const w=wDev/k,h=hDev/k;
+  const anchor=s.anchorY||0.72;
+  const dx=Math.round(-w/2*k)/k, dy=Math.round(-h*anchor*k)/k;
+  g.save();
+  g.imageSmoothingEnabled=false;
+  g.drawImage(sh,col*CW,row*CH,CW,CH,dx,dy,w,h);
+  g.restore();
+}
 function drawAfroCharacter(g,s,inv,live){
+  if(s&&s.id){const sh=skinSheet(s.id);if(sh){drawSheetSkin(g,sh,s,inv,live);return;}}
   if(s.img){drawImageSkin(g,s,inv,live);return;}
   if(s.render){drawSkinAlt(g,s,inv);return;}
   const rainbow=inv>0;
@@ -5318,6 +5468,8 @@ function render(){
     ctx.translate(Math.sin(tt*47)*s,Math.cos(tt*61)*s*0.7);
   }
   drawBg();
+  {const nowD=performance.now();const dtD=Math.min(0.05,(nowD-(window.__decoT||nowD))/1000);window.__decoT=nowD;
+   drawSkyProps(dtD);drawPlanes(dtD);}
   for(const z of zones)drawZone(z);
   for(const p of platforms)drawPlatform(p);
   for(const hz of hazards)drawHazard(hz);

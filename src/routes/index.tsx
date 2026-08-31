@@ -29,8 +29,14 @@ export const Route = createFileRoute("/")({
 function Index() {
   return (
     <div
-      className="fixed inset-0 overflow-hidden bg-black"
-      style={{ height: "100dvh", overscrollBehavior: "none", touchAction: "none" }}
+      className="fixed inset-0 overflow-hidden"
+      style={{
+        height: "100dvh",
+        width: "100%",
+        background: "#0b1a0b",
+        overscrollBehavior: "none",
+        touchAction: "none",
+      }}
     >
       <iframe
         src="/game.html"
