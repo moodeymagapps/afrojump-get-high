@@ -3564,7 +3564,44 @@ function drawImageSkin(g,s,inv,live){
   g.restore();
 }
 
+// ---------- Animierte Skin-Sheets (384x256, 4x2, Zelle 96x128) ----------
+const SHEET_SKINS=['kosak','danjo420','moodey','yannic','revengebird','fabienne','alex','ina','stephan'];
+const sheetCache={};
+function skinSheet(id){
+  if(SHEET_SKINS.indexOf(id)<0)return null;
+  let e=sheetCache[id];
+  if(!e){
+    e=sheetCache[id]={img:new Image(),ok:false};
+    e.img.onload=()=>{e.ok=true;};
+    e.img.onerror=()=>{e.ok=false;e.dead=true;};
+    e.img.src='skins/sheets/'+id+'.png';
+  }
+  return e.ok?e.img:null;
+}
+function drawSheetSkin(g,sh,s,inv,live){
+  const CW=96,CH=128;
+  let col=0;
+  if(live&&player){
+    if(player.landedT>0)col=1;
+    else if(player.vy<0)col=2;
+    else if(player.vy>2)col=3;
+    else col=0;
+  }
+  const row=(live&&(inv>0||player&&player.invincible>0))?1:0;
+  const targetH=62;
+  const k=(g===ctx?dpr:1);
+  const hDev=Math.max(1,Math.round(targetH*k));
+  const wDev=Math.max(1,Math.round(CW*(hDev/CH)));
+  const w=wDev/k,h=hDev/k;
+  const anchor=s.anchorY||0.72;
+  const dx=Math.round(-w/2*k)/k, dy=Math.round(-h*anchor*k)/k;
+  g.save();
+  g.imageSmoothingEnabled=false;
+  g.drawImage(sh,col*CW,row*CH,CW,CH,dx,dy,w,h);
+  g.restore();
+}
 function drawAfroCharacter(g,s,inv,live){
+  if(s&&s.id){const sh=skinSheet(s.id);if(sh){drawSheetSkin(g,sh,s,inv,live);return;}}
   if(s.img){drawImageSkin(g,s,inv,live);return;}
   if(s.render){drawSkinAlt(g,s,inv);return;}
   const rainbow=inv>0;
