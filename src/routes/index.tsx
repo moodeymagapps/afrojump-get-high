@@ -53,33 +53,49 @@ function patchGameHtml(html: string) {
     "const SKY_BIRDS=['leaves'];"
   );
 
+  // Sky: kleiner + nicht aufeinander
+  out = out.replace(
+    "const wf=rare?(0.18+Math.random()*0.10):(base==='stars'?0.5:0.24+Math.random()*0.2);\n  const w=W*wf,h=w*0.62;\n  const dir=Math.random()<0.5?1:-1;\n  skyProps.push({base,x:dir>0?-w:W,y:20+Math.random()*(H*0.55),w,h,\n    vx:dir*(8+Math.random()*12),alpha:0.5+Math.random()*0.15,par:0.15});",
+    "const wf=rare?(0.09+Math.random()*0.05):(base==='stars'?0.20:0.10+Math.random()*0.06);\n  const w=W*wf,h=w*0.52;\n  const dir=Math.random()<0.5?1:-1;\n  let sy=36+Math.random()*(H*0.48);\n  for(let k=0;k<8;k++){const hit=skyProps.some(p=>Math.abs((p.y||0)-sy)<Math.max(p.h||0,h)*0.9);if(!hit)break;sy=36+Math.random()*(H*0.48);}\n  skyProps.push({base,x:dir>0?-w:W,y:sy,w,h,\n    vx:dir*(8+Math.random()*12),alpha:0.55+Math.random()*0.18,par:0.15});"
+  );
+  out = out.replace(
+    "if(skyNextT<=0){skyNextT=3+Math.random()*5;if(skyProps.length<2)skySpawn(m);}",
+    "if(skyNextT<=0){skyNextT=5+Math.random()*6;if(skyProps.length<2)skySpawn(m);}"
+  );
+
   out = out.replace(
     "const PLANE_FILES=['fckafd','p161','merz','palestine'];",
     "const PLANE_FILES=['fckafd','161','merz','palestine'];try{PLANE_FILES.forEach(function(b){media('planes/'+b);});}catch(e){}"
   );
+  // Flieger: erstes nach ~80-140m / 8s, danach alle 200-400m bzw. 16-24s
   out = out.replaceAll(
     "planeNextM=200+Math.random()*300",
-    "planeNextM=40"
+    "planeNextM=80+Math.random()*60"
   );
   out = out.replaceAll(
     "planeT=12+Math.random()*6",
-    "planeT=1.2"
+    "planeT=8+Math.random()*4"
   );
   out = out.replace(
     "planeNextM=m+200+Math.random()*300",
-    "planeNextM=m+220+Math.random()*120"
+    "planeNextM=m+200+Math.random()*200"
+  );
+  out = out.replace(
+    "    if(m>=planeNextM||planeT<=0){\n      planeSpawn();\n      planeNextM=m+200+Math.random()*300;\n      planeT=12+Math.random()*6;",
+    "    if(m>=planeNextM||planeT<=0){\n      planeSpawn();\n      planeNextM=m+200+Math.random()*200;\n      planeT=16+Math.random()*8;"
   );
   out = out.replace(
     "const w=W*(0.28+Math.random()*0.14),h=w*0.3;",
-    "const w=W*(0.34+Math.random()*0.08),h=w*0.3;"
+    "const w=W*(0.30+Math.random()*0.08),h=w*0.28;"
   );
   out = out.replace(
     "y:30+Math.random()*(H*0.35)",
-    "y:H*0.30+Math.random()*(H*0.28)"
+    "y:H*0.28+Math.random()*(H*0.26)"
   );
+  // Richtung: Art zeigt nach links — flip wenn er nach rechts fliegt
   out = out.replace(
     "  if(plane){\n    plane.t+=dt;\n    plane.x+=plane.vx*dt;\n    const bob=Math.sin(plane.t*1.8)*3;\n    drawMedia(ctx,'planes/'+plane.base,plane.x,plane.y+bob,plane.w,plane.h,0.95,plane.dir<0);\n    if(plane.x>W+plane.w*1.2||plane.x<-plane.w*2.2)plane=null;",
-    "  if(plane){\n    const md=media('planes/'+plane.base);\n    if(!md.ready){drawMedia(ctx,'planes/'+plane.base,plane.x,plane.y,plane.w,plane.h,0.95,plane.dir<0);}\n    else{\n    plane.t+=dt;\n    plane.x+=plane.vx*dt;\n    const bob=Math.sin(plane.t*1.8)*3;\n    drawMedia(ctx,'planes/'+plane.base,plane.x,plane.y+bob,plane.w,plane.h,0.95,plane.dir<0);\n    if(plane.x>W+plane.w*1.2||plane.x<-plane.w*2.2)plane=null;}\n"
+    "  if(plane){\n    const md=media('planes/'+plane.base);\n    if(!md.ready){drawMedia(ctx,'planes/'+plane.base,plane.x,plane.y,plane.w,plane.h,0.95,plane.dir>0);}\n    else{\n    plane.t+=dt;\n    plane.x+=plane.vx*dt;\n    const bob=Math.sin(plane.t*1.8)*3;\n    drawMedia(ctx,'planes/'+plane.base,plane.x,plane.y+bob,plane.w,plane.h,0.95,plane.dir>0);\n    if(plane.x>W+plane.w*1.2||plane.x<-plane.w*2.2)plane=null;}\n"
   );
 
   out = out.replace(
@@ -120,7 +136,7 @@ function Index() {
       if (!doc.getElementById("afroFxScript")) {
         const s = doc.createElement("script");
         s.id = "afroFxScript";
-        s.src = "/afro-fx.js?v=fit7";
+        s.src = "/afro-fx.js?v=sky8";
         doc.body.appendChild(s);
       }
       if (!doc.getElementById("bgMusicScript")) {
@@ -138,7 +154,7 @@ function Index() {
     const frame = frameRef.current;
     if (!frame) return;
     let cancelled = false;
-    fetch("/game.html?v=fit7", { cache: "no-store" })
+    fetch("/game.html?v=sky8", { cache: "no-store" })
       .then((r) => r.text())
       .then((html) => {
         if (cancelled || !frame) return;
@@ -146,7 +162,7 @@ function Index() {
       })
       .catch(() => {
         if (!cancelled && frame && !frame.getAttribute("src")) {
-          frame.src = "/game.html?v=fit7";
+          frame.src = "/game.html?v=sky8";
         }
       });
     return () => {
