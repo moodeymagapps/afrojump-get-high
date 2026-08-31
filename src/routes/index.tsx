@@ -51,7 +51,7 @@ function patchGameHtml(html: string) {
     "const s=Math.min(vh/H,Math.max(vw/W,vh/H));",
     "const s=Math.max(vw/W,vh/H);"
   );
-  // echte Ursache des weißen Balkens: Portrait nutzte Contain (sFit)
+  // weißer Balken: Portrait nutzte Contain (sFit) — Cover-Scale
   out = out.replace(
     "const scale=wide?vh/H:sFit;",
     "const scale=Math.max(vw/W,vh/H);"
@@ -68,19 +68,25 @@ function patchGameHtml(html: string) {
   );
   out = out.replaceAll(
     "planeNextM=200+Math.random()*300",
-    "planeNextM=200+Math.random()*200"
+    "planeNextM=80+Math.random()*40"
   );
   out = out.replaceAll(
     "planeT=12+Math.random()*6",
-    "planeT=3+Math.random()*4"
+    "planeT=2+Math.random()*2"
   );
   out = out.replace(
     "planeNextM=m+200+Math.random()*300",
-    "planeNextM=m+200+Math.random()*200"
+    "planeNextM=m+180+Math.random()*80"
   );
   out = out.replace(
     "const w=W*(0.28+Math.random()*0.14),h=w*0.3;",
-    "const w=W*(0.22+Math.random()*0.08),h=w*0.28;"
+    "const w=W*(0.42+Math.random()*0.12),h=w*0.32;"
+  );
+
+  // PNG zuerst — WebM fehlt bei Planes, iOS bleibt sonst auf ready=false stehen
+  out = out.replace(
+    "const png=()=>{const i=new Image();i.onload=()=>{m.el=i;m.ready=true;};i.onerror=()=>{m.dead=true;};i.src='/'+base+'.png';};\n    try{",
+    "const png=()=>{const i=new Image();i.onload=()=>{if(!m.ready||!(m.el&&m.el.tagName==='VIDEO')){m.el=i;m.ready=true;}};i.onerror=()=>{if(!m.ready)m.dead=true;};i.src='/'+base+'.png';};\n    png();\n    try{"
   );
 
   out = out.replace(
@@ -116,7 +122,7 @@ function Index() {
       if (!doc.getElementById("afroFxScript")) {
         const s = doc.createElement("script");
         s.id = "afroFxScript";
-        s.src = "/afro-fx.js?v=iosfill4";
+        s.src = "/afro-fx.js?v=iosfill5";
         doc.body.appendChild(s);
       }
       if (!doc.getElementById("bgMusicScript")) {
@@ -134,7 +140,7 @@ function Index() {
     const frame = frameRef.current;
     if (!frame) return;
     let cancelled = false;
-    fetch("/game.html?v=iosfill4", { cache: "no-store" })
+    fetch("/game.html?v=iosfill5", { cache: "no-store" })
       .then((r) => r.text())
       .then((html) => {
         if (cancelled || !frame) return;
@@ -142,7 +148,7 @@ function Index() {
       })
       .catch(() => {
         if (!cancelled && frame && !frame.getAttribute("src")) {
-          frame.src = "/game.html?v=iosfill4";
+          frame.src = "/game.html?v=iosfill5";
         }
       });
     return () => {
