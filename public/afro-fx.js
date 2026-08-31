@@ -3,19 +3,13 @@
   if (window.__afroFxInit) return;
   window.__afroFxInit = true;
 
-  var PLANES = [
-    "/planes/merz.png",
-    "/planes/fckafd.png",
-    "/planes/161.png",
-    "/planes/palestine.png"
-  ];
+  var PLANES = ["/planes/merz.png", "/planes/fckafd.png", "/planes/161.png", "/planes/palestine.png"];
   var SKY = [
-    { src: "/sky/cloud.png", w: 92 },
-    { src: "/sky/cloud_bank.png", w: 120 },
-    { src: "/sky/bird.png", w: 40 },
-    { src: "/sky/birds.png", w: 58 },
-    { src: "/sky/balloon.png", w: 32 },
-    { src: "/sky/leaves.png", w: 32 }
+    { src: "/sky/cloud.png", maxW: 90, maxH: 64 },
+    { src: "/sky/cloud_bank.png", maxW: 110, maxH: 56 },
+    { src: "/sky/bird.png", maxW: 42, maxH: 42 },
+    { src: "/sky/birds.png", maxW: 60, maxH: 42 },
+    { src: "/sky/leaves.png", maxW: 34, maxH: 40 }
   ];
 
   function canvas() {
@@ -47,25 +41,29 @@
     var pi = 0;
     var live = false;
 
-    function spawn(src, w, y, spd, kind) {
+    function spawn(src, maxW, maxH, y, spd, kind) {
       var wrap = document.createElement("div");
-      wrap.style.cssText = "position:absolute;left:0;top:0;width:" + w + "px;pointer-events:none;";
+      wrap.style.cssText = "position:absolute;left:0;top:0;pointer-events:none;";
       var img = document.createElement("img");
       img.src = src;
       img.alt = "";
       img.draggable = false;
-      img.style.cssText = "display:block;width:100%;height:auto;pointer-events:none;image-rendering:pixelated;";
+      img.style.cssText =
+        "display:block;width:auto;height:auto;max-width:" + maxW +
+        "px;max-height:" + maxH + "px;pointer-events:none;";
       wrap.appendChild(img);
       layer.appendChild(wrap);
+      var W = layer.getBoundingClientRect().width || 360;
       items.push({
         wrap: wrap,
-        x: layer.getBoundingClientRect().width + 16,
+        x: W + 20,
         y: y,
         v: -Math.abs(spd),
-        w: w,
-        kind: kind,
-        bob: Math.random() * 5
+        w: maxW,
+        kind: kind
       });
+      wrap.style.left = items[items.length - 1].x + "px";
+      wrap.style.top = y + "px";
     }
 
     function tick() {
@@ -81,21 +79,21 @@
         last = m;
         var r = layer.getBoundingClientRect();
         if (m >= nextPlane && items.filter(function (it) { return it.kind === "plane"; }).length < 1 && r.width > 40) {
-          spawn(PLANES[pi++ % PLANES.length], Math.min(148, Math.max(104, r.width * 0.36)), 36 + Math.random() * Math.max(16, r.height * 0.2), 0.88, "plane");
+          var pw = Math.min(160, Math.max(110, r.width * 0.38));
+          spawn(PLANES[pi++ % PLANES.length], pw, 48, 32 + Math.random() * Math.max(12, r.height * 0.18), 0.9, "plane");
           nextPlane = m + 240 + Math.floor(Math.random() * 260);
         }
         var now = Date.now();
         if ((!nextSky || now >= nextSky) && items.filter(function (it) { return it.kind === "sky"; }).length < 2) {
           var s = SKY[Math.floor(Math.random() * SKY.length)];
-          spawn(s.src, s.w, 18 + Math.random() * Math.max(16, r.height * 0.32), 0.2 + Math.random() * 0.14, "sky");
+          spawn(s.src, s.maxW, s.maxH, 16 + Math.random() * Math.max(12, r.height * 0.3), 0.22, "sky");
           nextSky = now + 5000 + Math.random() * 5000;
         }
         for (var i = items.length - 1; i >= 0; i--) {
           var it = items[i];
           it.x += it.v;
-          it.bob += 0.03;
-          it.wrap.style.transform = "translate(" + it.x.toFixed(1) + "px," + (it.y + Math.sin(it.bob) * 3).toFixed(1) + "px)";
-          if (it.x < -it.w - 48) { it.wrap.remove(); items.splice(i, 1); }
+          it.wrap.style.left = it.x.toFixed(1) + "px";
+          if (it.x < -it.w - 60) { it.wrap.remove(); items.splice(i, 1); }
         }
       } catch (e) {}
       requestAnimationFrame(tick);
