@@ -3,13 +3,13 @@
   if (window.__afroFxInit) return;
   window.__afroFxInit = true;
 
-  var PLANES = ["/planes/merz.png", "/planes/fckafd.png", "/planes/161.png", "/planes/palestine.png"];
+  var PLANES = ["/planes/merz.gif", "/planes/fckafd.gif", "/planes/161.gif", "/planes/palestine.gif"];
   var SKY = [
-    { src: "/sky/bird.png", w: 40 },
-    { src: "/sky/birds.png", w: 58 },
-    { src: "/sky/cloud.png", w: 88 },
-    { src: "/sky/leaves.png", w: 32 },
-    { src: "/sky/balloon.png", w: 32 }
+    { src: "/sky/bird.gif", w: 40 },
+    { src: "/sky/birds.gif", w: 58 },
+    { src: "/sky/cloud.gif", w: 88 },
+    { src: "/sky/leaves.gif", w: 32 },
+    { src: "/sky/balloon.gif", w: 32 }
   ];
 
   function findCanvas() {
@@ -55,9 +55,6 @@
       img.style.cssText =
         "display:block;width:100%;height:auto;pointer-events:none;image-rendering:pixelated;opacity:" +
         (kind === "sky" ? "0.7" : "1") + ";";
-      img.onerror = function () {
-        if (src.indexOf(".png") !== -1) img.src = src.replace(".png", ".gif");
-      };
       boxEl.appendChild(img);
       layer.appendChild(boxEl);
       flyers.push({
