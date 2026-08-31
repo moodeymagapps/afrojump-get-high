@@ -5,9 +5,13 @@
 
   var PLANES = ["/planes/merz.gif", "/planes/fckafd.gif", "/planes/161.gif", "/planes/palestine.gif"];
   var SKY = [
+    { src: "/sky/cloud.gif", w: 88 },
+    { src: "/sky/cloud2.gif", w: 90 },
+    { src: "/sky/cloud3.gif", w: 70 },
+    { src: "/sky/cloud_wide.gif", w: 118 },
+    { src: "/sky/cloud_small.gif", w: 56 },
     { src: "/sky/bird.gif", w: 40 },
     { src: "/sky/birds.gif", w: 58 },
-    { src: "/sky/cloud.gif", w: 88 },
     { src: "/sky/leaves.gif", w: 32 },
     { src: "/sky/balloon.gif", w: 32 }
   ];
@@ -54,7 +58,7 @@
       img.draggable = false;
       img.style.cssText =
         "display:block;width:100%;height:auto;pointer-events:none;image-rendering:pixelated;opacity:" +
-        (kind === "sky" ? "0.7" : "1") + ";";
+        (kind === "sky" ? "0.72" : "1") + ";";
       boxEl.appendChild(img);
       layer.appendChild(boxEl);
       flyers.push({
@@ -81,10 +85,11 @@
           nextPlane = meters + 250 + Math.floor(Math.random() * 250);
         }
         var now = Date.now();
-        if ((!nextSkyAt || now >= nextSkyAt) && flyers.filter(function (f) { return f.kind === "sky"; }).length < 1) {
+        var skyLive = flyers.filter(function (f) { return f.kind === "sky"; }).length;
+        if ((!nextSkyAt || now >= nextSkyAt) && skyLive < 3) {
           var spec = SKY[Math.floor(Math.random() * SKY.length)];
-          spawnImg(spec.src, spec.w, 24 + Math.random() * Math.max(16, H * 0.3), 0.28, "sky");
-          nextSkyAt = now + 8000 + Math.random() * 8000;
+          spawnImg(spec.src, spec.w, 20 + Math.random() * Math.max(16, H * 0.34), 0.18 + Math.random() * 0.16, "sky");
+          nextSkyAt = now + 3500 + Math.random() * 4500;
         }
         for (var i = flyers.length - 1; i >= 0; i--) {
           var f = flyers[i];
