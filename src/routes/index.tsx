@@ -51,13 +51,14 @@ function patchGameHtml(html: string) {
     "const s=Math.min(vh/H,Math.max(vw/W,vh/H));",
     "const s=Math.max(vw/W,vh/H);"
   );
+  // echte Ursache des weißen Balkens: Portrait nutzte Contain (sFit)
+  out = out.replace(
+    "const scale=wide?vh/H:sFit;",
+    "const scale=Math.max(vw/W,vh/H);"
+  );
 
   out = out.replace(
     "const SKY_BIRDS=['bird','birds','leaves'];",
-    "const SKY_BIRDS=['leaves'];"
-  );
-  out = out.replace(
-    "const SKY_BIRDS=['leaves','bird','birds'];",
     "const SKY_BIRDS=['leaves'];"
   );
 
@@ -95,7 +96,7 @@ function patchGameHtml(html: string) {
     "<style id=\"afroSafeFill\">" +
     "html,body,#wrap{background:#0b1a0b!important;min-height:100dvh!important;min-height:-webkit-fill-available!important;}" +
     "canvas{box-shadow:none!important;}" +
-    "#menu,#menu::after{background-color:#0c1408!important;}" +
+    ".overlay,#menu,#menu::after{background-color:#0c1408!important;}" +
     "</style>";
   if (!out.includes("afroSafeFill")) {
     out = out.replace("</head>", inject + "</head>");
@@ -115,7 +116,7 @@ function Index() {
       if (!doc.getElementById("afroFxScript")) {
         const s = doc.createElement("script");
         s.id = "afroFxScript";
-        s.src = "/afro-fx.js?v=iosfill3";
+        s.src = "/afro-fx.js?v=iosfill4";
         doc.body.appendChild(s);
       }
       if (!doc.getElementById("bgMusicScript")) {
@@ -133,7 +134,7 @@ function Index() {
     const frame = frameRef.current;
     if (!frame) return;
     let cancelled = false;
-    fetch("/game.html?v=iosfill3", { cache: "no-store" })
+    fetch("/game.html?v=iosfill4", { cache: "no-store" })
       .then((r) => r.text())
       .then((html) => {
         if (cancelled || !frame) return;
@@ -141,7 +142,7 @@ function Index() {
       })
       .catch(() => {
         if (!cancelled && frame && !frame.getAttribute("src")) {
-          frame.src = "/game.html?v=iosfill3";
+          frame.src = "/game.html?v=iosfill4";
         }
       });
     return () => {
