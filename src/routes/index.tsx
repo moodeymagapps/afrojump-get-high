@@ -29,17 +29,38 @@ export const Route = createFileRoute("/")({
 
 function patchGameHtml(html: string) {
   let out = html;
-  if (!out.includes('<base ')) {
+  if (!out.includes("<base ")) {
     out = out.replace("<head>", '<head>\n<base href="/" />');
   }
+
   out = out.replace(
     "html,body{margin:0;padding:0;height:100%;background:#0b1a0b;",
     "html,body{margin:0;padding:0;height:100%;min-height:100dvh;min-height:-webkit-fill-available;background:#0b1a0b;"
   );
+
+  out = out.replace(
+    "canvas{background:#0b1a0b;display:block;box-shadow:0 0 40px #000a, 0 0 0 4px #2b1a0a, 0 0 0 8px #7cfc00;touch-action:none;image-rendering:pixelated;}",
+    "canvas{background:#0b1a0b;display:block;box-shadow:none;touch-action:none;image-rendering:pixelated;}"
+  );
+
+  out = out.replace(
+    "const vw=window.innerWidth,vh=window.innerHeight;",
+    "const vw=(window.visualViewport&&window.visualViewport.width)||window.innerWidth,vh=(window.visualViewport&&window.visualViewport.height)||window.innerHeight;"
+  );
+  out = out.replace(
+    "const s=Math.min(vh/H,Math.max(vw/W,vh/H));",
+    "const s=Math.max(vw/W,vh/H);"
+  );
+
   out = out.replace(
     "const SKY_BIRDS=['bird','birds','leaves'];",
     "const SKY_BIRDS=['leaves'];"
   );
+  out = out.replace(
+    "const SKY_BIRDS=['leaves','bird','birds'];",
+    "const SKY_BIRDS=['leaves'];"
+  );
+
   out = out.replace(
     "const PLANE_FILES=['fckafd','p161','merz','palestine'];",
     "const PLANE_FILES=['fckafd','161','merz','palestine'];"
@@ -50,12 +71,35 @@ function patchGameHtml(html: string) {
   );
   out = out.replaceAll(
     "planeT=12+Math.random()*6",
-    "planeT=4+Math.random()*4"
+    "planeT=3+Math.random()*4"
   );
+  out = out.replace(
+    "planeNextM=m+200+Math.random()*300",
+    "planeNextM=m+200+Math.random()*200"
+  );
+  out = out.replace(
+    "const w=W*(0.28+Math.random()*0.14),h=w*0.3;",
+    "const w=W*(0.22+Math.random()*0.08),h=w*0.28;"
+  );
+
   out = out.replace(
     "  // Birds — daytime\n  const birdA=Math.max(0,1-sstep(m,400,900));\n  if(birdA>0.01){",
     "  // Birds disabled\n  const birdA=0;\n  if(false){"
   );
+  out = out.replace(
+    "const birdA=Math.max(0,1-sstep(m,400,900));",
+    "const birdA=0;"
+  );
+
+  const inject =
+    "<style id=\"afroSafeFill\">" +
+    "html,body,#wrap{background:#0b1a0b!important;min-height:100dvh!important;min-height:-webkit-fill-available!important;}" +
+    "canvas{box-shadow:none!important;}" +
+    "#menu,#menu::after{background-color:#0c1408!important;}" +
+    "</style>";
+  if (!out.includes("afroSafeFill")) {
+    out = out.replace("</head>", inject + "</head>");
+  }
   return out;
 }
 
@@ -66,10 +110,12 @@ function Index() {
     try {
       const doc = frameRef.current?.contentDocument;
       if (!doc) return;
+      doc.documentElement.style.background = "#0b1a0b";
+      if (doc.body) doc.body.style.background = "#0b1a0b";
       if (!doc.getElementById("afroFxScript")) {
         const s = doc.createElement("script");
         s.id = "afroFxScript";
-        s.src = "/afro-fx.js";
+        s.src = "/afro-fx.js?v=iosfill3";
         doc.body.appendChild(s);
       }
       if (!doc.getElementById("bgMusicScript")) {
@@ -87,7 +133,7 @@ function Index() {
     const frame = frameRef.current;
     if (!frame) return;
     let cancelled = false;
-    fetch("/game.html", { cache: "no-store" })
+    fetch("/game.html?v=iosfill3", { cache: "no-store" })
       .then((r) => r.text())
       .then((html) => {
         if (cancelled || !frame) return;
@@ -95,7 +141,7 @@ function Index() {
       })
       .catch(() => {
         if (!cancelled && frame && !frame.getAttribute("src")) {
-          frame.src = "/game.html";
+          frame.src = "/game.html?v=iosfill3";
         }
       });
     return () => {
@@ -107,10 +153,13 @@ function Index() {
     <div
       style={{
         position: "fixed",
-        inset: 0,
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
         width: "100%",
-        height: "100%",
-        minHeight: "100dvh",
+        height: "100dvh",
+        minHeight: "-webkit-fill-available",
         background: "#0b1a0b",
         overflow: "hidden",
         overscrollBehavior: "none",
@@ -122,12 +171,14 @@ function Index() {
         title="Afro Jump"
         style={{
           position: "absolute",
-          inset: 0,
+          top: 0,
+          left: 0,
           width: "100%",
           height: "100%",
           border: 0,
           background: "#0b1a0b",
           display: "block",
+          colorScheme: "dark",
         }}
         allow="fullscreen; autoplay; clipboard-write"
         allowFullScreen
