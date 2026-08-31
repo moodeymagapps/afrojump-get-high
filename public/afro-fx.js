@@ -5,11 +5,10 @@
 
   var PLANES = ["/planes/merz.png", "/planes/fckafd.png", "/planes/161.png", "/planes/palestine.png"];
   var SKY = [
-    { src: "/sky/cloud.png", maxW: 90, maxH: 64 },
-    { src: "/sky/cloud_bank.png", maxW: 110, maxH: 56 },
-    { src: "/sky/bird.png", maxW: 42, maxH: 42 },
-    { src: "/sky/birds.png", maxW: 60, maxH: 42 },
-    { src: "/sky/leaves.png", maxW: 34, maxH: 40 }
+    { src: "/sky/cloud.png", maxW: 86, maxH: 58 },
+    { src: "/sky/cloud_bank.png", maxW: 104, maxH: 50 },
+    { src: "/sky/bird.png", maxW: 38, maxH: 38 },
+    { src: "/sky/birds.png", maxW: 54, maxH: 38 }
   ];
 
   function canvas() {
@@ -26,6 +25,9 @@
     var cv = canvas();
     if (!cv) { setTimeout(boot, 400); return; }
     var parent = cv.parentElement || document.body;
+    var cs = window.getComputedStyle(parent);
+    if (cs.position === "static") parent.style.position = "relative";
+
     var layer = document.getElementById("afroFxLayer");
     if (!layer) {
       layer = document.createElement("div");
@@ -35,7 +37,7 @@
     }
 
     var items = [];
-    var nextPlane = 240;
+    var nextPlane = 280;
     var nextSky = 0;
     var last = 0;
     var pi = 0;
@@ -43,57 +45,64 @@
 
     function spawn(src, maxW, maxH, y, spd, kind) {
       var wrap = document.createElement("div");
-      wrap.style.cssText = "position:absolute;left:0;top:0;pointer-events:none;";
+      wrap.style.cssText = "position:absolute;pointer-events:none;";
       var img = document.createElement("img");
       img.src = src;
       img.alt = "";
       img.draggable = false;
       img.style.cssText =
         "display:block;width:auto;height:auto;max-width:" + maxW +
-        "px;max-height:" + maxH + "px;pointer-events:none;";
+        "px;max-height:" + maxH + "px;pointer-events:none;opacity:" +
+        (kind === "sky" ? "0.75" : "0.96") + ";";
       wrap.appendChild(img);
       layer.appendChild(wrap);
       var W = layer.getBoundingClientRect().width || 360;
-      items.push({
-        wrap: wrap,
-        x: W + 20,
-        y: y,
-        v: -Math.abs(spd),
-        w: maxW,
-        kind: kind
-      });
-      wrap.style.left = items[items.length - 1].x + "px";
-      wrap.style.top = y + "px";
+      var it = { wrap: wrap, x: W + 24, y: y, v: -Math.abs(spd), w: maxW, kind: kind };
+      wrap.style.left = it.x + "px";
+      wrap.style.top = it.y + "px";
+      items.push(it);
+    }
+
+    function clearAll() {
+      items.forEach(function (it) { try { it.wrap.remove(); } catch (e) {} });
+      items.length = 0;
     }
 
     function tick() {
       try {
         var m = meters();
-        if (m >= 12) live = true;
+        if (m >= 20) live = true;
         if (!live) { requestAnimationFrame(tick); return; }
-        if (m < last - 30) {
-          nextPlane = 240;
-          items.forEach(function (it) { try { it.wrap.remove(); } catch (e) {} });
-          items.length = 0;
+        if (m < last - 40) {
+          nextPlane = 280;
+          nextSky = 0;
+          clearAll();
         }
         last = m;
         var r = layer.getBoundingClientRect();
-        if (m >= nextPlane && items.filter(function (it) { return it.kind === "plane"; }).length < 1 && r.width > 40) {
-          var pw = Math.min(160, Math.max(110, r.width * 0.38));
-          spawn(PLANES[pi++ % PLANES.length], pw, 48, 32 + Math.random() * Math.max(12, r.height * 0.18), 0.9, "plane");
-          nextPlane = m + 240 + Math.floor(Math.random() * 260);
+        var planes = 0, skies = 0, i;
+        for (i = 0; i < items.length; i++) {
+          if (items[i].kind === "plane") planes++;
+          else skies++;
+        }
+        if (m >= nextPlane && planes < 1 && r.width > 50) {
+          spawn(PLANES[pi++ % PLANES.length], 132, 40, 28 + Math.random() * 36, 0.72, "plane");
+          nextPlane = m + 320 + Math.floor(Math.random() * 220);
         }
         var now = Date.now();
-        if ((!nextSky || now >= nextSky) && items.filter(function (it) { return it.kind === "sky"; }).length < 2) {
+        if ((!nextSky || now >= nextSky) && skies < 2 && r.width > 50) {
           var s = SKY[Math.floor(Math.random() * SKY.length)];
-          spawn(s.src, s.maxW, s.maxH, 16 + Math.random() * Math.max(12, r.height * 0.3), 0.22, "sky");
-          nextSky = now + 5000 + Math.random() * 5000;
+          spawn(s.src, s.maxW, s.maxH, 14 + Math.random() * 48, 0.16 + Math.random() * 0.1, "sky");
+          nextSky = now + 7000 + Math.random() * 6000;
         }
-        for (var i = items.length - 1; i >= 0; i--) {
+        for (i = items.length - 1; i >= 0; i--) {
           var it = items[i];
           it.x += it.v;
           it.wrap.style.left = it.x.toFixed(1) + "px";
-          if (it.x < -it.w - 60) { it.wrap.remove(); items.splice(i, 1); }
+          if (it.x < -it.w - 80) {
+            it.wrap.remove();
+            items.splice(i, 1);
+          }
         }
       } catch (e) {}
       requestAnimationFrame(tick);
