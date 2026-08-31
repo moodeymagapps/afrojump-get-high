@@ -47,14 +47,6 @@ function patchGameHtml(html: string) {
     "const vw=window.innerWidth,vh=window.innerHeight;",
     "const vw=(window.visualViewport&&window.visualViewport.width)||window.innerWidth,vh=(window.visualViewport&&window.visualViewport.height)||window.innerHeight;"
   );
-  out = out.replace(
-    "const s=Math.min(vh/H,Math.max(vw/W,vh/H));",
-    "const s=Math.max(vw/W,vh/H);"
-  );
-  out = out.replace(
-    "const scale=wide?vh/H:sFit;",
-    "const scale=Math.max(vw/W,vh/H);"
-  );
 
   out = out.replace(
     "const SKY_BIRDS=['bird','birds','leaves'];",
@@ -84,10 +76,6 @@ function patchGameHtml(html: string) {
   out = out.replace(
     "y:30+Math.random()*(H*0.35)",
     "y:H*0.30+Math.random()*(H*0.28)"
-  );
-  out = out.replace(
-    "    if(m>=planeNextM||planeT<=0){\n      planeSpawn();\n      planeNextM=m+200+Math.random()*300;\n      planeT=12+Math.random()*6;",
-    "    if(m>=planeNextM||planeT<=0){\n      planeSpawn();\n      planeNextM=m+220+Math.random()*120;\n      planeT=7+Math.random()*4;"
   );
   out = out.replace(
     "  if(plane){\n    plane.t+=dt;\n    plane.x+=plane.vx*dt;\n    const bob=Math.sin(plane.t*1.8)*3;\n    drawMedia(ctx,'planes/'+plane.base,plane.x,plane.y+bob,plane.w,plane.h,0.95,plane.dir<0);\n    if(plane.x>W+plane.w*1.2||plane.x<-plane.w*2.2)plane=null;",
@@ -132,7 +120,7 @@ function Index() {
       if (!doc.getElementById("afroFxScript")) {
         const s = doc.createElement("script");
         s.id = "afroFxScript";
-        s.src = "/afro-fx.js?v=planes6";
+        s.src = "/afro-fx.js?v=fit7";
         doc.body.appendChild(s);
       }
       if (!doc.getElementById("bgMusicScript")) {
@@ -150,7 +138,7 @@ function Index() {
     const frame = frameRef.current;
     if (!frame) return;
     let cancelled = false;
-    fetch("/game.html?v=planes6", { cache: "no-store" })
+    fetch("/game.html?v=fit7", { cache: "no-store" })
       .then((r) => r.text())
       .then((html) => {
         if (cancelled || !frame) return;
@@ -158,7 +146,7 @@ function Index() {
       })
       .catch(() => {
         if (!cancelled && frame && !frame.getAttribute("src")) {
-          frame.src = "/game.html?v=planes6";
+          frame.src = "/game.html?v=fit7";
         }
       });
     return () => {
