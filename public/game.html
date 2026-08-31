@@ -1363,6 +1363,98 @@ function sprite(key){
   return e.ok?e.img:null;
 }
 for(const k in SPRITE_FILES)sprite(k);
+// ---------- Deko-Medien: transparentes WebM mit PNG-Fallback ----------
+const mediaCache={};
+function media(base){
+  let m=mediaCache[base];
+  if(!m){
+    m=mediaCache[base]={el:null,ready:false,dead:false};
+    const png=()=>{const i=new Image();i.onload=()=>{m.el=i;m.ready=true;};i.onerror=()=>{m.dead=true;};i.src='/'+base+'.png';};
+    try{
+      const v=document.createElement('video');
+      v.muted=true;v.loop=true;v.playsInline=true;v.autoplay=true;v.preload='auto';
+      v.setAttribute('muted','');v.setAttribute('playsinline','');
+      v.addEventListener('loadeddata',()=>{m.el=v;m.ready=true;v.play().catch(()=>{});});
+      v.addEventListener('error',png,{once:true});
+      v.src='/'+base+'.webm';
+      v.play().catch(()=>{});
+    }catch(e){png();}
+  }
+  return m;
+}
+function drawMedia(g,base,x,y,w,h,alpha,flip){
+  const m=media(base);
+  if(!m.ready||!m.el)return false;
+  g.save();
+  g.imageSmoothingEnabled=false;
+  if(alpha!=null)g.globalAlpha=alpha;
+  if(flip){g.translate(x+w,y);g.scale(-1,1);g.drawImage(m.el,0,0,w,h);}
+  else g.drawImage(m.el,Math.round(x),Math.round(y),Math.round(w),Math.round(h));
+  g.restore();
+  return true;
+}
+// ---------- Pixel-Sky-Props (rein dekorativ, hinter dem Gameplay) ----------
+const SKY_COMMON=['cloud','cloud_bank'];
+const SKY_BIRDS=['bird','birds','leaves'];
+let skyProps=[],skyNextT=1.2,skyRareM=420,skyLastCam=0;
+function skyReset(){skyProps=[];skyNextT=1.2;skyRareM=420;skyLastCam=cameraY||0;}
+function skySpawn(m){
+  let base;
+  const r=Math.random();
+  if(m>2600&&r<0.35)base='stars';
+  else if(r<0.62)base=SKY_COMMON[Math.floor(Math.random()*SKY_COMMON.length)];
+  else base=SKY_BIRDS[Math.floor(Math.random()*SKY_BIRDS.length)];
+  const rare=(m>=skyRareM)&&Math.random()<0.5;
+  if(rare){base=Math.random()<0.5?'balloon':'blimp';skyRareM=m+400+Math.random()*400;}
+  const wf=rare?(0.18+Math.random()*0.10):(base==='stars'?0.5:0.24+Math.random()*0.2);
+  const w=W*wf,h=w*0.62;
+  const dir=Math.random()<0.5?1:-1;
+  skyProps.push({base,x:dir>0?-w:W,y:20+Math.random()*(H*0.55),w,h,
+    vx:dir*(8+Math.random()*12),alpha:0.5+Math.random()*0.15,par:0.15});
+}
+function drawSkyProps(dt){
+  const m=Math.max(0,Math.round((bestY||0)));
+  const camD=(cameraY||0)-skyLastCam;skyLastCam=cameraY||0;
+  skyNextT-=dt;
+  if(skyNextT<=0){skyNextT=3+Math.random()*5;if(skyProps.length<2)skySpawn(m);}
+  for(const sp of skyProps){
+    sp.x+=sp.vx*dt;
+    sp.y-=camD*sp.par;
+    if(sp.base==='stars'&&m<=2200)sp.alpha=Math.max(0,sp.alpha-dt*0.4);
+    drawMedia(ctx,'sky/'+sp.base,sp.x,sp.y,sp.w,sp.h,sp.alpha);
+  }
+  skyProps=skyProps.filter(sp=>sp.alpha>0.02&&sp.x>-sp.w*2&&sp.x<W+sp.w*2&&sp.y>-sp.h*2&&sp.y<H+sp.h*2);
+}
+// ---------- Banner-Flugzeuge (Deko, keine Kollision) ----------
+const PLANE_FILES=['fckafd','p161','merz','palestine'];
+let plane=null,planeNextM=200+Math.random()*300,planeT=12+Math.random()*6;
+function planeReset(){plane=null;planeNextM=200+Math.random()*300;planeT=12+Math.random()*6;}
+function planeSpawn(){
+  const base=PLANE_FILES[Math.floor(Math.random()*PLANE_FILES.length)];
+  const w=W*(0.28+Math.random()*0.14),h=w*0.3;
+  const dir=Math.random()<0.5?1:-1;
+  const dur=4+Math.random()*3;
+  plane={base,dir,w,h,y:30+Math.random()*(H*0.35),
+    x:dir>0?-w:W,vx:dir*((W+w*2)/dur),t:0};
+}
+function drawPlanes(dt){
+  const m=Math.max(0,Math.round((bestY||0)));
+  if(!plane){
+    planeT-=dt;
+    if(m>=planeNextM||planeT<=0){
+      planeSpawn();
+      planeNextM=m+200+Math.random()*300;
+      planeT=12+Math.random()*6;
+    }
+  }
+  if(plane){
+    plane.t+=dt;
+    plane.x+=plane.vx*dt;
+    const bob=Math.sin(plane.t*1.8)*3;
+    drawMedia(ctx,'planes/'+plane.base,plane.x,plane.y+bob,plane.w,plane.h,0.95,plane.dir<0);
+    if(plane.x>W+plane.w*1.2||plane.x<-plane.w*2.2)plane=null;
+  }
+}
 // Zeichnet ein Plattform-Sprite: Oberkante = Kollisionskante, Breite = Plattformbreite
 function drawPlatSprite(key,x,topY,w,opts){
   const im=sprite(key);
@@ -2162,6 +2254,7 @@ function reset(){
   platforms=[];collectibles=[];enemies=[];projectiles=[];particles=[];smokeParticles=[];floatTexts=[];
   cameraY=0;bestY=0;scrollLocked=false;boss=null;nextBossScore=1500;gameOver=false;
   runBags=0;shake={t:0,mag:0};timeScale=1;deathT=0;rings=[];trail=[];flash={a:0,c:'255,255,255'};
+  skyReset();planeReset();
   killCombo=0;comboT=0;runKills=0;bossIndex=0;
   duel.myBest=0;duel.oppBest=0;duel.oppDead=false;duel.oppY=null;duel.oppX=W/2;duel.finished=false;
   stopBossMusic();
@@ -5338,6 +5431,8 @@ function render(){
     ctx.translate(Math.sin(tt*47)*s,Math.cos(tt*61)*s*0.7);
   }
   drawBg();
+  {const nowD=performance.now();const dtD=Math.min(0.05,(nowD-(window.__decoT||nowD))/1000);window.__decoT=nowD;
+   drawSkyProps(dtD);drawPlanes(dtD);}
   for(const z of zones)drawZone(z);
   for(const p of platforms)drawPlatform(p);
   for(const hz of hazards)drawHazard(hz);
