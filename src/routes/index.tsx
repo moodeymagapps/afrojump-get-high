@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 const KEY_ART =
   "https://afrojumper.app/__l5e/assets-v1/0ddacadd-adb6-40df-9701-fe9168b6a5f6/afro-jump-keyart-og.jpg";
@@ -27,6 +27,38 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
+function patchGameHtml(html: string) {
+  let out = html;
+  if (!out.includes('<base ')) {
+    out = out.replace("<head>", '<head>\n<base href="/" />');
+  }
+  out = out.replace(
+    "html,body{margin:0;padding:0;height:100%;background:#0b1a0b;",
+    "html,body{margin:0;padding:0;height:100%;min-height:100dvh;min-height:-webkit-fill-available;background:#0b1a0b;"
+  );
+  out = out.replace(
+    "const SKY_BIRDS=['bird','birds','leaves'];",
+    "const SKY_BIRDS=['leaves'];"
+  );
+  out = out.replace(
+    "const PLANE_FILES=['fckafd','p161','merz','palestine'];",
+    "const PLANE_FILES=['fckafd','161','merz','palestine'];"
+  );
+  out = out.replaceAll(
+    "planeNextM=200+Math.random()*300",
+    "planeNextM=200+Math.random()*200"
+  );
+  out = out.replaceAll(
+    "planeT=12+Math.random()*6",
+    "planeT=4+Math.random()*4"
+  );
+  out = out.replace(
+    "  // Birds — daytime\n  const birdA=Math.max(0,1-sstep(m,400,900));\n  if(birdA>0.01){",
+    "  // Birds disabled\n  const birdA=0;\n  if(false){"
+  );
+  return out;
+}
+
 function Index() {
   const frameRef = useRef<HTMLIFrameElement>(null);
 
@@ -51,35 +83,51 @@ function Index() {
     }
   }
 
+  useEffect(() => {
+    const frame = frameRef.current;
+    if (!frame) return;
+    let cancelled = false;
+    fetch("/game.html", { cache: "no-store" })
+      .then((r) => r.text())
+      .then((html) => {
+        if (cancelled || !frame) return;
+        frame.srcdoc = patchGameHtml(html);
+      })
+      .catch(() => {
+        if (!cancelled && frame && !frame.getAttribute("src")) {
+          frame.src = "/game.html";
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <div
-      className="fixed inset-0 overflow-hidden"
       style={{
         position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
+        inset: 0,
         width: "100%",
-        height: "100dvh",
-        minHeight: "-webkit-fill-available",
+        height: "100%",
+        minHeight: "100dvh",
         background: "#0b1a0b",
+        overflow: "hidden",
         overscrollBehavior: "none",
         touchAction: "none",
       }}
     >
       <iframe
         ref={frameRef}
-        src="/game.html"
         title="Afro Jump"
         style={{
           position: "absolute",
-          top: 0,
-          left: 0,
+          inset: 0,
           width: "100%",
           height: "100%",
           border: 0,
           background: "#0b1a0b",
+          display: "block",
         }}
         allow="fullscreen; autoplay; clipboard-write"
         allowFullScreen

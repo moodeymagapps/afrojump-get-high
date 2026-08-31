@@ -81,7 +81,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover",
       },
-      { name: "theme-color", content: "#0a0a0a" },
+      { name: "theme-color", content: "#0b1a0b" },
       { name: "mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
@@ -111,11 +111,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="de">
+    <html lang="de" style={{ background: "#0b1a0b", height: "100%" }}>
       <head>
         <HeadContent />
       </head>
-      <body>
+      <body style={{ margin: 0, background: "#0b1a0b", height: "100%", overflow: "hidden" }}>
         {children}
         <Scripts />
       </body>
@@ -128,7 +128,6 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
     </QueryClientProvider>
   );
