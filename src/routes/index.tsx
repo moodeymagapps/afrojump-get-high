@@ -27,7 +27,18 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-function patchGameHtml(html: string) {
+function readWarp() {
+  try {
+    const q = new URLSearchParams(window.location.search || "");
+    if (q.get("dev") !== "moodey") return 0;
+    const n = Number(q.get("warp") || q.get("m") || 0);
+    return Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
+  } catch {
+    return 0;
+  }
+}
+
+function patchGameHtml(html: string, warpTo: number) {
   let out = html;
   if (!out.includes("<base ")) {
     out = out.replace("<head>", '<head>\n<base href="/" />');
@@ -113,21 +124,28 @@ function patchGameHtml(html: string) {
     "const birdA=0;"
   );
 
-  const warpFn =
-    "function afroWarp(meters){meters=Math.max(0,Math.floor(+meters||0));var worldY=-meters*10;cameraY=worldY-(H*0.42);bestY=meters;if(player){player.y=worldY;player.vy=-10;player.vx=0;player.x=W/2;player.alive=true;player.invincible=5;player.invSrc='dev';}platforms=[];collectibles=[];if(enemies&&enemies.filter)enemies=enemies.filter(function(e){return e&&e.boss;});var py=worldY+90;for(var i=0;i<28;i++){py-=65;try{spawnPlatform(py);}catch(err){}}try{nextBossScore=Math.max(nextBossScore||0,meters+500);}catch(err){}gameOver=false;window.__afroWarpTo=meters;}\n" +
-    "window.afroWarp=afroWarp;\n" +
-    "(function(){try{var q=new URLSearchParams(((parent&&parent.location&&parent.location.search)||location.search||''));if(q.get('dev')!=='moodey')return;var w=q.get('warp')||q.get('m');if(w)window.__afroWarpTo=+w;window.addEventListener('keydown',function(e){if(!e)return;if(e.key==='Home'){e.preventDefault();afroWarp(10000);}else if(e.key==='PageUp'){e.preventDefault();afroWarp((bestY||0)+500);}else if(e.key==='PageDown'){e.preventDefault();afroWarp(Math.max(0,(bestY||0)-500));}});}catch(err){}})();\n";
-
-  if (!out.includes("function afroWarp")) {
+  if (warpTo > 0) {
     out = out.replace(
-      "function planeReset(){plane=null;planeNextM=80+Math.random()*60;planeT=8+Math.random()*4;}",
-      "function planeReset(){plane=null;planeNextM=80+Math.random()*60;planeT=8+Math.random()*4;}\n" + warpFn
+      "cameraY=0;bestY=0;scrollLocked=false;boss=null;nextBossScore=1500;gameOver=false;",
+      "cameraY=" +
+        -warpTo * 10 +
+        ";bestY=" +
+        warpTo +
+        ";scrollLocked=false;boss=null;nextBossScore=" +
+        (warpTo + 500) +
+        ";gameOver=false;"
     );
-  }
-  if (!out.includes("__afroApplyWarp")) {
     out = out.replace(
-      "skyReset();planeReset();",
-      "skyReset();planeReset();if(window.__afroWarpTo){setTimeout(function(){try{afroWarp(window.__afroWarpTo);}catch(e){}},40);}"
+      "player={x:W/2,y:H-100,vx:0,vy:-14",
+      "player={x:W/2,y:" + -warpTo * 10 + ",vx:0,vy:-14"
+    );
+    out = out.replace(
+      "platforms.push({x:W/2-40,y:H-40,w:80,h:12,vx:0,type:'normal',dir:1,range:0,ox:W/2-40,bounce:0,cracked:0});\n  let py=H-40;\n  for(let i=0;i<20;i++){\n    py-=rand(60,90);\n    spawnPlatform(py);",
+      "platforms.push({x:W/2-40,y:" +
+        (-warpTo * 10 + 40) +
+        ",w:80,h:12,vx:0,type:'normal',dir:1,range:0,ox:W/2-40,bounce:0,cracked:0});\n  let py=" +
+        (-warpTo * 10 + 40) +
+        ";\n  for(let i=0;i<28;i++){\n    py-=rand(60,90);\n    spawnPlatform(py);"
     );
   }
 
@@ -155,7 +173,7 @@ function Index() {
       if (!doc.getElementById("afroFxScript")) {
         const s = doc.createElement("script");
         s.id = "afroFxScript";
-        s.src = "/afro-fx.js?v=warp12";
+        s.src = "/afro-fx.js?v=warp13";
         doc.body.appendChild(s);
       }
       if (!doc.getElementById("bgMusicScript")) {
@@ -173,15 +191,16 @@ function Index() {
     const frame = frameRef.current;
     if (!frame) return;
     let cancelled = false;
-    fetch("/game.html?v=warp12", { cache: "no-store" })
+    const warpTo = readWarp();
+    fetch("/game.html?v=warp13", { cache: "no-store" })
       .then((r) => r.text())
       .then((html) => {
         if (cancelled || !frame) return;
-        frame.srcdoc = patchGameHtml(html);
+        frame.srcdoc = patchGameHtml(html, warpTo);
       })
       .catch(() => {
         if (!cancelled && frame && !frame.getAttribute("src")) {
-          frame.src = "/game.html?v=warp12";
+          frame.src = "/game.html?v=warp13";
         }
       });
     return () => {
