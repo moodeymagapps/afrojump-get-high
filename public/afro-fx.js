@@ -3,15 +3,13 @@
   if (window.__afroFxInit) return;
   window.__afroFxInit = true;
 
-  var PLANES = ["/planes/merz.png", "/planes/fckafd.png", "/planes/161.png", "/planes/palestine.png"];
+  var PLANES = ["/planes/merz.gif", "/planes/fckafd.gif", "/planes/161.gif", "/planes/palestine.gif"];
   var SKY = [
-    { src: "/sky/bird.png", w: 40 },
-    { src: "/sky/birds.png", w: 58 },
-    { src: "/sky/cloud.png", w: 88 },
-    { src: "/sky/cloud_bank.png", w: 110 },
-    { src: "/sky/balloon.png", w: 32 },
-    { src: "/sky/blimp.png", w: 62 },
-    { src: "/sky/leaves.png", w: 32 }
+    { src: "/sky/bird.gif", w: 40 },
+    { src: "/sky/birds.gif", w: 58 },
+    { src: "/sky/cloud.gif", w: 88 },
+    { src: "/sky/leaves.gif", w: 32 },
+    { src: "/sky/balloon.gif", w: 32 }
   ];
 
   function findCanvas() {
@@ -37,7 +35,6 @@
       wrap.appendChild(layer);
     }
     var layer = document.getElementById("afroFxLayer");
-
     var flyers = [];
     var nextPlane = 250;
     var nextSkyAt = 0;
@@ -50,23 +47,16 @@
     function spawnImg(src, wpx, y, speed, kind) {
       var img = document.createElement("img");
       img.src = src;
-      img.decoding = "async";
       img.alt = "";
       img.draggable = false;
       img.style.cssText =
         "position:absolute;top:0;left:0;width:" + wpx + "px;height:auto;" +
         "pointer-events:none;image-rendering:pixelated;opacity:" +
-        (kind === "sky" ? "0.6" : "0.95") + ";";
+        (kind === "sky" ? "0.7" : "1") + ";";
       layer.appendChild(img);
-      var W = box().width;
       flyers.push({
-        el: img,
-        x: W + 12,
-        y: y,
-        vx: -Math.abs(speed),
-        w: wpx,
-        kind: kind,
-        bob: Math.random() * 6
+        el: img, x: box().width + 12, y: y,
+        vx: -Math.abs(speed), w: wpx, kind: kind, bob: Math.random() * 6
       });
     }
 
@@ -74,24 +64,18 @@
       try {
         var meters = readMeters();
         if (meters >= 15) started = true;
-        if (!started) {
-          requestAnimationFrame(tick);
-          return;
-        }
+        if (!started) { requestAnimationFrame(tick); return; }
         if (meters < lastM - 30) {
-          nextPlane = 250;
-          nextSkyAt = 0;
+          nextPlane = 250; nextSkyAt = 0;
           flyers.forEach(function (f) { try { f.el.remove(); } catch (e) {} });
           flyers.length = 0;
         }
         lastM = meters;
         var W = box().width, H = box().height;
-        if (meters >= nextPlane && flyers.filter(function (f) { return f.kind === "plane"; }).length < 1) {
-          if (W >= 40) {
-            var w = Math.min(140, Math.max(100, W * 0.36));
-            spawnImg(PLANES[pIdx++ % PLANES.length], w, 40 + Math.random() * Math.max(16, H * 0.2), 0.9, "plane");
-            nextPlane = meters + 250 + Math.floor(Math.random() * 250);
-          }
+        if (meters >= nextPlane && flyers.filter(function (f) { return f.kind === "plane"; }).length < 1 && W >= 40) {
+          var w = Math.min(140, Math.max(100, W * 0.36));
+          spawnImg(PLANES[pIdx++ % PLANES.length], w, 40 + Math.random() * Math.max(16, H * 0.2), 0.9, "plane");
+          nextPlane = meters + 250 + Math.floor(Math.random() * 250);
         }
         var now = Date.now();
         if ((!nextSkyAt || now >= nextSkyAt) && flyers.filter(function (f) { return f.kind === "sky"; }).length < 1) {
@@ -104,10 +88,7 @@
           f.x += f.vx;
           f.bob += 0.03;
           f.el.style.transform = "translate(" + f.x.toFixed(1) + "px," + (f.y + Math.sin(f.bob) * 3).toFixed(1) + "px)";
-          if (f.x < -f.w - 40) {
-            f.el.remove();
-            flyers.splice(i, 1);
-          }
+          if (f.x < -f.w - 40) { f.el.remove(); flyers.splice(i, 1); }
         }
       } catch (e) {}
       requestAnimationFrame(tick);
