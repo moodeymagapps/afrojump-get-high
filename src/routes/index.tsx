@@ -27,18 +27,7 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-function readWarp() {
-  try {
-    const q = new URLSearchParams(window.location.search || "");
-    if (q.get("dev") !== "moodey") return 0;
-    const n = Number(q.get("warp") || q.get("m") || 0);
-    return Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
-  } catch {
-    return 0;
-  }
-}
-
-function patchGameHtml(html: string, warpTo: number) {
+function patchGameHtml(html: string) {
   let out = html;
   if (!out.includes("<base ")) {
     out = out.replace("<head>", '<head>\n<base href="/" />');
@@ -124,28 +113,26 @@ function patchGameHtml(html: string, warpTo: number) {
     "const birdA=0;"
   );
 
-  if (warpTo > 0) {
+  if (!out.includes("var __W=0")) {
     out = out.replace(
-      "cameraY=0;bestY=0;scrollLocked=false;boss=null;nextBossScore=1500;gameOver=false;",
-      "cameraY=" +
-        -warpTo * 10 +
-        ";bestY=" +
-        warpTo +
-        ";scrollLocked=false;boss=null;nextBossScore=" +
-        (warpTo + 500) +
-        ";gameOver=false;"
+      "function reset(){\n  prngState=",
+      "function reset(){\n  var __W=0;try{var loc=(parent&&parent.location)||location;var raw=((loc.search||'')+'&'+String(loc.hash||'').replace('#','')).replace(/^[?&#]+/,'');var s=new URLSearchParams(raw);if(s.get('dev')==='moodey')__W=Math.floor(+(s.get('warp')||s.get('m')||0)||0);}catch(e){}\n  prngState="
     );
     out = out.replace(
       "player={x:W/2,y:H-100,vx:0,vy:-14",
-      "player={x:W/2,y:" + -warpTo * 10 + ",vx:0,vy:-14"
+      "player={x:W/2,y:(__W?(-__W*10):(H-100)),vx:0,vy:-14"
     );
     out = out.replace(
-      "platforms.push({x:W/2-40,y:H-40,w:80,h:12,vx:0,type:'normal',dir:1,range:0,ox:W/2-40,bounce:0,cracked:0});\n  let py=H-40;\n  for(let i=0;i<20;i++){\n    py-=rand(60,90);\n    spawnPlatform(py);",
-      "platforms.push({x:W/2-40,y:" +
-        (-warpTo * 10 + 40) +
-        ",w:80,h:12,vx:0,type:'normal',dir:1,range:0,ox:W/2-40,bounce:0,cracked:0});\n  let py=" +
-        (-warpTo * 10 + 40) +
-        ";\n  for(let i=0;i<28;i++){\n    py-=rand(60,90);\n    spawnPlatform(py);"
+      "cameraY=0;bestY=0;scrollLocked=false;boss=null;nextBossScore=1500;gameOver=false;",
+      "cameraY=__W?(-__W*10):0;bestY=__W||0;scrollLocked=false;boss=null;nextBossScore=__W?(__W+500):1500;gameOver=false;"
+    );
+    out = out.replace(
+      "let py=H-40;\n  for(let i=0;i<20;i++){",
+      "let py=__W?(-__W*10+40):H-40;\n  for(let i=0;i<(__W?28:20);i++){"
+    );
+    out = out.replace(
+      "platforms.push({x:W/2-40,y:H-40,w:80,h:12,vx:0,type:'normal',dir:1,range:0,ox:W/2-40,bounce:0,cracked:0});",
+      "platforms.push({x:W/2-40,y:__W?(-__W*10+40):H-40,w:80,h:12,vx:0,type:'normal',dir:1,range:0,ox:W/2-40,bounce:0,cracked:0});"
     );
   }
 
@@ -173,7 +160,7 @@ function Index() {
       if (!doc.getElementById("afroFxScript")) {
         const s = doc.createElement("script");
         s.id = "afroFxScript";
-        s.src = "/afro-fx.js?v=warp13";
+        s.src = "/afro-fx.js?v=warp14";
         doc.body.appendChild(s);
       }
       if (!doc.getElementById("bgMusicScript")) {
@@ -191,16 +178,15 @@ function Index() {
     const frame = frameRef.current;
     if (!frame) return;
     let cancelled = false;
-    const warpTo = readWarp();
-    fetch("/game.html?v=warp13", { cache: "no-store" })
+    fetch("/game.html?v=warp14", { cache: "no-store" })
       .then((r) => r.text())
       .then((html) => {
         if (cancelled || !frame) return;
-        frame.srcdoc = patchGameHtml(html, warpTo);
+        frame.srcdoc = patchGameHtml(html);
       })
       .catch(() => {
         if (!cancelled && frame && !frame.getAttribute("src")) {
-          frame.src = "/game.html?v=warp13";
+          frame.src = "/game.html?v=warp14";
         }
       });
     return () => {
