@@ -55,8 +55,14 @@ function Index() {
     <div
       className="fixed inset-0 overflow-hidden"
       style={{
-        height: "100dvh",
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
         width: "100%",
+        height: "100dvh",
+        minHeight: "-webkit-fill-available",
         background: "#0b1a0b",
         overscrollBehavior: "none",
         touchAction: "none",
@@ -66,7 +72,15 @@ function Index() {
         ref={frameRef}
         src="/game.html"
         title="Afro Jump"
-        className="w-full h-full border-0"
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          border: 0,
+          background: "#0b1a0b",
+        }}
         allow="fullscreen; autoplay; clipboard-write"
         allowFullScreen
         onLoad={injectScripts}

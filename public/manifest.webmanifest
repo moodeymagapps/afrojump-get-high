@@ -4,7 +4,7 @@
   "description": "JUMP HIGH. 🟢",
   "start_url": "/?app=1",
   "scope": "/",
-  "display": "standalone",
+  "display": "fullscreen",
   "orientation": "portrait",
   "background_color": "#0b1a0b",
   "theme_color": "#0b1a0b",
