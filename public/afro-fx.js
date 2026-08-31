@@ -37,7 +37,7 @@
     }
 
     var items = [];
-    var nextPlane = 280;
+    var nextPlane = 450;
     var nextSky = 0;
     var last = 0;
     var pi = 0;
@@ -57,7 +57,15 @@
       wrap.appendChild(img);
       layer.appendChild(wrap);
       var W = layer.getBoundingClientRect().width || 360;
-      var it = { wrap: wrap, x: W + 24, y: y, v: -Math.abs(spd), w: maxW, kind: kind };
+      var goingRight = kind === "plane";
+      var it = {
+        wrap: wrap,
+        x: goingRight ? -maxW - 40 : W + 24,
+        y: y,
+        v: goingRight ? Math.abs(spd) : -Math.abs(spd),
+        w: maxW,
+        kind: kind
+      };
       wrap.style.left = it.x + "px";
       wrap.style.top = it.y + "px";
       items.push(it);
@@ -71,10 +79,10 @@
     function tick() {
       try {
         var m = meters();
-        if (m >= 20) live = true;
+        if (m >= 40) live = true;
         if (!live) { requestAnimationFrame(tick); return; }
         if (m < last - 40) {
-          nextPlane = 280;
+          nextPlane = 450;
           nextSky = 0;
           clearAll();
         }
@@ -86,20 +94,20 @@
           else skies++;
         }
         if (m >= nextPlane && planes < 1 && r.width > 50) {
-          spawn(PLANES[pi++ % PLANES.length], 132, 40, 28 + Math.random() * 36, 0.72, "plane");
-          nextPlane = m + 320 + Math.floor(Math.random() * 220);
+          spawn(PLANES[pi++ % PLANES.length], 132, 40, 22 + Math.random() * 40, 0.55, "plane");
+          nextPlane = m + 600 + Math.floor(Math.random() * 400);
         }
         var now = Date.now();
         if ((!nextSky || now >= nextSky) && skies < 2 && r.width > 50) {
           var s = SKY[Math.floor(Math.random() * SKY.length)];
           spawn(s.src, s.maxW, s.maxH, 14 + Math.random() * 48, 0.16 + Math.random() * 0.1, "sky");
-          nextSky = now + 7000 + Math.random() * 6000;
+          nextSky = now + 9000 + Math.random() * 8000;
         }
         for (i = items.length - 1; i >= 0; i--) {
           var it = items[i];
           it.x += it.v;
           it.wrap.style.left = it.x.toFixed(1) + "px";
-          if (it.x < -it.w - 80) {
+          if (it.x < -it.w - 80 || it.x > r.width + 80) {
             it.wrap.remove();
             items.splice(i, 1);
           }
