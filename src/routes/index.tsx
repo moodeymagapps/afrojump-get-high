@@ -51,7 +51,6 @@ function patchGameHtml(html: string) {
     "const s=Math.min(vh/H,Math.max(vw/W,vh/H));",
     "const s=Math.max(vw/W,vh/H);"
   );
-  // weißer Balken: Portrait nutzte Contain (sFit) — Cover-Scale
   out = out.replace(
     "const scale=wide?vh/H:sFit;",
     "const scale=Math.max(vw/W,vh/H);"
@@ -64,26 +63,37 @@ function patchGameHtml(html: string) {
 
   out = out.replace(
     "const PLANE_FILES=['fckafd','p161','merz','palestine'];",
-    "const PLANE_FILES=['fckafd','161','merz','palestine'];"
+    "const PLANE_FILES=['fckafd','161','merz','palestine'];try{PLANE_FILES.forEach(function(b){media('planes/'+b);});}catch(e){}"
   );
   out = out.replaceAll(
     "planeNextM=200+Math.random()*300",
-    "planeNextM=80+Math.random()*40"
+    "planeNextM=40"
   );
   out = out.replaceAll(
     "planeT=12+Math.random()*6",
-    "planeT=2+Math.random()*2"
+    "planeT=1.2"
   );
   out = out.replace(
     "planeNextM=m+200+Math.random()*300",
-    "planeNextM=m+180+Math.random()*80"
+    "planeNextM=m+220+Math.random()*120"
   );
   out = out.replace(
     "const w=W*(0.28+Math.random()*0.14),h=w*0.3;",
-    "const w=W*(0.42+Math.random()*0.12),h=w*0.32;"
+    "const w=W*(0.34+Math.random()*0.08),h=w*0.3;"
+  );
+  out = out.replace(
+    "y:30+Math.random()*(H*0.35)",
+    "y:H*0.30+Math.random()*(H*0.28)"
+  );
+  out = out.replace(
+    "    if(m>=planeNextM||planeT<=0){\n      planeSpawn();\n      planeNextM=m+200+Math.random()*300;\n      planeT=12+Math.random()*6;",
+    "    if(m>=planeNextM||planeT<=0){\n      planeSpawn();\n      planeNextM=m+220+Math.random()*120;\n      planeT=7+Math.random()*4;"
+  );
+  out = out.replace(
+    "  if(plane){\n    plane.t+=dt;\n    plane.x+=plane.vx*dt;\n    const bob=Math.sin(plane.t*1.8)*3;\n    drawMedia(ctx,'planes/'+plane.base,plane.x,plane.y+bob,plane.w,plane.h,0.95,plane.dir<0);\n    if(plane.x>W+plane.w*1.2||plane.x<-plane.w*2.2)plane=null;",
+    "  if(plane){\n    const md=media('planes/'+plane.base);\n    if(!md.ready){drawMedia(ctx,'planes/'+plane.base,plane.x,plane.y,plane.w,plane.h,0.95,plane.dir<0);}\n    else{\n    plane.t+=dt;\n    plane.x+=plane.vx*dt;\n    const bob=Math.sin(plane.t*1.8)*3;\n    drawMedia(ctx,'planes/'+plane.base,plane.x,plane.y+bob,plane.w,plane.h,0.95,plane.dir<0);\n    if(plane.x>W+plane.w*1.2||plane.x<-plane.w*2.2)plane=null;}\n"
   );
 
-  // PNG zuerst — WebM fehlt bei Planes, iOS bleibt sonst auf ready=false stehen
   out = out.replace(
     "const png=()=>{const i=new Image();i.onload=()=>{m.el=i;m.ready=true;};i.onerror=()=>{m.dead=true;};i.src='/'+base+'.png';};\n    try{",
     "const png=()=>{const i=new Image();i.onload=()=>{if(!m.ready||!(m.el&&m.el.tagName==='VIDEO')){m.el=i;m.ready=true;}};i.onerror=()=>{if(!m.ready)m.dead=true;};i.src='/'+base+'.png';};\n    png();\n    try{"
@@ -122,7 +132,7 @@ function Index() {
       if (!doc.getElementById("afroFxScript")) {
         const s = doc.createElement("script");
         s.id = "afroFxScript";
-        s.src = "/afro-fx.js?v=iosfill5";
+        s.src = "/afro-fx.js?v=planes6";
         doc.body.appendChild(s);
       }
       if (!doc.getElementById("bgMusicScript")) {
@@ -140,7 +150,7 @@ function Index() {
     const frame = frameRef.current;
     if (!frame) return;
     let cancelled = false;
-    fetch("/game.html?v=iosfill5", { cache: "no-store" })
+    fetch("/game.html?v=planes6", { cache: "no-store" })
       .then((r) => r.text())
       .then((html) => {
         if (cancelled || !frame) return;
@@ -148,7 +158,7 @@ function Index() {
       })
       .catch(() => {
         if (!cancelled && frame && !frame.getAttribute("src")) {
-          frame.src = "/game.html?v=iosfill5";
+          frame.src = "/game.html?v=planes6";
         }
       });
     return () => {
