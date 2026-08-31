@@ -1506,7 +1506,25 @@ function setOv(el,show){
   el.classList.add('closing');
   el._ovT=setTimeout(()=>{el._ovT=null;el.classList.remove('closing');el.style.display='none';},130);
 }
+// ---------- Lustige Death-/Fail-Sprüche ----------
+const DEATH_LINES=[
+  'Hahaha war das Weed zu stark?','Bro ist im Kushkoma','Nach jedem High kommt ein Tief',
+  'Skill-Issue, kein Strain-Issue','Der Joint hat dich gedroppt','Afro landed… poorly',
+  'Baggys eingesammelt, Würde verloren','Zu high zum Springen','Die Plattform war eine Halluzination',
+  'Cops 1 – Du 0','Respawn in 3… 2… noch ein Zug','Das war kein Flow, das war ein Fall',
+  'Mutterpflanze schämt sich','Bongzilla hat ausgeatmet. Du auch.','Game Over, aber der Vibe bleibt'
+];
+let lastDeathLine=-1;
+function setDeathLine(){
+  const el=document.getElementById('deathLine');
+  if(!el)return;
+  let i=lastDeathLine;
+  while(i===lastDeathLine&&DEATH_LINES.length>1)i=Math.floor(Math.random()*DEATH_LINES.length);
+  lastDeathLine=i;
+  el.textContent=DEATH_LINES[i];
+}
 function showOverlay(which){
+  if(which==='gameover')setDeathLine();
   setOv(menuEl,which==='menu');
   setOv(pauseEl,which==='paused');
   setOv(shopEl,which==='shop');
