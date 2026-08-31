@@ -5,10 +5,10 @@
 
   var PLANES = ["/planes/merz.png", "/planes/fckafd.png", "/planes/161.png", "/planes/palestine.png"];
   var SKY = [
+    { src: "/sky/bird.png", w: 40 },
+    { src: "/sky/birds.png", w: 58 },
     { src: "/sky/cloud.png", w: 88 },
     { src: "/sky/cloud_bank.png", w: 110 },
-    { src: "/sky/bird.png", w: 36 },
-    { src: "/sky/birds.png", w: 56 },
     { src: "/sky/balloon.png", w: 32 },
     { src: "/sky/blimp.png", w: 62 },
     { src: "/sky/leaves.png", w: 32 }
@@ -56,9 +56,18 @@
       img.style.cssText =
         "position:absolute;top:0;left:0;width:" + wpx + "px;height:auto;" +
         "pointer-events:none;image-rendering:pixelated;opacity:" +
-        (kind === "sky" ? "0.55" : "0.95") + ";";
+        (kind === "sky" ? "0.6" : "0.95") + ";";
       layer.appendChild(img);
-      flyers.push({ el: img, x: -wpx - 16, y: y, vx: speed, w: wpx, kind: kind, bob: Math.random() * 6 });
+      var W = box().width;
+      flyers.push({
+        el: img,
+        x: W + 12,
+        y: y,
+        vx: -Math.abs(speed),
+        w: wpx,
+        kind: kind,
+        bob: Math.random() * 6
+      });
     }
 
     function tick() {
@@ -76,28 +85,26 @@
           flyers.length = 0;
         }
         lastM = meters;
+        var W = box().width, H = box().height;
         if (meters >= nextPlane && flyers.filter(function (f) { return f.kind === "plane"; }).length < 1) {
-          var W = box().width, H = box().height;
           if (W >= 40) {
             var w = Math.min(140, Math.max(100, W * 0.36));
-            spawnImg(PLANES[pIdx++ % PLANES.length], w, 40 + Math.random() * Math.max(16, H * 0.2), 0.85, "plane");
+            spawnImg(PLANES[pIdx++ % PLANES.length], w, 40 + Math.random() * Math.max(16, H * 0.2), 0.9, "plane");
             nextPlane = meters + 250 + Math.floor(Math.random() * 250);
           }
         }
         var now = Date.now();
         if ((!nextSkyAt || now >= nextSkyAt) && flyers.filter(function (f) { return f.kind === "sky"; }).length < 1) {
           var spec = SKY[Math.floor(Math.random() * SKY.length)];
-          var H2 = box().height;
-          spawnImg(spec.src, spec.w, 24 + Math.random() * Math.max(16, H2 * 0.3), 0.22, "sky");
+          spawnImg(spec.src, spec.w, 24 + Math.random() * Math.max(16, H * 0.3), 0.28, "sky");
           nextSkyAt = now + 8000 + Math.random() * 8000;
         }
-        var WW = box().width;
         for (var i = flyers.length - 1; i >= 0; i--) {
           var f = flyers[i];
           f.x += f.vx;
           f.bob += 0.03;
           f.el.style.transform = "translate(" + f.x.toFixed(1) + "px," + (f.y + Math.sin(f.bob) * 3).toFixed(1) + "px)";
-          if (f.x > WW + f.w + 40) {
+          if (f.x < -f.w - 40) {
             f.el.remove();
             flyers.splice(i, 1);
           }
