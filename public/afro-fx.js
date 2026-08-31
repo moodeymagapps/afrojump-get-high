@@ -3,13 +3,13 @@
   if (window.__afroFxInit) return;
   window.__afroFxInit = true;
 
-  var PLANES = ["/planes/merz.gif", "/planes/fckafd.gif", "/planes/161.gif", "/planes/palestine.gif"];
+  var PLANES = ["/planes/merz.png", "/planes/fckafd.png", "/planes/161.png", "/planes/palestine.png"];
   var SKY = [
-    { src: "/sky/bird.gif", w: 40 },
-    { src: "/sky/birds.gif", w: 58 },
-    { src: "/sky/cloud.gif", w: 88 },
-    { src: "/sky/leaves.gif", w: 32 },
-    { src: "/sky/balloon.gif", w: 32 }
+    { src: "/sky/bird.png", w: 40 },
+    { src: "/sky/birds.png", w: 58 },
+    { src: "/sky/cloud.png", w: 88 },
+    { src: "/sky/leaves.png", w: 32 },
+    { src: "/sky/balloon.png", w: 32 }
   ];
 
   function findCanvas() {
@@ -45,17 +45,23 @@
     function box() { return layer.getBoundingClientRect(); }
 
     function spawnImg(src, wpx, y, speed, kind) {
+      var boxEl = document.createElement("div");
+      boxEl.style.cssText =
+        "position:absolute;top:0;left:0;width:" + wpx + "px;pointer-events:none;will-change:transform;";
       var img = document.createElement("img");
       img.src = src;
       img.alt = "";
       img.draggable = false;
       img.style.cssText =
-        "position:absolute;top:0;left:0;width:" + wpx + "px;height:auto;" +
-        "pointer-events:none;image-rendering:pixelated;opacity:" +
+        "display:block;width:100%;height:auto;pointer-events:none;image-rendering:pixelated;opacity:" +
         (kind === "sky" ? "0.7" : "1") + ";";
-      layer.appendChild(img);
+      img.onerror = function () {
+        if (src.indexOf(".png") !== -1) img.src = src.replace(".png", ".gif");
+      };
+      boxEl.appendChild(img);
+      layer.appendChild(boxEl);
       flyers.push({
-        el: img, x: box().width + 12, y: y,
+        el: boxEl, x: box().width + 12, y: y,
         vx: -Math.abs(speed), w: wpx, kind: kind, bob: Math.random() * 6
       });
     }
