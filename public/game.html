@@ -3181,13 +3181,23 @@ function update(dt){
     if(e.boss&&e.alive){
       e.y+=e.vy;
       if(e.vx)e.x+=e.vx;
-      if(Math.hypot(player.x-e.x,player.y-e.y)<player.r+6){
+      if(e.mini&&(e.x<-40||e.x>W+40))e.alive=false;
+      if(Math.hypot(player.x-e.x,player.y-e.y)<player.r+(e.w?e.w/2:6)){
         if(player.invincible>0){e.alive=false;}
-        else{e.alive=false;hurtPlayer();}
+        else{
+          e.alive=false;
+          if(e.knock){player.vx=(player.x<e.x?-1:1)*9;player.vy=-6;pushFloat(player.x,player.y-18,'BLING!','#ffd700');hurtPlayer();}
+          else if(e.tax){
+            if(runBags>0){runBags--;pushFloat(player.x,player.y-24,'-19%','#e0e0e0');}
+            hurtPlayer();
+          }
+          else hurtPlayer();
+        }
       }
       if(e.y>cameraY+H+40)e.alive=false;
     }
   }
+
 
   // camera – sanft nachziehen (kein hartes Rucken beim Landen)
   if(!scrollLocked){
