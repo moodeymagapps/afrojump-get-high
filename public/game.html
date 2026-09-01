@@ -2853,10 +2853,14 @@ function update(dt){
     }
   }
   player.x+=player.vx;
-  if(player.x<0)player.x=W;if(player.x>W)player.x=0;
+  if(bossMod.wall>0){
+    if(player.x<bossMod.wall){player.x=bossMod.wall;player.vx*=-0.4;}
+    if(player.x>W-bossMod.wall){player.x=W-bossMod.wall;player.vx*=-0.4;}
+  }else{if(player.x<0)player.x=W;if(player.x>W)player.x=0;}
   if(player.vx<-0.1)player.facing=-1;else if(player.vx>0.1)player.facing=1;
 
-  player.vy+=0.35;
+  player.vy+=0.35*bossMod.grav;
+
   if(player.invincible>0){
     player.invincible-=dt;
     if(player.invincible<=0)player.invSrc=null;
