@@ -5914,7 +5914,8 @@ function render(){
   {const nowD=performance.now();const dtD=Math.min(0.05,(nowD-(window.__decoT||nowD))/1000);window.__decoT=nowD;
    drawSkyProps(dtD);drawPlanes(dtD);}
   for(const z of zones)drawZone(z);
-  for(const p of platforms)drawPlatform(p);
+  if(bossMod.platAlpha<1){ctx.save();ctx.globalAlpha=bossMod.platAlpha;for(const p of platforms)drawPlatform(p);ctx.restore();}
+  else for(const p of platforms)drawPlatform(p);
   for(const hz of hazards)drawHazard(hz);
   for(const c of collectibles)if(!c.taken)drawCollectible(c);
   for(const e of enemies)drawEnemy(e);
