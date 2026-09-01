@@ -2806,7 +2806,9 @@ function spawnBoss(){
   if(player.y<arenaTop){player.y=arenaTop+60;player.vy=2;}
   const nm=(BOSS_NAMES[kind]||'BOSS');
   pushFloat(W/2,cameraY+150,nm,'#ffdd00');
-  pushFloat(W/2,cameraY+180,'3 ♥  –  drauf springen!','#ff5252');
+  if(BOSS_SUBS[kind])pushFloat(W/2,cameraY+172,BOSS_SUBS[kind],'#ffe082');
+  pushFloat(W/2,cameraY+196,'3 ♥  –  drauf springen!','#ff5252');
+
   // Musik komplett aus im Bossfight – nur Sounds
   stopMusic();stopBossMusic();sfx('boss');
   // eine Waffe zum Start, damit man sofort was tun kann
