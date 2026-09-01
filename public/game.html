@@ -5207,6 +5207,10 @@ function drawBoss(){
   const y=boss.y-cameraY;
   const bx=boss.x, bw=boss.w, bh=boss.h;
   const t=performance.now()/1000;
+  const spec=bSpec(boss);
+  // Wände (Gras Gott P3) + Effekt-Ebene der neuen Bosse
+  if(bossMod.wall>0){ctx.save();ctx.fillStyle='rgba(20,40,20,0.85)';ctx.fillRect(0,0,bossMod.wall,H);ctx.fillRect(W-bossMod.wall,0,bossMod.wall,H);ctx.restore();}
+  if(spec&&spec.draw)spec.draw(boss,bx,y,bw,bh,t);
   // Warn-Marker vor jedem Schuss (fairer Bossfight)
   if(boss.tele>0){
     ctx.save();
@@ -5215,6 +5219,8 @@ function drawBoss(){
     ctx.fillRect(bx-3,y+bh/2,6,H);
     ctx.restore();
   }
+  // Gruppen-Bosse zeichnen sich komplett selbst (161 Squadron, Hash Hydra)
+  if(spec&&spec.drawFull){spec.drawFull(boss);drawBossHP(bx,y,bh);return;}
   // Bild-Bosse (Pixel-Art Artwork)
   const bimg=BOSS_IMAGES[boss.kind];
   if(bimg){
@@ -5222,19 +5228,20 @@ function drawBoss(){
     if(e&&e.ready&&e.canvas){
       ctx.save();
       if(boss.hitT>0)ctx.globalAlpha=0.55;
+      if(boss.invT>0)ctx.globalAlpha=0.4+0.4*Math.abs(Math.sin(t*20));
       const bob=Math.sin(t*3)*3;
-      const ar=e.canvas.width/e.canvas.height;
+      const src=bimg.tint?bossTinted(e.canvas,bimg.tint,boss.kind):e.canvas;
+      const ar=src.width/src.height;
       let dh=bh*1.12, dw=dh*ar;
       if(dw>bw*1.5){dw=bw*1.5;dh=dw/ar;}
       ctx.imageSmoothingEnabled=false;
-      // Schatten
-      ctx.globalAlpha*=1;
-      ctx.drawImage(e.canvas,bx-dw/2,y-dh/2+bob,dw,dh);
+      ctx.drawImage(src,bx-dw/2,y-dh/2+bob,dw,dh);
       ctx.restore();
       drawBossHP(bx,y,bh);
       return;
     }
   }
+
   ctx.save();
   if(boss.hitT>0)ctx.globalAlpha=0.55;
   const idle=Math.sin(t*3)*3;
