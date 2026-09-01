@@ -2774,7 +2774,20 @@ function spawnBoss(){
   if(kind==='theplug'){boss.w=PS*1.0;boss.h=PS*1.35;boss.vx=2.3;}
   if(kind==='giantblunt'){boss.w=PS*0.85;boss.h=PS*1.6;boss.vx=1.9;}
   if(kind==='mutantbush'){boss.w=PS*1.4;boss.h=PS*1.1;boss.vx=1.6;}
+  // --- Neue Bosse: eigene Werte + eigene Attacken-Kombo ---
+  bossModReset();
+  const spec=BOSS_SPECS[kind];
+  if(spec){
+    if(spec.hp){boss.hp=spec.hp+Math.floor(bossIndex/BOSS_TYPES.length);boss.hpMax=boss.hp;}
+    const sc=spec.scale||1;
+    boss.w=PS*1.15*sc*(spec.wMul||1);
+    boss.h=PS*1.35*sc*(spec.hMul||1);
+    boss.vx=1.7*(spec.speed==null?1:spec.speed);
+    boss.noFloat=!!spec.noFloat;
+    if(spec.init)spec.init(boss);
+  }
   scrollLocked=true;
+
   // --- Boss arena: clear everything above the boss so the player can never
   // get stuck on a platform out of reach and build a fair fighting floor ---
   const arenaTop=boss.y+boss.h/2+70;
