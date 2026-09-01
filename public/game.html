@@ -3076,14 +3076,20 @@ function update(dt){
   // boss check
   if(!boss&&bestY>=nextBossScore){spawnBoss();}
   if(boss){
+    const spec=bSpec(boss);
+    // Arena-Modifikatoren jeden Frame neu setzen (Handler darf sie überschreiben)
+    bossModReset();
     if(boss.spawnT>0)boss.spawnT-=dt;
+    if(boss.invT>0)boss.invT-=dt;
     // sanftes Schweben statt hartes Zickzack
     const rageMul=boss.rage?1.5:1;
-    boss.x+=boss.vx*(boss.spawnT>0?0.3:rageMul)*(boss.dash>0?2.2:1);
-    if(boss.x<60){boss.x=60;boss.vx*=-1;}
-    if(boss.x>W-60){boss.x=W-60;boss.vx*=-1;}
+    if(!boss.noFloat||boss.vx){
+      boss.x+=boss.vx*(boss.spawnT>0?0.3:rageMul)*(boss.dash>0?2.2:1);
+      if(boss.x<60){boss.x=60;boss.vx*=-1;}
+      if(boss.x>W-60){boss.x=W-60;boss.vx*=-1;}
+    }
     boss.bob+=dt;
-    boss.y=cameraY+150+Math.sin(boss.bob*(boss.rage?2.6:1.6))*14;
+    if(!boss.noFloat)boss.y=cameraY+150+Math.sin(boss.bob*(boss.rage?2.6:1.6))*14;
     boss.hitT-=dt;
     boss.phase+=dt;
     if(boss.dash>0)boss.dash-=dt;
@@ -3101,26 +3107,42 @@ function update(dt){
       boss.dashT-=dt;
       if(boss.dashT<=0){boss.dashT=boss.rage?3.2:5;boss.dash=0.7;}
     }
+    // ---- eigene Attacken-Kombo des Bosses ----
+    if(spec&&spec.update&&boss.spawnT<=0)spec.update(boss,dt);
+    const invulnerable=(boss.invT>0);
     // stomp
-    if(player.vy>0&&Math.abs(player.x-boss.x)<boss.w/2+player.r*0.5&&player.y+player.r>boss.y-boss.h/2-4&&player.y+player.r<boss.y-boss.h/2+22){
-      boss.hp--;boss.hitT=0.3;player.vy=-17;burst(player.x,boss.y-boss.h/2,'#ff5252',20);addShake(6,0.25);pushFloat(boss.x,boss.y-boss.h/2,'-1','#ff5252');sfx('stomp');
-    }
-    // hit by projectile
-    for(const pr of projectiles){
-      if(pr.life>0&&Math.abs(pr.x-boss.x)<boss.w/2&&Math.abs(pr.y-boss.y)<boss.h/2){
-        pr.life=0;boss.hp--;boss.hitT=0.3;burst(pr.x,pr.y,'#ffffff',12);addShake(3,0.15);sfx('hit');
+    if(!spec||!spec.group){
+      if(player.vy>0&&Math.abs(player.x-boss.x)<boss.w/2+player.r*0.5&&player.y+player.r>boss.y-boss.h/2-4&&player.y+player.r<boss.y-boss.h/2+22){
+        let ok=true;
+        if(spec&&spec.stomp)ok=spec.stomp(boss);
+        player.vy=-17;
+        if(ok&&!invulnerable&&!(spec&&spec.hit&&spec.hit(boss,1))){
+          boss.hp--;boss.hitT=0.3;burst(player.x,boss.y-boss.h/2,'#ff5252',20);addShake(6,0.25);pushFloat(boss.x,boss.y-boss.h/2,'-1','#ff5252');sfx('stomp');
+        }else if(!ok){burst(player.x,boss.y-boss.h/2,'#bdbdbd',8);}
+      }
+      // hit by projectile
+      for(const pr of projectiles){
+        if(pr.life>0&&Math.abs(pr.x-boss.x)<boss.w/2&&Math.abs(pr.y-boss.y)<boss.h/2){
+          pr.life=0;
+          if(spec&&spec.noProjHit){burst(pr.x,pr.y,'#bdbdbd',6);continue;}
+          let ok=true;
+          if(spec&&spec.projHit)ok=spec.projHit(boss,pr);
+          if(!ok||invulnerable)continue;
+          if(spec&&spec.hit&&spec.hit(boss,1))continue;
+          boss.hp--;boss.hitT=0.3;burst(pr.x,pr.y,'#ffffff',12);addShake(3,0.15);sfx('hit');
+        }
+      }
+      // Nur die Joint-Unbesiegbarkeit macht Kontaktschaden (nicht die Treffer-Unverwundbarkeit)
+      if(!invulnerable&&player.invincible>0&&player.invSrc==='power'&&Math.abs(player.x-boss.x)<boss.w/2+player.r&&Math.abs(player.y-boss.y)<boss.h/2+player.r){
+        boss.hp-=dt*2.2;boss.hitT=0.12;
+      }
+      // body contact — costs one boss life (never instant-kill during reaction window)
+      if(boss.spawnT<=0&&player.invincible<=0&&Math.abs(player.x-boss.x)<boss.w/2-6&&Math.abs(player.y-boss.y)<boss.h/2-6&&!(player.vy>0&&player.y<boss.y)){
+        hurtPlayer();
       }
     }
-    // Nur die Joint-Unbesiegbarkeit macht Kontaktschaden (nicht die Treffer-Unverwundbarkeit)
-    if(player.invincible>0&&player.invSrc==='power'&&Math.abs(player.x-boss.x)<boss.w/2+player.r&&Math.abs(player.y-boss.y)<boss.h/2+player.r){
-      boss.hp-=dt*2.2;boss.hitT=0.12;
-    }
-    // body contact — costs one boss life (never instant-kill during reaction window)
-    if(boss.spawnT<=0&&player.invincible<=0&&Math.abs(player.x-boss.x)<boss.w/2-6&&Math.abs(player.y-boss.y)<boss.h/2-6&&!(player.vy>0&&player.y<boss.y)){
-      hurtPlayer();
-    }
     // Boss schießt – immer erst telegrafiert (Warn-Marker), danach der Schuss
-    if(boss.spawnT<=0){
+    if(boss.spawnT<=0&&!(spec&&spec.noShoot)){
       if(boss.tele>0){
         boss.tele-=dt;
         if(boss.tele<=0){
@@ -3137,13 +3159,14 @@ function update(dt){
         if(boss.shootT<=0){boss.shootT=boss.rage?1.15:1.6;boss.tele=boss.rage?0.42:0.55;boss.teleX=boss.x;sfx('tele');}
       }
     }
-    if(boss.hp<=0){
+    if(boss.hp<=0&&!(spec&&spec.death&&spec.death(boss))){
       burst(boss.x,boss.y,'#ffdd00',50);addShake(10,0.5);
       pushFloat(boss.x,boss.y,'BOSS DOWN!','#ffdd00');
       const reward=40+Math.min(60,bossIndex*10);
       totalBags+=reward;localStorage.setItem(BK,totalBags);updateBagsUI();
       pushFloat(boss.x,boss.y+20,'+'+reward+' 🌿','#7cfc00');sfx('bossdie');
       boss=null;scrollLocked=false;nextBossScore+=1800;bestY+=100;player.vy=-14;
+      bossModReset();
       player.bossLives=0;stopBossMusic();tryPlayMusic();
       // übrige Boss-Kugeln entfernen (sonst treffen sie einen nach dem Sieg)
       for(const e of enemies)if(e.boss)e.alive=false;
@@ -3151,7 +3174,8 @@ function update(dt){
       questProgress('boss',1);
       missionProgress('boss',1);
     }
-  }
+  }else{bossModReset();}
+
   // boss projectiles
   for(const e of enemies){
     if(e.boss&&e.alive){
