@@ -154,7 +154,7 @@ function patchGameHtml(html: string) {
     out = out.replace("</head>", inject + "</head>");
   }
   if (!out.includes("afro-shop.css")) {
-    out = out.replace("</head>", '<link rel="stylesheet" href="/afro-shop.css?v=warp37"></head>');
+    out = out.replace("</head>", '<link rel="stylesheet" href="/afro-shop.css?v=warp38"></head>');
   }
   out = out.replace(
     "stage.className='carStage carSlide'+(eq?' eq':'')+(owned_?'':' locked')+(cfg.big?' big':'');",
@@ -172,9 +172,13 @@ function patchGameHtml(html: string) {
     "buy:s=>{if(totalBags<s.price)return;totalBags-=s.price;",
     "buy:s=>{var _m=String((typeof boardName==='function'&&boardName())||'').toLowerCase()==='moodey';if(!_m&&totalBags<s.price)return;if(!_m)totalBags-=s.price;"
   );
+  out = out.replace(
+    "  }else{\n    if(meters>60&&r0<0.10)type='brittle';\n    else if(meters>40&&r0<0.20)type='spring';\n    else if(meters>30&&r0<0.45)type='moving';\n  }",
+    "  }else{\n    if(meters>1900&&r0<0.015)type='lava';\n    else if(meters>1600&&r0<0.018)type='fake';\n    else if(meters>1400&&r0<0.020)type='tech';\n    else if(meters>1200&&r0<0.025)type='crate';\n    else if(meters>1050&&r0<0.025)type='conveyor';\n    else if(meters>900&&r0<0.030)type='boost';\n    else if(meters>750&&r0<0.030)type='tramp';\n    else if(meters>600&&r0<0.035)type='slip';\n    else if(meters>500&&r0<0.040)type='rock';\n    else if(meters>60&&r0<0.10)type='brittle';\n    else if(meters>40&&r0<0.20)type='spring';\n    else if(meters>30&&r0<0.45)type='moving';\n  }"
+  );
 
   if (!out.includes("lava-menu.js")) {
-    out = out.replace("</body>", '<script src="/lava-menu.js?v=warp37"></script><script src="/afro-admin.js?v=warp37"></script></body>');
+    out = out.replace("</body>", '<script src="/lava-menu.js?v=warp38"></script><script src="/afro-admin.js?v=warp38"></script></body>');
   }
   out = out.replace('src="/lava/lava_btn.png"', 'src="/lava_btn.png"');
   out = out.replace(
@@ -244,7 +248,7 @@ function Index() {
       if (!doc.getElementById("afroFxScript")) {
         const s = doc.createElement("script");
         s.id = "afroFxScript";
-        s.src = "/afro-fx.js?v=warp37";
+        s.src = "/afro-fx.js?v=warp38";
         doc.body.appendChild(s);
       }
       if (!doc.getElementById("bgMusicScript")) {
@@ -256,13 +260,13 @@ function Index() {
       if (!doc.getElementById("lavaMenuScript")) {
         const s3 = doc.createElement("script");
         s3.id = "lavaMenuScript";
-        s3.src = "/lava-menu.js?v=warp37";
+        s3.src = "/lava-menu.js?v=warp38";
         doc.body.appendChild(s3);
       }
       if (!doc.getElementById("afroAdminScript")) {
         const s4 = doc.createElement("script");
         s4.id = "afroAdminScript";
-        s4.src = "/afro-admin.js?v=warp37";
+        s4.src = "/afro-admin.js?v=warp38";
         doc.body.appendChild(s4);
       }
     } catch {
@@ -274,7 +278,7 @@ function Index() {
     const frame = frameRef.current;
     if (!frame) return;
     let cancelled = false;
-    fetch("/game.html?v=warp37", { cache: "no-store" })
+    fetch("/game.html?v=warp38", { cache: "no-store" })
       .then((r) => r.text())
       .then((html) => {
         if (cancelled || !frame) return;
@@ -282,7 +286,7 @@ function Index() {
       })
       .catch(() => {
         if (!cancelled && frame && !frame.getAttribute("src")) {
-          frame.src = "/game.html?v=warp37";
+          frame.src = "/game.html?v=warp38";
         }
       });
     return () => {
