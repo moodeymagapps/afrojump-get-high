@@ -7,9 +7,9 @@ const KEY_ART =
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "AFRO JUMP – JUMP HIGH." },
+      { title: "STONER JUMP – JUMP HIGH." },
       { name: "description", content: "JUMP HIGH." },
-      { property: "og:title", content: "AFRO JUMP – JUMP HIGH." },
+      { property: "og:title", content: "STONER JUMP – JUMP HIGH." },
       { property: "og:url", content: "https://afrojumper.app" },
       { property: "og:image", content: KEY_ART },
     ],
@@ -69,7 +69,7 @@ function Index() {
     <div style={{ position: "fixed", inset: 0, width: "100%", height: "100dvh", background: "#0b1a0b", overflow: "hidden" }}>
       <iframe
         ref={frameRef}
-        title="Afro Jump"
+        title="Stoner Jump"
         style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0, background: "#0b1a0b" }}
         allow="fullscreen; autoplay; clipboard-write"
         allowFullScreen
