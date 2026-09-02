@@ -1,7 +1,7 @@
-/* Afro Jump – Lava button full width like Vollbild bar */
+/* Afro Jump – Lava button larger full-width bar */
 (function () {
   const SRC = "/lava_btn.png";
-  const CSS = "#menu #menuLava{width:100%;max-width:none;margin:8px 0 10px;padding:0;border:none;background:none!important;cursor:pointer;display:block;line-height:0;}#menu #menuLava img{width:100%;height:52px;object-fit:contain;object-position:center;display:block;image-rendering:pixelated;}";
+  const CSS = "#menu #menuLava{width:100%;max-width:none;margin:10px 0 12px;padding:0;border:none;background:none!important;cursor:pointer;display:block;line-height:0;}#menu #menuLava img{width:100%;height:88px;object-fit:contain;object-position:center;display:block;image-rendering:pixelated;}";
   function ensureCss(){
     if(document.getElementById("lavaMenuCss")) return;
     const s=document.createElement("style");
