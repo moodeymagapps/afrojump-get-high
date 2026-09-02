@@ -36,6 +36,12 @@ export function patchDuelLinks(html: string, roomCode: string | null) {
     "function duelLink(code){const u=new URL(window.location.href);u.searchParams.set('duel',code);return u.toString();}",
     "function duelLink(code){return 'https://afrojumper.app/'+String(code||'').toUpperCase();}"
   );
+  if (!out.includes("id:'dfbboy'") && !out.includes('id:"dfbboy"')) {
+    out = out.replace(
+      "{id:'bebi',       name:'Bebi',",
+      "{id:'dfbboy',     name:'DFB',         price:1500, community:true, rarity:'legendary', img:'skins/dfbboy.png',     anchorY:0.70},\n  {id:'bebi',       name:'Bebi',"
+    );
+  }
   const boot =
     "<script>window.DUEL_BOOT_CODE=" +
     JSON.stringify(roomCode) +
@@ -52,7 +58,7 @@ export function Index() {
     if (!frame) return;
     let cancelled = false;
     const roomCode = readRoomCode();
-    fetch("/game.html?v=duel5", { cache: "no-store" })
+    fetch("/game.html?v=duel6", { cache: "no-store" })
       .then((r) => r.text())
       .then((html) => {
         if (cancelled || !frame) return;
@@ -60,7 +66,7 @@ export function Index() {
       })
       .catch(() => {
         if (!cancelled && frame && !frame.getAttribute("src")) {
-          frame.src = "/game.html?v=duel5";
+          frame.src = "/game.html?v=duel6";
         }
       });
     return () => {
