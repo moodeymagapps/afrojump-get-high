@@ -155,9 +155,56 @@ function patchGameHtml(html: string) {
   }
 
   if (!out.includes("lava-menu.js")) {
-    out = out.replace("</body>", '<script src="/lava-menu.js?v=warp31"></script><script src="/afro-admin.js?v=warp31"></script></body>');
+    out = out.replace("</body>", '<script src="/lava-menu.js?v=warp32"></script><script src="/afro-admin.js?v=warp32"></script></body>');
   }
   out = out.replace('src="/lava/lava_btn.png"', 'src="/lava_btn.png"');
+  out = out.replace(
+    "function drawSkinIntoCanvas(g,s,cv){\n  const S=cv.width||80, PAD=Math.round(S*0.03);\n  g.imageSmoothingEnabled=false;g.clearRect(0,0,S,S);\n  if(s.img){",
+    `function drawSkinIntoCanvas(g,s,cv){
+  const S=cv.width||80, PAD=Math.round(S*0.02);
+  const drawHead=function(im,sx,sy,sw,sh){
+    const ch=Math.max(10,Math.round(sh*0.50));
+    const cw=Math.max(10,Math.round(sw*0.72));
+    const cx=sx+Math.round((sw-cw)/2);
+    const cy=sy+Math.max(0,Math.round(sh*0.01));
+    const box=S-PAD*2;
+    const sc=Math.max(box/cw,box/ch)*1.12;
+    const w=Math.round(cw*sc),h=Math.round(ch*sc);
+    const bob=Math.sin(performance.now()/260)*Math.round(S*0.03);
+    g.imageSmoothingEnabled=false;g.clearRect(0,0,S,S);
+    g.drawImage(im,cx,cy,cw,ch,Math.round((S-w)/2),Math.round((S-h)/2)+bob,w,h);
+  };
+  const loop=function(){
+    if(!cv.isConnected)return;
+    const shImg=(typeof skinSheet==='function')?skinSheet(s.id):null;
+    if(shImg){
+      const CW=s.frameW||96,CH=s.frameH||128;
+      const frame=Math.floor(performance.now()/360)%4;
+      drawHead(shImg,frame*CW,0,CW,CH);
+      requestAnimationFrame(loop);return;
+    }
+    if(s.img){
+      const entry=loadSkinImage(s.img,s.bgKey);
+      if(entry&&entry.canvas){
+        const im=entry.canvas,sw=s.frameW||im.width,sh=s.frameH||im.height;
+        const n=s.frames||1;
+        const frame=Math.floor(performance.now()/360)%n;
+        const sx=(frame%4)*sw,sy=Math.floor(frame/4)*sh;
+        drawHead(im,sx,sy,sw,sh);
+        requestAnimationFrame(loop);return;
+      }
+      if(!entry||!entry.ready){requestAnimationFrame(loop);return;}
+    }
+    g.save();g.scale(S/80,S/80);if(typeof drawSkinPreview==='function')drawSkinPreview(g,s);g.restore();
+  };
+  loop();
+}
+function __afroOldDrawSkinIntoCanvas(g,s,cv){
+  const S=cv.width||80, PAD=Math.round(S*0.03);
+  g.imageSmoothingEnabled=false;g.clearRect(0,0,S,S);
+  if(s.img){`
+  );
+  out = out.replace("big:true, canvasSize:160, idle:true,","big:true, canvasSize:200, idle:true,");
   out = out.replace(
     "{id:'moodey',     name:'Moodey',     price:2000, community:true, rarity:'legendary', img:'skins/moodey.png',     anchorY:0.70},",
     "{id:'moodey',     name:'Moodey',     price:2000, community:true, rarity:'legendary', img:'skins/moodey.png',     anchorY:0.70},\n  {id:'dfbboy',     name:'DFB',        price:1500, community:true, rarity:'epic',      img:'skins/sheets/dfbboy.png', frameW:96, frameH:128, frames:4, anchorY:0.70},"
@@ -225,7 +272,7 @@ function Index() {
       if (!doc.getElementById("afroFxScript")) {
         const s = doc.createElement("script");
         s.id = "afroFxScript";
-        s.src = "/afro-fx.js?v=warp31";
+        s.src = "/afro-fx.js?v=warp32";
         doc.body.appendChild(s);
       }
       if (!doc.getElementById("bgMusicScript")) {
@@ -237,13 +284,13 @@ function Index() {
       if (!doc.getElementById("lavaMenuScript")) {
         const s3 = doc.createElement("script");
         s3.id = "lavaMenuScript";
-        s3.src = "/lava-menu.js?v=warp31";
+        s3.src = "/lava-menu.js?v=warp32";
         doc.body.appendChild(s3);
       }
       if (!doc.getElementById("afroAdminScript")) {
         const s4 = doc.createElement("script");
         s4.id = "afroAdminScript";
-        s4.src = "/afro-admin.js?v=warp31";
+        s4.src = "/afro-admin.js?v=warp32";
         doc.body.appendChild(s4);
       }
     } catch {
@@ -255,7 +302,7 @@ function Index() {
     const frame = frameRef.current;
     if (!frame) return;
     let cancelled = false;
-    fetch("/game.html?v=warp31", { cache: "no-store" })
+    fetch("/game.html?v=warp32", { cache: "no-store" })
       .then((r) => r.text())
       .then((html) => {
         if (cancelled || !frame) return;
@@ -263,7 +310,7 @@ function Index() {
       })
       .catch(() => {
         if (!cancelled && frame && !frame.getAttribute("src")) {
-          frame.src = "/game.html?v=warp31";
+          frame.src = "/game.html?v=warp32";
         }
       });
     return () => {
