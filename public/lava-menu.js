@@ -1,7 +1,7 @@
-/* Afro Jump – Lava button uses /lava_btn.png */
+/* Afro Jump – Lava button uses /lava_btn.png, compact size */
 (function () {
   const SRC = "/lava_btn.png";
-  const CSS = "#menu #menuLava{width:100%;min-width:0;margin:6px 0 4px;padding:0;border:none;background:none!important;cursor:pointer;display:block;line-height:0;}#menu #menuLava img{width:100%;height:auto;display:block;image-rendering:pixelated;}";
+  const CSS = "#menu #menuLava{width:86%;max-width:280px;margin:4px auto 6px;padding:0;border:none;background:none!important;cursor:pointer;display:block;line-height:0;}#menu #menuLava img{width:100%;height:auto;max-height:58px;object-fit:contain;object-position:center;display:block;image-rendering:pixelated;}";
   function ensureCss(){
     if(document.getElementById("lavaMenuCss")) return;
     const s=document.createElement("style");
@@ -19,7 +19,7 @@
     img.removeAttribute("onerror");
     btn.innerHTML="";
     btn.appendChild(img);
-    btn.style.cssText="width:100%;background:none;border:none;padding:0;margin:6px 0 4px;cursor:pointer;";
+    btn.style.cssText="";
     return true;
   }
   function boot(){
