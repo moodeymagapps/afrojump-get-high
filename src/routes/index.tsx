@@ -155,9 +155,29 @@ function patchGameHtml(html: string) {
   }
 
   if (!out.includes("lava-menu.js")) {
-    out = out.replace("</body>", '<script src="/lava-menu.js?v=warp25"></script></body>');
+    out = out.replace("</body>", '<script src="/lava-menu.js?v=warp26"></script><script src="/afro-admin.js?v=warp26"></script></body>');
   }
   out = out.replace('src="/lava/lava_btn.png"', 'src="/lava_btn.png"');
+  out = out.replace(
+    "data.forEach((r,i)=>{",
+    "data=(data||[]).filter(function(r){return String(r.display_name||'').toLowerCase().indexOf('moodey')<0;});data.forEach((r,i)=>{"
+  );
+  out = out.replace(
+    "async function submitScore(){\n  if(!sb||!sbUser)return;",
+    "async function submitScore(){\n  if(!sb||!sbUser)return;\n  if(String(boardName()).toLowerCase().indexOf('moodey')>=0)return;"
+  );
+  out = out.replace(
+    "function openLootBox(box){\n  if(totalBags<box.price)return;\n  totalBags-=box.price;",
+    "function openLootBox(box){\n  var tickets=+localStorage.getItem('afroPoundTickets')||0;\n  var useTicket=box.id==='pound'&&tickets>0;\n  if(!useTicket&&totalBags<box.price)return;\n  if(useTicket){tickets--;localStorage.setItem('afroPoundTickets',String(tickets));}else totalBags-=box.price;"
+  );
+  out = out.replace(
+    "btn.disabled=totalBags<b.price;",
+    "btn.disabled=!(b.id==='pound'&&(+localStorage.getItem('afroPoundTickets')||0)>0)&&totalBags<b.price;"
+  );
+  out = out.replace(
+    "='ÖFFNEN – 🌿 '+b.price;",
+    "=(b.id==='pound'&&(+localStorage.getItem('afroPoundTickets')||0)>0)?('ÖFFNEN – GESCHENK x'+localStorage.getItem('afroPoundTickets')):('ÖFFNEN – 🌿 '+b.price);"
+  );
   out = out.replace(
     "highScore=+localStorage.getItem(HK)||0;",
     "highScore=+localStorage.getItem(HK)||0;if(highScore>=1000000){highScore=0;try{localStorage.setItem(HK,'0');}catch(e){}}"
@@ -189,7 +209,7 @@ function Index() {
       if (!doc.getElementById("afroFxScript")) {
         const s = doc.createElement("script");
         s.id = "afroFxScript";
-        s.src = "/afro-fx.js?v=warp25";
+        s.src = "/afro-fx.js?v=warp26";
         doc.body.appendChild(s);
       }
       if (!doc.getElementById("bgMusicScript")) {
@@ -201,8 +221,14 @@ function Index() {
       if (!doc.getElementById("lavaMenuScript")) {
         const s3 = doc.createElement("script");
         s3.id = "lavaMenuScript";
-        s3.src = "/lava-menu.js?v=warp25";
+        s3.src = "/lava-menu.js?v=warp26";
         doc.body.appendChild(s3);
+      }
+      if (!doc.getElementById("afroAdminScript")) {
+        const s4 = doc.createElement("script");
+        s4.id = "afroAdminScript";
+        s4.src = "/afro-admin.js?v=warp26";
+        doc.body.appendChild(s4);
       }
     } catch {
       /* ignore */
@@ -213,7 +239,7 @@ function Index() {
     const frame = frameRef.current;
     if (!frame) return;
     let cancelled = false;
-    fetch("/game.html?v=warp25", { cache: "no-store" })
+    fetch("/game.html?v=warp26", { cache: "no-store" })
       .then((r) => r.text())
       .then((html) => {
         if (cancelled || !frame) return;
@@ -221,7 +247,7 @@ function Index() {
       })
       .catch(() => {
         if (!cancelled && frame && !frame.getAttribute("src")) {
-          frame.src = "/game.html?v=warp25";
+          frame.src = "/game.html?v=warp26";
         }
       });
     return () => {
