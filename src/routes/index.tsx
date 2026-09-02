@@ -155,7 +155,7 @@ function patchGameHtml(html: string) {
   }
 
   if (!out.includes("lava-menu.js")) {
-    out = out.replace("</body>", '<script src="/lava-menu.js?v=warp23"></script></body>');
+    out = out.replace("</body>", '<script src="/lava-menu.js?v=warp24"></script></body>');
   }
   out = out.replace('src="/lava/lava_btn.png"', 'src="/lava_btn.png"');
   out = out.replace(
@@ -189,7 +189,7 @@ function Index() {
       if (!doc.getElementById("afroFxScript")) {
         const s = doc.createElement("script");
         s.id = "afroFxScript";
-        s.src = "/afro-fx.js?v=warp23";
+        s.src = "/afro-fx.js?v=warp24";
         doc.body.appendChild(s);
       }
       if (!doc.getElementById("bgMusicScript")) {
@@ -201,7 +201,7 @@ function Index() {
       if (!doc.getElementById("lavaMenuScript")) {
         const s3 = doc.createElement("script");
         s3.id = "lavaMenuScript";
-        s3.src = "/lava-menu.js?v=warp23";
+        s3.src = "/lava-menu.js?v=warp24";
         doc.body.appendChild(s3);
       }
     } catch {
@@ -213,7 +213,7 @@ function Index() {
     const frame = frameRef.current;
     if (!frame) return;
     let cancelled = false;
-    fetch("/game.html?v=warp23", { cache: "no-store" })
+    fetch("/game.html?v=warp24", { cache: "no-store" })
       .then((r) => r.text())
       .then((html) => {
         if (cancelled || !frame) return;
@@ -221,7 +221,7 @@ function Index() {
       })
       .catch(() => {
         if (!cancelled && frame && !frame.getAttribute("src")) {
-          frame.src = "/game.html?v=warp23";
+          frame.src = "/game.html?v=warp24";
         }
       });
     return () => {
