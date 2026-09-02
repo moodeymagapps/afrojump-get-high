@@ -155,9 +155,25 @@ function patchGameHtml(html: string) {
   }
 
   if (!out.includes("lava-menu.js")) {
-    out = out.replace("</body>", '<script src="/lava-menu.js?v=warp22"></script></body>');
+    out = out.replace("</body>", '<script src="/lava-menu.js?v=warp23"></script></body>');
   }
   out = out.replace('src="/lava/lava_btn.png"', 'src="/lava_btn.png"');
+  out = out.replace(
+    "highScore=+localStorage.getItem(HK)||0;",
+    "highScore=+localStorage.getItem(HK)||0;if(highScore>=1000000){highScore=0;try{localStorage.setItem(HK,'0');}catch(e){}}"
+  );
+  out = out.replace(
+    "var supported=fsSupported()&&!(isIOS&&!root.requestFullscreen);",
+    "var supported=true;"
+  );
+  out = out.replace(
+    "if(!supported||standalone){\n    // iOS Safari kennt kein echtes Element-Vollbild -> Button ausblenden\n    if(!supported){ if(fsBtn)fsBtn.style.display='none'; if(menuFs)menuFs.style.display='none'; }\n    else if(standalone){ if(fsBtn)fsBtn.style.display='none'; }\n  }",
+    "if(standalone){ if(fsBtn)fsBtn.style.display='none'; }"
+  );
+  out = out.replace(
+    "var p=(t.requestFullscreen&&t.requestFullscreen({navigationUI:'hide'}))||(t.webkitRequestFullscreen&&t.webkitRequestFullscreen());",
+    "var p=null;try{if(window.top&&window.top!==window.self&&window.top.document.documentElement.requestFullscreen)p=window.top.document.documentElement.requestFullscreen({navigationUI:'hide'});}catch(e){}if(!p)p=(t.requestFullscreen&&t.requestFullscreen({navigationUI:'hide'}))||(t.webkitRequestFullscreen&&t.webkitRequestFullscreen());try{window.scrollTo(0,1);}catch(e){}"
+  );
   return out;
 }
 
@@ -173,7 +189,7 @@ function Index() {
       if (!doc.getElementById("afroFxScript")) {
         const s = doc.createElement("script");
         s.id = "afroFxScript";
-        s.src = "/afro-fx.js?v=warp22";
+        s.src = "/afro-fx.js?v=warp23";
         doc.body.appendChild(s);
       }
       if (!doc.getElementById("bgMusicScript")) {
@@ -185,7 +201,7 @@ function Index() {
       if (!doc.getElementById("lavaMenuScript")) {
         const s3 = doc.createElement("script");
         s3.id = "lavaMenuScript";
-        s3.src = "/lava-menu.js?v=warp22";
+        s3.src = "/lava-menu.js?v=warp23";
         doc.body.appendChild(s3);
       }
     } catch {
@@ -197,7 +213,7 @@ function Index() {
     const frame = frameRef.current;
     if (!frame) return;
     let cancelled = false;
-    fetch("/game.html?v=warp22", { cache: "no-store" })
+    fetch("/game.html?v=warp23", { cache: "no-store" })
       .then((r) => r.text())
       .then((html) => {
         if (cancelled || !frame) return;
@@ -205,7 +221,7 @@ function Index() {
       })
       .catch(() => {
         if (!cancelled && frame && !frame.getAttribute("src")) {
-          frame.src = "/game.html?v=warp22";
+          frame.src = "/game.html?v=warp23";
         }
       });
     return () => {
