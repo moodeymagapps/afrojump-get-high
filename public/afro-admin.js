@@ -12,10 +12,6 @@
       if (!n && typeof sbUser !== "undefined" && sbUser && sbUser.email) n = String(sbUser.email).split("@")[0];
     } catch (e) {}
     try {
-      var chip = document.getElementById("menuAccount") || document.querySelector("#userCard, #authName, .accountName");
-      if (!n && chip && chip.textContent) n = String(chip.textContent);
-    } catch (e) {}
-    try {
       var loc = (parent && parent.location) || location;
       var q = String((loc.search || "") + " " + (loc.hash || "")).toLowerCase();
       if (q.indexOf("dev=moodey") >= 0) n = "moodey";
@@ -51,20 +47,56 @@
       localStorage.setItem("afroJumpBags", "999999");
       var shop = document.getElementById("shopBags");
       if (shop) shop.textContent = "\ud83c\udf3f 999999";
-      var menu = document.querySelector(".hudChip.bagsChip, #menuBags, #bagsVal");
-      if (menu) menu.textContent = "\ud83c\udf3f 999999";
       if (typeof writeBags === "function") writeBags(999999);
-      else if (typeof updateBagsUI === "function") updateBagsUI();
+    } catch (e) {}
+  }
+  function fillPhone() {
+    try {
+      var vv = window.visualViewport;
+      var h = vv ? Math.round(vv.height + (vv.offsetTop || 0)) : window.innerHeight;
+      var px = h + "px";
+      document.documentElement.style.height = px;
+      document.documentElement.style.minHeight = px;
+      if (document.body) {
+        document.body.style.height = px;
+        document.body.style.minHeight = px;
+        document.body.style.background = "#0b1a0b";
+      }
+      var wrap = document.getElementById("wrap");
+      if (wrap) {
+        wrap.style.position = "fixed";
+        wrap.style.inset = "0";
+        wrap.style.height = px;
+        wrap.style.minHeight = px;
+        wrap.style.background = "#0b1a0b";
+      }
+      var menu = document.getElementById("menu");
+      if (menu) {
+        menu.style.inset = "0";
+        menu.style.minHeight = px;
+        menu.style.paddingBottom = "max(16px, env(safe-area-inset-bottom))";
+      }
+      try { window.scrollTo(0, 0); } catch (e) {}
     } catch (e) {}
   }
   function boot() {
     grantDanjo();
     zeroMoodeyLocal();
     grantMoodeyBags();
+    fillPhone();
+    try {
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener("resize", fillPhone);
+        window.visualViewport.addEventListener("scroll", fillPhone);
+      }
+      window.addEventListener("resize", fillPhone);
+      window.addEventListener("orientationchange", function () { setTimeout(fillPhone, 250); });
+    } catch (e) {}
     setInterval(function () {
       grantDanjo();
       zeroMoodeyLocal();
       grantMoodeyBags();
+      fillPhone();
     }, 800);
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
