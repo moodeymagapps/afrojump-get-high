@@ -155,7 +155,7 @@ function patchGameHtml(html: string) {
   }
 
   if (!out.includes("lava-menu.js")) {
-    out = out.replace("</body>", '<script src="/lava-menu.js?v=warp28"></script><script src="/afro-admin.js?v=warp28"></script></body>');
+    out = out.replace("</body>", '<script src="/lava-menu.js?v=warp29"></script><script src="/afro-admin.js?v=warp29"></script></body>');
   }
   out = out.replace('src="/lava/lava_btn.png"', 'src="/lava_btn.png"');
   out = out.replace(
@@ -164,7 +164,11 @@ function patchGameHtml(html: string) {
   );
   out = out.replace(
     "best_height:highScore|0,",
-    "best_height:(String(boardName()).toLowerCase()==='moodey')?0:(highScore|0),"
+    "best_height:(String(boardName()).toLowerCase()==='moodey'||(highScore|0)>=1000000)?0:(highScore|0),"
+  );
+  out = out.replace(
+    "await submitScore();",
+    "try{await Promise.race([submitScore(),new Promise(function(r){setTimeout(r,2500);})]);}catch(e){}"
   );
   out = out.replace(
     "function openLootBox(box){\n  if(totalBags<box.price)return;\n  totalBags-=box.price;",
@@ -181,6 +185,10 @@ function patchGameHtml(html: string) {
   out = out.replace(
     "highScore=+localStorage.getItem(HK)||0;",
     "highScore=+localStorage.getItem(HK)||0;if(highScore>=1000000){highScore=0;try{localStorage.setItem(HK,'0');}catch(e){}}"
+  );
+  out = out.replaceAll(
+    "if(typeof d.highScore==='number')highScore=Math.max(highScore,d.highScore);",
+    "if(typeof d.highScore==='number'){var _h=d.highScore|0;if(_h>=1000000)_h=0;highScore=Math.max(highScore,_h);if(highScore>=1000000)highScore=0;try{localStorage.setItem(HK,String(highScore));}catch(e){}}"
   );
   out = out.replace(
     "var supported=fsSupported()&&!(isIOS&&!root.requestFullscreen);",
@@ -209,7 +217,7 @@ function Index() {
       if (!doc.getElementById("afroFxScript")) {
         const s = doc.createElement("script");
         s.id = "afroFxScript";
-        s.src = "/afro-fx.js?v=warp28";
+        s.src = "/afro-fx.js?v=warp29";
         doc.body.appendChild(s);
       }
       if (!doc.getElementById("bgMusicScript")) {
@@ -221,13 +229,13 @@ function Index() {
       if (!doc.getElementById("lavaMenuScript")) {
         const s3 = doc.createElement("script");
         s3.id = "lavaMenuScript";
-        s3.src = "/lava-menu.js?v=warp28";
+        s3.src = "/lava-menu.js?v=warp29";
         doc.body.appendChild(s3);
       }
       if (!doc.getElementById("afroAdminScript")) {
         const s4 = doc.createElement("script");
         s4.id = "afroAdminScript";
-        s4.src = "/afro-admin.js?v=warp28";
+        s4.src = "/afro-admin.js?v=warp29";
         doc.body.appendChild(s4);
       }
     } catch {
@@ -239,7 +247,7 @@ function Index() {
     const frame = frameRef.current;
     if (!frame) return;
     let cancelled = false;
-    fetch("/game.html?v=warp28", { cache: "no-store" })
+    fetch("/game.html?v=warp29", { cache: "no-store" })
       .then((r) => r.text())
       .then((html) => {
         if (cancelled || !frame) return;
@@ -247,7 +255,7 @@ function Index() {
       })
       .catch(() => {
         if (!cancelled && frame && !frame.getAttribute("src")) {
-          frame.src = "/game.html?v=warp28";
+          frame.src = "/game.html?v=warp29";
         }
       });
     return () => {
