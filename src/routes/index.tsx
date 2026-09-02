@@ -70,30 +70,12 @@ function patchGameHtml(html: string) {
     "function planeSpawn(){\n  const base=PLANE_FILES[Math.floor(Math.random()*PLANE_FILES.length)];",
     "function planeSpawn(){\n  let base=null;for(let i=0;i<PLANE_FILES.length;i++){const b=PLANE_FILES[(planeSeq+i)%PLANE_FILES.length];const md=media('planes/'+b);if(!md.dead){base=b;planeSeq=planeSeq+i+1;break;}}if(!base)return;"
   );
-  out = out.replaceAll(
-    "planeNextM=200+Math.random()*300",
-    "planeNextM=80+Math.random()*60"
-  );
-  out = out.replaceAll(
-    "planeT=12+Math.random()*6",
-    "planeT=8+Math.random()*4"
-  );
-  out = out.replace(
-    "planeNextM=m+200+Math.random()*300",
-    "planeNextM=m+200+Math.random()*200"
-  );
-  out = out.replace(
-    "const w=W*(0.28+Math.random()*0.14),h=w*0.3;",
-    "const w=W*(0.32+Math.random()*0.08),h=w*0.30;"
-  );
-  out = out.replace(
-    "const dur=4+Math.random()*3;",
-    "const dur=5.5+Math.random()*2;"
-  );
-  out = out.replace(
-    "y:30+Math.random()*(H*0.35)",
-    "y:H*0.26+Math.random()*(H*0.28)"
-  );
+  out = out.replaceAll("planeNextM=200+Math.random()*300", "planeNextM=80+Math.random()*60");
+  out = out.replaceAll("planeT=12+Math.random()*6", "planeT=8+Math.random()*4");
+  out = out.replace("planeNextM=m+200+Math.random()*300", "planeNextM=m+200+Math.random()*200");
+  out = out.replace("const w=W*(0.28+Math.random()*0.14),h=w*0.3;", "const w=W*(0.32+Math.random()*0.08),h=w*0.30;");
+  out = out.replace("const dur=4+Math.random()*3;", "const dur=5.5+Math.random()*2;");
+  out = out.replace("y:30+Math.random()*(H*0.35)", "y:H*0.26+Math.random()*(H*0.28)");
   out = out.replace(
     "  if(plane){\n    plane.t+=dt;\n    plane.x+=plane.vx*dt;\n    const bob=Math.sin(plane.t*1.8)*3;\n    drawMedia(ctx,'planes/'+plane.base,plane.x,plane.y+bob,plane.w,plane.h,0.95,plane.dir<0);\n    if(plane.x>W+plane.w*1.2||plane.x<-plane.w*2.2)plane=null;",
     "  if(plane){\n    plane.t+=dt;\n    plane.x+=plane.vx*dt;\n    const bob=Math.sin(plane.t*3.2)*10;\n    drawMedia(ctx,'planes/'+plane.base,plane.x,plane.y+bob,plane.w,plane.h,0.95,plane.dir>0);\n    if(plane.x>W+plane.w*1.2||plane.x<-plane.w*2.2)plane=null;"
@@ -108,28 +90,19 @@ function patchGameHtml(html: string) {
     "  // Birds — daytime\n  const birdA=Math.max(0,1-sstep(m,400,900));\n  if(birdA>0.01){",
     "  // Birds disabled\n  const birdA=0;\n  if(false){"
   );
-  out = out.replace(
-    "const birdA=Math.max(0,1-sstep(m,400,900));",
-    "const birdA=0;"
-  );
+  out = out.replace("const birdA=Math.max(0,1-sstep(m,400,900));", "const birdA=0;");
 
   if (!out.includes("var __W=0")) {
     out = out.replace(
       "function reset(){\n  prngState=",
       "function reset(){\n  var __W=0;try{var loc=(parent&&parent.location)||location;var raw=((loc.search||'')+'&'+String(loc.hash||'').replace('#','')).replace(/^[?&#]+/,'');var s=new URLSearchParams(raw);if(s.get('dev')==='moodey')__W=Math.floor(+(s.get('warp')||s.get('m')||0)||0);}catch(e){}window.__afroDevRun=!!__W;\n  prngState="
     );
-    out = out.replace(
-      "player={x:W/2,y:H-100,vx:0,vy:-14",
-      "player={x:W/2,y:(__W?(-__W*10):(H-100)),vx:0,vy:-14"
-    );
+    out = out.replace("player={x:W/2,y:H-100,vx:0,vy:-14", "player={x:W/2,y:(__W?(-__W*10):(H-100)),vx:0,vy:-14");
     out = out.replace(
       "cameraY=0;bestY=0;scrollLocked=false;boss=null;nextBossScore=1500;gameOver=false;",
       "cameraY=__W?(-__W*10):0;bestY=__W||0;scrollLocked=false;boss=null;nextBossScore=__W?(__W+500):1500;gameOver=false;"
     );
-    out = out.replace(
-      "let py=H-40;\n  for(let i=0;i<20;i++){",
-      "let py=__W?(-__W*10+40):H-40;\n  for(let i=0;i<(__W?28:20);i++){"
-    );
+    out = out.replace("let py=H-40;\n  for(let i=0;i<20;i++){", "let py=__W?(-__W*10+40):H-40;\n  for(let i=0;i<(__W?28:20);i++){");
     out = out.replace(
       "platforms.push({x:W/2-40,y:H-40,w:80,h:12,vx:0,type:'normal',dir:1,range:0,ox:W/2-40,bounce:0,cracked:0});",
       "platforms.push({x:W/2-40,y:__W?(-__W*10+40):H-40,w:80,h:12,vx:0,type:'normal',dir:1,range:0,ox:W/2-40,bounce:0,cracked:0});"
@@ -150,12 +123,8 @@ function patchGameHtml(html: string) {
     "canvas{box-shadow:none!important;}" +
     ".overlay,#menu,#menu::after{background-color:#0c1408!important;}" +
     "</style>";
-  if (!out.includes("afroSafeFill")) {
-    out = out.replace("</head>", inject + "</head>");
-  }
-  if (!out.includes("afro-shop.css")) {
-    out = out.replace("</head>", '<link rel="stylesheet" href="/afro-shop.css?v=warp38"></head>');
-  }
+  if (!out.includes("afroSafeFill")) out = out.replace("</head>", inject + "</head>");
+  if (!out.includes("afro-shop.css")) out = out.replace("</head>", '<link rel="stylesheet" href="/afro-shop.css?v=warp38"></head>');
   out = out.replace(
     "stage.className='carStage carSlide'+(eq?' eq':'')+(owned_?'':' locked')+(cfg.big?' big':'');",
     "stage.className='carStage carSlide'+(eq?' eq':'')+(owned_?'':' locked')+(cfg.big?' big':'')+' rar-'+(it.rarity||'common');"
@@ -197,10 +166,7 @@ function patchGameHtml(html: string) {
     "best_height:highScore|0,",
     "best_height:(String(boardName()).toLowerCase()==='moodey'||(highScore|0)>=1000000)?0:(highScore|0),"
   );
-  out = out.replace(
-    "await submitScore();",
-    "try{await Promise.race([submitScore(),new Promise(function(r){setTimeout(r,2500);})]);}catch(e){}"
-  );
+  out = out.replace("await submitScore();", "try{await Promise.race([submitScore(),new Promise(function(r){setTimeout(r,2500);})]);}catch(e){}");
   out = out.replace(
     "function openLootBox(box){\n  if(totalBags<box.price)return;\n  totalBags-=box.price;",
     "function openLootBox(box){\n  var tickets=+localStorage.getItem('afroPoundTickets')||0;\n  var useTicket=box.id==='pound'&&tickets>0;\n  if(!useTicket&&String((typeof boardName==='function'&&boardName())||'').toLowerCase()!=='moodey'&&totalBags<box.price)return;\n  if(useTicket){tickets--;localStorage.setItem('afroPoundTickets',String(tickets));}else totalBags-=box.price;"
@@ -221,10 +187,7 @@ function patchGameHtml(html: string) {
     "if(typeof d.highScore==='number')highScore=Math.max(highScore,d.highScore);",
     "if(typeof d.highScore==='number'){var _h=d.highScore|0;if(_h>=1000000)_h=0;highScore=Math.max(highScore,_h);if(highScore>=1000000)highScore=0;try{localStorage.setItem(HK,String(highScore));}catch(e){}}"
   );
-  out = out.replace(
-    "var supported=fsSupported()&&!(isIOS&&!root.requestFullscreen);",
-    "var supported=true;"
-  );
+  out = out.replace("var supported=fsSupported()&&!(isIOS&&!root.requestFullscreen);", "var supported=true;");
   out = out.replace(
     "if(!supported||standalone){\n    // iOS Safari kennt kein echtes Element-Vollbild -> Button ausblenden\n    if(!supported){ if(fsBtn)fsBtn.style.display='none'; if(menuFs)menuFs.style.display='none'; }\n    else if(standalone){ if(fsBtn)fsBtn.style.display='none'; }\n  }",
     "if(standalone){ if(fsBtn)fsBtn.style.display='none'; }"
@@ -237,6 +200,9 @@ function patchGameHtml(html: string) {
     "function duelLink(code){const u=new URL(window.location.href);u.searchParams.set('duel',code);return u.toString();}",
     "function duelLink(code){return 'https://afrojumper.app/'+String(code||'').toUpperCase();}"
   );
+  const duelUi =
+    '<script id="duelBarFix">(function(){function setBar(code){try{if(parent&&parent.history&&parent.history.pushState)parent.history.pushState({},"","/"+code);}catch(e){try{history.pushState({},"","/"+code);}catch(e2){}}}function wire(){var btn=document.getElementById("duelCreate");if(!btn||btn.getAttribute("data-barfix")==="1")return;btn.setAttribute("data-barfix","1");btn.addEventListener("click",function(){setTimeout(function(){if(typeof duel==="undefined"||!duel.code)return;setBar(duel.code);var copy=document.getElementById("duelCopy");if(!copy)return;copy.onclick=function(){var link="https://afrojumper.app/"+duel.code;var done=function(){try{duelSay("Raum <b style=\\"color:#7cfc00\\">"+duel.code+"</b><br>"+link+"<br>Warte auf Gegner\u2026");}catch(e){}};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(link).then(done).catch(done);else done();};},80);});}if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",wire);else wire();})();</script>';
+  if (!out.includes("duelBarFix")) out = out.replace("</body>", duelUi + "</body>");
   return out;
 }
 
@@ -299,7 +265,9 @@ export function Index() {
         if (room) {
           html2 = html2.replace(
             "</body>",
-            "<script>setTimeout(function(){try{openDuel();duelJoin('" + room + "','guest');}catch(e){}},700);</script></body>"
+            "<script>setTimeout(function(){try{openDuel();duelJoin('" +
+              room +
+              "','guest');}catch(e){}},700);</script></body>"
           );
         }
         frame.srcdoc = html2;
