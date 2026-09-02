@@ -155,9 +155,17 @@ function patchGameHtml(html: string) {
   }
 
   if (!out.includes("lava-menu.js")) {
-    out = out.replace("</body>", '<script src="/lava-menu.js?v=warp29"></script><script src="/afro-admin.js?v=warp29"></script></body>');
+    out = out.replace("</body>", '<script src="/lava-menu.js?v=warp30"></script><script src="/afro-admin.js?v=warp30"></script></body>');
   }
   out = out.replace('src="/lava/lava_btn.png"', 'src="/lava_btn.png"');
+  out = out.replace(
+    "{id:'moodey',     name:'Moodey',     price:2000, community:true, rarity:'legendary', img:'skins/moodey.png',     anchorY:0.70},",
+    "{id:'moodey',     name:'Moodey',     price:2000, community:true, rarity:'legendary', img:'skins/moodey.png',     anchorY:0.70},\n  {id:'dfbboy',     name:'DFB',        price:1500, community:true, rarity:'epic',      img:'skins/dfbboy.png',     anchorY:0.70},"
+  );
+  out = out.replace(
+    "SHEET_SKINS=['kosak','danjo420','moodey','yannic','revengebird','fabienne','alex','ina','stephan'];",
+    "SHEET_SKINS=['kosak','danjo420','moodey','yannic','revengebird','fabienne','alex','ina','stephan','dfbboy'];"
+  );
   out = out.replace(
     "data.forEach((r,i)=>{",
     "data.forEach((r,i)=>{if(String(r.display_name||'').toLowerCase()==='moodey')r.best_height=0;"
@@ -217,7 +225,7 @@ function Index() {
       if (!doc.getElementById("afroFxScript")) {
         const s = doc.createElement("script");
         s.id = "afroFxScript";
-        s.src = "/afro-fx.js?v=warp29";
+        s.src = "/afro-fx.js?v=warp30";
         doc.body.appendChild(s);
       }
       if (!doc.getElementById("bgMusicScript")) {
@@ -229,13 +237,13 @@ function Index() {
       if (!doc.getElementById("lavaMenuScript")) {
         const s3 = doc.createElement("script");
         s3.id = "lavaMenuScript";
-        s3.src = "/lava-menu.js?v=warp29";
+        s3.src = "/lava-menu.js?v=warp30";
         doc.body.appendChild(s3);
       }
       if (!doc.getElementById("afroAdminScript")) {
         const s4 = doc.createElement("script");
         s4.id = "afroAdminScript";
-        s4.src = "/afro-admin.js?v=warp29";
+        s4.src = "/afro-admin.js?v=warp30";
         doc.body.appendChild(s4);
       }
     } catch {
@@ -247,7 +255,7 @@ function Index() {
     const frame = frameRef.current;
     if (!frame) return;
     let cancelled = false;
-    fetch("/game.html?v=warp29", { cache: "no-store" })
+    fetch("/game.html?v=warp30", { cache: "no-store" })
       .then((r) => r.text())
       .then((html) => {
         if (cancelled || !frame) return;
@@ -255,7 +263,7 @@ function Index() {
       })
       .catch(() => {
         if (!cancelled && frame && !frame.getAttribute("src")) {
-          frame.src = "/game.html?v=warp29";
+          frame.src = "/game.html?v=warp30";
         }
       });
     return () => {
