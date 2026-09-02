@@ -30,22 +30,39 @@ export function readRoomCode() {
   return null;
 }
 
+const EXTRA_BOOT = `
+<script>
+(function(){
+  function addDfb(){
+    try{
+      if(typeof SKINS==='undefined' || !Array.isArray(SKINS)) return false;
+      if(!SKINS.some(function(s){ return s && (s.id==='dfbboy' || s.id==='dfb'); })){
+        SKINS.push({id:'dfbboy', name:'DFB', price:1500, community:true, rarity:'legendary', img:'skins/dfbboy.png', anchorY:0.70});
+      }
+      return true;
+    }catch(e){ return false; }
+  }
+  function boot(){
+    addDfb();
+    var n=0, t=setInterval(function(){ n++; if(addDfb()||n>50) clearInterval(t); }, 100);
+    var c=window.DUEL_BOOT_CODE;
+    if(c && /^[A-Z0-9]{4,8}$/i.test(c)){
+      setTimeout(function(){ try{ openDuel(); duelJoin(String(c).toUpperCase(),'guest'); }catch(e){} }, 700);
+    }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+</script>
+`;
+
 export function patchDuelLinks(html: string, roomCode: string | null) {
   let out = html;
   out = out.replace(
     "function duelLink(code){const u=new URL(window.location.href);u.searchParams.set('duel',code);return u.toString();}",
     "function duelLink(code){return 'https://afrojumper.app/'+String(code||'').toUpperCase();}"
   );
-  if (!out.includes("id:'dfbboy'") && !out.includes('id:"dfbboy"')) {
-    out = out.replace(
-      "{id:'bebi',       name:'Bebi',",
-      "{id:'dfbboy',     name:'DFB',         price:1500, community:true, rarity:'legendary', img:'skins/dfbboy.png',     anchorY:0.70},\n  {id:'bebi',       name:'Bebi',"
-    );
-  }
-  const boot =
-    "<script>window.DUEL_BOOT_CODE=" +
-    JSON.stringify(roomCode) +
-    ";(function(){var c=window.DUEL_BOOT_CODE;if(c&&/^[A-Z0-9]{4,8}$/i.test(c)){setTimeout(function(){try{openDuel();duelJoin(String(c).toUpperCase(),'guest');}catch(e){}},700);}})();</script>";
+  const boot = "<script>window.DUEL_BOOT_CODE=" + JSON.stringify(roomCode) + ";</script>" + EXTRA_BOOT;
   if (out.includes("</body>")) out = out.replace("</body>", boot + "</body>");
   else out += boot;
   return out;
@@ -58,7 +75,7 @@ export function Index() {
     if (!frame) return;
     let cancelled = false;
     const roomCode = readRoomCode();
-    fetch("/game.html?v=duel6", { cache: "no-store" })
+    fetch("/game.html?v=duel7", { cache: "no-store" })
       .then((r) => r.text())
       .then((html) => {
         if (cancelled || !frame) return;
@@ -66,7 +83,7 @@ export function Index() {
       })
       .catch(() => {
         if (!cancelled && frame && !frame.getAttribute("src")) {
-          frame.src = "/game.html?v=duel6";
+          frame.src = "/game.html?v=duel7";
         }
       });
     return () => {
