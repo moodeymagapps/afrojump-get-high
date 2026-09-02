@@ -18,37 +18,49 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-function patchDuelLinks(html: string, duelCode: string | null) {
+export function readRoomCode() {
+  try {
+    const path = window.location.pathname.replace(/^\//, "").split("/")[0];
+    if (path && /^[A-Z0-9]{4,8}$/i.test(path)) return path.toUpperCase();
+  } catch (e) {}
+  try {
+    const q = new URLSearchParams(window.location.search).get("duel");
+    if (q && /^[A-Z0-9]{4,8}$/i.test(q)) return q.toUpperCase();
+  } catch (e) {}
+  return null;
+}
+
+export function patchDuelLinks(html: string, roomCode: string | null) {
   let out = html;
   out = out.replace(
     "function duelLink(code){const u=new URL(window.location.href);u.searchParams.set('duel',code);return u.toString();}",
-    "function duelLink(code){return 'https://afrojumper.app/?duel='+encodeURIComponent(String(code||'').toUpperCase());}"
+    "function duelLink(code){return 'https://afrojumper.app/'+String(code||'').toUpperCase();}"
   );
   const boot =
     "<script>window.DUEL_BOOT_CODE=" +
-    JSON.stringify(duelCode) +
+    JSON.stringify(roomCode) +
     ";(function(){var c=window.DUEL_BOOT_CODE;if(c&&/^[A-Z0-9]{4,8}$/i.test(c)){setTimeout(function(){try{openDuel();duelJoin(String(c).toUpperCase(),'guest');}catch(e){}},700);}})();</script>";
   if (out.includes("</body>")) out = out.replace("</body>", boot + "</body>");
   else out += boot;
   return out;
 }
 
-function Index() {
+export function Index() {
   const frameRef = useRef<HTMLIFrameElement>(null);
   useEffect(() => {
     const frame = frameRef.current;
     if (!frame) return;
     let cancelled = false;
-    const duelCode = new URLSearchParams(window.location.search).get("duel");
-    fetch("/game.html?v=duel4", { cache: "no-store" })
+    const roomCode = readRoomCode();
+    fetch("/game.html?v=duel5", { cache: "no-store" })
       .then((r) => r.text())
       .then((html) => {
         if (cancelled || !frame) return;
-        frame.srcdoc = patchDuelLinks(html, duelCode);
+        frame.srcdoc = patchDuelLinks(html, roomCode);
       })
       .catch(() => {
         if (!cancelled && frame && !frame.getAttribute("src")) {
-          frame.src = "/game.html?v=duel4" + window.location.search;
+          frame.src = "/game.html?v=duel5";
         }
       });
     return () => {
