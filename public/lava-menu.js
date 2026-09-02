@@ -1,7 +1,7 @@
-/* Afro Jump – Lava button larger full-width bar */
+/* Afro Jump – Lava button above Vollbild */
 (function () {
   const SRC = "/lava_btn.png";
-  const CSS = "#menu #menuLava{width:100%;max-width:none;margin:10px 0 12px;padding:0;border:none;background:none!important;cursor:pointer;display:block;line-height:0;}#menu #menuLava img{width:100%;height:88px;object-fit:contain;object-position:center;display:block;image-rendering:pixelated;}";
+  const CSS = "#menu #menuLava{width:100%;max-width:none;margin:10px 0 8px;padding:0;border:none;background:none!important;cursor:pointer;display:block;line-height:0;}#menu #menuLava img{width:100%;height:88px;object-fit:contain;object-position:center;display:block;image-rendering:pixelated;}";
   function ensureCss(){
     if(document.getElementById("lavaMenuCss")) return;
     const s=document.createElement("style");
@@ -19,6 +19,12 @@
     img.removeAttribute("onerror");
     btn.innerHTML="";
     btn.appendChild(img);
+    const slot=document.querySelector("#menu .mUtil") || document.getElementById("menuFs");
+    if(slot && slot.parentNode && btn.parentNode!==slot.parentNode){
+      slot.parentNode.insertBefore(btn, slot);
+    } else if(slot && slot.parentNode && btn.nextElementSibling!==slot){
+      slot.parentNode.insertBefore(btn, slot);
+    }
     btn.style.cssText="";
     return true;
   }
