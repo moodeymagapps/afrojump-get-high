@@ -1,0 +1,18 @@
+#shop{background:radial-gradient(ellipse at 50% 0%,rgba(124,252,0,.12),transparent 42%),linear-gradient(180deg,#0c1408 0%,#0a0814 55%,#12081c 100%)!important;}
+#shop h2{color:#d4ff4a;text-shadow:0 0 10px #7cfc00,2px 2px 0 #000;letter-spacing:1px;}
+#shopBags{color:#b8ff64;text-shadow:0 0 8px #7cfc00;}
+#shop .tabs button{background:#1a0e08;color:#cbb48a;box-shadow:inset -2px -2px 0 #000,inset 2px 2px 0 #6b3f14,0 3px 0 #000;}
+#shop .tabs button.on{background:#123800;color:#d4ff4a;box-shadow:inset -2px -2px 0 #000,inset 2px 2px 0 #7cfc00,0 0 12px rgba(124,252,0,.45);}
+.carStage{background:radial-gradient(ellipse at 50% 28%,#4a2a78 0%,#1a0e30 48%,#0b0714 100%)!important;box-shadow:inset 0 0 28px #000,inset 0 0 0 3px #ffd36a,0 0 16px rgba(255,211,106,.28)!important;height:210px!important;}
+.carStage::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,.08),transparent 28%,transparent 62%,rgba(0,0,0,.45)),repeating-linear-gradient(180deg,transparent 0 3px,rgba(0,0,0,.12) 4px);mix-blend-mode:soft-light;}
+.carStage.eq{box-shadow:inset 0 0 0 3px #7cfc00,0 0 22px rgba(124,252,0,.55)!important;}
+.carStage.rar-legendary{box-shadow:inset 0 0 0 3px #ffd54f,0 0 22px rgba(255,213,79,.5)!important;}
+.carStage.rar-epic{box-shadow:inset 0 0 0 3px #ce93d8,0 0 22px rgba(206,147,216,.5)!important;}
+.carStage.rar-rare{box-shadow:inset 0 0 0 3px #4fc3f7,0 0 18px rgba(79,195,247,.4)!important;}
+.carStage canvas{filter:drop-shadow(0 8px 10px rgba(0,0,0,.55));}
+.carArrow{background:linear-gradient(#3d2410,#2b1a0a);color:#ffe082;box-shadow:inset -3px -3px 0 #000,inset 3px 3px 0 #c48a2a,0 0 10px rgba(255,213,79,.25)!important;}
+.carName{text-shadow:0 0 8px rgba(255,224,130,.4),2px 2px 0 #000;}
+.carDots i.on{background:#d4ff4a;box-shadow:0 0 8px #7cfc00;}
+.carEq{animation:afroPulse 1.4s ease-in-out infinite;}
+@keyframes afroPulse{0%,100%{opacity:1}50%{opacity:.55}}
+.carPanel{box-shadow:inset 0 0 0 2px #4a2c73,0 0 12px rgba(74,44,115,.35);}
