@@ -1,4 +1,4 @@
-/* Reset only the Moodey account score. Grant Moodey infinite bags. Grant Thowbi 2000 bags. */
+/* Reset only the Moodey account score. Grant Moodey infinite bags. */
 (function () {
   function currentName() {
     var n = "";
@@ -21,10 +21,6 @@
   function isMoodey() {
     var n = currentName();
     return n === "moodey" || n.indexOf("moodey") >= 0;
-  }
-  function isThowbi() {
-    var n = currentName();
-    return n === "thowbi" || n.indexOf("thowbi") >= 0;
   }
   function grantDanjo() {
     try {
@@ -52,24 +48,6 @@
       var shop = document.getElementById("shopBags");
       if (shop) shop.textContent = "\ud83c\udf3f 999999";
       if (typeof writeBags === "function") writeBags(999999);
-    } catch (e) {}
-  }
-  function grantThowbiBags() {
-    try {
-      if (!isThowbi()) return;
-      if (localStorage.getItem("afroGiftThowbi2k") === "1") return;
-      var cur = 0;
-      try { if (typeof totalBags !== "undefined") cur = Number(totalBags) || 0; } catch (e) {}
-      try {
-        if (!cur) cur = Number(localStorage.getItem("afroJumpBags") || 0) || 0;
-      } catch (e) {}
-      var next = Math.max(cur, 2000);
-      try { if (typeof totalBags !== "undefined") totalBags = next; } catch (e) {}
-      localStorage.setItem("afroJumpBags", String(next));
-      localStorage.setItem("afroGiftThowbi2k", "1");
-      var shop = document.getElementById("shopBags");
-      if (shop) shop.textContent = "\ud83c\udf3f " + next;
-      if (typeof writeBags === "function") writeBags(next);
     } catch (e) {}
   }
   function fillPhone() {
@@ -105,7 +83,6 @@
     grantDanjo();
     zeroMoodeyLocal();
     grantMoodeyBags();
-    grantThowbiBags();
     fillPhone();
     try {
       if (window.visualViewport) {
@@ -119,7 +96,6 @@
       grantDanjo();
       zeroMoodeyLocal();
       grantMoodeyBags();
-      grantThowbiBags();
       fillPhone();
     }, 800);
   }
