@@ -41,6 +41,12 @@ function patchSkins(html: string) {
     "if(d.selectedSkin&&owned.includes(d.selectedSkin))selectedSkin=d.selectedSkin;",
     "if(d.selectedSkin&&d.selectedSkin!=='james'&&owned.includes(d.selectedSkin))selectedSkin=d.selectedSkin;if(selectedSkin==='james')selectedSkin='bob';"
   );
+  const LOGO = '/stoner-jump-logo.jpg';
+  out = out.replaceAll('Afro Jump', 'Stoner Jump');
+  out = out.replaceAll('AFRO JUMP', 'STONER JUMP');
+  out = out.replaceAll('/__l5e/assets-v1/69274bbc-7857-4d3d-a4d3-4747a688e509/afro-jump-logo.png', LOGO);
+  out = out.replaceAll('/stoner-jump-logo.jpg', LOGO);
+  out = out.replaceAll("Afro landed", "Stoner landed");
   return out;
 }
 
@@ -50,7 +56,7 @@ function Index() {
     const frame = frameRef.current;
     if (!frame) return;
     let cancelled = false;
-    fetch("/game.html?v=warp41", { cache: "no-store" })
+    fetch("/game.html?v=stoner1", { cache: "no-store" })
       .then((r) => r.text())
       .then((html) => {
         if (cancelled || !frame) return;
@@ -58,7 +64,7 @@ function Index() {
       })
       .catch(() => {
         if (!cancelled && frame && !frame.getAttribute("src")) {
-          frame.src = "/game.html?v=warp41";
+          frame.src = "/game.html?v=stoner1";
         }
       });
     return () => {
