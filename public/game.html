@@ -704,6 +704,8 @@
     box-shadow:inset -3px -3px 0 #05040a, inset 3px 3px 0 rgba(124,252,0,.5), 0 3px 0 rgba(0,0,0,.6);}
   #menu .mChips p#menuBags{color:#ffd766;box-shadow:inset -3px -3px 0 #05040a, inset 3px 3px 0 rgba(255,213,74,.5), 0 3px 0 rgba(0,0,0,.6);}
   #menu #menuPlay{width:100%;min-width:0;margin:2px 0 0;}
+  #menu #menuLava{width:100%;min-width:0;margin:6px 0 0;}
+  #menu #menuLava img{filter:drop-shadow(0 4px 0 rgba(0,0,0,.55)) drop-shadow(0 0 10px rgba(255,80,0,.45));}
   #menu .mGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:100%;}
   #menu .mUtil{display:grid;grid-template-columns:1fr;gap:9px;width:100%;}
   #menu .btn.sm.tiny{padding:10px 8px;font-size:7.5px;opacity:.92;}
@@ -866,6 +868,7 @@
         <p id="menuBags">🌿 0 Baggys</p>
       </div>
       <button class="mSprite" id="menuPlay" aria-label="Spielen"><img src="/__l5e/assets-v1/f129af28-20bc-401f-9272-47b3328d0bee/ui_m_play.png" alt="Spielen"></button>
+      <button class="mSprite" id="menuLava" aria-label="Lava-Modus"><img src="/lava/lava_btn.png" alt="LAVA" onerror="this.style.display='none';this.parentNode.innerHTML='🌋 LAVA';this.parentNode.style.cssText='width:100%;padding:14px 0;font-family:Press Start 2P,monospace;font-size:14px;color:#ff9a3c;background:linear-gradient(#5c1800,#2a0800);border:none;box-shadow:inset -3px -3px 0 #1a0400,inset 3px 3px 0 #ff6a00,0 4px 0 #000;clip-path:polygon(0 6px,6px 6px,6px 0,calc(100% - 6px) 0,calc(100% - 6px) 6px,100% 6px,100% calc(100% - 6px),calc(100% - 6px) calc(100% - 6px),calc(100% - 6px) 100%,6px 100%,6px calc(100% - 6px),0 calc(100% - 6px));'"></button>
       <div class="mGrid">
         <button class="mSprite" id="menuShop" aria-label="Shop"><img src="/__l5e/assets-v1/49c2f7d3-9b6a-4193-8c19-e70c682da4c9/ui_m_shop.png" alt="Shop"></button>
         <button class="mSprite" id="menuDaily" aria-label="Täglich &amp; Aufgaben"><img src="/__l5e/assets-v1/a06ac07c-36c8-46a2-a1d9-d1d82b334d44/ui_m_daily.png" alt="Täglich und Aufgaben"></button>
@@ -1637,8 +1640,21 @@ function showOverlay(which){
   powerEl.style.display=which==='editor'?'none':'flex';
   pauseBtn.style.display=which==='playing'?'flex':'none';
 }
-function goMenu(){gameState='menu';menuHigh.textContent='Best: '+highScore+'m';updateBagsUI();showOverlay('menu');}
-function startGame(){reset();gameState='playing';showOverlay('playing');tryPlayMusic();}
+function goMenu(){lavaMode=false;gameState='menu';menuHigh.textContent='Best: '+highScore+'m';updateBagsUI();showOverlay('menu');}
+function startGame(){lavaMode=false;reset();gameState='playing';showOverlay('playing');tryPlayMusic();}
+function startLavaGame(){
+  lavaMode=true;
+  reset();
+  // Lava starts below the screen and rises
+  lavaY = cameraY + H + 40;
+  lavaSpeed = 0.42;
+  lavaFrame = 0;
+  lavaSurvived = 0;
+  nextBossScore = Infinity; // no bosses in lava mode
+  gameState='playing';
+  showOverlay('playing');
+  tryPlayMusic();
+}
 function pauseGame(){if(gameState!=='playing')return;gameState='paused';showOverlay('paused');stopMusic();stopBossMusic();}
 function resumeGame(){if(gameState!=='paused')return;gameState='playing';showOverlay('playing');last=performance.now();if(!boss)tryPlayMusic();}
 function openShop(from){shopReturn=from;carTouched.skins=carTouched.weapons=carTouched.joints=false;gameState='shop';renderShop();updateBagsUI();showOverlay('shop');}
@@ -2198,6 +2214,7 @@ document.addEventListener('visibilitychange',()=>{
   }
 });
 document.getElementById('menuPlay').onclick=()=>{playWipe();startGame();};
+document.getElementById('menuLava').onclick=()=>{playWipe();startLavaGame();};
 function playWipe(){const w=document.getElementById('wipe');if(!w)return;w.classList.remove('go');void w.offsetWidth;w.classList.add('go');setTimeout(()=>w.classList.remove('go'),400);}
 document.getElementById('menuShop').onclick=()=>openShop('menu');
 document.getElementById('pauseResume').onclick=()=>resumeGame();
@@ -2212,6 +2229,8 @@ document.getElementById('overMenu').onclick=()=>goMenu();
 
 // State
 let player,platforms,collectibles,enemies,projectiles,particles,smokeParticles,floatTexts,cameraY,bestY,scrollLocked,boss,bossTimer,nextBossScore,gameOver,rngSeed,runBags;
+let lavaMode=false, lavaY=0, lavaSpeed=0.35, lavaFrame=0, lavaSurvived=0, lavaBest=0;
+try{lavaBest=parseInt(localStorage.getItem('afro_lava_best')||'0',10)||0;}catch(_){}
 // Map-Duell: selbstgebaute Map (parts) + Laufzustand
 let hazards=[],zones=[],goalY=null,customMap=null;
 let GOAL_M=1500;                   // Ziel-Höhe einer gebauten Map (Host wählt)
@@ -2744,11 +2763,32 @@ function spawnPlatform(y){
   const meters=Math.max(0,Math.floor(-y/10));
   let type='normal';
   const r0=rnd();
-  if(meters>60&&r0<0.10)type='brittle';
-  else if(meters>40&&r0<0.20)type='spring';
-  else if(meters>30&&r0<0.45)type='moving';
+  if(lavaMode){
+    // Progressive unlock of ALL existing platform types from Map/Multiplayer system
+    // Early: normal + moving + spring
+    // Mid: brittle, rock, slip, tramp, boost
+    // Late: conveyor, crate, tech, fake, lava
+    if(meters>1400 && r0<0.07) type='lava';
+    else if(meters>1100 && r0<0.06) type='fake';
+    else if(meters>950  && r0<0.07) type='tech';
+    else if(meters>800  && r0<0.08) type='crate';
+    else if(meters>700  && r0<0.09) type='conveyor';
+    else if(meters>600  && r0<0.10) type='boost';
+    else if(meters>500  && r0<0.10) type='tramp';
+    else if(meters>420  && r0<0.11) type='slip';
+    else if(meters>340  && r0<0.12) type='rock';
+    else if(meters>260  && r0<0.13) type='brittle';
+    else if(meters>160  && r0<0.18) type='spring';
+    else if(meters>70   && r0<0.38) type='moving';
+    // else stays 'normal'
+  }else{
+    if(meters>60&&r0<0.10)type='brittle';
+    else if(meters>40&&r0<0.20)type='spring';
+    else if(meters>30&&r0<0.45)type='moving';
+  }
   const p={x:x,y:y,w:w,h:12,vx:0,type,dir:rnd()<.5?-1:1,range:0,ox:x,bounce:0,cracked:0,springT:0};
   if(type==='moving'){p.range=rand(40,80);p.vx=rand(0.6,1.4);}
+  if(type==='conveyor'){p.dir=rnd()<.5?-1:1;}
   platforms.push(p);
   // collectible
   const r=rnd();
@@ -3077,7 +3117,28 @@ function update(dt){
     onGoalReached();
   }
 
-  // boss check
+  // ---- LAVA MODE: rising lava ----
+  if(lavaMode && !gameOver){
+    lavaSurvived += dt;
+    // accelerate with height
+    const base = 0.38 + Math.min(2.8, bestY / 900);
+    lavaSpeed = base + Math.sin(lavaSurvived*0.7)*0.05;
+    // lava follows the player from below (never too far behind)
+    const targetLava = Math.min(player.y + 90, cameraY + H - 30);
+    // rise continuously
+    lavaY -= lavaSpeed * 60 * dt;   // world units upward (negative y)
+    // keep it from falling too far behind the camera
+    if(lavaY > cameraY + H + 20) lavaY = cameraY + H + 20;
+    // kill if player touches lava surface
+    if(player.y + player.r > lavaY - 8){
+      if(player.invincible<=0){
+        die();
+      }
+    }
+    lavaFrame += dt * 8;
+  }
+
+  // boss check (skipped in lava mode via nextBossScore=Infinity)
   if(!boss&&bestY>=nextBossScore){spawnBoss();}
   if(boss){
     const spec=bSpec(boss);
@@ -3353,19 +3414,27 @@ function die(){
   timeScale=0.3;
   setTimeout(()=>{timeScale=1;},450);
   if(bestY>highScore){highScore=bestY;localStorage.setItem(HK,highScore);}
+  if(lavaMode){
+    const t=Math.floor(lavaSurvived);
+    if(t>lavaBest){lavaBest=t; try{localStorage.setItem('afro_lava_best',lavaBest);}catch(_){}}
+    finalScore.textContent='🌋 Zeit: '+t+'s   |   Höhe: '+bestY+'m';
+    finalHigh.textContent='Lava-Rekord: '+lavaBest+'s';
+    finalBags.textContent='Gesammelt: 🌿 '+runBags;
+  }else{
+    finalScore.textContent='Höhe: '+bestY+'m';
+    finalHigh.textContent='Best: '+highScore+'m';
+    finalBags.textContent='Gesammelt: 🌿 '+runBags+' (Total: '+totalBags+')';
+  }
   persistShop();
   stopBossMusic();
   updateBagsUI();
-  finalScore.textContent='Höhe: '+bestY+'m';
-  finalHigh.textContent='Best: '+highScore+'m';
-  finalBags.textContent='Gesammelt: 🌿 '+runBags+' (Total: '+totalBags+')';
   missionProgress('runs',1);
   missionProgress('height',bestY);
   try{submitScore();}catch(_){}
   if(duel.active)duelSendEnd();
   setTimeout(()=>showOverlay('gameover'),500);
 }
-document.getElementById('restart').onclick=()=>{playWipe();startGame();};
+document.getElementById('restart').onclick=()=>{playWipe(); if(lavaMode) startLavaGame(); else startGame();};
 
 // ---------- RENDER ----------
 function biomeColors(m){
@@ -5916,6 +5985,70 @@ function render(){
   for(const z of zones)drawZone(z);
   if(bossMod.platAlpha<1){ctx.save();ctx.globalAlpha=bossMod.platAlpha;for(const p of platforms)drawPlatform(p);ctx.restore();}
   else for(const p of platforms)drawPlatform(p);
+
+  // ---- LAVA MODE visual ----
+  if(lavaMode){
+    const ly = lavaY - cameraY;
+    // fill everything below the lava surface
+    if(ly < H + 40){
+      const surfaceY = Math.min(H + 20, Math.max(-40, ly));
+      // deep lava body
+      const grad = ctx.createLinearGradient(0, surfaceY, 0, H);
+      grad.addColorStop(0, '#ff6a00');
+      grad.addColorStop(0.25, '#e03a00');
+      grad.addColorStop(0.6, '#8b1500');
+      grad.addColorStop(1, '#3a0600');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, surfaceY, W, H - surfaceY + 40);
+
+      // animated wavy surface
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(0, surfaceY);
+      const waveT = performance.now() / 180;
+      for(let x=0; x<=W; x+=6){
+        const wy = surfaceY + Math.sin(x*0.045 + waveT)*4.5 + Math.sin(x*0.11 + waveT*1.7)*2.2;
+        ctx.lineTo(x, wy);
+      }
+      ctx.lineTo(W, H+20); ctx.lineTo(0, H+20); ctx.closePath();
+      ctx.fillStyle = 'rgba(255,140,0,0.55)';
+      ctx.fill();
+      // bright rim
+      ctx.beginPath();
+      for(let x=0; x<=W; x+=5){
+        const wy = surfaceY + Math.sin(x*0.045 + waveT)*4.5 + Math.sin(x*0.11 + waveT*1.7)*2.2;
+        if(x===0) ctx.moveTo(x, wy); else ctx.lineTo(x, wy);
+      }
+      ctx.strokeStyle = '#ffcc44';
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+      ctx.restore();
+
+      // rising bubbles / particles
+      ctx.save();
+      for(let i=0;i<14;i++){
+        const bx = (i*97 + waveT*30) % W;
+        const by = surfaceY + 10 + ((i*53 + waveT*40) % Math.max(20, H-surfaceY));
+        const r = 1.5 + (i%3);
+        ctx.globalAlpha = 0.35 + 0.4*Math.sin(waveT + i);
+        ctx.fillStyle = '#ffdd66';
+        ctx.beginPath(); ctx.arc(bx, by, r, 0, Math.PI*2); ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    // HUD: survival time
+    const t = Math.floor(lavaSurvived);
+    ctx.save();
+    ctx.font = "11px 'Press Start 2P', monospace";
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(0,0,0,0.55)';
+    ctx.fillRect(W/2-70, 8, 140, 22);
+    ctx.fillStyle = '#ff9a3c';
+    ctx.fillText('🌋 '+t+'s  |  '+bestY+'m', W/2, 24);
+    ctx.restore();
+  }
+
   for(const hz of hazards)drawHazard(hz);
   for(const c of collectibles)if(!c.taken)drawCollectible(c);
   for(const e of enemies)drawEnemy(e);
