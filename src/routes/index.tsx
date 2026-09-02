@@ -8,96 +8,326 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "AFRO JUMP – JUMP HIGH." },
-      { name: "description", content: "JUMP HIGH." },
+      { name: "description", content: "JUMP HIGH. 🟢" },
       { property: "og:title", content: "AFRO JUMP – JUMP HIGH." },
+      { property: "og:description", content: "JUMP HIGH. 🟢" },
+      { property: "og:type", content: "website" },
       { property: "og:url", content: "https://afrojumper.app" },
       { property: "og:image", content: KEY_ART },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "og:image:alt", content: "AFRO JUMP Pixelart Key-Art – JUMP HIGH." },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "AFRO JUMP – JUMP HIGH." },
+      { name: "twitter:description", content: "JUMP HIGH. 🟢" },
+      { name: "twitter:image", content: KEY_ART },
     ],
     links: [{ rel: "canonical", href: "https://afrojumper.app" }],
   }),
   component: Index,
 });
 
-export function readRoomCode() {
-  try {
-    const path = window.location.pathname.replace(/^\//, "").split("/")[0];
-    if (path && /^[A-Z0-9]{4,8}$/i.test(path)) return path.toUpperCase();
-  } catch (e) {}
-  try {
-    const q = new URLSearchParams(window.location.search).get("duel");
-    if (q && /^[A-Z0-9]{4,8}$/i.test(q)) return q.toUpperCase();
-  } catch (e) {}
-  return null;
-}
-
-const EXTRA_BOOT = `
-<script>
-(function(){
-  function addDfb(){
-    try{
-      if(typeof SKINS==='undefined' || !Array.isArray(SKINS)) return false;
-      if(!SKINS.some(function(s){ return s && (s.id==='dfbboy' || s.id==='dfb'); })){
-        SKINS.push({id:'dfbboy', name:'DFB', price:1500, community:true, rarity:'legendary', img:'skins/dfbboy.png', anchorY:0.70});
-      }
-      return true;
-    }catch(e){ return false; }
-  }
-  function boot(){
-    addDfb();
-    var n=0, t=setInterval(function(){ n++; if(addDfb()||n>50) clearInterval(t); }, 100);
-    var c=window.DUEL_BOOT_CODE;
-    if(c && /^[A-Z0-9]{4,8}$/i.test(c)){
-      setTimeout(function(){ try{ openDuel(); duelJoin(String(c).toUpperCase(),'guest'); }catch(e){} }, 700);
-    }
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', boot);
-  else boot();
-})();
-</script>
-`;
-
-export function patchDuelLinks(html: string, roomCode: string | null) {
+function patchGameHtml(html: string) {
   let out = html;
+  if (!out.includes("<base ")) {
+    out = out.replace("<head>", '<head>\n<base href="/" />');
+  }
+
   out = out.replace(
-    "function duelLink(code){const u=new URL(window.location.href);u.searchParams.set('duel',code);return u.toString();}",
-    "function duelLink(code){return 'https://afrojumper.app/'+String(code||'').toUpperCase();}"
+    "html,body{margin:0;padding:0;height:100%;background:#0b1a0b;",
+    "html,body{margin:0;padding:0;height:100%;min-height:100dvh;min-height:-webkit-fill-available;background:#0b1a0b;"
   );
-  const boot = "<script>window.DUEL_BOOT_CODE=" + JSON.stringify(roomCode) + ";</script>" + EXTRA_BOOT;
-  if (out.includes("</body>")) out = out.replace("</body>", boot + "</body>");
-  else out += boot;
+
+  out = out.replace(
+    "canvas{background:#0b1a0b;display:block;box-shadow:0 0 40px #000a, 0 0 0 4px #2b1a0a, 0 0 0 8px #7cfc00;touch-action:none;image-rendering:pixelated;}",
+    "canvas{background:#0b1a0b;display:block;box-shadow:none;touch-action:none;image-rendering:pixelated;}"
+  );
+
+  out = out.replace(
+    "const vw=window.innerWidth,vh=window.innerHeight;",
+    "const vw=(window.visualViewport&&window.visualViewport.width)||window.innerWidth,vh=(window.visualViewport&&window.visualViewport.height)||window.innerHeight;"
+  );
+
+  out = out.replace(
+    "const SKY_BIRDS=['bird','birds','leaves'];",
+    "const SKY_BIRDS=['leaves'];"
+  );
+
+  out = out.replace(
+    "const wf=rare?(0.18+Math.random()*0.10):(base==='stars'?0.5:0.24+Math.random()*0.2);\n  const w=W*wf,h=w*0.62;\n  const dir=Math.random()<0.5?1:-1;\n  skyProps.push({base,x:dir>0?-w:W,y:20+Math.random()*(H*0.55),w,h,\n    vx:dir*(8+Math.random()*12),alpha:0.5+Math.random()*0.15,par:0.15});",
+    "const wf=rare?(0.09+Math.random()*0.05):(base==='stars'?0.20:0.10+Math.random()*0.06);\n  const w=W*wf,h=w*0.52;\n  const dir=Math.random()<0.5?1:-1;\n  let sy=36+Math.random()*(H*0.48);\n  for(let k=0;k<8;k++){const hit=skyProps.some(p=>Math.abs((p.y||0)-sy)<Math.max(p.h||0,h)*0.9);if(!hit)break;sy=36+Math.random()*(H*0.48);}\n  skyProps.push({base,x:dir>0?-w:W,y:sy,w,h,\n    vx:dir*(8+Math.random()*12),alpha:0.55+Math.random()*0.18,par:0.15});"
+  );
+  out = out.replace(
+    "if(skyNextT<=0){skyNextT=3+Math.random()*5;if(skyProps.length<2)skySpawn(m);}",
+    "if(skyNextT<=0){skyNextT=5+Math.random()*6;if(skyProps.length<2)skySpawn(m);}"
+  );
+
+  out = out.replace(
+    "const PLANE_FILES=['fckafd','p161','merz','palestine'];",
+    "const PLANE_FILES=['161','weidel','fckafd','merz','palestine'];let planeSeq=0;try{PLANE_FILES.forEach(function(b){media('planes/'+b);});}catch(e){}"
+  );
+  out = out.replace(
+    "function planeSpawn(){\n  const base=PLANE_FILES[Math.floor(Math.random()*PLANE_FILES.length)];",
+    "function planeSpawn(){\n  let base=null;for(let i=0;i<PLANE_FILES.length;i++){const b=PLANE_FILES[(planeSeq+i)%PLANE_FILES.length];const md=media('planes/'+b);if(!md.dead){base=b;planeSeq=planeSeq+i+1;break;}}if(!base)return;"
+  );
+  out = out.replaceAll(
+    "planeNextM=200+Math.random()*300",
+    "planeNextM=80+Math.random()*60"
+  );
+  out = out.replaceAll(
+    "planeT=12+Math.random()*6",
+    "planeT=8+Math.random()*4"
+  );
+  out = out.replace(
+    "planeNextM=m+200+Math.random()*300",
+    "planeNextM=m+200+Math.random()*200"
+  );
+  out = out.replace(
+    "const w=W*(0.28+Math.random()*0.14),h=w*0.3;",
+    "const w=W*(0.32+Math.random()*0.08),h=w*0.30;"
+  );
+  out = out.replace(
+    "const dur=4+Math.random()*3;",
+    "const dur=5.5+Math.random()*2;"
+  );
+  out = out.replace(
+    "y:30+Math.random()*(H*0.35)",
+    "y:H*0.26+Math.random()*(H*0.28)"
+  );
+  out = out.replace(
+    "  if(plane){\n    plane.t+=dt;\n    plane.x+=plane.vx*dt;\n    const bob=Math.sin(plane.t*1.8)*3;\n    drawMedia(ctx,'planes/'+plane.base,plane.x,plane.y+bob,plane.w,plane.h,0.95,plane.dir<0);\n    if(plane.x>W+plane.w*1.2||plane.x<-plane.w*2.2)plane=null;",
+    "  if(plane){\n    plane.t+=dt;\n    plane.x+=plane.vx*dt;\n    const bob=Math.sin(plane.t*3.2)*10;\n    drawMedia(ctx,'planes/'+plane.base,plane.x,plane.y+bob,plane.w,plane.h,0.95,plane.dir>0);\n    if(plane.x>W+plane.w*1.2||plane.x<-plane.w*2.2)plane=null;"
+  );
+
+  out = out.replace(
+    "const png=()=>{const i=new Image();i.onload=()=>{m.el=i;m.ready=true;};i.onerror=()=>{m.dead=true;};i.src='/'+base+'.png';};\n    try{",
+    "const png=()=>{const i=new Image();i.onload=()=>{if(!m.ready||!(m.el&&m.el.tagName==='VIDEO')){m.el=i;m.ready=true;}};i.onerror=()=>{if(!m.ready)m.dead=true;};i.src='/'+base+'.png';};\n    png();\n    try{"
+  );
+
+  out = out.replace(
+    "  // Birds — daytime\n  const birdA=Math.max(0,1-sstep(m,400,900));\n  if(birdA>0.01){",
+    "  // Birds disabled\n  const birdA=0;\n  if(false){"
+  );
+  out = out.replace(
+    "const birdA=Math.max(0,1-sstep(m,400,900));",
+    "const birdA=0;"
+  );
+
+  if (!out.includes("var __W=0")) {
+    out = out.replace(
+      "function reset(){\n  prngState=",
+      "function reset(){\n  var __W=0;try{var loc=(parent&&parent.location)||location;var raw=((loc.search||'')+'&'+String(loc.hash||'').replace('#','')).replace(/^[?&#]+/,'');var s=new URLSearchParams(raw);if(s.get('dev')==='moodey')__W=Math.floor(+(s.get('warp')||s.get('m')||0)||0);}catch(e){}window.__afroDevRun=!!__W;\n  prngState="
+    );
+    out = out.replace(
+      "player={x:W/2,y:H-100,vx:0,vy:-14",
+      "player={x:W/2,y:(__W?(-__W*10):(H-100)),vx:0,vy:-14"
+    );
+    out = out.replace(
+      "cameraY=0;bestY=0;scrollLocked=false;boss=null;nextBossScore=1500;gameOver=false;",
+      "cameraY=__W?(-__W*10):0;bestY=__W||0;scrollLocked=false;boss=null;nextBossScore=__W?(__W+500):1500;gameOver=false;"
+    );
+    out = out.replace(
+      "let py=H-40;\n  for(let i=0;i<20;i++){",
+      "let py=__W?(-__W*10+40):H-40;\n  for(let i=0;i<(__W?28:20);i++){"
+    );
+    out = out.replace(
+      "platforms.push({x:W/2-40,y:H-40,w:80,h:12,vx:0,type:'normal',dir:1,range:0,ox:W/2-40,bounce:0,cracked:0});",
+      "platforms.push({x:W/2-40,y:__W?(-__W*10+40):H-40,w:80,h:12,vx:0,type:'normal',dir:1,range:0,ox:W/2-40,bounce:0,cracked:0});"
+    );
+  }
+  out = out.replace(
+    "if(bestY>highScore){highScore=bestY;localStorage.setItem(HK,highScore);}",
+    "if(bestY>highScore&&!window.__afroDevRun){highScore=bestY;localStorage.setItem(HK,highScore);}"
+  );
+  out = out.replace(
+    "const rec=gameState==='playing'&&bestY>highScore&&highScore>0;",
+    "const rec=gameState==='playing'&&bestY>highScore&&highScore>0&&!window.__afroDevRun;"
+  );
+
+  const inject =
+    "<style id=\"afroSafeFill\">" +
+    "html,body,#wrap{background:#0b1a0b!important;min-height:100dvh!important;min-height:-webkit-fill-available!important;}" +
+    "canvas{box-shadow:none!important;}" +
+    ".overlay,#menu,#menu::after{background-color:#0c1408!important;}" +
+    "</style>";
+  if (!out.includes("afroSafeFill")) {
+    out = out.replace("</head>", inject + "</head>");
+  }
+  if (!out.includes("afro-shop.css")) {
+    out = out.replace("</head>", '<link rel="stylesheet" href="/afro-shop.css?v=warp38"></head>');
+  }
+  out = out.replace(
+    "stage.className='carStage carSlide'+(eq?' eq':'')+(owned_?'':' locked')+(cfg.big?' big':'');",
+    "stage.className='carStage carSlide'+(eq?' eq':'')+(owned_?'':' locked')+(cfg.big?' big':'')+' rar-'+(it.rarity||'common');"
+  );
+  out = out.replace(
+    "const CW=96,CH=128;",
+    "const CW=Math.max(8,Math.floor((sh.naturalWidth||sh.width||384)/4)||96),CH=Math.max(8,Math.floor((sh.naturalHeight||sh.height||256)/2)||128);"
+  );
+  out = out.replace(
+    "function updateBagsUI(anim){\n  const target=totalBags;",
+    "function updateBagsUI(anim){\n  try{var _n=String((typeof boardName==='function'&&boardName())||'').toLowerCase();if(_n==='moodey'){totalBags=999999;try{localStorage.setItem(BK,'999999');}catch(e){}}}catch(e){}\n  const target=totalBags;"
+  );
+  out = out.replace(
+    "buy:s=>{if(totalBags<s.price)return;totalBags-=s.price;",
+    "buy:s=>{var _m=String((typeof boardName==='function'&&boardName())||'').toLowerCase()==='moodey';if(!_m&&totalBags<s.price)return;if(!_m)totalBags-=s.price;"
+  );
+  out = out.replace(
+    "  }else{\n    if(meters>60&&r0<0.10)type='brittle';\n    else if(meters>40&&r0<0.20)type='spring';\n    else if(meters>30&&r0<0.45)type='moving';\n  }",
+    "  }else{\n    if(meters>1900&&r0<0.015)type='lava';\n    else if(meters>1600&&r0<0.018)type='fake';\n    else if(meters>1400&&r0<0.020)type='tech';\n    else if(meters>1200&&r0<0.025)type='crate';\n    else if(meters>1050&&r0<0.025)type='conveyor';\n    else if(meters>900&&r0<0.030)type='boost';\n    else if(meters>750&&r0<0.030)type='tramp';\n    else if(meters>600&&r0<0.035)type='slip';\n    else if(meters>500&&r0<0.040)type='rock';\n    else if(meters>60&&r0<0.10)type='brittle';\n    else if(meters>40&&r0<0.20)type='spring';\n    else if(meters>30&&r0<0.45)type='moving';\n  }"
+  );
+
+  if (!out.includes("lava-menu.js")) {
+    out = out.replace("</body>", '<script src="/lava-menu.js?v=warp38"></script><script src="/afro-admin.js?v=warp38"></script></body>');
+  }
+  out = out.replace('src="/lava/lava_btn.png"', 'src="/lava_btn.png"');
+  out = out.replace(
+    "{id:'moodey',     name:'Moodey',     price:2000, community:true, rarity:'legendary', img:'skins/moodey.png',     anchorY:0.70},",
+    "{id:'moodey',     name:'Moodey',     price:2000, community:true, rarity:'legendary', img:'skins/moodey.png',     anchorY:0.70},\n  {id:'dfbboy',     name:'DFB',        price:1500, community:true, rarity:'epic',      img:'skins/dfbboy.png',     anchorY:0.70},"
+  );
+  out = out.replace(
+    "SHEET_SKINS=['kosak','danjo420','moodey','yannic','revengebird','fabienne','alex','ina','stephan'];",
+    "SHEET_SKINS=['kosak','danjo420','moodey','yannic','revengebird','fabienne','alex','ina','stephan','dfbboy'];"
+  );
+  out = out.replace(
+    "data.forEach((r,i)=>{",
+    "data.forEach((r,i)=>{if(String(r.display_name||'').toLowerCase()==='moodey')r.best_height=0;"
+  );
+  out = out.replace(
+    "best_height:highScore|0,",
+    "best_height:(String(boardName()).toLowerCase()==='moodey'||(highScore|0)>=1000000)?0:(highScore|0),"
+  );
+  out = out.replace(
+    "await submitScore();",
+    "try{await Promise.race([submitScore(),new Promise(function(r){setTimeout(r,2500);})]);}catch(e){}"
+  );
+  out = out.replace(
+    "function openLootBox(box){\n  if(totalBags<box.price)return;\n  totalBags-=box.price;",
+    "function openLootBox(box){\n  var tickets=+localStorage.getItem('afroPoundTickets')||0;\n  var useTicket=box.id==='pound'&&tickets>0;\n  if(!useTicket&&String((typeof boardName==='function'&&boardName())||'').toLowerCase()!=='moodey'&&totalBags<box.price)return;\n  if(useTicket){tickets--;localStorage.setItem('afroPoundTickets',String(tickets));}else totalBags-=box.price;"
+  );
+  out = out.replace(
+    "btn.disabled=totalBags<b.price;",
+    "btn.disabled=String((typeof boardName==='function'&&boardName())||'').toLowerCase()!=='moodey'&&!(b.id==='pound'&&(+localStorage.getItem('afroPoundTickets')||0)>0)&&totalBags<b.price;"
+  );
+  out = out.replace(
+    "='ÖFFNEN – 🌿 '+b.price;",
+    "=(b.id==='pound'&&(+localStorage.getItem('afroPoundTickets')||0)>0)?('ÖFFNEN – GESCHENK x'+localStorage.getItem('afroPoundTickets')):('ÖFFNEN – 🌿 '+b.price);"
+  );
+  out = out.replace(
+    "highScore=+localStorage.getItem(HK)||0;",
+    "highScore=+localStorage.getItem(HK)||0;if(highScore>=1000000){highScore=0;try{localStorage.setItem(HK,'0');}catch(e){}}"
+  );
+  out = out.replaceAll(
+    "if(typeof d.highScore==='number')highScore=Math.max(highScore,d.highScore);",
+    "if(typeof d.highScore==='number'){var _h=d.highScore|0;if(_h>=1000000)_h=0;highScore=Math.max(highScore,_h);if(highScore>=1000000)highScore=0;try{localStorage.setItem(HK,String(highScore));}catch(e){}}"
+  );
+  out = out.replace(
+    "var supported=fsSupported()&&!(isIOS&&!root.requestFullscreen);",
+    "var supported=true;"
+  );
+  out = out.replace(
+    "if(!supported||standalone){\n    // iOS Safari kennt kein echtes Element-Vollbild -> Button ausblenden\n    if(!supported){ if(fsBtn)fsBtn.style.display='none'; if(menuFs)menuFs.style.display='none'; }\n    else if(standalone){ if(fsBtn)fsBtn.style.display='none'; }\n  }",
+    "if(standalone){ if(fsBtn)fsBtn.style.display='none'; }"
+  );
+  out = out.replace(
+    "var p=(t.requestFullscreen&&t.requestFullscreen({navigationUI:'hide'}))||(t.webkitRequestFullscreen&&t.webkitRequestFullscreen());",
+    "var p=null;try{if(window.top&&window.top!==window.self&&window.top.document.documentElement.requestFullscreen)p=window.top.document.documentElement.requestFullscreen({navigationUI:'hide'});}catch(e){}if(!p)p=(t.requestFullscreen&&t.requestFullscreen({navigationUI:'hide'}))||(t.webkitRequestFullscreen&&t.webkitRequestFullscreen());try{window.scrollTo(0,1);}catch(e){}"
+  );
   return out;
 }
 
-export function Index() {
+function Index() {
   const frameRef = useRef<HTMLIFrameElement>(null);
+
+  function injectScripts() {
+    try {
+      const doc = frameRef.current?.contentDocument;
+      if (!doc) return;
+      doc.documentElement.style.background = "#0b1a0b";
+      if (doc.body) doc.body.style.background = "#0b1a0b";
+      if (!doc.getElementById("afroFxScript")) {
+        const s = doc.createElement("script");
+        s.id = "afroFxScript";
+        s.src = "/afro-fx.js?v=warp38";
+        doc.body.appendChild(s);
+      }
+      if (!doc.getElementById("bgMusicScript")) {
+        const s2 = doc.createElement("script");
+        s2.id = "bgMusicScript";
+        s2.src = "/bg-music-pause.js";
+        doc.body.appendChild(s2);
+      }
+      if (!doc.getElementById("lavaMenuScript")) {
+        const s3 = doc.createElement("script");
+        s3.id = "lavaMenuScript";
+        s3.src = "/lava-menu.js?v=warp38";
+        doc.body.appendChild(s3);
+      }
+      if (!doc.getElementById("afroAdminScript")) {
+        const s4 = doc.createElement("script");
+        s4.id = "afroAdminScript";
+        s4.src = "/afro-admin.js?v=warp38";
+        doc.body.appendChild(s4);
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+
   useEffect(() => {
     const frame = frameRef.current;
     if (!frame) return;
     let cancelled = false;
-    const roomCode = readRoomCode();
-    fetch("/game.html?v=duel7", { cache: "no-store" })
+    fetch("/game.html?v=warp38", { cache: "no-store" })
       .then((r) => r.text())
       .then((html) => {
         if (cancelled || !frame) return;
-        frame.srcdoc = patchDuelLinks(html, roomCode);
+        frame.srcdoc = patchGameHtml(html);
       })
       .catch(() => {
         if (!cancelled && frame && !frame.getAttribute("src")) {
-          frame.src = "/game.html?v=duel7";
+          frame.src = "/game.html?v=warp38";
         }
       });
     return () => {
       cancelled = true;
     };
   }, []);
+
   return (
-    <div style={{ position: "fixed", inset: 0, width: "100%", height: "100dvh", background: "#0b1a0b", overflow: "hidden" }}>
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: "100%",
+        height: "100dvh",
+        minHeight: "-webkit-fill-available",
+        background: "#0b1a0b",
+        overflow: "hidden",
+        overscrollBehavior: "none",
+        touchAction: "none",
+      }}
+    >
       <iframe
         ref={frameRef}
         title="Afro Jump"
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0, background: "#0b1a0b" }}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          border: 0,
+          background: "#0b1a0b",
+          display: "block",
+          colorScheme: "dark",
+        }}
         allow="fullscreen; autoplay; clipboard-write"
         allowFullScreen
+        onLoad={injectScripts}
       />
     </div>
   );
