@@ -154,7 +154,7 @@ function patchGameHtml(html: string) {
     out = out.replace("</head>", inject + "</head>");
   }
   if (!out.includes("afro-shop.css")) {
-    out = out.replace("</head>", '<link rel="stylesheet" href="/afro-shop.css?v=warp36"></head>');
+    out = out.replace("</head>", '<link rel="stylesheet" href="/afro-shop.css?v=warp37"></head>');
   }
   out = out.replace(
     "stage.className='carStage carSlide'+(eq?' eq':'')+(owned_?'':' locked')+(cfg.big?' big':'');",
@@ -164,9 +164,17 @@ function patchGameHtml(html: string) {
     "const CW=96,CH=128;",
     "const CW=Math.max(8,Math.floor((sh.naturalWidth||sh.width||384)/4)||96),CH=Math.max(8,Math.floor((sh.naturalHeight||sh.height||256)/2)||128);"
   );
+  out = out.replace(
+    "function updateBagsUI(anim){\n  const target=totalBags;",
+    "function updateBagsUI(anim){\n  try{var _n=String((typeof boardName==='function'&&boardName())||'').toLowerCase();if(_n==='moodey'){totalBags=999999;try{localStorage.setItem(BK,'999999');}catch(e){}}}catch(e){}\n  const target=totalBags;"
+  );
+  out = out.replace(
+    "buy:s=>{if(totalBags<s.price)return;totalBags-=s.price;",
+    "buy:s=>{var _m=String((typeof boardName==='function'&&boardName())||'').toLowerCase()==='moodey';if(!_m&&totalBags<s.price)return;if(!_m)totalBags-=s.price;"
+  );
 
   if (!out.includes("lava-menu.js")) {
-    out = out.replace("</body>", '<script src="/lava-menu.js?v=warp36"></script><script src="/afro-admin.js?v=warp36"></script></body>');
+    out = out.replace("</body>", '<script src="/lava-menu.js?v=warp37"></script><script src="/afro-admin.js?v=warp37"></script></body>');
   }
   out = out.replace('src="/lava/lava_btn.png"', 'src="/lava_btn.png"');
   out = out.replace(
@@ -191,11 +199,11 @@ function patchGameHtml(html: string) {
   );
   out = out.replace(
     "function openLootBox(box){\n  if(totalBags<box.price)return;\n  totalBags-=box.price;",
-    "function openLootBox(box){\n  var tickets=+localStorage.getItem('afroPoundTickets')||0;\n  var useTicket=box.id==='pound'&&tickets>0;\n  if(!useTicket&&totalBags<box.price)return;\n  if(useTicket){tickets--;localStorage.setItem('afroPoundTickets',String(tickets));}else totalBags-=box.price;"
+    "function openLootBox(box){\n  var tickets=+localStorage.getItem('afroPoundTickets')||0;\n  var useTicket=box.id==='pound'&&tickets>0;\n  if(!useTicket&&String((typeof boardName==='function'&&boardName())||'').toLowerCase()!=='moodey'&&totalBags<box.price)return;\n  if(useTicket){tickets--;localStorage.setItem('afroPoundTickets',String(tickets));}else totalBags-=box.price;"
   );
   out = out.replace(
     "btn.disabled=totalBags<b.price;",
-    "btn.disabled=!(b.id==='pound'&&(+localStorage.getItem('afroPoundTickets')||0)>0)&&totalBags<b.price;"
+    "btn.disabled=String((typeof boardName==='function'&&boardName())||'').toLowerCase()!=='moodey'&&!(b.id==='pound'&&(+localStorage.getItem('afroPoundTickets')||0)>0)&&totalBags<b.price;"
   );
   out = out.replace(
     "='ÖFFNEN – 🌿 '+b.price;",
@@ -236,7 +244,7 @@ function Index() {
       if (!doc.getElementById("afroFxScript")) {
         const s = doc.createElement("script");
         s.id = "afroFxScript";
-        s.src = "/afro-fx.js?v=warp36";
+        s.src = "/afro-fx.js?v=warp37";
         doc.body.appendChild(s);
       }
       if (!doc.getElementById("bgMusicScript")) {
@@ -248,13 +256,13 @@ function Index() {
       if (!doc.getElementById("lavaMenuScript")) {
         const s3 = doc.createElement("script");
         s3.id = "lavaMenuScript";
-        s3.src = "/lava-menu.js?v=warp36";
+        s3.src = "/lava-menu.js?v=warp37";
         doc.body.appendChild(s3);
       }
       if (!doc.getElementById("afroAdminScript")) {
         const s4 = doc.createElement("script");
         s4.id = "afroAdminScript";
-        s4.src = "/afro-admin.js?v=warp36";
+        s4.src = "/afro-admin.js?v=warp37";
         doc.body.appendChild(s4);
       }
     } catch {
@@ -266,7 +274,7 @@ function Index() {
     const frame = frameRef.current;
     if (!frame) return;
     let cancelled = false;
-    fetch("/game.html?v=warp36", { cache: "no-store" })
+    fetch("/game.html?v=warp37", { cache: "no-store" })
       .then((r) => r.text())
       .then((html) => {
         if (cancelled || !frame) return;
@@ -274,7 +282,7 @@ function Index() {
       })
       .catch(() => {
         if (!cancelled && frame && !frame.getAttribute("src")) {
-          frame.src = "/game.html?v=warp36";
+          frame.src = "/game.html?v=warp37";
         }
       });
     return () => {
