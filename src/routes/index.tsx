@@ -257,10 +257,8 @@ export function Index() {
         const room = readRoomCode();
         if (room) {
           html2 = html2.replace(
-            "</body>",
-            "<script>setTimeout(function(){try{openDuel();duelJoin('" +
-              room +
-              "','guest');}catch(e){}},700);</script></body>"
+            "<head>",
+            '<head>\n<script>window.DUEL_BOOT_CODE="' + room + '";</script>'
           );
         }
         frame.srcdoc = html2;
