@@ -6945,20 +6945,24 @@ document.getElementById('duelJoinBtn').onclick=()=>{
 document.getElementById('duelCreate').onclick=()=>{
   const code=randCode();
   duelJoin(code,'host');
+  duelSetUrl(code);
+  const link=duelLink(code);
   duelCopyBtn.style.display='block';
+  duelSay('Raum <b style="color:#7cfc00">'+code+'</b><br><span style="font-size:13px;word-break:break-all">'+escHtml(link)+'</span><br>Warte auf Gegner…');
   duelCopyBtn.onclick=()=>{
-    const link=duelLink(code);
-    if(navigator.clipboard)navigator.clipboard.writeText(link).catch(()=>{});
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(link).catch(()=>{});
     duelSay('Raum <b style="color:#7cfc00">'+code+'</b><br>Link kopiert:<br><span style="font-size:13px;word-break:break-all">'+escHtml(link)+'</span><br>Warte auf Gegner…');
   };
 };
-// Auto-join when opened through an invite link
+// Auto-join when opened through an invite link (afrojumper.app/CODE)
 (()=>{
-  const p=new URLSearchParams(window.location.search);
-  const code=p.get('duel');
-  if(code&&/^[A-Z0-9]{4,8}$/.test(code)){
-    setTimeout(()=>{openDuel();duelJoin(code,'guest');},600);
-  }
+  const code=duelCodeFromUrl();
+  if(!code)return;
+  setTimeout(()=>{
+    if(duel.code===code)return;
+    openDuel();
+    duelJoin(code,'guest');
+  },700);
 })();
 
 // ================= MAP-DUELL: Editor + Rennen =================
