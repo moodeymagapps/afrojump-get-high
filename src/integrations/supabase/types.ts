@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           best_height: number
           display_name: string
+          lava_best: number
           skin: string | null
           total_bags: number
           updated_at: string
@@ -26,6 +27,7 @@ export type Database = {
         Insert: {
           best_height?: number
           display_name?: string
+          lava_best?: number
           skin?: string | null
           total_bags?: number
           updated_at?: string
@@ -34,6 +36,7 @@ export type Database = {
         Update: {
           best_height?: number
           display_name?: string
+          lava_best?: number
           skin?: string | null
           total_bags?: number
           updated_at?: string
