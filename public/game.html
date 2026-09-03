@@ -6686,7 +6686,7 @@ async function loadBoard(){
     boardListEl.appendChild(row);
   });
   if(!sbUser)boardMsgEl.textContent='Melde dich an, um in der Rangliste zu erscheinen.';
-  else if(myRank)boardMsgEl.textContent='Dein Platz: #'+myRank+' mit '+highScore+'m';
+  else if(myRank)boardMsgEl.textContent='Dein Platz: #'+myRank+' · '+highScore+'m · 🌋 '+lavaBest+'s';
   else boardMsgEl.textContent='Du bist noch nicht in den Top 50 – weiter springen!';
 }
 document.getElementById('menuBoard').onclick=()=>openBoard();
