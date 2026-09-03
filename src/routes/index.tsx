@@ -196,13 +196,6 @@ function patchGameHtml(html: string) {
     "var p=(t.requestFullscreen&&t.requestFullscreen({navigationUI:'hide'}))||(t.webkitRequestFullscreen&&t.webkitRequestFullscreen());",
     "var p=null;try{if(window.top&&window.top!==window.self&&window.top.document.documentElement.requestFullscreen)p=window.top.document.documentElement.requestFullscreen({navigationUI:'hide'});}catch(e){}if(!p)p=(t.requestFullscreen&&t.requestFullscreen({navigationUI:'hide'}))||(t.webkitRequestFullscreen&&t.webkitRequestFullscreen());try{window.scrollTo(0,1);}catch(e){}"
   );
-  out = out.replace(
-    "function duelLink(code){const u=new URL(window.location.href);u.searchParams.set('duel',code);return u.toString();}",
-    "function duelLink(code){return 'https://afrojumper.app/'+String(code||'').toUpperCase();}"
-  );
-  const duelUi =
-    '<script id="duelBarFix">(function(){function setBar(code){try{if(parent&&parent.history&&parent.history.pushState)parent.history.pushState({},"","/"+code);}catch(e){try{history.pushState({},"","/"+code);}catch(e2){}}}function wire(){var btn=document.getElementById("duelCreate");if(!btn||btn.getAttribute("data-barfix")==="1")return;btn.setAttribute("data-barfix","1");btn.addEventListener("click",function(){setTimeout(function(){if(typeof duel==="undefined"||!duel.code)return;setBar(duel.code);var copy=document.getElementById("duelCopy");if(!copy)return;copy.onclick=function(){var link="https://afrojumper.app/"+duel.code;var done=function(){try{duelSay("Raum <b style=\\"color:#7cfc00\\">"+duel.code+"</b><br>"+link+"<br>Warte auf Gegner\u2026");}catch(e){}};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(link).then(done).catch(done);else done();};},80);});}if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",wire);else wire();})();</script>';
-  if (!out.includes("duelBarFix")) out = out.replace("</body>", duelUi + "</body>");
   return out;
 }
 
