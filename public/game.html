@@ -6769,7 +6769,7 @@ function pushDuelCfg(){
     try{duel.channel.send({type:'broadcast',event:'cfg',payload:{size:duelCfg.size,budget:duelCfg.budget}});}catch(_){}
   }
 }
-function closeDuel(){duelLeave();showOverlay('menu');goMenu();}
+function closeDuel(){duelLeave();duelSetUrl(null);showOverlay('menu');goMenu();}
 function duelLeave(){
   if(duel.channel){try{duel.channel.send({type:'broadcast',event:'bye',payload:{}});}catch(_){}
     try{duel.channel.unsubscribe();}catch(_){}}
