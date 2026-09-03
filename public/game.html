@@ -6846,7 +6846,7 @@ async function duelJoin(code,role){
   ch.on('broadcast',{event:'ping'},()=>{duel.lastSeen=Date.now();duel.oppOffline=false;});
   ch.subscribe((status)=>{
     if(status==='SUBSCRIBED'){
-      duelSay('Raum <b style="color:#7cfc00">'+code+'</b><br>'+(role==='host'?'Warte auf Gegner…':'Verbinde mit Host…'));
+      duelSay('Raum <b style="color:#7cfc00">'+code+'</b><br>'+(role==='host'?('<span style="font-size:13px;word-break:break-all">'+escHtml(duelLink(code))+'</span><br>Warte auf Gegner…'):'Verbinde mit Host…'));
       ch.send({type:'broadcast',event:'hello',payload:{name:myDuelName(),skin:selectedSkin}});
     }else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'){
       duelSay('<span style="color:#ff8a80">Verbindungsfehler. Bitte nochmal versuchen.</span>');
