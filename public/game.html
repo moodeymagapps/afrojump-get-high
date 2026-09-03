@@ -6698,7 +6698,27 @@ const duelCopyBtn=document.getElementById('duelCopy');
 const duelRematchBtn=document.getElementById('duelRematch');
 function duelSay(html){duelBox.innerHTML=html;}
 function duelSeedFromCode(code){let h=2166136261;for(let i=0;i<code.length;i++){h^=code.charCodeAt(i);h=Math.imul(h,16777619);}return h|0;}
-function duelLink(code){const u=new URL(window.location.href);u.searchParams.set('duel',code);return u.toString();}
+function duelOrigin(){
+  try{if(window.parent&&window.parent!==window&&parent.location&&/^https?:$/.test(parent.location.protocol))return parent.location.origin;}catch(e){}
+  try{if(/^https?:$/.test(location.protocol))return location.origin;}catch(e){}
+  return 'https://afrojumper.app';
+}
+function duelLink(code){return duelOrigin()+'/'+String(code||'').toUpperCase();}
+function duelSetUrl(code){
+  const path=code?('/'+String(code).toUpperCase()):'/';
+  try{if(window.parent&&window.parent!==window&&parent.history&&parent.history.pushState){parent.history.pushState({},'',path);return;}}catch(e){}
+  try{history.pushState({},'',path);}catch(e){}
+}
+function duelCodeFromUrl(){
+  let path='',search='';
+  try{if(window.parent&&window.parent!==window&&parent.location){path=parent.location.pathname||'';search=parent.location.search||'';}}catch(e){}
+  if(!path){try{path=location.pathname||'';search=location.search||'';}catch(e){}}
+  const seg=String(path).replace(/^\/+/,'').split('/')[0];
+  if(/^[A-Z0-9]{4,8}$/i.test(seg))return seg.toUpperCase();
+  try{const q=new URLSearchParams(search||'').get('duel');if(q&&/^[A-Z0-9]{4,8}$/i.test(q))return q.toUpperCase();}catch(e){}
+  try{if(window.DUEL_BOOT_CODE&&/^[A-Z0-9]{4,8}$/i.test(String(window.DUEL_BOOT_CODE)))return String(window.DUEL_BOOT_CODE).toUpperCase();}catch(e){}
+  return null;
+}
 function myDuelName(){return (sbProfile&&sbProfile.display_name)||(sbUser&&sbUser.email&&String(sbUser.email).split('@')[0])||'Spieler';}
 function duelResetRound(){
   duel.finished=false;duel.oppDead=false;duel.oppBest=0;duel.myBest=0;
