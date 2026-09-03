@@ -6654,6 +6654,7 @@ async function submitScore(){
       user_id:sbUser.id,
       display_name:boardName(),
       best_height:highScore|0,
+      lava_best:lavaBest|0,
       total_bags:totalBags|0,
       skin:selectedSkin,
       updated_at:new Date().toISOString(),
@@ -6665,7 +6666,7 @@ async function loadBoard(){
   if(!sb){boardMsgEl.textContent='Rangliste offline nicht verfügbar.';return;}
   await submitScore();
   const {data,error}=await sb.from('leaderboard')
-    .select('user_id,display_name,best_height,total_bags,skin')
+    .select('user_id,display_name,best_height,lava_best,total_bags,skin')
     .order('best_height',{ascending:false}).limit(50);
   if(error){boardMsgEl.textContent='Fehler beim Laden der Rangliste.';return;}
   boardListEl.innerHTML='';
@@ -6680,11 +6681,12 @@ async function loadBoard(){
     const sk=SKINS.find(s=>s.id===r.skin);
     row.innerHTML='<span class="rank">'+medal+'</span>'+
       '<span class="who">'+escHtml(r.display_name||'Spieler')+(sk?' <span style="opacity:.6">· '+escHtml(sk.name)+'</span>':'')+'</span>'+
-      '<span class="val">'+(r.best_height|0)+'m</span>';
+      '<span class="val">'+(r.best_height|0)+'m</span>'+
+      '<span class="val" style="color:#ff9a3c">🌋 '+(r.lava_best|0)+'s</span>';
     boardListEl.appendChild(row);
   });
   if(!sbUser)boardMsgEl.textContent='Melde dich an, um in der Rangliste zu erscheinen.';
-  else if(myRank)boardMsgEl.textContent='Dein Platz: #'+myRank+' mit '+highScore+'m';
+  else if(myRank)boardMsgEl.textContent='Dein Platz: #'+myRank+' · '+highScore+'m · 🌋 '+lavaBest+'s';
   else boardMsgEl.textContent='Du bist noch nicht in den Top 50 – weiter springen!';
 }
 document.getElementById('menuBoard').onclick=()=>openBoard();
@@ -6698,7 +6700,33 @@ const duelCopyBtn=document.getElementById('duelCopy');
 const duelRematchBtn=document.getElementById('duelRematch');
 function duelSay(html){duelBox.innerHTML=html;}
 function duelSeedFromCode(code){let h=2166136261;for(let i=0;i<code.length;i++){h^=code.charCodeAt(i);h=Math.imul(h,16777619);}return h|0;}
-function duelLink(code){const u=new URL(window.location.href);u.searchParams.set('duel',code);return u.toString();}
+function duelOrigin(){
+  try{if(window.parent&&window.parent!==window&&parent.location&&/^https?:$/.test(parent.location.protocol))return parent.location.origin;}catch(e){}
+  try{if(/^https?:$/.test(location.protocol))return location.origin;}catch(e){}
+  return 'https://afrojumper.app';
+}
+function duelLink(code){return duelOrigin()+'/'+String(code||'').toUpperCase();}
+function duelSetUrl(code){
+  const path=code?('/'+String(code).toUpperCase()):'/';
+  // Use the native History method so the host page's router does NOT re-mount the game
+  try{
+    if(window.parent&&window.parent!==window&&parent.history){
+      History.prototype.replaceState.call(parent.history,parent.history.state||{},'',path);
+      return;
+    }
+  }catch(e){}
+  try{History.prototype.replaceState.call(history,history.state||{},'',path);}catch(e){}
+}
+function duelCodeFromUrl(){
+  let path='',search='';
+  try{if(window.parent&&window.parent!==window&&parent.location){path=parent.location.pathname||'';search=parent.location.search||'';}}catch(e){}
+  if(!path){try{path=location.pathname||'';search=location.search||'';}catch(e){}}
+  const seg=String(path).replace(/^\/+/,'').split('/')[0];
+  if(/^[A-Z0-9]{4,8}$/i.test(seg))return seg.toUpperCase();
+  try{const q=new URLSearchParams(search||'').get('duel');if(q&&/^[A-Z0-9]{4,8}$/i.test(q))return q.toUpperCase();}catch(e){}
+  try{if(window.DUEL_BOOT_CODE&&/^[A-Z0-9]{4,8}$/i.test(String(window.DUEL_BOOT_CODE)))return String(window.DUEL_BOOT_CODE).toUpperCase();}catch(e){}
+  return null;
+}
 function myDuelName(){return (sbProfile&&sbProfile.display_name)||(sbUser&&sbUser.email&&String(sbUser.email).split('@')[0])||'Spieler';}
 function duelResetRound(){
   duel.finished=false;duel.oppDead=false;duel.oppBest=0;duel.myBest=0;
@@ -6749,7 +6777,7 @@ function pushDuelCfg(){
     try{duel.channel.send({type:'broadcast',event:'cfg',payload:{size:duelCfg.size,budget:duelCfg.budget}});}catch(_){}
   }
 }
-function closeDuel(){duelLeave();showOverlay('menu');goMenu();}
+function closeDuel(){duelLeave();duelSetUrl(null);showOverlay('menu');goMenu();}
 function duelLeave(){
   if(duel.channel){try{duel.channel.send({type:'broadcast',event:'bye',payload:{}});}catch(_){}
     try{duel.channel.unsubscribe();}catch(_){}}
@@ -6826,7 +6854,7 @@ async function duelJoin(code,role){
   ch.on('broadcast',{event:'ping'},()=>{duel.lastSeen=Date.now();duel.oppOffline=false;});
   ch.subscribe((status)=>{
     if(status==='SUBSCRIBED'){
-      duelSay('Raum <b style="color:#7cfc00">'+code+'</b><br>'+(role==='host'?'Warte auf Gegner…':'Verbinde mit Host…'));
+      duelSay('Raum <b style="color:#7cfc00">'+code+'</b><br>'+(role==='host'?('<span style="font-size:13px;word-break:break-all">'+escHtml(duelLink(code))+'</span><br>Warte auf Gegner…'):'Verbinde mit Host…'));
       ch.send({type:'broadcast',event:'hello',payload:{name:myDuelName(),skin:selectedSkin}});
     }else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'){
       duelSay('<span style="color:#ff8a80">Verbindungsfehler. Bitte nochmal versuchen.</span>');
@@ -6925,20 +6953,24 @@ document.getElementById('duelJoinBtn').onclick=()=>{
 document.getElementById('duelCreate').onclick=()=>{
   const code=randCode();
   duelJoin(code,'host');
+  duelSetUrl(code);
+  const link=duelLink(code);
   duelCopyBtn.style.display='block';
+  duelSay('Raum <b style="color:#7cfc00">'+code+'</b><br><span style="font-size:13px;word-break:break-all">'+escHtml(link)+'</span><br>Warte auf Gegner…');
   duelCopyBtn.onclick=()=>{
-    const link=duelLink(code);
-    if(navigator.clipboard)navigator.clipboard.writeText(link).catch(()=>{});
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(link).catch(()=>{});
     duelSay('Raum <b style="color:#7cfc00">'+code+'</b><br>Link kopiert:<br><span style="font-size:13px;word-break:break-all">'+escHtml(link)+'</span><br>Warte auf Gegner…');
   };
 };
-// Auto-join when opened through an invite link
+// Auto-join when opened through an invite link (afrojumper.app/CODE)
 (()=>{
-  const p=new URLSearchParams(window.location.search);
-  const code=p.get('duel');
-  if(code&&/^[A-Z0-9]{4,8}$/.test(code)){
-    setTimeout(()=>{openDuel();duelJoin(code,'guest');},600);
-  }
+  const code=duelCodeFromUrl();
+  if(!code)return;
+  setTimeout(()=>{
+    if(duel.code===code)return;
+    openDuel();
+    duelJoin(code,'guest');
+  },700);
 })();
 
 // ================= MAP-DUELL: Editor + Rennen =================
