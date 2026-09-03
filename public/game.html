@@ -6708,8 +6708,14 @@ function duelOrigin(){
 function duelLink(code){return duelOrigin()+'/'+String(code||'').toUpperCase();}
 function duelSetUrl(code){
   const path=code?('/'+String(code).toUpperCase()):'/';
-  try{if(window.parent&&window.parent!==window&&parent.history&&parent.history.pushState){parent.history.pushState({},'',path);return;}}catch(e){}
-  try{history.pushState({},'',path);}catch(e){}
+  // Use the native History method so the host page's router does NOT re-mount the game
+  try{
+    if(window.parent&&window.parent!==window&&parent.history){
+      History.prototype.replaceState.call(parent.history,parent.history.state||{},'',path);
+      return;
+    }
+  }catch(e){}
+  try{History.prototype.replaceState.call(history,history.state||{},'',path);}catch(e){}
 }
 function duelCodeFromUrl(){
   let path='',search='';
