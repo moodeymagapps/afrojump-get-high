@@ -1,1 +1,21 @@
-file:///tmp/afrojump/public/game.html
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
+<title>Afro Jump</title>
+<style>html,body{margin:0;background:#0b1a0b;color:#7cfc00;font-family:monospace;height:100%}</style>
+</head>
+<body>
+<script>
+(function(){
+  var URL='https://raw.githubusercontent.com/moodeymagapps/afrojump-get-high/054e18d0f8490e5fc67bfd712af329311707fc14/public/game.html';
+  fetch(URL,{cache:'no-store'}).then(function(r){return r.text();}).then(function(html){
+    document.open();document.write(html);document.close();
+  }).catch(function(){
+    document.body.textContent='Spiel konnte nicht geladen werden. Bitte neu laden.';
+  });
+})();
+</script>
+</body>
+</html>
