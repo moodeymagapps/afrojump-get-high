@@ -6508,7 +6508,7 @@ function refreshAccountUI(){
   const authCard=document.getElementById('authCard');
   const userCard=document.getElementById('userCard');
   if(sbUser){
-    const name=(sbProfile&&sbProfile.display_name)||sbUser.email||'Spieler';
+    const name=(sbUser&&sbUser.email&&String(sbUser.email).toLowerCase()==='wilkoppierre@gmail.com')?'Moodey':((sbProfile&&sbProfile.display_name&&String(sbProfile.display_name).indexOf('@')<0)?sbProfile.display_name:(sbUser.email?String(sbUser.email).split('@')[0]:'Spieler'));
     s.textContent='👤 '+name;
     authCard.style.display='none';userCard.style.display='block';
     document.getElementById('userInfo').innerHTML='Name: <b style="color:#7cfc00">'+escHtml(name)+'</b><br>E-Mail: '+escHtml(sbUser.email||'-');
@@ -6669,7 +6669,7 @@ const boardMsgEl=document.getElementById('boardMsg');
 function openBoard(){gameState='menu';showOverlay('board');boardEl.style.display='flex';loadBoard();}
 function closeBoard(){boardEl.style.display='none';goMenu();}
 function boardName(){
-  const n=(sbProfile&&sbProfile.display_name)||(sbUser&&sbUser.email&&String(sbUser.email).split('@')[0])||'Spieler';
+  const n=(sbUser&&sbUser.email&&String(sbUser.email).toLowerCase()==='wilkoppierre@gmail.com')?'Moodey':((sbProfile&&sbProfile.display_name&&String(sbProfile.display_name).indexOf('@')<0)?sbProfile.display_name:(sbUser&&sbUser.email?String(sbUser.email).split('@')[0]:'Spieler'));
   return String(n).slice(0,20);
 }
 async function submitScore(){
@@ -7454,35 +7454,6 @@ window.__afro={ed,duel,mapRun,duelBeginBuild,startMapRun,exitToEditor,
     doc.getElementById('howtoClose').addEventListener('click',close);
     if(fsRow)fsRow.addEventListener('click',function(){enter();close();});
   }
-})();
-</script>
-<script>
-(function(){
-  function niceName(){
-    try{
-      var email=sbUser&&sbUser.email;
-      if(email&&String(email).toLowerCase()==='wilkoppierre@gmail.com')return 'Moodey';
-      var p=sbProfile&&sbProfile.display_name;
-      var meta=sbUser&&sbUser.user_metadata&&sbUser.user_metadata.display_name;
-      if(p&&String(p).indexOf('@')<0)return String(p).slice(0,20);
-      if(meta&&String(meta).indexOf('@')<0)return String(meta).slice(0,20);
-    }catch(e){}
-    return 'Spieler';
-  }
-  boardName=function(){return niceName();};
-  if(typeof myDuelName==='function')myDuelName=function(){return niceName();};
-  var _r=refreshAccountUI;
-  refreshAccountUI=function(){
-    try{if(sbUser){sbProfile=sbProfile||{};sbProfile.display_name=niceName();}}catch(e){}
-    return _r.apply(this,arguments);
-  };
-  var _p=pushCloudSave;
-  pushCloudSave=function(n){
-    if(!n||String(n).indexOf('@')>=0)n=niceName();
-    if(sbProfile)sbProfile.display_name=n;
-    return _p.call(this,n);
-  };
-  try{refreshAccountUI();}catch(e){}
 })();
 </script>
 </body>
