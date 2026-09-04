@@ -3437,7 +3437,7 @@ function die(){
   addShake(12,0.6);
   timeScale=0.3;
   setTimeout(()=>{timeScale=1;},450);
-  if(bestY>highScore){highScore=bestY;localStorage.setItem(HK,highScore);}
+  if(!lavaMode&&bestY>highScore){highScore=bestY;localStorage.setItem(HK,highScore);}
   if(lavaMode){
     const t=Math.floor(lavaSurvived);
     if(t>lavaBest){lavaBest=t; try{localStorage.setItem('afro_lava_best',lavaBest);}catch(_){}}
