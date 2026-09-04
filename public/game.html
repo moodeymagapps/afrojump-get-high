@@ -6696,17 +6696,18 @@ function lbFaceStyle(skinId){
   return 'background-image:'+url+';background-size:cover;background-position:top center;';
 }
 function renderBoard(){
-  const data=boardData;
+  const lava0=boardMode==='lava';
+  const data=(boardData||[]).slice().sort((a,b)=>lava0?((b.lava_best|0)-(a.lava_best|0)):((b.best_height|0)-(a.best_height|0)));
   boardListEl.innerHTML='';
-  const lava=boardMode==='lava';
+  const lava=lava0;
   boardEl.classList.toggle('lbLava',lava);
   document.getElementById('lbTitle').textContent=lava?'🌋 LAVA RANGLISTE':'🏆 NORMAL RANGLISTE';
   document.getElementById('lbTabNormal').classList.toggle('on',!lava);
   document.getElementById('lbTabLava').classList.toggle('on',lava);
   if(!data||!data.length){boardMsgEl.textContent='Noch keine Einträge – sei der Erste!';return;}
-  const rows=data.slice().sort((a,b)=>lava?((b.lava_best|0)-(a.lava_best|0)):((b.best_height|0)-(a.best_height|0)));
   let myRank=0;
-  rows.forEach((r,i)=>{
+  data.forEach((r,i)=>{
+
     const mine=sbUser&&r.user_id===sbUser.id;
     if(mine)myRank=i+1;
     const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1);
