@@ -203,14 +203,30 @@
   #duelJoinBtn{padding:10px 12px;border:none;background:#4caf50;color:#fff;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:9px;cursor:pointer;box-shadow:inset -2px -2px 0 #1b5e20, inset 2px 2px 0 #a5d6a7, 0 3px 0 #1b5e20;}
   /* Rangliste */
   #board{overflow-y:auto;}
-  .lbRow{display:flex;align-items:center;gap:8px;background:#1b1230;padding:8px 10px;margin-bottom:6px;box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #4a2c73;font-family:'VT323','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:18px;letter-spacing:1px;color:#fff;}
+  #lbPanel{width:100%;max-width:380px;padding:14px 12px 16px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:10px;
+    background:#141a10;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #4d7a2c, 0 0 0 3px #2b3a1c, 0 0 24px rgba(0,0,0,.6);}
+  #board.lbLava #lbPanel{background:#150a06;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #8a3b12, 0 0 0 3px #3a1206, 0 0 26px rgba(255,90,0,.25);}
+  #lbTitle{margin:0;color:#9dff4a;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:12px;text-shadow:2px 2px 0 #000;letter-spacing:1px;}
+  #board.lbLava #lbTitle{color:#ff8a1e;text-shadow:2px 2px 0 #000,0 0 10px rgba(255,110,0,.6);}
+  .lbTabs{display:flex;gap:8px;}
+  .lbTab{padding:8px 16px;background:transparent;border:none;cursor:pointer;color:#8f9c85;
+    font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:10px;letter-spacing:1px;
+    box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #3d4a33;}
+  .lbTab.on{color:#0f1a08;background:#8fdc3a;box-shadow:inset -2px -2px 0 #2c5211, inset 2px 2px 0 #d6ffa1;}
+  #board.lbLava .lbTab.on{color:#1a0800;background:#ff8a1e;box-shadow:inset -2px -2px 0 #6b2200, inset 2px 2px 0 #ffd39a;}
+  .lbRow{display:flex;align-items:center;gap:8px;background:#1b1230;padding:6px 8px;margin-bottom:6px;box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #4a2c73;font-family:'VT323','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:18px;letter-spacing:1px;color:#fff;}
+  #board.lbLava .lbRow{background:#20100a;box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #7a3410;}
   .lbRow .rank{flex:0 0 42px;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:10px;color:#ffd54a;}
+  .lbRow .face{flex:0 0 32px;width:32px;height:32px;image-rendering:pixelated;background-repeat:no-repeat;background-color:#000;box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #55606a;}
   .lbRow .who{flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .lbRow .val{flex:0 0 auto;color:#7cfc00;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:10px;}
+  #board.lbLava .lbRow .val{color:#ffb03c;}
   .lbRow.me{box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #7cfc00;background:#16240f;}
+  #board.lbLava .lbRow.me{box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #ff8a1e;background:#3a1204;}
   .lbRow.top1 .rank{color:#ffd700;}
   .lbRow.top2 .rank{color:#e0e0e0;}
   .lbRow.top3 .rank{color:#d68910;}
+
   #hint{position:absolute;bottom:12px;left:0;right:0;text-align:center;font-size:14px;opacity:.6;pointer-events:none;font-family:'VT323','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;letter-spacing:1px;}
   #fireBtn{position:absolute;bottom:60px;left:50%;transform:translateX(-50%);width:78px;height:78px;border-radius:50%;background:#c62828;border:none;color:#fff;font-size:30px;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:inset -4px -4px 0 #7f1010, inset 4px 4px 0 #ff8a80, 0 5px 0 #7f1010, 0 0 20px rgba(255,80,80,.6);z-index:5;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;user-select:none;-webkit-tap-highlight-color:transparent;}
   #fireBtn:active{transform:translateX(-50%) translateY(3px);box-shadow:inset -4px -4px 0 #7f1010, inset 4px 4px 0 #ff8a80, 0 2px 0 #7f1010;}
@@ -975,14 +991,21 @@
     </div>
   </div>
   <div id="board" class="overlay">
-    <div class="head" style="display:flex;justify-content:space-between;width:100%;max-width:360px;align-items:center;margin-bottom:12px;">
-      <h2 style="margin:0;color:#ffd54a;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:13px;text-shadow:2px 2px 0 #000;">🏆 RANGLISTE</h2>
-      <button id="boardClose" class="btn icon v-red">✕</button>
+    <div id="lbPanel">
+      <div class="head" style="display:flex;justify-content:space-between;width:100%;align-items:center;">
+        <h2 id="lbTitle">🏆 NORMAL RANGLISTE</h2>
+        <button id="boardClose" class="btn icon v-red">✕</button>
+      </div>
+      <div class="lbTabs">
+        <button class="lbTab on" id="lbTabNormal">🍃 NORMAL</button>
+        <button class="lbTab" id="lbTabLava">🌋 LAVA</button>
+      </div>
+      <div id="boardList" style="width:100%;"></div>
+      <div id="boardMsg" style="font-family:'VT323','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:16px;opacity:.8;text-align:center;"></div>
+      <button class="btn ghost" id="boardRefresh">👑 Aktualisieren</button>
     </div>
-    <div id="boardList" style="width:100%;max-width:360px;"></div>
-    <div id="boardMsg" style="font-family:'VT323','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:16px;opacity:.8;margin-top:6px;text-align:center;max-width:340px;"></div>
-    <button class="btn ghost" id="boardRefresh">🔄 Aktualisieren</button>
   </div>
+
   <div id="duel" class="overlay">
     <h1>MAP-DUELL</h1>
     <p style="font-size:16px;max-width:320px;text-align:center;">Jeder baut dem anderen eine Map – und muss sie einmal selbst schaffen. Dann spielt jeder die Map des Gegners: wer zuerst am Ziel ist, gewinnt!</p>
@@ -2251,7 +2274,7 @@ const BOSS_TYPES=['budboss','kingblunt','drgreenthumb','theplug','giantblunt','m
 // Bild-Bosse (Pixel-Art) – Namen + Untertitel wie auf den Artworks
 const BOSS_IMAGES={
   budboss:{src:'/__l5e/assets-v1/23cd3ead-a14b-4f58-a46e-ff04ea7ee915/budboss.png',bg:'white',name:'BUD BOSS',sub:'Der Lord der Blüten'},
-  kingblunt:{src:'/__l5e/assets-v1/bf2f4cc9-c9e3-4980-932a-3ed2711b60f2/kingblunt.png',bg:'white',name:'KING BLUNT',sub:'Der gekrönte Joint'}
+  kingblunt:{src:'/bosses/kingblunt.png',bg:null,name:'KING BLUNT',sub:'Der gekrönte Joint'}
 };
 const BOSS_NAMES={budboss:'BUD BOSS',kingblunt:'KING BLUNT',drgreenthumb:'DR. GREENTHUMB',theplug:'THE PLUG',giantblunt:'GIANT BLUNT',mutantbush:'MUTANT BUSH'};
 const BOSS_SUBS={};
@@ -6661,6 +6684,44 @@ async function submitScore(){
     },{onConflict:'user_id'});
   }catch(err){console.warn('leaderboard submit failed',err);}
 }
+let boardMode='normal', boardData=null;
+function lbFaceStyle(skinId){
+  const sk=SKINS.find(s=>s.id===skinId);
+  if(!sk||!sk.img)return '';
+  // Kopf-Portrait: oberes Quadrat des Skin-Bildes zeigen
+  return "background-image:url('/"+sk.img+"');background-size:cover;background-position:top center;";
+}
+
+function renderBoard(){
+  const lava0=boardMode==='lava';
+  const data=(boardData||[]).slice().sort((a,b)=>lava0?((b.lava_best|0)-(a.lava_best|0)):((b.best_height|0)-(a.best_height|0)));
+  boardListEl.innerHTML='';
+  const lava=lava0;
+  boardEl.classList.toggle('lbLava',lava);
+  document.getElementById('lbTitle').textContent=lava?'🌋 LAVA RANGLISTE':'🏆 NORMAL RANGLISTE';
+  document.getElementById('lbTabNormal').classList.toggle('on',!lava);
+  document.getElementById('lbTabLava').classList.toggle('on',lava);
+  if(!data||!data.length){boardMsgEl.textContent='Noch keine Einträge – sei der Erste!';return;}
+  let myRank=0;
+  data.forEach((r,i)=>{
+
+    const mine=sbUser&&r.user_id===sbUser.id;
+    if(mine)myRank=i+1;
+    const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1);
+    const row=document.createElement('div');
+    row.className='lbRow'+(mine?' me':'')+(i<3?' top'+(i+1):'');
+    const sk=SKINS.find(s=>s.id===r.skin);
+    row.innerHTML='<span class="rank">'+medal+'</span>'+
+      '<span class="face" style="'+lbFaceStyle(r.skin)+'"></span>'+
+      '<span class="who">'+escHtml(r.display_name||'Spieler')+(sk?' <span style="opacity:.6">· '+escHtml(sk.name)+'</span>':'')+'</span>'+
+      '<span class="val">'+(r.best_height|0)+'m</span>'+
+      '<span class="val">'+(lava?'🔥 ':'🕒 ')+(r.lava_best|0)+'s</span>';
+    boardListEl.appendChild(row);
+  });
+  if(!sbUser)boardMsgEl.textContent='Melde dich an, um in der Rangliste zu erscheinen.';
+  else if(myRank)boardMsgEl.textContent='Dein Platz: #'+myRank+' · '+highScore+'m · '+(lava?'🔥 ':'🕒 ')+lavaBest+'s';
+  else boardMsgEl.textContent='Du bist noch nicht in den Top 50 – weiter springen!';
+}
 async function loadBoard(){
   boardMsgEl.textContent='Lade…';
   if(!sb){boardMsgEl.textContent='Rangliste offline nicht verfügbar.';return;}
@@ -6669,29 +6730,15 @@ async function loadBoard(){
     .select('user_id,display_name,best_height,lava_best,total_bags,skin')
     .order('best_height',{ascending:false}).limit(50);
   if(error){boardMsgEl.textContent='Fehler beim Laden der Rangliste.';return;}
-  boardListEl.innerHTML='';
-  if(!data||!data.length){boardMsgEl.textContent='Noch keine Einträge – sei der Erste!';return;}
-  let myRank=0;
-  data.forEach((r,i)=>{
-    const mine=sbUser&&r.user_id===sbUser.id;
-    if(mine)myRank=i+1;
-    const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1);
-    const row=document.createElement('div');
-    row.className='lbRow'+(mine?' me':'')+(i<3?' top'+(i+1):'');
-    const sk=SKINS.find(s=>s.id===r.skin);
-    row.innerHTML='<span class="rank">'+medal+'</span>'+
-      '<span class="who">'+escHtml(r.display_name||'Spieler')+(sk?' <span style="opacity:.6">· '+escHtml(sk.name)+'</span>':'')+'</span>'+
-      '<span class="val">'+(r.best_height|0)+'m</span>'+
-      '<span class="val" style="color:#ff9a3c">🌋 '+(r.lava_best|0)+'s</span>';
-    boardListEl.appendChild(row);
-  });
-  if(!sbUser)boardMsgEl.textContent='Melde dich an, um in der Rangliste zu erscheinen.';
-  else if(myRank)boardMsgEl.textContent='Dein Platz: #'+myRank+' · '+highScore+'m · 🌋 '+lavaBest+'s';
-  else boardMsgEl.textContent='Du bist noch nicht in den Top 50 – weiter springen!';
+  boardData=data||[];
+  renderBoard();
 }
 document.getElementById('menuBoard').onclick=()=>openBoard();
 document.getElementById('boardClose').onclick=()=>closeBoard();
 document.getElementById('boardRefresh').onclick=()=>loadBoard();
+document.getElementById('lbTabNormal').onclick=()=>{boardMode='normal';renderBoard();};
+document.getElementById('lbTabLava').onclick=()=>{boardMode='lava';renderBoard();};
+
 
 // ================= 1v1 DUELL v2 (Link/Code, Realtime, Countdown, Revanche) =================
 const duelEl=document.getElementById('duel');
