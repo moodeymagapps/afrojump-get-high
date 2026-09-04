@@ -2941,12 +2941,8 @@ function spawnBoss(){
   const PS=(player&&player.r?player.r:22)*2;
   const hp=6+Math.min(6,bossIndex-1)*1; // Boss 1: 6 HP, danach steigend
   boss={kind,x:W/2,y:cameraY+150,w:PS*1.15,h:PS*1.35,hp,hpMax:hp,vx:1.7,shootT:1.2,alive:true,hitT:0,phase:0,spawnT:1.4,tele:0,teleX:W/2,rage:false,bob:0,gunT:4,dropT:2.5,dashT:3.5,dash:0};
-  if(kind==='budboss'){boss.w=PS*1.15;boss.h=PS*1.5;boss.vx=1.7;}
-  if(kind==='kingblunt'){boss.w=PS*1.1;boss.h=PS*1.6;boss.vx=1.5;}
-  if(kind==='drgreenthumb'){boss.w=PS*1.25;boss.h=PS*1.25;boss.vx=2.0;}
-  if(kind==='theplug'){boss.w=PS*1.0;boss.h=PS*1.35;boss.vx=2.3;}
-  if(kind==='giantblunt'){boss.w=PS*0.85;boss.h=PS*1.6;boss.vx=1.9;}
-  if(kind==='mutantbush'){boss.w=PS*1.4;boss.h=PS*1.1;boss.vx=1.6;}
+  // (alte Bosse entfernt – Größen kommen jetzt komplett aus BOSS_SPECS)
+
   // --- Neue Bosse: eigene Werte + eigene Attacken-Kombo ---
   bossModReset();
   const spec=BOSS_SPECS[kind];
