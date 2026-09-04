@@ -161,3 +161,25 @@
     renderBoard();
   };
 })();
+
+/* Remove broken James skin completely */
+(function () {
+  try {
+    if (typeof SKINS !== "undefined") {
+      for (let i = SKINS.length - 1; i >= 0; i--) {
+        if (SKINS[i] && SKINS[i].id === "james") SKINS.splice(i, 1);
+      }
+    }
+    if (typeof owned !== "undefined" && Array.isArray(owned)) {
+      owned = owned.filter(function (id) { return id !== "james"; });
+      if (owned.indexOf("bob") < 0) owned.push("bob");
+      if (typeof selectedSkin !== "undefined" && (selectedSkin === "james" || owned.indexOf(selectedSkin) < 0)) {
+        selectedSkin = "bob";
+      }
+      try {
+        localStorage.setItem(OK, JSON.stringify(owned));
+        if (typeof selectedSkin !== "undefined") localStorage.setItem(SK, selectedSkin);
+      } catch (e) {}
+    }
+  } catch (e) {}
+})();
