@@ -3163,7 +3163,7 @@ function update(dt){
   }
 
   // boss check (skipped in lava mode via nextBossScore=Infinity)
-  if(!boss&&bestY>=nextBossScore){spawnBoss();}
+if(!lavaMode&&!boss&&bestY>=nextBossScore){spawnBoss();}
   if(boss){
     const spec=bSpec(boss);
     // Arena-Modifikatoren jeden Frame neu setzen (Handler darf sie überschreiben)
