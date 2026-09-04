@@ -2950,12 +2950,14 @@ function spawnBoss(){
   // --- Neue Bosse: eigene Werte + eigene Attacken-Kombo ---
   bossModReset();
   const spec=BOSS_SPECS[kind];
+  const tier=Math.max(0,Math.floor(bestY/1200)-1); // je höher, desto stärker
+  boss.tier=tier;
   if(spec){
-    if(spec.hp){boss.hp=spec.hp+Math.floor(bossIndex/BOSS_TYPES.length);boss.hpMax=boss.hp;}
+    if(spec.hp){boss.hp=spec.hp+Math.floor(bossIndex/BOSS_TYPES.length)+Math.min(14,Math.round(tier*0.9));boss.hpMax=boss.hp;}
     const sc=spec.scale||1;
     boss.w=PS*1.15*sc*(spec.wMul||1);
     boss.h=PS*1.35*sc*(spec.hMul||1);
-    boss.vx=1.7*(spec.speed==null?1:spec.speed);
+    boss.vx=1.7*(spec.speed==null?1:spec.speed)*(1+Math.min(0.75,tier*0.06));
     boss.noFloat=!!spec.noFloat;
     if(spec.init)spec.init(boss);
   }
@@ -2981,6 +2983,7 @@ function spawnBoss(){
   pushFloat(W/2,cameraY+150,nm,'#ffdd00');
   if(BOSS_SUBS[kind])pushFloat(W/2,cameraY+172,BOSS_SUBS[kind],'#ffe082');
   pushFloat(W/2,cameraY+196,'3 ♥  –  drauf springen!','#ff5252');
+  if(tier>0)pushFloat(W/2,cameraY+220,'STUFE '+(tier+1),'#ffab40');
 
   // Musik komplett aus im Bossfight – nur Sounds
   stopMusic();stopBossMusic();sfx('boss');
@@ -3288,6 +3291,9 @@ if(!lavaMode&&!boss&&bestY>=nextBossScore){spawnBoss();}
     }
     boss.bob+=dt;
     if(!boss.noFloat)boss.y=cameraY+150+Math.sin(boss.bob*(boss.rage?2.6:1.6))*14;
+    // Boss bleibt IMMER im Bild (nie durch den Boden, nie aus der Arena)
+    boss.y=Math.max(cameraY+70,Math.min(cameraY+H*0.55,boss.y));
+    boss.x=Math.max(50,Math.min(W-50,boss.x));
     boss.hitT-=dt;
     boss.phase+=dt;
     if(boss.dash>0)boss.dash-=dt;
