@@ -6684,6 +6684,46 @@ async function submitScore(){
     },{onConflict:'user_id'});
   }catch(err){console.warn('leaderboard submit failed',err);}
 }
+let boardMode='normal', boardData=null;
+function lbFaceStyle(skinId){
+  const sk=SKINS.find(s=>s.id===skinId);
+  if(!sk||!sk.img)return '';
+  const url="url('/"+sk.img+"')";
+  if(typeof SHEET_SKINS!=='undefined'&&SHEET_SKINS.indexOf(sk.id)>=0){
+    // 4x2 Sheet (Zelle 96x128) -> Kopf der ersten Zelle zeigen
+    return 'background-image:'+url+';background-size:256px 171px;background-position:-16px -1px;';
+  }
+  return 'background-image:'+url+';background-size:cover;background-position:top center;';
+}
+function renderBoard(){
+  const data=boardData;
+  boardListEl.innerHTML='';
+  const lava=boardMode==='lava';
+  boardEl.classList.toggle('lbLava',lava);
+  document.getElementById('lbTitle').textContent=lava?'🌋 LAVA RANGLISTE':'🏆 NORMAL RANGLISTE';
+  document.getElementById('lbTabNormal').classList.toggle('on',!lava);
+  document.getElementById('lbTabLava').classList.toggle('on',lava);
+  if(!data||!data.length){boardMsgEl.textContent='Noch keine Einträge – sei der Erste!';return;}
+  const rows=data.slice().sort((a,b)=>lava?((b.lava_best|0)-(a.lava_best|0)):((b.best_height|0)-(a.best_height|0)));
+  let myRank=0;
+  rows.forEach((r,i)=>{
+    const mine=sbUser&&r.user_id===sbUser.id;
+    if(mine)myRank=i+1;
+    const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1);
+    const row=document.createElement('div');
+    row.className='lbRow'+(mine?' me':'')+(i<3?' top'+(i+1):'');
+    const sk=SKINS.find(s=>s.id===r.skin);
+    row.innerHTML='<span class="rank">'+medal+'</span>'+
+      '<span class="face" style="'+lbFaceStyle(r.skin)+'"></span>'+
+      '<span class="who">'+escHtml(r.display_name||'Spieler')+(sk?' <span style="opacity:.6">· '+escHtml(sk.name)+'</span>':'')+'</span>'+
+      '<span class="val">'+(r.best_height|0)+'m</span>'+
+      '<span class="val">'+(lava?'🔥 ':'🕒 ')+(r.lava_best|0)+'s</span>';
+    boardListEl.appendChild(row);
+  });
+  if(!sbUser)boardMsgEl.textContent='Melde dich an, um in der Rangliste zu erscheinen.';
+  else if(myRank)boardMsgEl.textContent='Dein Platz: #'+myRank+' · '+highScore+'m · '+(lava?'🔥 ':'🕒 ')+lavaBest+'s';
+  else boardMsgEl.textContent='Du bist noch nicht in den Top 50 – weiter springen!';
+}
 async function loadBoard(){
   boardMsgEl.textContent='Lade…';
   if(!sb){boardMsgEl.textContent='Rangliste offline nicht verfügbar.';return;}
@@ -6692,29 +6732,15 @@ async function loadBoard(){
     .select('user_id,display_name,best_height,lava_best,total_bags,skin')
     .order('best_height',{ascending:false}).limit(50);
   if(error){boardMsgEl.textContent='Fehler beim Laden der Rangliste.';return;}
-  boardListEl.innerHTML='';
-  if(!data||!data.length){boardMsgEl.textContent='Noch keine Einträge – sei der Erste!';return;}
-  let myRank=0;
-  data.forEach((r,i)=>{
-    const mine=sbUser&&r.user_id===sbUser.id;
-    if(mine)myRank=i+1;
-    const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1);
-    const row=document.createElement('div');
-    row.className='lbRow'+(mine?' me':'')+(i<3?' top'+(i+1):'');
-    const sk=SKINS.find(s=>s.id===r.skin);
-    row.innerHTML='<span class="rank">'+medal+'</span>'+
-      '<span class="who">'+escHtml(r.display_name||'Spieler')+(sk?' <span style="opacity:.6">· '+escHtml(sk.name)+'</span>':'')+'</span>'+
-      '<span class="val">'+(r.best_height|0)+'m</span>'+
-      '<span class="val" style="color:#ff9a3c">🌋 '+(r.lava_best|0)+'s</span>';
-    boardListEl.appendChild(row);
-  });
-  if(!sbUser)boardMsgEl.textContent='Melde dich an, um in der Rangliste zu erscheinen.';
-  else if(myRank)boardMsgEl.textContent='Dein Platz: #'+myRank+' · '+highScore+'m · 🌋 '+lavaBest+'s';
-  else boardMsgEl.textContent='Du bist noch nicht in den Top 50 – weiter springen!';
+  boardData=data||[];
+  renderBoard();
 }
 document.getElementById('menuBoard').onclick=()=>openBoard();
 document.getElementById('boardClose').onclick=()=>closeBoard();
 document.getElementById('boardRefresh').onclick=()=>loadBoard();
+document.getElementById('lbTabNormal').onclick=()=>{boardMode='normal';renderBoard();};
+document.getElementById('lbTabLava').onclick=()=>{boardMode='lava';renderBoard();};
+
 
 // ================= 1v1 DUELL v2 (Link/Code, Realtime, Countdown, Revanche) =================
 const duelEl=document.getElementById('duel');
