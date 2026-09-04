@@ -7456,6 +7456,34 @@ window.__afro={ed,duel,mapRun,duelBeginBuild,startMapRun,exitToEditor,
   }
 })();
 </script>
-<script src="/afro-fix.js?v=3"></script>
+<script>
+(function(){
+  function niceName(){
+    try{
+      var email=sbUser&&sbUser.email;
+      if(email&&String(email).toLowerCase()==='wilkoppierre@gmail.com')return 'Moodey';
+      var p=sbProfile&&sbProfile.display_name;
+      var meta=sbUser&&sbUser.user_metadata&&sbUser.user_metadata.display_name;
+      if(p&&String(p).indexOf('@')<0)return String(p).slice(0,20);
+      if(meta&&String(meta).indexOf('@')<0)return String(meta).slice(0,20);
+    }catch(e){}
+    return 'Spieler';
+  }
+  boardName=function(){return niceName();};
+  if(typeof myDuelName==='function')myDuelName=function(){return niceName();};
+  var _r=refreshAccountUI;
+  refreshAccountUI=function(){
+    try{if(sbUser){sbProfile=sbProfile||{};sbProfile.display_name=niceName();}}catch(e){}
+    return _r.apply(this,arguments);
+  };
+  var _p=pushCloudSave;
+  pushCloudSave=function(n){
+    if(!n||String(n).indexOf('@')>=0)n=niceName();
+    if(sbProfile)sbProfile.display_name=n;
+    return _p.call(this,n);
+  };
+  try{refreshAccountUI();}catch(e){}
+})();
+</script>
 </body>
 </html>
