@@ -6688,13 +6688,10 @@ let boardMode='normal', boardData=null;
 function lbFaceStyle(skinId){
   const sk=SKINS.find(s=>s.id===skinId);
   if(!sk||!sk.img)return '';
-  const url="url('/"+sk.img+"')";
-  if(typeof SHEET_SKINS!=='undefined'&&SHEET_SKINS.indexOf(sk.id)>=0){
-    // 4x2 Sheet (Zelle 96x128) -> Kopf der ersten Zelle zeigen
-    return 'background-image:'+url+';background-size:256px 171px;background-position:-16px -1px;';
-  }
-  return 'background-image:'+url+';background-size:cover;background-position:top center;';
+  // Kopf-Portrait: oberes Quadrat des Skin-Bildes zeigen
+  return "background-image:url('/"+sk.img+"');background-size:cover;background-position:top center;";
 }
+
 function renderBoard(){
   const lava0=boardMode==='lava';
   const data=(boardData||[]).slice().sort((a,b)=>lava0?((b.lava_best|0)-(a.lava_best|0)):((b.best_height|0)-(a.best_height|0)));
