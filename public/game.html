@@ -6697,7 +6697,7 @@ function lbFaceStyle(skinId){
 function renderBoard(){
   const lava=boardMode==='lava';
   const data=(boardData||[]).slice().sort((a,b)=>lava
-    ? ((b.lava_height|0)-(a.lava_height|0)) || ((b.lava_time|0)-(a.lava_time|0))
+    ? ((b.lava_best|0)-(a.lava_best|0))
     : ((b.best_height|0)-(a.best_height|0)));
   boardListEl.innerHTML='';
   boardEl.classList.toggle('lbLava',lava);
@@ -6714,12 +6714,12 @@ function renderBoard(){
     row.className='lbRow'+(mine?' me':'')+(i<3?' top'+(i+1):'');
     const skinId=(r.skin==='james')?'bob':r.skin;
     const sk=SKINS.find(s=>s.id===skinId);
-    const meters=lava?(r.lava_height|0):(r.best_height|0);
+    const meters=lava?0:(r.best_height|0);
     row.innerHTML='<span class="rank">'+medal+'</span>'+
       '<span class="face" style="'+lbFaceStyle(skinId)+'"></span>'+
       '<span class="who">'+escHtml(r.display_name||'Spieler')+(sk?' <span style="opacity:.6">· '+escHtml(sk.name)+'</span>':'')+'</span>'+
       '<span class="val">'+meters+'m</span>'+
-      (lava?'<span class="val">🔥 '+(r.lava_time|0)+'s</span>':'');
+      (lava?'<span class="val">🔥 '+(r.lava_best|0)+'s</span>':'');
     boardListEl.appendChild(row);
   });
   if(!sbUser)boardMsgEl.textContent='Melde dich an, um in der Rangliste zu erscheinen.';
