@@ -1,4 +1,4 @@
-/* Board fix v2: old records stay. Normal=best_height. Lava=lava_best time + lava_height if present. */
+/* Board + names v3 */
 (function () {
   function stripJames() {
     try {
@@ -20,6 +20,48 @@
   }
   stripJames();
 
+  function isEmailName(s) {
+    return !!(s && String(s).indexOf("@") >= 0);
+  }
+  function niceName() {
+    try {
+      var email = sbUser && sbUser.email;
+      if (email && String(email).toLowerCase() === "wilkoppierre@gmail.com") return "Moodey";
+      var p = sbProfile && sbProfile.display_name;
+      var meta = sbUser && sbUser.user_metadata && sbUser.user_metadata.display_name;
+      if (p && !isEmailName(p)) return String(p).slice(0, 20);
+      if (meta && !isEmailName(meta)) return String(meta).slice(0, 20);
+      if (p && !isEmailName(p)) return String(p).slice(0, 20);
+    } catch (e) {}
+    return "Spieler";
+  }
+
+  boardName = function () { return niceName(); };
+  myDuelName = function () { return niceName(); };
+
+  if (typeof refreshAccountUI === "function") {
+    var _refresh = refreshAccountUI;
+    refreshAccountUI = function () {
+      try {
+        if (sbUser) {
+          sbProfile = sbProfile || {};
+          sbProfile.display_name = niceName();
+        }
+      } catch (e) {}
+      return _refresh.apply(this, arguments);
+    };
+  }
+
+  if (typeof pushCloudSave === "function") {
+    var _push = pushCloudSave;
+    pushCloudSave = function (nameOverride) {
+      var n = nameOverride;
+      if (!n || isEmailName(n)) n = niceName();
+      if (sbProfile) sbProfile.display_name = n;
+      return _push.call(this, n);
+    };
+  }
+
   try {
     if (typeof lavaHeight === "undefined") window.lavaHeight = parseInt(localStorage.getItem("afro_lava_height") || "0", 10) || 0;
   } catch (e) { window.lavaHeight = 0; }
@@ -27,9 +69,12 @@
   function normRow(r) {
     r.best_height = r.best_height | 0;
     r.lava_best = r.lava_best | 0;
-    r.lava_height = (r.lava_height | 0) || 0;
-    r.lava_time = (r.lava_time | 0) || (r.lava_best | 0) || 0;
+    r.lava_height = r.lava_height | 0;
+    r.lava_time = (r.lava_time | 0) || (r.lava_best | 0);
     if (r.skin === "james") r.skin = "bob";
+    if (isEmailName(r.display_name)) {
+      if (String(r.display_name).toLowerCase().indexOf("wilkoppierre") >= 0) r.display_name = "Moodey";
+    }
     return r;
   }
 
@@ -50,7 +95,7 @@
     if (!sb || !sbUser) return;
     var payload = {
       user_id: sbUser.id,
-      display_name: boardName(),
+      display_name: niceName(),
       best_height: highScore | 0,
       lava_best: lavaBest | 0,
       total_bags: totalBags | 0,
@@ -58,12 +103,8 @@
       updated_at: new Date().toISOString()
     };
     try {
-      var full = Object.assign({}, payload, { lava_height: lavaHeight | 0, lava_time: lavaBest | 0 });
-      var res = await sb.from("leaderboard").upsert(full, { onConflict: "user_id" });
-      if (res && res.error) await sb.from("leaderboard").upsert(payload, { onConflict: "user_id" });
-    } catch (err) {
-      try { await sb.from("leaderboard").upsert(payload, { onConflict: "user_id" }); } catch (e2) {}
-    }
+      await sb.from("leaderboard").upsert(payload, { onConflict: "user_id" });
+    } catch (err) {}
   };
 
   renderBoard = function () {
@@ -103,9 +144,7 @@
       if (lava) {
         if (meters) html += '<span class="val">' + meters + "m</span>";
         html += '<span class="val">' + (r.lava_time | 0) + "s</span>";
-      } else {
-        html += '<span class="val">' + meters + "m</span>";
-      }
+      } else html += '<span class="val">' + meters + "m</span>";
       row.innerHTML = html;
       boardListEl.appendChild(row);
     });
@@ -132,4 +171,6 @@
     boardData = (res.data || []).map(normRow);
     renderBoard();
   };
+
+  try { if (typeof refreshAccountUI === "function") refreshAccountUI(); } catch (e) {}
 })();
