@@ -6733,7 +6733,7 @@ async function loadBoard(){
   if(!sb){boardMsgEl.textContent='Rangliste offline nicht verfügbar.';return;}
   await submitScore();
   const {data,error}=await sb.from('leaderboard')
-    .select('user_id,display_name,best_height,lava_best,lava_height,lava_time,total_bags,skin')
+    .select('user_id,display_name,best_height,lava_best,total_bags,skin')
     .order('best_height',{ascending:false}).limit(50);
   if(error){boardMsgEl.textContent='Fehler beim Laden der Rangliste.';return;}
   boardData=data||[];
