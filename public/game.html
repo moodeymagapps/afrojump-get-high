@@ -2271,13 +2271,10 @@ const duel={active:false,code:null,seed:null,role:null,channel:null,ready:false,
   oppOffline:false,lastSeen:0};
 let shake={t:0,mag:0},timeScale=1,deathT=0,bossIndex=0;
 let killCombo=0,comboT=0,runKills=0;
-const BOSS_TYPES=['budboss','kingblunt','drgreenthumb','theplug','giantblunt','mutantbush'];
+const BOSS_TYPES=[]; // wird von registerBosses() mit dem aktuellen Roster gefüllt
 // Bild-Bosse (Pixel-Art) – Namen + Untertitel wie auf den Artworks
-const BOSS_IMAGES={
-  budboss:{src:'/__l5e/assets-v1/23cd3ead-a14b-4f58-a46e-ff04ea7ee915/budboss.png',bg:'white',name:'BUD BOSS',sub:'Der Lord der Blüten'},
-  kingblunt:{src:'/bosses/kingblunt.png',bg:null,name:'KING BLUNT',sub:'Der gekrönte Joint'}
-};
-const BOSS_NAMES={budboss:'BUD BOSS',kingblunt:'KING BLUNT',drgreenthumb:'DR. GREENTHUMB',theplug:'THE PLUG',giantblunt:'GIANT BLUNT',mutantbush:'MUTANT BUSH'};
+const BOSS_IMAGES={};
+const BOSS_NAMES={};
 const BOSS_SUBS={};
 
 /* =======================================================================
@@ -2643,15 +2640,127 @@ lastcall:{name:'LAST CALL',sub:'Der Himmel macht zu',tint:'#212121',hp:11,speed:
 };
 // Reihenfolge nach Höhe (nach den 6 Alten)
 const BOSS_ORDER=['filtertip','plugjr','bouncerblunt','dripdealer','cloudking','taxmantoke','radiorager','mutantmunch','skyjudge','afdzepp','merzmaschine','weidelwitch','squad161','palphoenix','hashhydra','spacecaddet','bagbaron','borderbird','grasgott','lastcall'];
+/* ===== BOSS-ROSTER 2.0 — alle alten Bosse entfernt, 5 neue rotieren ===== */
+Object.assign(BOSS_SPECS,{
+captainhash:{name:'CAPTAIN HASH',sub:'Joint-Haken · Rauchwand · Fässer',arena:'/arenas/storm.jpg',hp:7,speed:1.0,
+  init(b){b.fog=0;b.fogT=4;b.barrelT=2.6;b.hookT=2.2;},
+  update(b,dt){
+    b.fogT-=dt;b.barrelT-=dt;b.hookT-=dt;
+    if(b.fogT<=0){b.fogT=b.rage?5:7;b.fog=b.rage?2.2:1.6;sfx('tele');}
+    if(b.fog>0)b.fog-=dt;
+    if(b.barrelT<=0){b.barrelT=b.rage?1.6:2.4;
+      const left=Math.random()<0.5;
+      bShot(b,left?-20:W+20,bFloor()-18,(left?1:-1)*(b.rage?7:5),0,{mini:true,barrel:true,w:26,h:26});
+      sfx('shoot');}
+    if(b.hookT<=0){b.hookT=b.rage?1.5:2.4;
+      const dx=Math.max(-3.2,Math.min(3.2,(player.x-b.x)*0.05));
+      bShot(b,b.x,b.y+b.h/2,dx,b.rage?6.2:5,{hook:true,w:14,h:14});}
+  },
+  draw(b,bx,y,bw,bh,t){
+    if(b.fog>0){const a=Math.min(0.72,b.fog*0.5);ctx.save();ctx.globalAlpha=a;ctx.fillStyle='#20242c';ctx.fillRect(0,0,W,H);
+      ctx.globalAlpha=a*0.5;ctx.fillStyle='#4b5566';
+      for(let i=0;i<8;i++)ctx.beginPath(),ctx.arc((i*137+t*40)%W,(i*97+t*17)%H,40+i*6,0,7),ctx.fill();
+      ctx.restore();}
+  }
+},
+madhoney:{name:'MAD HONEY',sub:'Honig klebt · Bienenschwarm',arena:'/arenas/hive.jpg',hp:8,speed:1.25,
+  init(b){b.waveT=2.2;b.gooT=3;b.goo=0;},
+  update(b,dt){
+    b.waveT-=dt;b.gooT-=dt;
+    if(b.gooT<=0){b.gooT=b.rage?4:6;b.goo=b.rage?3:2;pushFloat(b.x,b.y+20,'KLEBRIG!','#ffca28');}
+    if(b.goo>0){b.goo-=dt;player.vx*=0.82;bossMod.grav=1.25;}
+    if(b.waveT<=0){b.waveT=b.rage?1.5:2.4;
+      const n=b.rage?7:5;
+      for(let i=0;i<n;i++)bShot(b,b.x,b.y+b.h/2,(i-(n-1)/2)*1.1,b.rage?4.6:3.6,{bee:true,w:11,h:11,ph:i});
+      sfx('shoot');}
+  },
+  draw(b,bx,y,bw,bh,t){
+    if(b.goo>0){ctx.save();ctx.globalAlpha=0.22;ctx.fillStyle='#ffb300';ctx.fillRect(0,0,W,H);ctx.restore();}
+  }
+},
+icebongyeti:{name:'ICEBONG YETI',sub:'Rutschiger Boden · Eisbrocken',arena:'/arenas/glacier.jpg',hp:9,speed:0.9,
+  init(b){b.iceT=1.8;b.slide=(Math.random()<0.5?-1:1);b.flipT=3;},
+  update(b,dt){
+    b.iceT-=dt;b.flipT-=dt;
+    if(b.flipT<=0){b.flipT=3;b.slide*=-1;}
+    player.vx+=b.slide*(b.rage?0.32:0.2);
+    player.vx=Math.max(-9,Math.min(9,player.vx));
+    if(b.iceT<=0){b.iceT=b.rage?0.7:1.2;
+      const n=b.rage?3:2;
+      for(let i=0;i<n;i++)bShot(b,rand(40,W-40),cameraY+30,0,b.rage?5.4:4.2,{ice:true,w:18,h:18});}
+  },
+  draw(b,bx,y,bw,bh,t){
+    ctx.save();ctx.globalAlpha=0.18;ctx.fillStyle='#7fd8ff';ctx.fillRect(0,H-70,W,70);ctx.restore();
+  }
+},
+radioactiverudy:{name:'RADIOACTIVE RUDY',sub:'Giftpfützen · schräge Schüsse',arena:'/arenas/toxic.jpg',hp:8,speed:1.15,
+  init(b){b.pud=[];b.pudT=1.6;b.shotT=1.5;b.dmgT=0;},
+  update(b,dt){
+    b.pudT-=dt;b.shotT-=dt;b.dmgT-=dt;
+    if(b.pudT<=0){b.pudT=b.rage?1.4:2.2;b.pud.push({x:player.x,y:bFloor()-6,t:b.rage?5:3.5});}
+    for(const q of b.pud)q.t-=dt;
+    b.pud=b.pud.filter(q=>q.t>0);
+    if(b.dmgT<=0)for(const q of b.pud){
+      if(Math.abs(player.x-q.x)<34&&Math.abs(player.y-q.y)<30){b.dmgT=1.4;bHurt();break;}
+    }
+    if(b.shotT<=0){b.shotT=b.rage?0.9:1.5;
+      for(const sgn of [-1,1])bShot(b,b.x,b.y+b.h/2,sgn*(b.rage?3.4:2.4),b.rage?4.8:3.8,{tox:true,w:13,h:13});
+      sfx('shoot');}
+  },
+  draw(b,bx,y,bw,bh,t){
+    ctx.save();
+    for(const q of b.pud){ctx.globalAlpha=Math.min(0.6,q.t*0.3);ctx.fillStyle='#9dff2b';
+      ctx.beginPath();ctx.ellipse(q.x,q.y-cameraY,34,10,0,0,7);ctx.fill();}
+    ctx.restore();
+  }
+},
+discodank:{name:'DISCO DANK',sub:'Flackern · Teleport · Doppelschuss',arena:'/arenas/club.jpg',hp:9,speed:1.4,noShoot:true,
+  init(b){b.tpT=2.4;b.flash=0;b.burstN=0;b.burstT=0;},
+  update(b,dt){
+    b.tpT-=dt;
+    if(b.flash>0)b.flash-=dt;
+    if(b.tpT<=0){b.tpT=b.rage?1.8:2.8;b.flash=0.35;sfx('tele');
+      setTimeout(()=>{if(!boss||boss!==b)return;b.x=rand(70,W-70);b.burstN=2;b.burstT=0.1;},260);}
+    if(b.burstN>0){b.burstT-=dt;
+      if(b.burstT<=0){b.burstT=b.rage?0.16:0.26;b.burstN--;
+        const dx=Math.max(-3.5,Math.min(3.5,(player.x-b.x)*0.045));
+        bShot(b,b.x,b.y+b.h/2,dx,b.rage?7:5.6,{disco:true,w:12,h:12});sfx('shoot');}
+    }
+  },
+  draw(b,bx,y,bw,bh,t){
+    if(b.flash>0){ctx.save();ctx.globalAlpha=0.35*Math.abs(Math.sin(t*40));
+      ctx.fillStyle=['#ff4fd8','#7c4dff','#ffd54f'][Math.floor(t*10)%3];ctx.fillRect(0,0,W,H);ctx.restore();}
+  }
+}
+});
+const BOSS_ROSTER=['captainhash','madhoney','icebongyeti','radioactiverudy','discodank'];
+const BOSS_ARENA={};
 (function registerBosses(){
-  const fallbacks=[BOSS_IMAGES.budboss.src,BOSS_IMAGES.kingblunt.src];
-  BOSS_ORDER.forEach((id,i)=>{
-    const s=BOSS_SPECS[id];if(!s)return;
+  BOSS_TYPES.length=0;
+  for(const k in BOSS_IMAGES)delete BOSS_IMAGES[k];
+  for(const k in BOSS_NAMES)delete BOSS_NAMES[k];
+  BOSS_ROSTER.forEach(id=>{
+    const s=BOSS_SPECS[id];
     BOSS_TYPES.push(id);
-    BOSS_NAMES[id]=s.name;BOSS_SUBS[id]=s.sub;
-    BOSS_IMAGES[id]={src:s.src||fallbacks[i%fallbacks.length],bg:'white',name:s.name,sub:s.sub,tint:s.tint};
+    BOSS_NAMES[id]=s.name;BOSS_SUBS[id]=s.sub;BOSS_ARENA[id]=s.arena;
+    BOSS_IMAGES[id]={src:'/bosses/'+id+'.png',bg:null,name:s.name,sub:s.sub};
   });
 })();
+// Arena-Hintergrund (zugeschnittenes Artwork, füllt die Arena komplett)
+function drawArenaBg(){
+  if(!boss)return;
+  const src=BOSS_ARENA[boss.kind];if(!src)return;
+  const e=loadSkinImage(src,null);
+  if(!e||!e.ready||!e.canvas)return;
+  const c=e.canvas,ar=c.width/c.height,sr=W/H;
+  let sw=c.width,sh=c.height,sx=0,sy=0;
+  if(ar>sr){sw=c.height*sr;sx=(c.width-sw)/2;}
+  else{sh=c.width/sr;sy=(c.height-sh)/2;}
+  ctx.save();ctx.imageSmoothingEnabled=false;
+  ctx.drawImage(c,sx,sy,sw,sh,0,0,W,H);
+  ctx.globalAlpha=0.25;ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
+  ctx.restore();
+}
 // getönte Kopie des Fallback-Artworks, damit sich alle Bosse unterscheiden
 const _bossTintCache={};
 function bossTinted(canvas,tint,key){
@@ -2678,7 +2787,7 @@ function reset(){
   player={x:W/2,y:H-100,vx:0,vy:-14,r:22,facing:1,invincible:0,shootCd:0,alive:true,bossShot:false,squash:1,stretch:1,landedT:0,bossLives:0,hitFlash:0,jetpackT:0,gunT:0};
   if(jperk().shield){player.invincible=jperk().shield;player.invSrc='spawn';}
   platforms=[];collectibles=[];enemies=[];projectiles=[];particles=[];smokeParticles=[];floatTexts=[];
-  cameraY=0;bestY=0;scrollLocked=false;boss=null;nextBossScore=1500;gameOver=false;
+  cameraY=0;bestY=0;scrollLocked=false;boss=null;nextBossScore=1200;gameOver=false;
   runBags=0;shake={t:0,mag:0};timeScale=1;deathT=0;rings=[];trail=[];flash={a:0,c:'255,255,255'};
   skyReset();planeReset();
   killCombo=0;comboT=0;runKills=0;bossIndex=0;
@@ -3254,7 +3363,7 @@ if(!lavaMode&&!boss&&bestY>=nextBossScore){spawnBoss();}
       const reward=40+Math.min(60,bossIndex*10);
       totalBags+=reward;localStorage.setItem(BK,totalBags);updateBagsUI();
       pushFloat(boss.x,boss.y+20,'+'+reward+' 🌿','#7cfc00');sfx('bossdie');
-      boss=null;scrollLocked=false;nextBossScore+=1800;bestY+=100;player.vy=-14;
+      boss=null;scrollLocked=false;nextBossScore=bestY+1200;bestY+=100;player.vy=-14;
       bossModReset();
       player.bossLives=0;stopBossMusic();tryPlayMusic();
       // übrige Boss-Kugeln entfernen (sonst treffen sie einen nach dem Sieg)
@@ -6005,7 +6114,8 @@ function render(){
     ctx.translate(Math.sin(tt*47)*s,Math.cos(tt*61)*s*0.7);
   }
   drawBg();
-  {const nowD=performance.now();const dtD=Math.min(0.05,(nowD-(window.__decoT||nowD))/1000);window.__decoT=nowD;
+  if(boss)drawArenaBg();
+  else {const nowD=performance.now();const dtD=Math.min(0.05,(nowD-(window.__decoT||nowD))/1000);window.__decoT=nowD;
    drawSkyProps(dtD);drawPlanes(dtD);}
   for(const z of zones)drawZone(z);
   if(bossMod.platAlpha<1){ctx.save();ctx.globalAlpha=bossMod.platAlpha;for(const p of platforms)drawPlatform(p);ctx.restore();}
