@@ -3065,22 +3065,29 @@ function spawnBoss(){
   }
   scrollLocked=true;
 
-  // --- Boss arena: clear everything above the boss so the player can never
-  // get stuck on a platform out of reach and build a fair fighting floor ---
-  const arenaTop=boss.y+boss.h/2+70;
-  platforms=platforms.filter(p=>p.y>arenaTop);
-  collectibles=collectibles.filter(c=>c.y>arenaTop);
-  enemies=enemies.filter(e=>e.boss||!e.plat||e.plat.y>arenaTop);
-  const floorY=cameraY+H-80;
-  // fairere Arena: mehr Standflächen, gleichmäßige Sprungabstände bis zum Boss
-  const arena=[[30,floorY],[W/2-40,floorY-70],[W-110,floorY-30],[20,floorY-130],[W/2-40,floorY-195],[W-105,floorY-160],[35,floorY-250],[W-115,floorY-290]];
+  // --- Boss-Arena: geschlossener Raum. Boden unten, ein paar Plattformen,
+  // Spieler unten, Boss oben – er kommt zu DIR runter. ---
+  const arenaTop=cameraY+40;
+  platforms=platforms.filter(p=>false);
+  collectibles=collectibles.filter(c=>false);
+  enemies=enemies.filter(e=>e.boss);
+  const floorY=cameraY+H-46;
+  boss.floorY=floorY;
+  boss.arenaTop=arenaTop;
+  // durchgehender Boden, damit man nie runterfällt
+  platforms.push({x:-20,y:floorY,w:W+40,h:14,vx:0,type:'normal',dir:1,range:0,ox:-20,bounce:0,cracked:0,springT:0,arenaFloor:true});
+  const arena=[[W*0.10-45,floorY-105],[W*0.50-45,floorY-165],[W*0.86-45,floorY-105],[W*0.28-45,floorY-250],[W*0.72-45,floorY-250]];
   for(const [ax,ay] of arena){
-    platforms.push({x:ax,y:ay,w:86,h:12,vx:0,type:'normal',dir:1,range:0,ox:ax,bounce:0,cracked:0,springT:0});
+    platforms.push({x:ax,y:ay,w:90,h:12,vx:0,type:'normal',dir:1,range:0,ox:ax,bounce:0,cracked:0,springT:0});
   }
   platforms.sort((a,b)=>b.y-a.y);
+  // Spieler unten in der Arena, Boss oben daneben
+  player.x=W*0.5;player.y=floorY-46;player.vx=0;player.vy=-6;
+  boss.x=W*0.68;boss.y=cameraY+120;
+  boss.yTarget=cameraY+120;
+  boss.descend=0;
   player.bossLives=3;player.invincible=Math.max(player.invincible,1.2);
   player.invSrc='spawn';
-  if(player.y<arenaTop){player.y=arenaTop+60;player.vy=2;}
   const nm=(BOSS_NAMES[kind]||'BOSS');
   pushFloat(W/2,cameraY+150,nm,'#ffdd00');
   if(BOSS_SUBS[kind])pushFloat(W/2,cameraY+172,BOSS_SUBS[kind],'#ffe082');
@@ -3090,7 +3097,8 @@ function spawnBoss(){
   // Musik komplett aus im Bossfight – nur Sounds
   stopMusic();startBossMusic(kind);sfx('boss');
   // eine Waffe zum Start, damit man sofort was tun kann
-  collectibles.push({x:W/2,y:cameraY+H-140,type:'gun',t:0,taken:false});
+  collectibles.push({x:W/2,y:floorY-200,type:'gun',t:0,taken:false});
+
 }
 
 
