@@ -3168,6 +3168,11 @@ function update(dt){
   }
   if(player.gunT>0)player.gunT-=dt;
   player.y+=player.vy;
+  // Im Bossfight: Decke – man springt nie aus dem Bild und sieht sich immer
+  if(boss&&scrollLocked){
+    const cTop=(boss.arenaTop==null?cameraY+40:boss.arenaTop)+player.r+4;
+    if(player.y<cTop){player.y=cTop;if(player.vy<0)player.vy=0.5;}
+  }
 
   // squash/stretch — stretch when rising fast, squash briefly after landing
   const vyN=Math.max(-16,Math.min(16,player.vy));
