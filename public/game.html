@@ -195,6 +195,12 @@
   .boxCard button:disabled{background:#4a1414;color:#c99;cursor:not-allowed;box-shadow:inset -2px -2px 0 #200, inset 2px 2px 0 #7a2a2a;}
   #openBox{background:linear-gradient(rgba(6,4,12,.96),rgba(6,4,12,.99));}
   #openBox canvas{background:transparent;box-shadow:none;image-rendering:pixelated;}
+  #boxStage{position:relative;width:300px;height:300px;}
+  #boxStage canvas,#boxStage video{position:absolute;left:0;top:0;width:300px;height:300px;}
+  #boxStage video{object-fit:contain;image-rendering:pixelated;display:none;background:transparent;mix-blend-mode:screen;
+    filter:drop-shadow(0 0 12px var(--bagGlow,rgba(124,252,0,.55)));}
+  #boxStage video.show{display:block;}
+
   #boxLabel{font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:11px;letter-spacing:1px;min-height:20px;text-align:center;text-shadow:2px 2px 0 #000;}
   #boxSub{font-family:'VT323','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:18px;letter-spacing:1px;min-height:22px;opacity:.9;}
   #duelJoinRow{display:flex;gap:6px;width:100%;max-width:340px;margin:6px 0;}
@@ -720,8 +726,28 @@
     box-shadow:inset -3px -3px 0 #05040a, inset 3px 3px 0 rgba(124,252,0,.5), 0 3px 0 rgba(0,0,0,.6);}
   #menu .mChips p#menuBags{color:#ffd766;box-shadow:inset -3px -3px 0 #05040a, inset 3px 3px 0 rgba(255,213,74,.5), 0 3px 0 rgba(0,0,0,.6);}
   #menu #menuPlay{width:100%;min-width:0;margin:2px 0 0;}
-  #menu #menuLava{width:100%;min-width:0;margin:6px 0 0;}
-  #menu #menuLava img{filter:drop-shadow(0 4px 0 rgba(0,0,0,.55)) drop-shadow(0 0 10px rgba(255,80,0,.45));}
+  #menu .mGrid #menuLava{width:100%;min-width:0;margin:0;}
+  #menu #menuLava img{width:100%;height:auto;aspect-ratio:759/172;object-fit:contain;
+    filter:drop-shadow(0 4px 0 rgba(0,0,0,.55)) drop-shadow(0 0 10px rgba(255,80,0,.45));}
+  #menu #menuLava.lavaFallback{width:100%;padding:14px 0;font-family:'Press Start 2P',monospace;font-size:12px;
+    color:#ff9a3c;background:linear-gradient(#5c1800,#2a0800)!important;border:none;
+    box-shadow:inset -3px -3px 0 #1a0400,inset 3px 3px 0 #ff6a00,0 4px 0 #000;}
+  /* News-Streifen unter dem Logo */
+  .newsBar{position:relative;width:100%;max-width:340px;padding:8px 10px;overflow:hidden;
+    background:linear-gradient(90deg,rgba(10,26,10,.9),rgba(18,44,14,.92),rgba(10,26,10,.9));
+    box-shadow:inset -3px -3px 0 #05040a, inset 3px 3px 0 rgba(124,252,0,.45), 0 3px 0 rgba(0,0,0,.6);
+    animation:newsIn .42s cubic-bezier(.2,1.4,.4,1) both;}
+  .newsBar::after{content:'';position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(100deg,transparent 35%,rgba(255,255,255,.28) 50%,transparent 65%);
+    transform:translateX(-120%);animation:newsShine .9s ease-out .45s 1 both;}
+  .newsText{display:block;font-family:'Press Start 2P',monospace;font-size:8px;letter-spacing:1px;
+    line-height:1.6;color:#dfffc4;text-align:center;text-shadow:0 0 8px rgba(124,252,0,.55);
+    animation:newsText .5s ease-out .18s both;}
+  .newsText b{color:#ffd766;}
+  @keyframes newsIn{0%{opacity:0;transform:translateY(-14px) scaleY(.4)}100%{opacity:1;transform:none}}
+  @keyframes newsText{0%{opacity:0;filter:brightness(2.4)}55%{opacity:1;filter:brightness(1.9)}100%{opacity:1;filter:brightness(1)}}
+  @keyframes newsShine{0%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
+
   #menu .mGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:100%;}
   #menu .mUtil{display:grid;grid-template-columns:1fr;gap:9px;width:100%;}
   #menu .btn.sm.tiny{padding:10px 8px;font-size:7.5px;opacity:.92;}
@@ -879,15 +905,16 @@
     <div class="mWrap">
       <img class="logoImg" src="/__l5e/assets-v1/69274bbc-7857-4d3d-a4d3-4747a688e509/afro-jump-logo.png" alt="Afro Jump">
       <div class="tag">JUMP HIGH.</div>
+      <div id="newsBar" class="newsBar"><span id="newsText" class="newsText"></span></div>
+
       <div class="mChips">
         <p id="menuHigh">Best: 0m</p>
         <p id="menuBags">🌿 0 Baggys</p>
       </div>
       <button class="mSprite" id="menuPlay" aria-label="Spielen"><img src="/__l5e/assets-v1/f129af28-20bc-401f-9272-47b3328d0bee/ui_m_play.png" alt="Spielen"></button>
-      <button class="mSprite" id="menuLava" aria-label="Lava-Modus"><img src="/lava/lava_btn.png" alt="LAVA" onerror="this.style.display='none';this.parentNode.innerHTML='🌋 LAVA';this.parentNode.style.cssText='width:100%;padding:14px 0;font-family:Press Start 2P,monospace;font-size:14px;color:#ff9a3c;background:linear-gradient(#5c1800,#2a0800);border:none;box-shadow:inset -3px -3px 0 #1a0400,inset 3px 3px 0 #ff6a00,0 4px 0 #000;clip-path:polygon(0 6px,6px 6px,6px 0,calc(100% - 6px) 0,calc(100% - 6px) 6px,100% 6px,100% calc(100% - 6px),calc(100% - 6px) calc(100% - 6px),calc(100% - 6px) 100%,6px 100%,6px calc(100% - 6px),0 calc(100% - 6px));'"></button>
       <div class="mGrid">
         <button class="mSprite" id="menuShop" aria-label="Shop"><img src="/__l5e/assets-v1/49c2f7d3-9b6a-4193-8c19-e70c682da4c9/ui_m_shop.png" alt="Shop"></button>
-        <button class="mSprite" id="menuDaily" aria-label="Täglich &amp; Aufgaben"><img src="/__l5e/assets-v1/a06ac07c-36c8-46a2-a1d9-d1d82b334d44/ui_m_daily.png" alt="Täglich und Aufgaben"></button>
+      <button class="mSprite" id="menuLava" aria-label="Lava-Modus"><img src="/lava_btn.png" alt="LAVA" onerror="this.style.display='none';this.parentNode.innerHTML='🌋 LAVA';this.parentNode.classList.add('lavaFallback');"></button>
         <button class="mSprite" id="menuBoard" aria-label="Rangliste"><img src="/__l5e/assets-v1/0cfba60d-e3c2-4cf3-b135-d5e650702f1b/ui_m_rank.png" alt="Rangliste"></button>
         <button class="mSprite" id="menuDuel" aria-label="Map-Duell 1v1"><img src="/__l5e/assets-v1/b33b6766-031d-476c-9487-6d9231c16455/ui_m_duel.png" alt="Map-Duell"></button>
         <button class="mSprite" id="menuAccount" aria-label="Account"><img src="/__l5e/assets-v1/2abdab3f-85d9-4914-80a8-367794f6318c/ui_m_account.png" alt="Account"></button>
@@ -921,7 +948,11 @@
   </div>
   <div id="openBox" class="overlay">
     <div id="boxLabel">TÜTCHEN ÖFFNEN…</div>
-    <canvas id="boxCanvas" width="300" height="300"></canvas>
+    <div id="boxStage">
+      <video id="boxVideo" muted playsinline preload="auto" disablepictureinpicture></video>
+      <canvas id="boxCanvas" width="300" height="300"></canvas>
+    </div>
+
     <div id="boxSub"></div>
     <button class="btn" id="boxAgain" style="display:none;">🎒 Nochmal öffnen</button>
     <button class="btn ghost" id="boxDone" style="display:none;">✓ Weiter</button>
@@ -1649,7 +1680,7 @@ function pauseGame(){if(gameState!=='playing')return;gameState='paused';showOver
 function resumeGame(){if(gameState!=='paused')return;gameState='playing';showOverlay('playing');last=performance.now();if(boss)startBossMusic(boss.kind);else tryPlayMusic();}
 function openShop(from){shopReturn=from;carTouched.skins=carTouched.weapons=carTouched.joints=false;gameState='shop';renderShop();updateBagsUI();showOverlay('shop');}
 function closeShop(){
-  if(typeof openBoxEl!=='undefined'&&openBoxEl){openBoxEl.style.display='none';boxAnim=null;}
+  if(typeof openBoxEl!=='undefined'&&openBoxEl){openBoxEl.style.display='none';boxAnim=null;try{hideBaggyVideo();}catch(e){}}
   if(shopReturn==='paused'){gameState='paused';showOverlay('paused');}
   else if(shopReturn==='gameover'){gameState='gameover';showOverlay('gameover');}
   else goMenu();
@@ -1993,6 +2024,31 @@ const boxSub=document.getElementById('boxSub');
 const boxAgain=document.getElementById('boxAgain');
 const boxDone=document.getElementById('boxDone');
 let boxAnim=null,boxLoopRunning=false;
+// Baggy-Öffnungsvideos je Seltenheit (einmalig, kein Loop)
+const boxVideo=document.getElementById('boxVideo');
+const BAGGY_VIDS={
+  common:{src:'/__l5e/assets-v1/ecdae892-1535-42bb-bcc0-5e1bf5a3598d/baggy_common.mp4',webm:'/__l5e/assets-v1/bc630d56-a978-4c03-93ab-d6a5ead1ad5c/baggy_common.webm',glow:'rgba(124,252,0,.55)',parts:16,spread:110},
+  rare:{src:'/__l5e/assets-v1/a5c6b8cd-0928-4289-bd10-3125939e0718/baggy_rare.mp4',webm:'/__l5e/assets-v1/8b7f294d-cae9-4e6d-a3f6-40bbfe463340/baggy_rare.webm',glow:'rgba(120,140,255,.65)',parts:44,spread:190},
+  epic:{src:'/__l5e/assets-v1/a5c6b8cd-0928-4289-bd10-3125939e0718/baggy_rare.mp4',webm:'/__l5e/assets-v1/8b7f294d-cae9-4e6d-a3f6-40bbfe463340/baggy_rare.webm',glow:'rgba(186,104,200,.7)',parts:60,spread:210},
+  legendary:{src:'/__l5e/assets-v1/c2958506-c249-45d4-a7d7-88f32f39d7fc/baggy_legendary.mp4',webm:'/__l5e/assets-v1/09df3fc1-d225-4f53-bad0-9c20a5a2d140/baggy_legendary.webm',glow:'rgba(255,213,74,.8)',parts:110,spread:300}
+};
+const BAGGY_VID_RATE=3.2; // 6s Clip passt so genau bis zum Reveal
+const canMp4=(function(){try{const v=document.createElement('video');return !!v.canPlayType('video/mp4; codecs="avc1.42E01E"');}catch(e){return false;}})();
+function playBaggyVideo(rarity){
+  const cfg=BAGGY_VIDS[rarity]||BAGGY_VIDS.common;
+  if(!boxVideo)return cfg;
+  try{
+    boxVideo.style.setProperty('--bagGlow',cfg.glow);
+    const url=canMp4?cfg.src:(cfg.webm||cfg.src);
+    if(boxVideo.dataset.rar!==rarity){boxVideo.dataset.rar=rarity;boxVideo.src=url;}
+    boxVideo.onerror=()=>hideBaggyVideo();
+    boxVideo.loop=false;boxVideo.currentTime=0;boxVideo.playbackRate=BAGGY_VID_RATE;
+    boxVideo.classList.add('show');
+    const pr=boxVideo.play();if(pr&&pr.catch)pr.catch(()=>hideBaggyVideo());
+  }catch(e){}
+  return cfg;
+}
+function hideBaggyVideo(){ if(!boxVideo)return; try{boxVideo.pause();boxVideo.classList.remove('show');}catch(e){} }
 function openLootBox(box){
   if(totalBags<box.price)return;
   totalBags-=box.price;
@@ -2021,8 +2077,9 @@ function startBoxAnim(box,res,sub){
   boxLabel.textContent=box.name+' …';boxLabel.style.color='#fff';
   boxSub.textContent='';
   boxAnim={t:0,box,res,sub,revealed:false,particles:[]};
+  boxAnim.vid=playBaggyVideo(res.rarity);
   boxAgain.onclick=()=>{ if(totalBags<box.price){boxSub.textContent='Nicht genug Baggys!';return;} openLootBox(box); };
-  boxDone.onclick=()=>{boxAnim=null;openBoxEl.style.display='none';renderShop();updateBagsUI();};
+  boxDone.onclick=()=>{boxAnim=null;hideBaggyVideo();openBoxEl.style.display='none';renderShop();updateBagsUI();};
   if(!boxLoopRunning){boxLoopRunning=true;requestAnimationFrame(boxLoop);}
 }
 function boxLoop(ts){
@@ -2033,22 +2090,25 @@ function boxLoop(ts){
   const t=boxAnim.t,a=boxAnim;
   const rar=RARITY[a.res.rarity];
   bctx.clearRect(0,0,300,300);
+  const hasVid=!!(boxVideo&&boxVideo.classList.contains('show')&&boxVideo.readyState>=2&&!boxVideo.paused);
   if(t<1.2){
-    // shake phase
-    const sh=Math.sin(t*40)*(2+t*6);
-    drawBaggy(bctx,150,150,2.2,a.box.bag,0,sh);
+    // Baggy kommt nach vorne (Video) – Fallback: gezeichnetes Tütchen
+    if(!hasVid){const sh=Math.sin(t*40)*(2+t*6);drawBaggy(bctx,150,150,2.2,a.box.bag,0,sh);}
     boxLabel.textContent=a.box.name+' …';
   }else if(t<1.9){
     const p=(t-1.2)/0.7;
-    drawBaggy(bctx,150,150-p*20,2.2,a.box.bag,p,Math.sin(t*30)*2*(1-p));
-    // flash
-    bctx.fillStyle='rgba(255,255,255,'+(p*0.55)+')';bctx.fillRect(0,0,300,300);
+    if(!hasVid){
+      drawBaggy(bctx,150,150-p*20,2.2,a.box.bag,p,Math.sin(t*30)*2*(1-p));
+      bctx.fillStyle='rgba(255,255,255,'+(p*0.55)+')';bctx.fillRect(0,0,300,300);
+    }
     boxLabel.textContent='ÖFFNET…';
   }else{
     if(!a.revealed){
       a.revealed=true;
-      for(let i=0;i<40;i++){
-        const ang=Math.random()*Math.PI*2,sp=40+Math.random()*160;
+      hideBaggyVideo();
+      const vc=a.vid||BAGGY_VIDS.common;
+      for(let i=0;i<vc.parts;i++){
+        const ang=Math.random()*Math.PI*2,sp=40+Math.random()*vc.spread;
         a.particles.push({x:150,y:150,vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp,life:1.2,c:Math.random()<0.5?rar.color:'#ffffff'});
       }
       boxLabel.textContent=rar.name+' – '+a.res.item.name;
@@ -2205,6 +2265,23 @@ document.addEventListener('visibilitychange',()=>{
 });
 document.getElementById('menuPlay').onclick=()=>{playWipe();startGame();};
 document.getElementById('menuLava').onclick=()=>{playWipe();startLavaGame();};
+// ---- News-Streifen im Hauptmenü (Text hier anpassen) ----
+const NEWS_LINES=[
+  'NEUE BOSSE',
+  'NEUER LAVA MODUS',
+  'ARENEN • RANGLISTE • MULTIPLAYER'
+];
+function renderNews(){
+  const bar=document.getElementById('newsBar'),txt=document.getElementById('newsText');
+  if(!bar||!txt)return;
+  const lines=(typeof NEWS_LINES!=='undefined'&&NEWS_LINES.length)?NEWS_LINES:[];
+  if(!lines.length){bar.style.display='none';return;}
+  bar.style.display='block';
+  txt.innerHTML=lines.map((l,i)=>i===0?'<b>'+escHtml(String(l))+'</b>':escHtml(String(l))).join('<br>');
+  bar.classList.remove('go');void bar.offsetWidth;bar.classList.add('go');
+}
+try{renderNews();}catch(e){}
+
 function playWipe(){const w=document.getElementById('wipe');if(!w)return;w.classList.remove('go');void w.offsetWidth;w.classList.add('go');setTimeout(()=>w.classList.remove('go'),400);}
 document.getElementById('menuShop').onclick=()=>openShop('menu');
 document.getElementById('pauseResume').onclick=()=>resumeGame();
@@ -6463,7 +6540,7 @@ const accountEl=document.getElementById('account');
 let questSessionHeight=0;
 
 // Menu extras
-document.getElementById('menuDaily').onclick=()=>openAccount();
+// Tagesbelohnung lebt jetzt nur noch im Account-Menü
 document.getElementById('menuAccount').onclick=()=>openAccount();
 
 // ---- Settings (Helligkeit) ----
