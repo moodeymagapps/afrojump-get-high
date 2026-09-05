@@ -3443,7 +3443,7 @@ if(!lavaMode&&!boss&&bestY>=nextBossScore){spawnBoss();}
         if(spec&&spec.stomp)ok=spec.stomp(boss);
         player.vy=-17;
         if(ok&&!invulnerable&&!(spec&&spec.hit&&spec.hit(boss,1))){
-          boss.hp--;boss.hitT=0.3;burst(player.x,boss.y-boss.h/2,'#ff5252',20);addShake(6,0.25);pushFloat(boss.x,boss.y-boss.h/2,'-1','#ff5252');sfx('stomp');
+          boss.hp--;boss.hitT=0.3;boss.descend=Math.max(0,(boss.descend||0)-110);burst(player.x,boss.y-boss.h/2,'#ff5252',20);addShake(6,0.25);pushFloat(boss.x,boss.y-boss.h/2,'-1','#ff5252');sfx('stomp');
         }else if(!ok){burst(player.x,boss.y-boss.h/2,'#bdbdbd',8);}
       }
       // hit by projectile
