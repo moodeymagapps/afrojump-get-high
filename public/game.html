@@ -2274,20 +2274,28 @@ document.getElementById('menuPlay').onclick=()=>{playWipe();startGame();};
 document.getElementById('menuLava').onclick=()=>{playWipe();startLavaGame();};
 // ---- News-Streifen im Hauptmenü (Text hier anpassen) ----
 const NEWS_LINES=[
-  'NEUE BOSSE',
-  'NEUER LAVA MODUS',
-  'ARENEN • RANGLISTE • MULTIPLAYER'
+  'Neuer Lava Modus!',
+  'Neue Bosse!',
+  'Arenen • Rangliste • 1v1'
 ];
+let newsIdx=0,newsTimer=null;
 function renderNews(){
   const bar=document.getElementById('newsBar'),txt=document.getElementById('newsText');
   if(!bar||!txt)return;
   const lines=(typeof NEWS_LINES!=='undefined'&&NEWS_LINES.length)?NEWS_LINES:[];
   if(!lines.length){bar.style.display='none';return;}
   bar.style.display='block';
-  txt.innerHTML=lines.map((l,i)=>i===0?'<b>'+escHtml(String(l))+'</b>':escHtml(String(l))).join('<br>');
-  bar.classList.remove('go');void bar.offsetWidth;bar.classList.add('go');
+  const show=()=>{
+    txt.innerHTML='<span>'+escHtml(String(lines[newsIdx%lines.length]))+'</span>';
+    newsIdx++;
+  };
+  show();
+  if(newsTimer)clearInterval(newsTimer);
+  if(lines.length>1)newsTimer=setInterval(show,3800);
+  bar.onclick=()=>{playWipe();startLavaGame();};
 }
 try{renderNews();}catch(e){}
+
 
 function playWipe(){const w=document.getElementById('wipe');if(!w)return;w.classList.remove('go');void w.offsetWidth;w.classList.add('go');setTimeout(()=>w.classList.remove('go'),400);}
 document.getElementById('menuShop').onclick=()=>openShop('menu');
