@@ -1910,12 +1910,21 @@ function drawSkinIntoCanvas(g,s,cv){
 }
 function drawSetPreview(g,set,cv){
   const skin=SKINS.find(s=>s.id===set.skin),weapon=WEAPON_SKINS.find(w=>w.id===set.weapon),joint=JOINT_SKINS.find(j=>j.id===set.joint);
+  let attempts=0;
   const paint=()=>{
     g.clearRect(0,0,cv.width,cv.height);g.imageSmoothingEnabled=false;
-    if(skin){const e=loadSkinImage(skin.img,skin.bgKey);if(e.canvas)g.drawImage(e.canvas,0,0,96,128,4,18,96,128);}
+    if(skin){
+      const e=loadSkinImage(skin.img,skin.bgKey);
+      if(e.canvas){
+        const sw=skin.frameW||Math.floor(e.canvas.width/4),sh=skin.frameH||Math.floor(e.canvas.height/2);
+        const sc=Math.min(96/sw,128/sh),dw=Math.round(sw*sc),dh=Math.round(sh*sc);
+        g.drawImage(e.canvas,0,0,sw,sh,4+Math.round((96-dw)/2),18+Math.round((128-dh)/2),dw,dh);
+      }
+    }
     if(weapon){const im=itemImg(weapon.img);if(im)g.drawImage(im,98,10,58,58);}
     if(joint){const im=itemImg(joint.img);if(im)g.drawImage(im,98,88,58,58);}
-    if(cv.isConnected&&(!skin||!loadSkinImage(skin.img,skin.bgKey).canvas||!weapon||!itemImg(weapon.img)||!joint||!itemImg(joint.img)))setTimeout(paint,80);
+    const waiting=skin&&!loadSkinImage(skin.img,skin.bgKey).canvas||weapon&&!itemImg(weapon.img)||joint&&!itemImg(joint.img);
+    if(cv.isConnected&&waiting&&attempts++<75)setTimeout(paint,80);
   };
   paint();
 }
@@ -3740,7 +3749,7 @@ function registerKill(x,y){
   if(killCombo>=2){
     const bonus=Math.min(5,killCombo-1);
     totalBags+=bonus;runBags+=bonus;localStorage.setItem(BK,totalBags);
-    bagsEl.textContent='🌿 '+totalBags;
+    updateBagsUI(true);
     pushFloat(x,y-16,'COMBO x'+killCombo+' +🌿'+bonus,'#ffd54a');
   }else{
     pushFloat(x,y-16,'BUSTED!','#ffcc00');
