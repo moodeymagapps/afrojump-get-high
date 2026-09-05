@@ -1101,7 +1101,7 @@ bgm.volume=0.55;
 function updateMuteUI(){muteBtn.textContent=muted?'🔇':'🔊';muteBtn.classList.toggle('off',!!muted);}
 function tryPlayMusic(){if(!muted){bgm.play().catch(()=>{});}}
 function stopMusic(){try{bgm.pause();}catch(e){}}
-muteBtn.onclick=(e)=>{e.stopPropagation();muted=!muted;localStorage.setItem(MK,muted?'1':'0');updateMuteUI();if(muted){stopMusic();stopBossMusic();}else{if(!boss)tryPlayMusic();}};
+muteBtn.onclick=(e)=>{e.stopPropagation();muted=!muted;localStorage.setItem(MK,muted?'1':'0');updateMuteUI();if(muted){stopMusic();stopBossMusic();}else{if(boss)startBossMusic(boss.kind);else tryPlayMusic();}};
 updateMuteUI();
 // ---------- Boss Music (ein eigener Track pro Boss) ----------
 let audioCtx=null;
@@ -1646,7 +1646,7 @@ function startLavaGame(){
   tryPlayMusic();
 }
 function pauseGame(){if(gameState!=='playing')return;gameState='paused';showOverlay('paused');stopMusic();stopBossMusic();}
-function resumeGame(){if(gameState!=='paused')return;gameState='playing';showOverlay('playing');last=performance.now();if(!boss)tryPlayMusic();}
+function resumeGame(){if(gameState!=='paused')return;gameState='playing';showOverlay('playing');last=performance.now();if(boss)startBossMusic(boss.kind);else tryPlayMusic();}
 function openShop(from){shopReturn=from;carTouched.skins=carTouched.weapons=carTouched.joints=false;gameState='shop';renderShop();updateBagsUI();showOverlay('shop');}
 function closeShop(){
   if(typeof openBoxEl!=='undefined'&&openBoxEl){openBoxEl.style.display='none';boxAnim=null;}
@@ -2949,7 +2949,7 @@ function spawnBoss(){
   if(tier>0)pushFloat(W/2,cameraY+220,'STUFE '+(tier+1),'#ffab40');
 
   // Musik komplett aus im Bossfight – nur Sounds
-  stopMusic();stopBossMusic();sfx('boss');
+  stopMusic();startBossMusic(kind);sfx('boss');
   // eine Waffe zum Start, damit man sofort was tun kann
   collectibles.push({x:W/2,y:cameraY+H-140,type:'gun',t:0,taken:false});
 }
@@ -3529,7 +3529,7 @@ function die(){
     finalBags.textContent='Gesammelt: 🌿 '+runBags+' (Total: '+totalBags+')';
   }
   persistShop();
-  stopBossMusic();
+  stopBossMusic();tryPlayMusic();
   updateBagsUI();
   missionProgress('runs',1);
   missionProgress('height',bestY);
