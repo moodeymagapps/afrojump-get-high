@@ -3400,9 +3400,21 @@ if(!lavaMode&&!boss&&bestY>=nextBossScore){spawnBoss();}
       if(boss.x>W-60){boss.x=W-60;boss.vx*=-1;}
     }
     boss.bob+=dt;
-    if(!boss.noFloat)boss.y=cameraY+150+Math.sin(boss.bob*(boss.rage?2.6:1.6))*14;
+    const aTop=(boss.arenaTop==null?cameraY+40:boss.arenaTop);
+    const aFloor=(boss.floorY==null?cameraY+H-46:boss.floorY);
+    if(!boss.noFloat){
+      // Boss startet oben und sinkt langsam zum Spieler herab
+      const highY=aTop+boss.h/2+16;
+      const lowY=aFloor-boss.h/2-64;
+      boss.descend=Math.min(lowY-highY,(boss.descend||0)+dt*(boss.rage?34:22));
+      const ty=highY+boss.descend+Math.sin(boss.bob*(boss.rage?2.6:1.6))*10;
+      boss.y+=(ty-boss.y)*Math.min(1,dt*4);
+      // sanft dem Spieler folgen, damit man ihn treffen kann
+      boss.x+=Math.max(-1.1,Math.min(1.1,(player.x-boss.x)*0.012))*(boss.rage?1.4:1);
+    }
     // Boss bleibt IMMER im Bild (nie durch den Boden, nie aus der Arena)
-    boss.y=Math.max(cameraY+70,Math.min(cameraY+H*0.55,boss.y));
+    boss.y=Math.max(aTop+boss.h/2,Math.min(aFloor-boss.h/2-30,boss.y));
+
     boss.x=Math.max(50,Math.min(W-50,boss.x));
     boss.hitT-=dt;
     boss.phase+=dt;
