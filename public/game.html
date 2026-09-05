@@ -1312,6 +1312,18 @@ const WEAPON_SKINS=[
   {id:'w_void',     name:'Void-Kanone',      rarity:'mythic',   img:'weapons/blaster_void.png',  shape:'smoke', core:'#f3e5f5',ring:'#d500f9',perk:{blast:1,pierce:1,cd:0.55,gun:2},    ability:'Void-Explosionen mit Durchschlag'},
   {id:'w_spectral', name:'Spektral-Shuriken',rarity:'mythic',   img:'weapons/star_spectral.png', shape:'bud',   core:'#ffffff',ring:'#ff4081',perk:{spread:1,pierce:1,speed:1.6,cd:0.6},ability:'Dreifach-Streuung mit Durchschlag'},
   {id:'w_nova',     name:'Supernova-Stern',  rarity:'mythic',   img:'weapons/star_nova.png',     shape:'flame', core:'#fffde7',ring:'#ffab00',perk:{blast:1,spread:1,speed:1.4,gun:3},  ability:'Explosive Streuung, +3s Waffenzeit'},
+  // ---- MYTHIC Legenden-Arsenal (nur Loot) ----
+  {id:'w_kushcannon',  name:'Kush-Kanone',      rarity:'mythic', img:'weapons/kushcannon.png',  shape:'bud',   core:'#dcedc8',ring:'#33691e',perk:{blast:1,cd:0.5,gun:2},           ability:'Bud-Granaten mit Flächenschaden'},
+  {id:'w_gatling',     name:'Ganja-Gatling',    rarity:'mythic', img:'weapons/gatling.png',     shape:'bullet',core:'#fff9c4',ring:'#827717',perk:{cd:0.3,speed:1.3},              ability:'Extremes Dauerfeuer'},
+  {id:'w_dabrig',      name:'Dab-Rig-Blaster',  rarity:'mythic', img:'weapons/dabrig.png',      shape:'flame', core:'#ffe082',ring:'#ff6d00',perk:{blast:1,pierce:1,cd:0.6},        ability:'Heiße Dab-Explosionen'},
+  {id:'w_budsniper',   name:'Bud-Sniper',       rarity:'mythic', img:'weapons/budsniper.png',   shape:'laser', core:'#ffffff',ring:'#00e676',perk:{pierce:1,speed:2,cd:0.75},       ability:'Präzisionsschuss durch alles'},
+  {id:'w_jointlauncher',name:'Joint-Launcher',  rarity:'mythic', img:'weapons/jointlauncher.png',shape:'smoke',core:'#f5f5f5',ring:'#8d6e63',perk:{blast:1,spread:1,cd:0.65},       ability:'Doppelte Rauch-Granaten'},
+  {id:'w_mightyspliff',name:'Mighty Spliff',    rarity:'mythic', img:'weapons/mightyspliff.png',shape:'smoke', core:'#fff8e1',ring:'#ff8a00',perk:{cd:0.45,gun:4},                 ability:'+4s Waffenzeit, schneller Takt'},
+  {id:'w_gravitybong', name:'Gravity-Bong',     rarity:'mythic', img:'weapons/gravitybong.png', shape:'bubble',core:'#e0f7fa',ring:'#00b8d4',perk:{blast:1,speed:1.4,cd:0.55},      ability:'Druckwellen-Schuss'},
+  {id:'w_hashthrower', name:'Hashish-Werfer',   rarity:'mythic', img:'weapons/hashthrower.png', shape:'bomb',  core:'#d7ccc8',ring:'#4e342e',perk:{blast:1,pierce:1,gun:2},         ability:'Hash-Bomben mit Durchschlag'},
+  {id:'w_vaporrifle',  name:'Vapor-Rifle',      rarity:'mythic', img:'weapons/vaporrifle.png',  shape:'laser', core:'#e1f5fe',ring:'#2979ff',perk:{cd:0.4,pierce:1,speed:1.7},      ability:'Vapor-Strahl im Dauerfeuer'},
+  {id:'w_roachbow',    name:'Roach-Armbrust',   rarity:'mythic', img:'weapons/roachbow.png',    shape:'seed',  core:'#ffe0b2',ring:'#6d4c41',perk:{pierce:1,spread:1,speed:1.6},    ability:'Dreifach-Bolzen, durchbohrt'},
+
 ];
 
 // ---- Joint-/Konsum-Skins (Pixel-Art Sprites, nur aus Loot-Tütchen) ----
@@ -1334,6 +1346,20 @@ const JOINT_SKINS=[
   {id:'j_cbdbrick', name:'CBD-Brownie',    rarity:'rare',     img:'items/cbdbrick.png',  paper:'#5d4037',tip:'#8d6e63',smoke:'#d7ccc8',perk:{shield:3},            ability:'3s Startschutz'},
   {id:'j_goldpipe', name:'24K Pfeife',     rarity:'legendary',img:'items/goldpipe.png',  paper:'#ffd700',tip:'#fff176',smoke:'#fff9c4',perk:{bags:3,magnet:16},    ability:'+3 🌿 pro Tütchen & Magnet'},
   {id:'j_rocket',   name:'Rocket Spliff',  rarity:'legendary',img:'items/rocket.png',    paper:'#ef5350',tip:'#ffd54a',smoke:'#ffffff',perk:{jump:1.12,inv:3,gun:1},ability:'+12% Sprung, +3s Schutz'},
+  // ---- MYTHIC Konsum-Legenden (nur Loot) ----
+  {id:'j_goldspliff',name:'Golden Spliff',  rarity:'mythic', img:'items/goldspliff.png', paper:'#ffd700',tip:'#fff59d',smoke:'#fff8e1',perk:{bags:4,inv:3},        ability:'+4 🌿 pro Tütchen & +3s Schutz'},
+  {id:'j_terpflask', name:'Terpen-Flasche', rarity:'mythic', img:'items/terpflask.png',  paper:'#b2ff59',tip:'#64dd17',smoke:'#f1f8e9',perk:{jump:1.15,magnet:18},  ability:'+15% Sprung & Magnet'},
+  {id:'j_kief',      name:'Kief-Dose',      rarity:'mythic', img:'items/kief.png',       paper:'#cddc39',tip:'#827717',smoke:'#f0f4c3',perk:{bags:3,magnet:24},     ability:'+3 🌿 & starker Magnet'},
+  {id:'j_dabpearl',  name:'Dab-Perle',      rarity:'mythic', img:'items/dabpearl.png',   paper:'#ffca28',tip:'#ff6d00',smoke:'#fff3c4',perk:{inv:5},                ability:'+5s Unverwundbarkeit'},
+  {id:'j_rso',       name:'RSO-Spritze',    rarity:'mythic', img:'items/rso.png',        paper:'#8d6e63',tip:'#212121',smoke:'#d7ccc8',perk:{shield:5,inv:2},       ability:'5s Startschutz & +2s Schutz'},
+  {id:'j_grinder',   name:'Gold-Grinder',   rarity:'mythic', img:'items/grinder.png',    paper:'#ffd54a',tip:'#c49000',smoke:'#fff8e1',perk:{bags:5},               ability:'+5 🌿 pro Tütchen'},
+  {id:'j_terpvial',  name:'Myrcen-Vial',    rarity:'mythic', img:'items/terpvial.png',   paper:'#ea80fc',tip:'#aa00ff',smoke:'#f3e5f5',perk:{jump:1.18},            ability:'+18% Sprungkraft'},
+  {id:'j_waxdart',   name:'Wax-Dart',       rarity:'mythic', img:'items/waxdart.png',    paper:'#ffe082',tip:'#ff8f00',smoke:'#fff8e1',perk:{gun:4,inv:1},          ability:'+4s Waffenzeit'},
+  {id:'j_kiefdart',  name:'Kief-Dart',      rarity:'mythic', img:'items/kiefdart.png',   paper:'#dce775',tip:'#9e9d24',smoke:'#f9fbe7',perk:{gun:3,bags:2},         ability:'+3s Waffenzeit & +2 🌿'},
+  {id:'j_patch',     name:'Medi-Patch',     rarity:'mythic', img:'items/patch.png',      paper:'#a5d6a7',tip:'#2e7d32',smoke:'#e8f5e9',perk:{shield:6},             ability:'6s Startschutz'},
+  {id:'j_cannagar',  name:'Cannagar',       rarity:'mythic', img:'items/cannagar.png',   paper:'#8d6e63',tip:'#ff7043',smoke:'#efebe9',perk:{inv:4,jump:1.08},      ability:'+4s Schutz & +8% Sprung'},
+  {id:'j_nebula',    name:'Nebula-Bong',    rarity:'mythic', img:'items/nebula.png',     paper:'#b388ff',tip:'#7c4dff',smoke:'#ede7f6',perk:{inv:3,jump:1.12,magnet:20},ability:'Alles etwas besser: Schutz, Sprung, Magnet'},
+
 ];
 // ---- Item-Sprite Loader (freigestellte PNGs) ----
 const ITEM_IMG_CACHE={};
