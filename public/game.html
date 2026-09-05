@@ -1265,6 +1265,7 @@ const RARITY={
   rare:     {name:'DANK',     color:'#4fc3f7', refund:120},
   epic:     {name:'FIRE OG',  color:'#ba68c8', refund:300},
   legendary:{name:'TOP SHELF',color:'#ffd54a', refund:800},
+  mythic:   {name:'MYTHIC',   color:'#00e5ff', refund:2500},
 };
 // These character skins are loot-box exclusive (no purchase possible)
 const LOOT_ONLY_SKINS=new Set([]);
@@ -1297,7 +1298,21 @@ const WEAPON_SKINS=[
   {id:'w_bombsling',name:'Bomben-Schleuder', rarity:'epic',     img:'weapons/bombsling.png',shape:'bomb',  core:'#c5e1a5',ring:'#33691e',perk:{blast:1},                 ability:'Explosion trifft alles in der Nähe'},
   {id:'w_chicken',  name:'Huhn-Kanone',      rarity:'legendary',img:'weapons/chicken.png',  shape:'smoke', core:'#ffffff',ring:'#e0e0e0',perk:{pierce:1,cd:0.8,gun:1},   ability:'Durchschlag + mehr Waffenzeit'},
   {id:'w_crossbow', name:'Armbrust 420',     rarity:'legendary',img:'weapons/crossbow.png', shape:'laser', core:'#ffffff',ring:'#7cfc00',perk:{pierce:1,speed:1.5,cd:0.7},ability:'Pfeil durchbohrt alles'},
+  // ---- Neue Blaster-Familie (Grau / Blau / Gold) ----
+  {id:'w_blastgrey',name:'Beton-Blaster',    rarity:'common',   img:'weapons/blaster_grey.png',  shape:'bullet',core:'#eceff1',ring:'#546e7a',perk:{cd:0.85},                    ability:'Schnellerer Nachladetakt'},
+  {id:'w_blastblue',name:'Frost-Blaster',    rarity:'epic',     img:'weapons/blaster_blue.png',  shape:'bubble',core:'#e3f2fd',ring:'#3d5afe',perk:{cd:0.6,speed:1.25},          ability:'Schnelles, flinkes Dauerfeuer'},
+  {id:'w_blastgold',name:'Gold-Blaster',     rarity:'legendary',img:'weapons/blaster_gold.png',  shape:'bullet',core:'#fff59d',ring:'#ff9800',perk:{cd:0.6,pierce:1,gun:2},      ability:'Durchschlag + 2s Waffenzeit'},
+  // ---- Wurfsterne (Grün / Blau / Gold-Orange) ----
+  {id:'w_stargreen',name:'Kush-Stern',       rarity:'rare',     img:'weapons/star_green.png',    shape:'bud',   core:'#c5e1a5',ring:'#2e7d32',perk:{speed:1.4,cd:0.85},          ability:'Schnelle Wurfsterne'},
+  {id:'w_starblue', name:'Sturm-Stern',      rarity:'epic',     img:'weapons/star_blue.png',     shape:'laser', core:'#e1f5fe',ring:'#2962ff',perk:{spread:1,speed:1.3},        ability:'Doppelwurf mit Streuung'},
+  {id:'w_starorange',name:'Lava-Stern',      rarity:'legendary',img:'weapons/star_orange.png',   shape:'flame', core:'#ffe082',ring:'#e64a19',perk:{blast:1,speed:1.3},          ability:'Explodiert beim Treffer'},
+  // ---- MYTHIC: extrem selten, stärkste Waffen im Spiel ----
+  {id:'w_omega',    name:'Omega-Blaster',    rarity:'mythic',   img:'weapons/blaster_omega.png', shape:'laser', core:'#ffffff',ring:'#00e5ff',perk:{cd:0.42,pierce:1,speed:1.5,gun:3},   ability:'Dauer-Laser, durchbohrt alles, +3s'},
+  {id:'w_void',     name:'Void-Kanone',      rarity:'mythic',   img:'weapons/blaster_void.png',  shape:'smoke', core:'#f3e5f5',ring:'#d500f9',perk:{blast:1,pierce:1,cd:0.55,gun:2},    ability:'Void-Explosionen mit Durchschlag'},
+  {id:'w_spectral', name:'Spektral-Shuriken',rarity:'mythic',   img:'weapons/star_spectral.png', shape:'bud',   core:'#ffffff',ring:'#ff4081',perk:{spread:1,pierce:1,speed:1.6,cd:0.6},ability:'Dreifach-Streuung mit Durchschlag'},
+  {id:'w_nova',     name:'Supernova-Stern',  rarity:'mythic',   img:'weapons/star_nova.png',     shape:'flame', core:'#fffde7',ring:'#ffab00',perk:{blast:1,spread:1,speed:1.4,gun:3},  ability:'Explosive Streuung, +3s Waffenzeit'},
 ];
+
 // ---- Joint-/Konsum-Skins (Pixel-Art Sprites, nur aus Loot-Tütchen) ----
 // perk: inv=extra Unverwundbarkeit (s), bags=extra 🌿 pro Tütchen, jump=Sprungfaktor,
 //       magnet=Sammelradius (px), gun=extra Waffenzeit (s), shield=Startschutz (s)
@@ -1331,9 +1346,9 @@ for(const w of WEAPON_SKINS)itemImg(w.img);
 for(const j of JOINT_SKINS)itemImg(j.img);
 // ---- Loot-Tütchen ----
 const LOOT_BOXES=[
-  {id:'gram', name:'GRAMM-TÜTCHEN', price:150,  bag:'#9ccc65', odds:{common:0.70,rare:0.25,epic:0.045,legendary:0.005}},
-  {id:'zip',  name:'ZIP-BEUTEL',    price:450,  bag:'#ba68c8', odds:{common:0.40,rare:0.42,epic:0.15, legendary:0.03}},
-  {id:'pound',name:'PFUND-PAKET',   price:1200, bag:'#ffd54a', odds:{common:0.10,rare:0.35,epic:0.40, legendary:0.15}},
+  {id:'gram', name:'GRAMM-TÜTCHEN', price:150,  bag:'#9ccc65', odds:{mythic:0.0004,legendary:0.006,epic:0.044,rare:0.25,common:0.6996}},
+  {id:'zip',  name:'ZIP-BEUTEL',    price:450,  bag:'#ba68c8', odds:{mythic:0.0015,legendary:0.03,epic:0.1485,rare:0.42,common:0.40}},
+  {id:'pound',name:'PFUND-PAKET',   price:1200, bag:'#ffd54a', odds:{mythic:0.006,legendary:0.15,epic:0.394,rare:0.35,common:0.10}},
 ];
 // Loot inventory
 const WK='afroJumpWeapon',JK='afroJumpJoint',OWK='afroJumpOwnedW',OJK='afroJumpOwnedJ';
@@ -1985,7 +2000,7 @@ function renderBoxes(){
     card.appendChild(cv);
     const nm=document.createElement('div');nm.className='bname';nm.textContent=b.name;card.appendChild(nm);
     const od=document.createElement('div');od.className='odds';
-    od.innerHTML=Object.entries(b.odds).map(([r,p])=>'<span style="color:'+RARITY[r].color+'">'+RARITY[r].name+' '+(p*100).toFixed(p<0.05?1:0)+'%</span>').join(' · ');
+    od.innerHTML=Object.entries(b.odds).map(([r,p])=>'<span style="color:'+RARITY[r].color+'">'+RARITY[r].name+' '+(p*100<0.1?(p*100).toFixed(2):(p*100).toFixed(p<0.05?1:0))+'%</span>').join(' · ');
     card.appendChild(od);
     const btn=document.createElement('button');
     btn.textContent='ÖFFNEN – 🌿 '+b.price;
@@ -2007,7 +2022,7 @@ function lootPool(rarity){
 }
 function rollRarity(odds){
   let r=Math.random(),acc=0;
-  for(const k of ['legendary','epic','rare','common']){
+  for(const k of ['mythic','legendary','epic','rare','common']){
     acc+=odds[k]||0;
     if(r<acc)return k;
   }
@@ -2039,6 +2054,7 @@ const BAGGY_VIDS={
   common:{src:'/__l5e/assets-v1/ecdae892-1535-42bb-bcc0-5e1bf5a3598d/baggy_common.mp4',webm:'/__l5e/assets-v1/bc630d56-a978-4c03-93ab-d6a5ead1ad5c/baggy_common.webm',glow:'rgba(124,252,0,.55)',parts:16,spread:110},
   rare:{src:'/__l5e/assets-v1/a5c6b8cd-0928-4289-bd10-3125939e0718/baggy_rare.mp4',webm:'/__l5e/assets-v1/8b7f294d-cae9-4e6d-a3f6-40bbfe463340/baggy_rare.webm',glow:'rgba(186,104,200,.7)',parts:44,spread:190},
   epic:{src:'/__l5e/assets-v1/a5c6b8cd-0928-4289-bd10-3125939e0718/baggy_rare.mp4',webm:'/__l5e/assets-v1/8b7f294d-cae9-4e6d-a3f6-40bbfe463340/baggy_rare.webm',glow:'rgba(186,104,200,.7)',parts:60,spread:210},
+  mythic:{src:'/__l5e/assets-v1/c2958506-c249-45d4-a7d7-88f32f39d7fc/baggy_legendary.mp4',webm:'/__l5e/assets-v1/09df3fc1-d225-4f53-bad0-9c20a5a2d140/baggy_legendary.webm',glow:'rgba(0,229,255,.9)',parts:150,spread:360},
   legendary:{src:'/__l5e/assets-v1/c2958506-c249-45d4-a7d7-88f32f39d7fc/baggy_legendary.mp4',webm:'/__l5e/assets-v1/09df3fc1-d225-4f53-bad0-9c20a5a2d140/baggy_legendary.webm',glow:'rgba(255,213,74,.8)',parts:110,spread:300}
 };
 // Farbe der Öffnungs-Animation folgt der Kisten-Seltenheit:
