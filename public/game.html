@@ -1297,7 +1297,21 @@ const WEAPON_SKINS=[
   {id:'w_bombsling',name:'Bomben-Schleuder', rarity:'epic',     img:'weapons/bombsling.png',shape:'bomb',  core:'#c5e1a5',ring:'#33691e',perk:{blast:1},                 ability:'Explosion trifft alles in der Nähe'},
   {id:'w_chicken',  name:'Huhn-Kanone',      rarity:'legendary',img:'weapons/chicken.png',  shape:'smoke', core:'#ffffff',ring:'#e0e0e0',perk:{pierce:1,cd:0.8,gun:1},   ability:'Durchschlag + mehr Waffenzeit'},
   {id:'w_crossbow', name:'Armbrust 420',     rarity:'legendary',img:'weapons/crossbow.png', shape:'laser', core:'#ffffff',ring:'#7cfc00',perk:{pierce:1,speed:1.5,cd:0.7},ability:'Pfeil durchbohrt alles'},
+  // ---- Neue Blaster-Familie (Grau / Blau / Gold) ----
+  {id:'w_blastgrey',name:'Beton-Blaster',    rarity:'common',   img:'weapons/blaster_grey.png',  shape:'bullet',core:'#eceff1',ring:'#546e7a',perk:{cd:0.85},                    ability:'Schnellerer Nachladetakt'},
+  {id:'w_blastblue',name:'Frost-Blaster',    rarity:'epic',     img:'weapons/blaster_blue.png',  shape:'bubble',core:'#e3f2fd',ring:'#3d5afe',perk:{cd:0.6,speed:1.25},          ability:'Schnelles, flinkes Dauerfeuer'},
+  {id:'w_blastgold',name:'Gold-Blaster',     rarity:'legendary',img:'weapons/blaster_gold.png',  shape:'bullet',core:'#fff59d',ring:'#ff9800',perk:{cd:0.6,pierce:1,gun:2},      ability:'Durchschlag + 2s Waffenzeit'},
+  // ---- Wurfsterne (Grün / Blau / Gold-Orange) ----
+  {id:'w_stargreen',name:'Kush-Stern',       rarity:'rare',     img:'weapons/star_green.png',    shape:'bud',   core:'#c5e1a5',ring:'#2e7d32',perk:{speed:1.4,cd:0.85},          ability:'Schnelle Wurfsterne'},
+  {id:'w_starblue', name:'Sturm-Stern',      rarity:'epic',     img:'weapons/star_blue.png',     shape:'laser', core:'#e1f5fe',ring:'#2962ff',perk:{spread:1,speed:1.3},        ability:'Doppelwurf mit Streuung'},
+  {id:'w_starorange',name:'Lava-Stern',      rarity:'legendary',img:'weapons/star_orange.png',   shape:'flame', core:'#ffe082',ring:'#e64a19',perk:{blast:1,speed:1.3},          ability:'Explodiert beim Treffer'},
+  // ---- MYTHIC: extrem selten, stärkste Waffen im Spiel ----
+  {id:'w_omega',    name:'Omega-Blaster',    rarity:'mythic',   img:'weapons/blaster_omega.png', shape:'laser', core:'#ffffff',ring:'#00e5ff',perk:{cd:0.42,pierce:1,speed:1.5,gun:3},   ability:'Dauer-Laser, durchbohrt alles, +3s'},
+  {id:'w_void',     name:'Void-Kanone',      rarity:'mythic',   img:'weapons/blaster_void.png',  shape:'smoke', core:'#f3e5f5',ring:'#d500f9',perk:{blast:1,pierce:1,cd:0.55,gun:2},    ability:'Void-Explosionen mit Durchschlag'},
+  {id:'w_spectral', name:'Spektral-Shuriken',rarity:'mythic',   img:'weapons/star_spectral.png', shape:'bud',   core:'#ffffff',ring:'#ff4081',perk:{spread:1,pierce:1,speed:1.6,cd:0.6},ability:'Dreifach-Streuung mit Durchschlag'},
+  {id:'w_nova',     name:'Supernova-Stern',  rarity:'mythic',   img:'weapons/star_nova.png',     shape:'flame', core:'#fffde7',ring:'#ffab00',perk:{blast:1,spread:1,speed:1.4,gun:3},  ability:'Explosive Streuung, +3s Waffenzeit'},
 ];
+
 // ---- Joint-/Konsum-Skins (Pixel-Art Sprites, nur aus Loot-Tütchen) ----
 // perk: inv=extra Unverwundbarkeit (s), bags=extra 🌿 pro Tütchen, jump=Sprungfaktor,
 //       magnet=Sammelradius (px), gun=extra Waffenzeit (s), shield=Startschutz (s)
