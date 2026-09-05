@@ -74,9 +74,7 @@
   }
   function fillPhone() {
     try {
-      var vv = window.visualViewport;
-      var h = vv ? Math.round(vv.height + (vv.offsetTop || 0)) : window.innerHeight;
-      var px = h + "px";
+      var px = "100%";
       document.documentElement.style.height = px;
       document.documentElement.style.minHeight = px;
       if (document.body) {
