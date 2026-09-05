@@ -2089,7 +2089,7 @@ function startBoxAnim(box,res,sub){
   boxLabel.textContent=box.name+' …';boxLabel.style.color='#fff';
   boxSub.textContent='';
   boxAnim={t:0,box,res,sub,revealed:false,particles:[]};
-  boxAnim.vid=playBaggyVideo(res.rarity);
+  boxAnim.vid=playBaggyVideo(BOX_BAGGY[box.id]||res.rarity);
   boxAgain.onclick=()=>{ if(totalBags<box.price){boxSub.textContent='Nicht genug Baggys!';return;} openLootBox(box); };
   boxDone.onclick=()=>{boxAnim=null;hideBaggyVideo();openBoxEl.style.display='none';renderShop();updateBagsUI();};
   if(!boxLoopRunning){boxLoopRunning=true;requestAnimationFrame(boxLoop);}
