@@ -7483,14 +7483,18 @@ function edAutoBtnUI(){
 function edAutoBuild(){
   const climb=START_Y-GOAL_Y-200;
   const cap=v=>v===Infinity?null:v;
-  const P=Math.max(6,Math.min(cap(BUDGET.plat)||96,120));
-  const T=Math.max(0,Math.min(cap(BUDGET.boost)||18,20));
-  const total=P+T;
-  const g=Math.max(60,Math.min(168,climb/total));
+  const P=Math.max(6,Math.min(cap(BUDGET.plat)||120,240));
+  const T=Math.max(0,Math.min(cap(BUDGET.boost)||24,48));
+  const cap2=P+T;
+  const y0=START_Y-110, yEnd=GOAL_Y+140;
+  const span=y0-yEnd;
+  let n=Math.min(cap2,Math.max(2,Math.ceil(span/165)+1));
+  const g=span/(n-1);
+  const total=n;
   const trampEvery=T>0?total/T:1e9;
   const parts=[];
-  let y=START_Y-110, x=W/2, nextT=trampEvery;
-  for(let i=0;i<total&&y>GOAL_Y+130;i++){
+  let y=y0, x=W/2, nextT=trampEvery;
+  for(let i=0;i<total;i++){
     const isT=T>0&&i+1>=Math.floor(nextT);
     if(isT)nextT+=trampEvery;
     let nx=x+(Math.random()*2-1)*170;
