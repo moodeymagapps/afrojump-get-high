@@ -514,6 +514,20 @@
     padding:6px 9px;gap:6px;text-shadow:2px 2px 0 #000;}
   .hudChip.bagsChip{box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #7cfc00;}
   .hudChip.rec{box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #ffd54a;border:none;}
+  .hudCopy{display:flex;flex-direction:column;gap:3px;min-width:0;}
+  .hudLabel{font-size:6px;line-height:1;color:#b9adca;text-shadow:1px 1px 0 #000;white-space:nowrap;}
+  .hudValue{font-size:9px;line-height:1;color:#fff;white-space:nowrap;font-variant-numeric:tabular-nums;}
+  .hudChip.recordChip{box-shadow:inset -3px -3px 0 #000,inset 3px 3px 0 #ffd54a;}
+  .hudChip.recordChip .ic{color:#ffd54a;}
+  .hudChip.bagsChip .hudLabel{color:#bde69d;}
+  .hudChip.bagsChip .hudValue{color:#8dff3c;}
+  @media (max-width:390px){
+    #ui{left:calc(6px + env(safe-area-inset-left));right:calc(6px + env(safe-area-inset-right));}
+    .hudChip{padding:6px 7px;gap:5px;}
+    .hudLabel{font-size:5px;}.hudValue{font-size:8px;}
+    #ui .right{gap:4px;}
+    #pauseBtn,#muteBtn,.pxBtn{width:34px;height:36px;}
+  }
   #power{background:#2b1a0a;border:none;box-shadow:inset -3px -3px 0 #000, inset 3px 3px 0 #ffd54a;
     padding:5px 9px;}
   #pauseBtn,#muteBtn,.pxBtn{width:38px;height:38px;background:#2b1a0a;border:none;
@@ -894,10 +908,10 @@
   <canvas id="c" width="400" height="700"></canvas>
   <div id="ui">
     <div class="stats">
-      <div class="hudChip"><span class="ic">⬆</span><div id="score">Höhe: 0m</div></div>
-      <div class="hudChip"><span class="ic">★</span><div id="high">Best: 0m</div></div>
+      <div class="hudChip"><span class="ic">⬆</span><div class="hudCopy"><span class="hudLabel">HÖHE</span><div class="hudValue" id="score">0 m</div></div></div>
+      <div class="hudChip recordChip"><span class="ic">★</span><div class="hudCopy"><span class="hudLabel">REKORD</span><div class="hudValue" id="high">0 m</div></div></div>
     </div>
-    <div class="right"><div class="bagsWrap"><div class="hudChip bagsChip"><div id="bags">🌿 0</div></div></div><button id="fsBtn" class="pxBtn" title="Vollbild">⛶</button><button id="muteBtn" title="Musik">🔊</button><button id="pauseBtn" title="Pause">❚❚</button></div>
+    <div class="right"><div class="bagsWrap"><div class="hudChip bagsChip"><span class="ic">🌿</span><div class="hudCopy"><span class="hudLabel">BAGGIES</span><div class="hudValue" id="bags">0</div></div></div></div><button id="fsBtn" class="pxBtn" title="Vollbild">⛶</button><button id="muteBtn" title="Musik">🔊</button><button id="pauseBtn" title="Pause">❚❚</button></div>
   </div>
   <div id="power"></div>
   <div id="settings" class="overlay">
@@ -1224,7 +1238,7 @@ if(!owned.includes(DEFAULT_SKIN))owned.push(DEFAULT_SKIN);
 let selectedSkin=localStorage.getItem(SK)||DEFAULT_SKIN;
 if(selectedSkin==='james')selectedSkin='bob';
 if(!owned.includes(selectedSkin))selectedSkin=DEFAULT_SKIN;
-highEl.textContent='Best: '+highScore+'m';
+highEl.textContent=highScore+' m';
 
 // Skins catalog
 const SKINS=[
@@ -1661,7 +1675,7 @@ function bagDelta(d){
   w.appendChild(el);setTimeout(()=>el.remove(),820);
 }
 function writeBags(v){
-  bagsEl.textContent='🌿 '+v;menuBags.textContent='🌿 '+v+' Baggys';shopBags.textContent='🌿 '+v;
+  bagsEl.textContent=String(v);menuBags.textContent='🌿 '+v+' Baggys';shopBags.textContent='🌿 '+v;
 }
 function updateBagsUI(anim){
   const target=totalBags;
@@ -1896,12 +1910,21 @@ function drawSkinIntoCanvas(g,s,cv){
 }
 function drawSetPreview(g,set,cv){
   const skin=SKINS.find(s=>s.id===set.skin),weapon=WEAPON_SKINS.find(w=>w.id===set.weapon),joint=JOINT_SKINS.find(j=>j.id===set.joint);
+  let attempts=0;
   const paint=()=>{
     g.clearRect(0,0,cv.width,cv.height);g.imageSmoothingEnabled=false;
-    if(skin){const e=loadSkinImage(skin.img,skin.bgKey);if(e.canvas)g.drawImage(e.canvas,0,0,96,128,4,18,96,128);}
+    if(skin){
+      const e=loadSkinImage(skin.img,skin.bgKey);
+      if(e.canvas){
+        const sw=skin.frameW||Math.floor(e.canvas.width/4),sh=skin.frameH||Math.floor(e.canvas.height/2);
+        const sc=Math.min(96/sw,128/sh),dw=Math.round(sw*sc),dh=Math.round(sh*sc);
+        g.drawImage(e.canvas,0,0,sw,sh,4+Math.round((96-dw)/2),18+Math.round((128-dh)/2),dw,dh);
+      }
+    }
     if(weapon){const im=itemImg(weapon.img);if(im)g.drawImage(im,98,10,58,58);}
     if(joint){const im=itemImg(joint.img);if(im)g.drawImage(im,98,88,58,58);}
-    if(cv.isConnected&&(!skin||!loadSkinImage(skin.img,skin.bgKey).canvas||!weapon||!itemImg(weapon.img)||!joint||!itemImg(joint.img)))setTimeout(paint,80);
+    const waiting=skin&&!loadSkinImage(skin.img,skin.bgKey).canvas||weapon&&!itemImg(weapon.img)||joint&&!itemImg(joint.img);
+    if(cv.isConnected&&waiting&&attempts++<75)setTimeout(paint,80);
   };
   paint();
 }
@@ -3348,7 +3371,7 @@ function update(dt){
     c.t+=dt;
     if(Math.hypot(player.x-c.x,player.y-c.y)<player.r+10+(jperk().magnet||0)){
       c.taken=true;
-      if(c.type==='bag'){const gain=2+(jperk().bags||0);runBags+=gain;totalBags+=gain;bagsEl.textContent='🌿 '+totalBags;hudPop(bagsChipEl);burst(c.x,c.y,'#7cfc00',18);addRing(c.x,c.y,'124,252,0',5,30,0.3);pushFloat(c.x,c.y-4,'+'+gain+' 🌿','#7cfc00');sfx('pickup');}
+      if(c.type==='bag'){const gain=2+(jperk().bags||0);runBags+=gain;totalBags+=gain;updateBagsUI(true);burst(c.x,c.y,'#7cfc00',18);addRing(c.x,c.y,'124,252,0',5,30,0.3);pushFloat(c.x,c.y-4,'+'+gain+' 🌿','#7cfc00');sfx('pickup');}
       else if(c.type==='joint'){player.invincible=6+(jperk().inv||0);player.invSrc='power';player.vy=-22;burst(c.x,c.y,'#ff69b4',24);addRing(c.x,c.y,'255,105,180',6,64,0.42);addFlash('255,105,180',0.16);addShake(3,0.14);pushFloat(c.x,c.y-4,'INVINCIBLE!','#ff69b4');sfx('pickup');}
       else if(c.type==='jetpack'){player.jetpackT=3.0;player.vy=-14;burst(c.x,c.y,'#ff8a00',30);addRing(c.x,c.y,'255,138,0',6,64,0.42);addFlash('255,170,60',0.16);addShake(3,0.14);pushFloat(c.x,c.y-4,'JETPACK!','#ff8a00');}
       else if(c.type==='gun'){const gt=5.0+(jperk().gun||0)+(wperk().gun||0);player.gunT=gt;burst(c.x,c.y,'#e0e0e0',22);addRing(c.x,c.y,'235,235,235',6,56,0.38);addFlash('255,255,255',0.12);pushFloat(c.x,c.y-4,'GUN '+Math.round(gt)+'s!','#e0e0e0');sfx('pickup');}
@@ -3726,7 +3749,7 @@ function registerKill(x,y){
   if(killCombo>=2){
     const bonus=Math.min(5,killCombo-1);
     totalBags+=bonus;runBags+=bonus;localStorage.setItem(BK,totalBags);
-    bagsEl.textContent='🌿 '+totalBags;
+    updateBagsUI(true);
     pushFloat(x,y-16,'COMBO x'+killCombo+' +🌿'+bonus,'#ffd54a');
   }else{
     pushFloat(x,y-16,'BUSTED!','#ffcc00');
@@ -6727,14 +6750,14 @@ function loop(t){
   }
   render();
   // HUD nur bei Änderung schreiben (spart Layout-Arbeit pro Frame)
-  const sTxt='Höhe: '+bestY+'m';
+  const sTxt=bestY+' m';
   if(sTxt!==hud.score){
     hud.score=sTxt;scoreEl.textContent=sTxt;
     const mile=Math.floor(bestY/100);
     if(gameState==='playing'&&mile>(hud.mile||0)){hud.mile=mile;hudPop(scoreChipEl);}
     else if(mile<(hud.mile||0))hud.mile=mile;
   }
-  const hTxt='Best: '+Math.max(highScore,bestY)+'m';
+  const hTxt=Math.max(highScore,bestY)+' m';
   if(hTxt!==hud.high){hud.high=hTxt;highEl.textContent=hTxt;}
   const rec=gameState==='playing'&&bestY>highScore&&highScore>0;
   if(rec!==hud.rec){hud.rec=rec;highChipEl.classList.toggle('rec',rec);if(rec)hudPop(highChipEl);}
