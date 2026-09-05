@@ -13,7 +13,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 <style>
   html,body{margin:0;padding:0;height:100%;background:#0b1a0b;overflow:hidden;overscroll-behavior:none;-webkit-overflow-scrolling:auto;-webkit-tap-highlight-color:transparent;font-family:'VT323','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;color:#fff;touch-action:none;user-select:none;-webkit-user-select:none;image-rendering:pixelated;}
-  html,body{width:100%;height:100dvh;}
+  html,body{width:100%;height:100%;min-height:100%;}
   #wrap,iframe{background:#0b1a0b;}
   /* Vollbild-/Install-Hinweis (erster Start) */
   #howto{position:fixed;inset:0;z-index:58;display:none;flex-direction:column;align-items:center;justify-content:center;padding:calc(22px + env(safe-area-inset-top)) 20px calc(22px + env(safe-area-inset-bottom));box-sizing:border-box;background:linear-gradient(rgba(8,6,16,.92),rgba(8,6,16,.97));font-family:'VT323',monospace;text-align:center;}
@@ -233,7 +233,7 @@
   .lbRow.top2 .rank{color:#e0e0e0;}
   .lbRow.top3 .rank{color:#d68910;}
 
-  #hint{position:absolute;bottom:12px;left:0;right:0;text-align:center;font-size:14px;opacity:.6;pointer-events:none;font-family:'VT323','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;letter-spacing:1px;}
+  #hint{position:absolute;bottom:calc(12px + env(safe-area-inset-bottom));left:0;right:0;text-align:center;font-size:14px;opacity:.6;pointer-events:none;font-family:'VT323','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;letter-spacing:1px;}
   #fireBtn{position:absolute;bottom:60px;left:50%;transform:translateX(-50%);width:78px;height:78px;border-radius:50%;background:#c62828;border:none;color:#fff;font-size:30px;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:inset -4px -4px 0 #7f1010, inset 4px 4px 0 #ff8a80, 0 5px 0 #7f1010, 0 0 20px rgba(255,80,80,.6);z-index:5;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;user-select:none;-webkit-tap-highlight-color:transparent;}
   #fireBtn:active{transform:translateX(-50%) translateY(3px);box-shadow:inset -4px -4px 0 #7f1010, inset 4px 4px 0 #ff8a80, 0 2px 0 #7f1010;}
   #fireBtn.on{display:flex;}
@@ -1092,7 +1092,10 @@ const W=400,H=700;
 let dpr=1,bgW=W,bgOX=0;
 var bgDirty=false;
 function fit(){
-  const vw=window.innerWidth,vh=window.innerHeight;
+  const vv=window.visualViewport;
+  const vw=Math.round((vv&&vv.width)||document.documentElement.clientWidth||window.innerWidth);
+  const standalone=window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches;
+  const vh=Math.round(standalone?Math.max(screen.height||0,window.innerHeight||0):((vv&&vv.height)||document.documentElement.clientHeight||window.innerHeight));
   // Höhe füllen; auf schmalen (Portrait-)Screens zusätzlich Breite begrenzen.
   const s=Math.min(vh/H,Math.max(vw/W,vh/H));
   const sFit=Math.min(vw/W,vh/H);
