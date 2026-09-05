@@ -952,6 +952,7 @@
       <button data-tab="boxes">🎒 TÜTCHEN</button>
       <button data-tab="weapons">🔫 WAFFEN</button>
       <button data-tab="joints">🚬 JOINTS</button>
+      <button data-tab="sets">📦 SETS</button>
     </div>
     <div class="skinGrid" id="skinGrid"></div>
   </div>
@@ -1257,6 +1258,9 @@ const SKINS=[
   {id:'fussel',     name:'Fussel',      price:800,  community:true, rarity:'legendary', img:'/__l5e/assets-v1/1ad94750-4ea0-40f3-9b32-8b6014bc6333/fussel-atlas.png',anchorY:0.88,frames:8,frameW:320,frameH:250,bgKey:'atlas'},
   {id:'bubi',       name:'Bubi',        price:900,  community:true, rarity:'legendary', img:'/__l5e/assets-v1/0d932b0c-c6bc-4130-9118-3954d4d3e222/bubi-atlas.png',anchorY:0.88,frames:8,frameW:320,frameH:250,bgKey:'atlas'},
   {id:'bebi',       name:'Bebi',        price:900,  community:true, rarity:'legendary', img:'/__l5e/assets-v1/418ee147-9c65-4884-9d13-54683c841d97/bebi-atlas.png',anchorY:0.88,frames:8,frameW:320,frameH:250,bgKey:'atlas'},
+  {id:'kosmonaut',  name:'Der Kosmonaut',price:2000, community:true, rarity:'legendary', img:'sets/kosmonaut.png',   anchorY:0.82,frames:8,frameW:96,frameH:128,bgKey:'atlas',bundleOnly:true},
+  {id:'ganjaguru',  name:'Der Ganja-Guru',price:2000,community:true, rarity:'legendary', img:'sets/ganja-guru.png',  anchorY:0.82,frames:8,frameW:96,frameH:128,bgKey:'atlas',bundleOnly:true},
+  {id:'cyberkiffer',name:'Der Cyber-Kiffer',price:2000,community:true,rarity:'legendary', img:'sets/cyber-kiffer.png',anchorY:0.82,frames:8,frameW:96,frameH:128,bgKey:'atlas',bundleOnly:true},
 ];
 // Maus-Skins: nur optische Item-Varianten (Käse statt Baggy, Mehlwurm statt Joint)
 const MOUSE_SKINS=new Set(['bubi','bebi']);
@@ -1322,6 +1326,9 @@ const WEAPON_SKINS=[
   {id:'w_hashthrower', name:'Hashish-Werfer',   rarity:'mythic', img:'weapons/hashthrower.png', shape:'bomb',  core:'#d7ccc8',ring:'#4e342e',perk:{blast:1,pierce:1,gun:2},         ability:'Hash-Bomben mit Durchschlag'},
   {id:'w_vaporrifle',  name:'Vapor-Rifle',      rarity:'mythic', img:'weapons/vaporrifle.png',  shape:'laser', core:'#e1f5fe',ring:'#2979ff',perk:{cd:0.4,pierce:1,speed:1.7},      ability:'Vapor-Strahl im Dauerfeuer'},
   {id:'w_roachbow',    name:'Rückkehr-Dolch',   rarity:'mythic', img:'weapons/dagger.png',      shape:'dagger',core:'#cfd8dc',ring:'#5e35b1',perk:{boomerang:2,speed:1.25,cd:0.9},  ability:'Dolch kehrt 2x zum Spieler zurück'},
+  {id:'w_astroset',    name:'Das Astro-Gewehr', rarity:'legendary',img:'sets/astro-gewehr.png',  shape:'laser',core:'#80deea',ring:'#00bcd4',perk:{pierce:1,speed:1.5,cd:0.65},ability:'Teil des Kosmonaut-Komplett-Sets',bundleOnly:true},
+  {id:'w_guruset',     name:'Der Guru-Stab',    rarity:'legendary',img:'sets/guru-stab.png',     shape:'bud',core:'#dcedc8',ring:'#7cb342',perk:{blast:1,cd:0.7},ability:'Teil des Ganja-Guru-Komplett-Sets',bundleOnly:true},
+  {id:'w_cyberset',    name:'Die Glitch-Pistole',rarity:'legendary',img:'sets/glitch-pistole.png',shape:'laser',core:'#80deea',ring:'#7c4dff',perk:{pierce:1,cd:0.55,speed:1.35},ability:'Teil des Cyber-Kiffer-Komplett-Sets',bundleOnly:true},
 
 ];
 
@@ -1358,7 +1365,15 @@ const JOINT_SKINS=[
   {id:'j_patch',     name:'Medi-Patch',     rarity:'mythic', img:'items/patch.png',      paper:'#a5d6a7',tip:'#2e7d32',smoke:'#e8f5e9',perk:{shield:6},             ability:'6s Startschutz'},
   {id:'j_cannagar',  name:'Cannagar',       rarity:'mythic', img:'items/cannagar.png',   paper:'#8d6e63',tip:'#ff7043',smoke:'#efebe9',perk:{inv:4,jump:1.08},      ability:'+4s Schutz & +8% Sprung'},
   {id:'j_nebula',    name:'Nebula-Bong',    rarity:'mythic', img:'items/nebula.png',     paper:'#b388ff',tip:'#7c4dff',smoke:'#ede7f6',perk:{inv:3,jump:1.12,magnet:20},ability:'Alles etwas besser: Schutz, Sprung, Magnet'},
+  {id:'j_kosmoset',  name:'Der Kosmo-Joint',rarity:'legendary',img:'sets/kosmo-joint.png',paper:'#eceff1',tip:'#7cfc00',smoke:'#b3e5fc',perk:{jump:1.05,inv:2},ability:'Teil des Kosmonaut-Komplett-Sets',bundleOnly:true},
+  {id:'j_guruset',   name:'Der Weihrauch-Joint',rarity:'legendary',img:'sets/weihrauch-joint.png',paper:'#d7ccc8',tip:'#ff8a65',smoke:'#f5f5f5',perk:{inv:3,magnet:18},ability:'Teil des Ganja-Guru-Komplett-Sets',bundleOnly:true},
+  {id:'j_cyberset',  name:'Der Circuit-Joint',rarity:'legendary',img:'sets/circuit-joint.png',paper:'#80deea',tip:'#7c4dff',smoke:'#e1f5fe',perk:{jump:1.05,gun:2},ability:'Teil des Cyber-Kiffer-Komplett-Sets',bundleOnly:true},
 
+];
+const SET_PACKS=[
+  {id:'set_kosmonaut',name:'KOSMONAUT-SET',price:2000,skin:'kosmonaut',weapon:'w_astroset',joint:'j_kosmoset',rarity:'legendary',ability:'Kosmonaut + Kosmo-Joint + Astro-Gewehr'},
+  {id:'set_ganjaguru',name:'GANJA-GURU-SET',price:2000,skin:'ganjaguru',weapon:'w_guruset',joint:'j_guruset',rarity:'legendary',ability:'Ganja-Guru + Guru-Stab + Weihrauch-Joint'},
+  {id:'set_cyberkiffer',name:'CYBER-KIFFER-SET',price:2000,skin:'cyberkiffer',weapon:'w_cyberset',joint:'j_cyberset',rarity:'legendary',ability:'Cyber-Kiffer + Circuit-Joint + Glitch-Pistole'},
 ];
 // ---- Item-Sprite Loader (freigestellte PNGs) ----
 const ITEM_IMG_CACHE={};
@@ -1806,9 +1821,21 @@ function renderShop(){
   for(const b of document.querySelectorAll('#shopTabs button'))b.classList.toggle('on',b.dataset.tab===shopTab);
   if(shopTab==='boxes')return renderBoxes();
   skinGrid.style.display='block';
+  if(shopTab==='sets')return renderCarousel({
+    key:'sets',list:SET_PACKS,
+    isOwned:it=>owned.includes(it.skin)&&ownedWeapons.includes(it.weapon)&&ownedJoints.includes(it.joint),
+    isEquipped:it=>selectedSkin===it.skin&&selectedWeapon===it.weapon&&selectedJoint===it.joint,
+    priceText:it=>'🌿 '+it.price,
+    lockText:it=>'🔒 GESPERRT – 🌿 '+it.price,
+    canBuy:it=>totalBags>=it.price,
+    buyText:it=>'🌿 SET KAUFEN – '+it.price,
+    buy:it=>{if(totalBags<it.price)return;totalBags-=it.price;if(!owned.includes(it.skin))owned.push(it.skin);if(!ownedWeapons.includes(it.weapon))ownedWeapons.push(it.weapon);if(!ownedJoints.includes(it.joint))ownedJoints.push(it.joint);selectedSkin=it.skin;selectedWeapon=it.weapon;selectedJoint=it.joint;persistShop();persistLoot();updateBagsUI();},
+    equip:it=>{selectedSkin=it.skin;selectedWeapon=it.weapon;selectedJoint=it.joint;persistShop();persistLoot();},
+    draw:(g,it,cv)=>drawSetPreview(g,it,cv),big:true,canvasSize:160,idle:true
+  });
   if(shopTab==='weapons')return renderCarousel({
     key:'weapons',
-    list:WEAPON_SKINS,
+    list:WEAPON_SKINS.filter(it=>!it.bundleOnly||ownedWeapons.includes(it.id)),
     isOwned:it=>ownedWeapons.includes(it.id),
     isEquipped:it=>selectedWeapon===it.id,
     priceText:it=>it.free?'Gratis':'🎒 Nur aus Tütchen',
@@ -1820,7 +1847,7 @@ function renderShop(){
   });
   if(shopTab==='joints')return renderCarousel({
     key:'joints',
-    list:JOINT_SKINS,
+    list:JOINT_SKINS.filter(it=>!it.bundleOnly||ownedJoints.includes(it.id)),
     isOwned:it=>ownedJoints.includes(it.id),
     isEquipped:it=>selectedJoint===it.id,
     priceText:it=>it.free?'Gratis':'🎒 Nur aus Tütchen',
@@ -1830,7 +1857,7 @@ function renderShop(){
     idle:true,
     equip:it=>{selectedJoint=it.id;persistLoot();}
   });
-  const list=SKINS.filter(s=>!s.lootOnly||owned.includes(s.id));
+  const list=SKINS.filter(s=>(!s.lootOnly||owned.includes(s.id))&&(!s.bundleOnly||owned.includes(s.id)));
   renderCarousel({
     key:'skins',
     list,
@@ -1866,6 +1893,13 @@ function drawSkinIntoCanvas(g,s,cv){
     if(entry.ready)drawIt();
     else{const t=setInterval(()=>{if(entry.ready){clearInterval(t);if(cv.isConnected)drawIt();}},60);setTimeout(()=>clearInterval(t),6000);}
   }else{g.save();g.scale(S/80,S/80);drawSkinPreview(g,s);g.restore();}
+}
+function drawSetPreview(g,set,cv){
+  const skin=SKINS.find(s=>s.id===set.skin),weapon=WEAPON_SKINS.find(w=>w.id===set.weapon),joint=JOINT_SKINS.find(j=>j.id===set.joint);
+  g.clearRect(0,0,cv.width,cv.height);
+  if(skin){const mini=document.createElement('canvas');mini.width=mini.height=110;drawSkinIntoCanvas(mini.getContext('2d'),skin,mini);g.drawImage(mini,0,20,110,110);}
+  if(weapon){const mini=document.createElement('canvas');mini.width=mini.height=80;drawWeaponPreview(mini.getContext('2d'),weapon);g.drawImage(mini,88,10,68,68);}
+  if(joint){const mini=document.createElement('canvas');mini.width=mini.height=80;drawJointPreview(mini.getContext('2d'),joint);g.drawImage(mini,88,82,68,68);}
 }
 // ---- Stat-/Vorteils-Aufbereitung (nur vorhandene Perk-Werte) ----
 const clamp01=v=>Math.max(0.06,Math.min(1,v));
@@ -4406,7 +4440,7 @@ function drawImageSkin(g,s,inv,live){
 }
 
 // ---------- Animierte Skin-Sheets (384x256, 4x2, Zelle 96x128) ----------
-const SHEET_SKINS=['kosak','danjo420','moodey','yannic','revengebird','fabienne','alex','ina','stephan'];
+const SHEET_SKINS=['kosak','danjo420','moodey','yannic','revengebird','fabienne','alex','ina','stephan','dfbboy','kosmonaut','ganjaguru','cyberkiffer'];
 const sheetCache={};
 function skinSheet(id){
   if(SHEET_SKINS.indexOf(id)<0)return null;
