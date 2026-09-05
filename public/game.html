@@ -942,7 +942,11 @@
   </div>
   <div id="openBox" class="overlay">
     <div id="boxLabel">TÜTCHEN ÖFFNEN…</div>
-    <canvas id="boxCanvas" width="300" height="300"></canvas>
+    <div id="boxStage">
+      <video id="boxVideo" muted playsinline preload="auto" disablepictureinpicture></video>
+      <canvas id="boxCanvas" width="300" height="300"></canvas>
+    </div>
+
     <div id="boxSub"></div>
     <button class="btn" id="boxAgain" style="display:none;">🎒 Nochmal öffnen</button>
     <button class="btn ghost" id="boxDone" style="display:none;">✓ Weiter</button>
