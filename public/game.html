@@ -1680,7 +1680,7 @@ function pauseGame(){if(gameState!=='playing')return;gameState='paused';showOver
 function resumeGame(){if(gameState!=='paused')return;gameState='playing';showOverlay('playing');last=performance.now();if(boss)startBossMusic(boss.kind);else tryPlayMusic();}
 function openShop(from){shopReturn=from;carTouched.skins=carTouched.weapons=carTouched.joints=false;gameState='shop';renderShop();updateBagsUI();showOverlay('shop');}
 function closeShop(){
-  if(typeof openBoxEl!=='undefined'&&openBoxEl){openBoxEl.style.display='none';boxAnim=null;}
+  if(typeof openBoxEl!=='undefined'&&openBoxEl){openBoxEl.style.display='none';boxAnim=null;try{hideBaggyVideo();}catch(e){}}
   if(shopReturn==='paused'){gameState='paused';showOverlay('paused');}
   else if(shopReturn==='gameover'){gameState='gameover';showOverlay('gameover');}
   else goMenu();
@@ -2024,6 +2024,28 @@ const boxSub=document.getElementById('boxSub');
 const boxAgain=document.getElementById('boxAgain');
 const boxDone=document.getElementById('boxDone');
 let boxAnim=null,boxLoopRunning=false;
+// Baggy-Öffnungsvideos je Seltenheit (einmalig, kein Loop)
+const boxVideo=document.getElementById('boxVideo');
+const BAGGY_VIDS={
+  common:{src:'/__l5e/assets-v1/ecdae892-1535-42bb-bcc0-5e1bf5a3598d/baggy_common.mp4',glow:'rgba(124,252,0,.55)',parts:16,spread:110},
+  rare:{src:'/__l5e/assets-v1/a5c6b8cd-0928-4289-bd10-3125939e0718/baggy_rare.mp4',glow:'rgba(120,140,255,.65)',parts:44,spread:190},
+  epic:{src:'/__l5e/assets-v1/a5c6b8cd-0928-4289-bd10-3125939e0718/baggy_rare.mp4',glow:'rgba(186,104,200,.7)',parts:60,spread:210},
+  legendary:{src:'/__l5e/assets-v1/c2958506-c249-45d4-a7d7-88f32f39d7fc/baggy_legendary.mp4',glow:'rgba(255,213,74,.8)',parts:110,spread:300}
+};
+const BAGGY_VID_RATE=3.2; // 6s Clip passt so genau bis zum Reveal
+function playBaggyVideo(rarity){
+  const cfg=BAGGY_VIDS[rarity]||BAGGY_VIDS.common;
+  if(!boxVideo)return cfg;
+  try{
+    boxVideo.style.setProperty('--bagGlow',cfg.glow);
+    if(boxVideo.dataset.rar!==rarity){boxVideo.dataset.rar=rarity;boxVideo.src=cfg.src;}
+    boxVideo.loop=false;boxVideo.currentTime=0;boxVideo.playbackRate=BAGGY_VID_RATE;
+    boxVideo.classList.add('show');
+    const pr=boxVideo.play();if(pr&&pr.catch)pr.catch(()=>{});
+  }catch(e){}
+  return cfg;
+}
+function hideBaggyVideo(){ if(!boxVideo)return; try{boxVideo.pause();boxVideo.classList.remove('show');}catch(e){} }
 function openLootBox(box){
   if(totalBags<box.price)return;
   totalBags-=box.price;
@@ -2052,8 +2074,9 @@ function startBoxAnim(box,res,sub){
   boxLabel.textContent=box.name+' …';boxLabel.style.color='#fff';
   boxSub.textContent='';
   boxAnim={t:0,box,res,sub,revealed:false,particles:[]};
+  boxAnim.vid=playBaggyVideo(res.rarity);
   boxAgain.onclick=()=>{ if(totalBags<box.price){boxSub.textContent='Nicht genug Baggys!';return;} openLootBox(box); };
-  boxDone.onclick=()=>{boxAnim=null;openBoxEl.style.display='none';renderShop();updateBagsUI();};
+  boxDone.onclick=()=>{boxAnim=null;hideBaggyVideo();openBoxEl.style.display='none';renderShop();updateBagsUI();};
   if(!boxLoopRunning){boxLoopRunning=true;requestAnimationFrame(boxLoop);}
 }
 function boxLoop(ts){
@@ -2064,22 +2087,25 @@ function boxLoop(ts){
   const t=boxAnim.t,a=boxAnim;
   const rar=RARITY[a.res.rarity];
   bctx.clearRect(0,0,300,300);
+  const hasVid=!!(boxVideo&&boxVideo.classList.contains('show'));
   if(t<1.2){
-    // shake phase
-    const sh=Math.sin(t*40)*(2+t*6);
-    drawBaggy(bctx,150,150,2.2,a.box.bag,0,sh);
+    // Baggy kommt nach vorne (Video) – Fallback: gezeichnetes Tütchen
+    if(!hasVid){const sh=Math.sin(t*40)*(2+t*6);drawBaggy(bctx,150,150,2.2,a.box.bag,0,sh);}
     boxLabel.textContent=a.box.name+' …';
   }else if(t<1.9){
     const p=(t-1.2)/0.7;
-    drawBaggy(bctx,150,150-p*20,2.2,a.box.bag,p,Math.sin(t*30)*2*(1-p));
-    // flash
-    bctx.fillStyle='rgba(255,255,255,'+(p*0.55)+')';bctx.fillRect(0,0,300,300);
+    if(!hasVid){
+      drawBaggy(bctx,150,150-p*20,2.2,a.box.bag,p,Math.sin(t*30)*2*(1-p));
+      bctx.fillStyle='rgba(255,255,255,'+(p*0.55)+')';bctx.fillRect(0,0,300,300);
+    }
     boxLabel.textContent='ÖFFNET…';
   }else{
     if(!a.revealed){
       a.revealed=true;
-      for(let i=0;i<40;i++){
-        const ang=Math.random()*Math.PI*2,sp=40+Math.random()*160;
+      hideBaggyVideo();
+      const vc=a.vid||BAGGY_VIDS.common;
+      for(let i=0;i<vc.parts;i++){
+        const ang=Math.random()*Math.PI*2,sp=40+Math.random()*vc.spread;
         a.particles.push({x:150,y:150,vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp,life:1.2,c:Math.random()<0.5?rar.color:'#ffffff'});
       }
       boxLabel.textContent=rar.name+' – '+a.res.item.name;
