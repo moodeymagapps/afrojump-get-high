@@ -7435,6 +7435,7 @@ function duelBeginBuild(){
   ed.parts=[];ed.hist=[];ed.verified=false;ed.rev++;ed.world=null;ed.worldRev=-1;
   edSetCam(CAM_MAX);
   gameState='editor';showOverlay('editor');
+  ed.autoLeft=ED_AUTO_MAX;edAutoBtnUI();
   edValidate();edRefreshUI();
   edPhaseEl.textContent='MAP BAUEN · ZIEL '+GOAL_M+'m'+(duelCfg.budget==='inf'?' · ∞':'');
 }
@@ -7470,7 +7471,72 @@ edScrollEl.addEventListener('input',()=>{
   const t=Number(edScrollEl.value)/1000;
   ed.cam=CAM_MIN+(CAM_MAX-CAM_MIN)*t;
 });
+// ---------- Auto-Generator: fertige, spielbare Map (max. 5x) ----------
+const ED_AUTO_MAX=5;
+function edAutoLeft(){return ed.autoLeft==null?ED_AUTO_MAX:ed.autoLeft;}
+function edAutoBtnUI(){
+  const b=document.getElementById('edAuto');if(!b)return;
+  const n=edAutoLeft();
+  b.textContent='🎲 AUTO '+n+'/'+ED_AUTO_MAX;
+  b.disabled=n<=0;
+}
+function edAutoBuild(){
+  const climb=START_Y-GOAL_Y-160;
+  const cap=v=>v===Infinity?null:v;
+  const P=Math.max(6,Math.min(cap(BUDGET.plat)||96,96));
+  const T=Math.max(2,Math.min(cap(BUDGET.boost)||18,18));
+  const gpMax=178,gtMax=600;
+  const s=Math.min(1,climb/(P*gpMax+T*gtMax));
+  const gp=gpMax*s, gt=gtMax*s;
+  const total=P+T;
+  const trampEvery=T>0?total/T:1e9;
+  const parts=[];
+  let y=START_Y-100, x=W/2, nextTramp=trampEvery;
+  for(let i=0;i<total&&y>GOAL_Y+120;i++){
+    const isT=T>0&&i>=Math.floor(nextTramp)-1;
+    if(isT)nextTramp+=trampEvery;
+    const spread=isT?150:170;
+    let nx=x+(Math.random()*2-1)*spread;
+    nx=Math.max(40,Math.min(W-40,nx));
+    parts.push({k:isT?'tramp':(Math.random()<0.14?'move':(Math.random()<0.12?'brit':'plat')),x:edSnap(nx),y:edSnap(y)});
+    x=nx;
+    y-=isT?gt:gp;
+  }
+  // Items auf ein paar Plattformen
+  const items=cap(BUDGET.item)||24, en=cap(BUDGET.enemy)||14;
+  let ic=0, ec=0;
+  for(let i=2;i<parts.length&&ic<items;i+=3){
+    const q=parts[i];
+    const k=ic%7===3?'gun':(ic%5===4?'joint':'bag');
+    parts.push({k:k,x:q.x,y:edSnap(q.y-34)});ic++;
+  }
+  for(let i=4;i<parts.length&&ec<Math.max(0,Math.floor(en/2));i+=9){
+    const q=parts[i];
+    if(!PLAT_KINDS[q.k]||q.k==='tramp')continue;
+    parts.push({k:'cop',x:q.x,y:q.y});ec++;
+  }
+  return parts;
+}
+function edAutoGenerate(){
+  if(edAutoLeft()<=0){edSay('Keine Auto-Maps mehr übrig.',true);return;}
+  let best=null;
+  for(let tries=0;tries<12;tries++){
+    const parts=edAutoBuild();
+    const keep=ed.parts;
+    ed.parts=parts;
+    const v=edValidate();
+    ed.parts=keep;
+    if(v.ok&&!v.bad.length){best=parts;break;}
+    if(!best||v.ok)best=parts;
+  }
+  ed.autoLeft=edAutoLeft()-1;
+  ed.parts=best;ed.hist=[];
+  edTouch();edAutoBtnUI();
+  edSay('Map erzeugt ✔ Du kannst sie im Editor noch ändern. Noch '+edAutoLeft()+'x neu.',true);
+  sfx('pickup');
+}
 document.getElementById('edUndo').onclick=()=>edUndo();
+document.getElementById('edAuto').onclick=()=>edAutoGenerate();
 document.getElementById('edClear').onclick=()=>{if(!ed.parts.length)return;ed.parts=[];ed.hist=[];edTouch();edSay('Map geleert.',true);};
 document.getElementById('edTest').onclick=()=>{
   if(!ed.parts.length){edSay('Baue erst ein paar Teile.',true);return;}
