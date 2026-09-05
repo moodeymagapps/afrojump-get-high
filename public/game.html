@@ -1103,66 +1103,33 @@ function tryPlayMusic(){if(!muted){bgm.play().catch(()=>{});}}
 function stopMusic(){try{bgm.pause();}catch(e){}}
 muteBtn.onclick=(e)=>{e.stopPropagation();muted=!muted;localStorage.setItem(MK,muted?'1':'0');updateMuteUI();if(muted){stopMusic();stopBossMusic();}else{if(!boss)tryPlayMusic();}};
 updateMuteUI();
-// ---------- Procedural Boss Music (WebAudio synth — no file needed) ----------
-let audioCtx=null,bossMusicNodes=null;
+// ---------- Boss Music (ein eigener Track pro Boss) ----------
+let audioCtx=null;
 function ensureAudio(){if(!audioCtx){try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}}return audioCtx;}
-function startBossMusic(){
+const BOSS_TRACKS={
+  captainhash:'/__l5e/assets-v1/8710c96e-e06c-493c-8f54-d65a342fbbce/boss1.mp3',
+  madhoney:'/__l5e/assets-v1/942c2700-7c8b-4c87-8ff7-64ea5dd178d8/boss2.mp3',
+  icebongyeti:'/__l5e/assets-v1/9197379f-74d7-4176-8d55-dd64f590bc5d/boss3.mp3',
+  radioactiverudy:'/__l5e/assets-v1/beb69e45-26d0-4759-8b97-820cf5f52a05/boss4.mp3',
+  discodank:'/__l5e/assets-v1/d37263fe-f7b9-4c6d-a7ec-c7375848e459/boss5.mp3'
+};
+let bossAudio=null,bossAudioKind=null;
+function startBossMusic(kind){
+  stopMusic(); // normale Musik aus
+  const src=BOSS_TRACKS[kind];
+  if(!src){stopBossMusic();return;}
+  if(bossAudio&&bossAudioKind!==kind)stopBossMusic();
   if(muted)return;
-  stopMusic(); // duck main bgm
-  const ac=ensureAudio();if(!ac)return;
-  if(bossMusicNodes)return;
-  if(ac.state==='suspended')ac.resume().catch(()=>{});
-  const master=ac.createGain();master.gain.value=0;master.connect(ac.destination);
-  master.gain.linearRampToValueAtTime(0.35,ac.currentTime+0.4);
-  // menacing bass sequence — dubby, reggae/cartoon boss vibe
-  const notes=[55,55,49,55, 65.4,55,49,58.3]; // A1 pattern with a G1 flavor
-  const step=0.28;
-  const bass=ac.createOscillator();bass.type='sawtooth';
-  const bassGain=ac.createGain();bassGain.gain.value=0;
-  const bassFilt=ac.createBiquadFilter();bassFilt.type='lowpass';bassFilt.frequency.value=340;bassFilt.Q.value=6;
-  bass.connect(bassFilt).connect(bassGain).connect(master);
-  bass.start();
-  // arpeggio lead
-  const lead=ac.createOscillator();lead.type='square';
-  const leadGain=ac.createGain();leadGain.gain.value=0;
-  const leadFilt=ac.createBiquadFilter();leadFilt.type='lowpass';leadFilt.frequency.value=1800;
-  lead.connect(leadFilt).connect(leadGain).connect(master);
-  lead.start();
-  // scheduler
-  let stepIdx=0;
-  const schedule=()=>{
-    if(!bossMusicNodes)return;
-    const t=ac.currentTime;
-    const n=notes[stepIdx%notes.length];
-    bass.frequency.setValueAtTime(n,t);
-    bassGain.gain.cancelScheduledValues(t);
-    bassGain.gain.setValueAtTime(0.9,t);
-    bassGain.gain.exponentialRampToValueAtTime(0.001,t+step*0.9);
-    // lead: play offbeat
-    const leadNote=n*4*(stepIdx%2?1.5:1);
-    lead.frequency.setValueAtTime(leadNote,t+step*0.5);
-    leadGain.gain.setValueAtTime(0.15,t+step*0.5);
-    leadGain.gain.exponentialRampToValueAtTime(0.001,t+step*0.9);
-    // kick click
-    if(stepIdx%2===0){
-      const kick=ac.createOscillator();const kg=ac.createGain();
-      kick.frequency.setValueAtTime(120,t);kick.frequency.exponentialRampToValueAtTime(40,t+0.15);
-      kg.gain.setValueAtTime(0.5,t);kg.gain.exponentialRampToValueAtTime(0.001,t+0.2);
-      kick.connect(kg).connect(master);kick.start(t);kick.stop(t+0.22);
-    }
-    stepIdx++;
-  };
-  schedule();
-  const iv=setInterval(schedule,step*1000);
-  bossMusicNodes={master,bass,lead,iv,ctx:ac};
+  if(!bossAudio){
+    bossAudio=new Audio(src);
+    bossAudio.loop=true;bossAudio.volume=0.6;bossAudioKind=kind;
+  }
+  bossAudio.play().catch(()=>{});
 }
 function stopBossMusic(){
-  if(!bossMusicNodes)return;
-  const {master,bass,lead,iv,ctx}=bossMusicNodes;
-  clearInterval(iv);
-  try{master.gain.cancelScheduledValues(ctx.currentTime);master.gain.linearRampToValueAtTime(0,ctx.currentTime+0.3);}catch(e){}
-  setTimeout(()=>{try{bass.stop();lead.stop();master.disconnect();}catch(e){}},400);
-  bossMusicNodes=null;
+  if(!bossAudio)return;
+  try{bossAudio.pause();bossAudio.currentTime=0;}catch(e){}
+  bossAudio=null;bossAudioKind=null;
 }
 // ---------- SFX (kurze WebAudio-Blips – kein Boss-Loop mehr) ----------
 function sfx(kind){
