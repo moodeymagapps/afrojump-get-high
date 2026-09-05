@@ -3065,22 +3065,29 @@ function spawnBoss(){
   }
   scrollLocked=true;
 
-  // --- Boss arena: clear everything above the boss so the player can never
-  // get stuck on a platform out of reach and build a fair fighting floor ---
-  const arenaTop=boss.y+boss.h/2+70;
-  platforms=platforms.filter(p=>p.y>arenaTop);
-  collectibles=collectibles.filter(c=>c.y>arenaTop);
-  enemies=enemies.filter(e=>e.boss||!e.plat||e.plat.y>arenaTop);
-  const floorY=cameraY+H-80;
-  // fairere Arena: mehr Standflächen, gleichmäßige Sprungabstände bis zum Boss
-  const arena=[[30,floorY],[W/2-40,floorY-70],[W-110,floorY-30],[20,floorY-130],[W/2-40,floorY-195],[W-105,floorY-160],[35,floorY-250],[W-115,floorY-290]];
+  // --- Boss-Arena: geschlossener Raum. Boden unten, ein paar Plattformen,
+  // Spieler unten, Boss oben – er kommt zu DIR runter. ---
+  const arenaTop=cameraY+40;
+  platforms=platforms.filter(p=>false);
+  collectibles=collectibles.filter(c=>false);
+  enemies=enemies.filter(e=>e.boss);
+  const floorY=cameraY+H-46;
+  boss.floorY=floorY;
+  boss.arenaTop=arenaTop;
+  // durchgehender Boden, damit man nie runterfällt
+  platforms.push({x:-20,y:floorY,w:W+40,h:14,vx:0,type:'normal',dir:1,range:0,ox:-20,bounce:0,cracked:0,springT:0,arenaFloor:true});
+  const arena=[[W*0.10-45,floorY-105],[W*0.50-45,floorY-165],[W*0.86-45,floorY-105],[W*0.28-45,floorY-250],[W*0.72-45,floorY-250]];
   for(const [ax,ay] of arena){
-    platforms.push({x:ax,y:ay,w:86,h:12,vx:0,type:'normal',dir:1,range:0,ox:ax,bounce:0,cracked:0,springT:0});
+    platforms.push({x:ax,y:ay,w:90,h:12,vx:0,type:'normal',dir:1,range:0,ox:ax,bounce:0,cracked:0,springT:0});
   }
   platforms.sort((a,b)=>b.y-a.y);
+  // Spieler unten in der Arena, Boss oben daneben
+  player.x=W*0.5;player.y=floorY-46;player.vx=0;player.vy=-6;
+  boss.x=W*0.68;boss.y=cameraY+120;
+  boss.yTarget=cameraY+120;
+  boss.descend=0;
   player.bossLives=3;player.invincible=Math.max(player.invincible,1.2);
   player.invSrc='spawn';
-  if(player.y<arenaTop){player.y=arenaTop+60;player.vy=2;}
   const nm=(BOSS_NAMES[kind]||'BOSS');
   pushFloat(W/2,cameraY+150,nm,'#ffdd00');
   if(BOSS_SUBS[kind])pushFloat(W/2,cameraY+172,BOSS_SUBS[kind],'#ffe082');
@@ -3090,7 +3097,8 @@ function spawnBoss(){
   // Musik komplett aus im Bossfight – nur Sounds
   stopMusic();startBossMusic(kind);sfx('boss');
   // eine Waffe zum Start, damit man sofort was tun kann
-  collectibles.push({x:W/2,y:cameraY+H-140,type:'gun',t:0,taken:false});
+  collectibles.push({x:W/2,y:floorY-200,type:'gun',t:0,taken:false});
+
 }
 
 
@@ -3160,6 +3168,11 @@ function update(dt){
   }
   if(player.gunT>0)player.gunT-=dt;
   player.y+=player.vy;
+  // Im Bossfight: Decke – man springt nie aus dem Bild und sieht sich immer
+  if(boss&&scrollLocked){
+    const cTop=(boss.arenaTop==null?cameraY+40:boss.arenaTop)+player.r+4;
+    if(player.y<cTop){player.y=cTop;if(player.vy<0)player.vy=0.5;}
+  }
 
   // squash/stretch — stretch when rising fast, squash briefly after landing
   const vyN=Math.max(-16,Math.min(16,player.vy));
@@ -3392,9 +3405,21 @@ if(!lavaMode&&!boss&&bestY>=nextBossScore){spawnBoss();}
       if(boss.x>W-60){boss.x=W-60;boss.vx*=-1;}
     }
     boss.bob+=dt;
-    if(!boss.noFloat)boss.y=cameraY+150+Math.sin(boss.bob*(boss.rage?2.6:1.6))*14;
+    const aTop=(boss.arenaTop==null?cameraY+40:boss.arenaTop);
+    const aFloor=(boss.floorY==null?cameraY+H-46:boss.floorY);
+    if(!boss.noFloat){
+      // Boss startet oben und sinkt langsam zum Spieler herab
+      const highY=aTop+boss.h/2+16;
+      const lowY=aFloor-boss.h/2-64;
+      boss.descend=Math.min(lowY-highY,(boss.descend||0)+dt*(boss.rage?34:22));
+      const ty=highY+boss.descend+Math.sin(boss.bob*(boss.rage?2.6:1.6))*10;
+      boss.y+=(ty-boss.y)*Math.min(1,dt*4);
+      // sanft dem Spieler folgen, damit man ihn treffen kann
+      boss.x+=Math.max(-1.1,Math.min(1.1,(player.x-boss.x)*0.012))*(boss.rage?1.4:1);
+    }
     // Boss bleibt IMMER im Bild (nie durch den Boden, nie aus der Arena)
-    boss.y=Math.max(cameraY+70,Math.min(cameraY+H*0.55,boss.y));
+    boss.y=Math.max(aTop+boss.h/2,Math.min(aFloor-boss.h/2-30,boss.y));
+
     boss.x=Math.max(50,Math.min(W-50,boss.x));
     boss.hitT-=dt;
     boss.phase+=dt;
@@ -3423,7 +3448,7 @@ if(!lavaMode&&!boss&&bestY>=nextBossScore){spawnBoss();}
         if(spec&&spec.stomp)ok=spec.stomp(boss);
         player.vy=-17;
         if(ok&&!invulnerable&&!(spec&&spec.hit&&spec.hit(boss,1))){
-          boss.hp--;boss.hitT=0.3;burst(player.x,boss.y-boss.h/2,'#ff5252',20);addShake(6,0.25);pushFloat(boss.x,boss.y-boss.h/2,'-1','#ff5252');sfx('stomp');
+          boss.hp--;boss.hitT=0.3;boss.descend=Math.max(0,(boss.descend||0)-110);burst(player.x,boss.y-boss.h/2,'#ff5252',20);addShake(6,0.25);pushFloat(boss.x,boss.y-boss.h/2,'-1','#ff5252');sfx('stomp');
         }else if(!ok){burst(player.x,boss.y-boss.h/2,'#bdbdbd',8);}
       }
       // hit by projectile
