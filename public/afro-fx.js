@@ -24,8 +24,8 @@
       el.style.background = "#0b1a0b";
       el.style.backgroundColor = "#0b1a0b";
       el.style.width = "100%";
-      el.style.height = h ? h + "px" : "100%";
-      el.style.minHeight = h ? h + "px" : "100dvh";
+      el.style.height = "100%";
+      el.style.minHeight = "100%";
       el.style.margin = "0";
       el.style.overflow = "hidden";
     });
@@ -34,7 +34,7 @@
       wrap.style.background = "#0b1a0b";
       wrap.style.inset = "0";
       wrap.style.width = w ? w + "px" : "100%";
-      wrap.style.height = h ? h + "px" : "100%";
+      wrap.style.height = "100%";
     }
   }
   paintFill();

@@ -282,7 +282,7 @@ export function Index() {
         right: 0,
         bottom: 0,
         width: "100%",
-        height: "100dvh",
+        height: "100%",
         minHeight: "-webkit-fill-available",
         background: "#0b1a0b",
         overflow: "hidden",
