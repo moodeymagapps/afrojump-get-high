@@ -1896,10 +1896,14 @@ function drawSkinIntoCanvas(g,s,cv){
 }
 function drawSetPreview(g,set,cv){
   const skin=SKINS.find(s=>s.id===set.skin),weapon=WEAPON_SKINS.find(w=>w.id===set.weapon),joint=JOINT_SKINS.find(j=>j.id===set.joint);
-  g.clearRect(0,0,cv.width,cv.height);
-  if(skin){const mini=document.createElement('canvas');mini.width=mini.height=110;drawSkinIntoCanvas(mini.getContext('2d'),skin,mini);g.drawImage(mini,0,20,110,110);}
-  if(weapon){const mini=document.createElement('canvas');mini.width=mini.height=80;drawWeaponPreview(mini.getContext('2d'),weapon);g.drawImage(mini,88,10,68,68);}
-  if(joint){const mini=document.createElement('canvas');mini.width=mini.height=80;drawJointPreview(mini.getContext('2d'),joint);g.drawImage(mini,88,82,68,68);}
+  const paint=()=>{
+    g.clearRect(0,0,cv.width,cv.height);g.imageSmoothingEnabled=false;
+    if(skin){const e=loadSkinImage(skin.img,skin.bgKey);if(e.canvas)g.drawImage(e.canvas,0,0,96,128,4,18,96,128);}
+    if(weapon){const im=itemImg(weapon.img);if(im)g.drawImage(im,98,10,58,58);}
+    if(joint){const im=itemImg(joint.img);if(im)g.drawImage(im,98,88,58,58);}
+    if(cv.isConnected&&(!skin||!loadSkinImage(skin.img,skin.bgKey).canvas||!weapon||!itemImg(weapon.img)||!joint||!itemImg(joint.img)))setTimeout(paint,80);
+  };
+  paint();
 }
 // ---- Stat-/Vorteils-Aufbereitung (nur vorhandene Perk-Werte) ----
 const clamp01=v=>Math.max(0.06,Math.min(1,v));
