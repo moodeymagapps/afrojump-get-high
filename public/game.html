@@ -2000,7 +2000,7 @@ function renderBoxes(){
     card.appendChild(cv);
     const nm=document.createElement('div');nm.className='bname';nm.textContent=b.name;card.appendChild(nm);
     const od=document.createElement('div');od.className='odds';
-    od.innerHTML=Object.entries(b.odds).map(([r,p])=>'<span style="color:'+RARITY[r].color+'">'+RARITY[r].name+' '+(p*100).toFixed(p<0.05?1:0)+'%</span>').join(' · ');
+    od.innerHTML=Object.entries(b.odds).map(([r,p])=>'<span style="color:'+RARITY[r].color+'">'+RARITY[r].name+' '+(p*100<0.1?(p*100).toFixed(2):(p*100).toFixed(p<0.05?1:0))+'%</span>').join(' · ');
     card.appendChild(od);
     const btn=document.createElement('button');
     btn.textContent='ÖFFNEN – 🌿 '+b.price;
