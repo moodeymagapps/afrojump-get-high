@@ -195,6 +195,12 @@
   .boxCard button:disabled{background:#4a1414;color:#c99;cursor:not-allowed;box-shadow:inset -2px -2px 0 #200, inset 2px 2px 0 #7a2a2a;}
   #openBox{background:linear-gradient(rgba(6,4,12,.96),rgba(6,4,12,.99));}
   #openBox canvas{background:transparent;box-shadow:none;image-rendering:pixelated;}
+  #boxStage{position:relative;width:300px;height:300px;}
+  #boxStage canvas,#boxStage video{position:absolute;left:0;top:0;width:300px;height:300px;}
+  #boxStage video{object-fit:contain;image-rendering:pixelated;display:none;background:transparent;
+    filter:drop-shadow(0 0 12px var(--bagGlow,rgba(124,252,0,.55)));}
+  #boxStage video.show{display:block;}
+
   #boxLabel{font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:11px;letter-spacing:1px;min-height:20px;text-align:center;text-shadow:2px 2px 0 #000;}
   #boxSub{font-family:'VT323','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:18px;letter-spacing:1px;min-height:22px;opacity:.9;}
   #duelJoinRow{display:flex;gap:6px;width:100%;max-width:340px;margin:6px 0;}
