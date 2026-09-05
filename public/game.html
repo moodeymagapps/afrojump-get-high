@@ -262,7 +262,7 @@
   #edPal button.on b{color:#7cfc00;}
   #edRow{display:flex;gap:4px;align-items:center;}
   #edRow button{border:none;background:#455a64;color:#fff;font-family:inherit;font-size:8px;padding:8px 6px;cursor:pointer;box-shadow:inset -2px -2px 0 #263238, inset 2px 2px 0 #90a4ae, 0 2px 0 #263238;}
-  #edTest{background:#ffb300!important;color:#111!important;box-shadow:inset -2px -2px 0 #b47a00, inset 2px 2px 0 #ffe082, 0 2px 0 #b47a00!important;}
+  #edAuto,#edTest{background:#ffb300!important;color:#111!important;box-shadow:inset -2px -2px 0 #b47a00, inset 2px 2px 0 #ffe082, 0 2px 0 #b47a00!important;}
   #edSend{background:#4caf50!important;box-shadow:inset -2px -2px 0 #1b5e20, inset 2px 2px 0 #a5d6a7, 0 2px 0 #1b5e20!important;}
   #edSend:disabled{background:#4a1414!important;color:#c99!important;box-shadow:inset -2px -2px 0 #200, inset 2px 2px 0 #7a2a2a!important;cursor:not-allowed;}
   #edScroll{flex:1;min-width:40px;accent-color:#7cfc00;}
@@ -339,7 +339,7 @@
     box-shadow:0 3px 0 rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.12);
     transition:transform .08s ease,filter .12s ease;}
   #edRow button:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.5);}
-  #edTest{background:linear-gradient(180deg,#ffcf4d,#e29500)!important;color:#1a1200!important;
+  #edAuto,#edTest{background:linear-gradient(180deg,#ffcf4d,#e29500)!important;color:#1a1200!important;
     border-color:rgba(255,224,130,.7)!important;
     box-shadow:0 3px 0 rgba(0,0,0,.5),0 0 14px rgba(255,183,0,.28),inset 0 1px 0 rgba(255,255,255,.35)!important;}
   #edSend{background:linear-gradient(180deg,#6ee06f,#2e7d32)!important;
@@ -528,7 +528,7 @@
   #edPal button.on{background:#0d3d00;box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #7cfc00, 0 3px 0 #000;}
   #edRow button{background:#455a64;border:none;
     box-shadow:inset -2px -2px 0 #263238, inset 2px 2px 0 #90a4ae, 0 3px 0 #000;}
-  #edTest{background:#ffb300!important;color:#111!important;
+  #edAuto,#edTest{background:#ffb300!important;color:#111!important;
     box-shadow:inset -2px -2px 0 #b47a00, inset 2px 2px 0 #ffe082, 0 3px 0 #000!important;}
   #edSend{background:#4caf50!important;
     box-shadow:inset -2px -2px 0 #1b5e20, inset 2px 2px 0 #a5d6a7, 0 3px 0 #000!important;}
@@ -655,7 +655,7 @@
   .carAct,.carArrow,
   .skinCard button,.boxCard button,
   #duelJoinBtn,#duelCfg .cfgBtns button,
-  #edUndo,#edClear,#edTest,#edSend,
+  #edUndo,#edClear,#edAuto,#edTest,#edSend,
   .btn.icon{
     --c:#4f9d20;--cd:#1e4409;--cl:#9dea52;
     position:relative;border:none;cursor:pointer;color:#fff;
@@ -676,7 +676,7 @@
   .overlay .btn:active:not(:disabled),.tabs button:active,.carAct:active:not(:disabled),
   .carArrow:active,.skinCard button:active:not(:disabled),.boxCard button:active:not(:disabled),
   #duelJoinBtn:active,#duelCfg .cfgBtns button:active,
-  #edUndo:active,#edClear:active,#edTest:active,#edSend:active:not(:disabled),.btn.icon:active{
+  #edUndo:active,#edClear:active,#edAuto,#edTest:active,#edSend:active:not(:disabled),.btn.icon:active{
     transform:translateY(4px) scale(.965);
     box-shadow:inset -4px -4px 0 var(--cd), inset 4px 4px 0 var(--cl), 0 0 0 4px #05040a, 0 2px 0 rgba(0,0,0,.6);
     filter:brightness(1.25);
@@ -684,9 +684,9 @@
   .overlay .btn:disabled,.carAct:disabled,.skinCard button:disabled,.boxCard button:disabled,#edSend:disabled{
     filter:grayscale(.7) brightness(.7);cursor:not-allowed;transform:none!important;}
   /* Farbvarianten (Funktion = Farbe) */
-  .btn.v-green,.tabs button.on,#edTest{--c:#4f9d20;--cd:#1e4409;--cl:#9dea52;}
+  .btn.v-green,.tabs button.on,#edAuto,#edTest{--c:#4f9d20;--cd:#1e4409;--cl:#9dea52;}
   .btn.v-purple{--c:#7a2fa8;--cd:#340f4c;--cl:#c078e8;}
-  .btn.v-blue{--c:#1f5fa8;--cd:#0a2547;--cl:#67aef2;}
+  .btn.v-blue,#edAuto{--c:#1f5fa8;--cd:#0a2547;--cl:#67aef2;}
   .btn.v-gold,.boxCard button{--c:#c99012;--cd:#5e3d02;--cl:#ffd766;color:#1a1206;text-shadow:2px 2px 0 rgba(255,255,255,.25);}
   .btn.v-red,#duelJoinBtn{--c:#b52a26;--cd:#520d0b;--cl:#f2726c;}
   .btn.v-slate,.btn.ghost,.tabs button,.carArrow,#edUndo,#edClear,#duelCfg .cfgBtns button{--c:#5b6472;--cd:#242a33;--cl:#9aa5b3;}
@@ -707,7 +707,7 @@
   .carArrow{color:#ffd54f;font-size:16px;}
   .skinCard button,.boxCard button{font-size:8px;padding:9px 6px;
     box-shadow:inset -3px -3px 0 var(--cd), inset 3px 3px 0 var(--cl), 0 0 0 3px #05040a, 0 3px 0 rgba(0,0,0,.6);}
-  #duelJoinBtn,#duelCfg .cfgBtns button,#edUndo,#edClear,#edTest,#edSend{font-size:9px;padding:11px 10px;}
+  #duelJoinBtn,#duelCfg .cfgBtns button,#edUndo,#edClear,#edAuto,#edTest,#edSend{font-size:9px;padding:11px 10px;}
 
   /* ---------- Hauptmenü: kompaktes Mobile-Game-Layout ---------- */
   #menu{justify-content:flex-start;gap:0;
@@ -820,7 +820,7 @@
   .overlay .btn:not(.icon),
   .tabs button,.carAct,.skinCard button,.boxCard button,
   #duelJoinBtn,#duelCfg .cfgBtns button,
-  #edTest,#edSend,#edUndo,#edClear{
+  #edAuto,#edTest,#edSend,#edUndo,#edClear{
     background:var(--sBar,var(--sBarGray)) center center/100% 100% no-repeat!important;
     box-shadow:none!important;clip-path:none!important;border:none!important;
     image-rendering:pixelated;
@@ -834,19 +834,19 @@
   .tabs button{min-height:44px;padding:10px 8% 2px;font-size:8px;}
   .carAct{min-height:56px;padding:12px 10% 4px;font-size:10px;}
   .skinCard button,.boxCard button{min-height:40px;padding:9px 8% 2px;font-size:8px;}
-  #duelJoinBtn,#duelCfg .cfgBtns button,#edTest,#edSend,#edUndo,#edClear{
+  #duelJoinBtn,#duelCfg .cfgBtns button,#edAuto,#edTest,#edSend,#edUndo,#edClear{
     min-height:44px;padding:10px 8% 2px;font-size:9px;background-color:transparent!important;}
   /* Farbzuordnung -> Sprite */
-  .btn.v-green,.tabs button.on,#edTest,.carAct.eq,#edSend,.skinCard button{--sBar:var(--sBarGreen);}
+  .btn.v-green,.tabs button.on,#edAuto,#edTest,.carAct.eq,#edSend,.skinCard button{--sBar:var(--sBarGreen);}
   .btn.v-gold,.boxCard button{--sBar:var(--sBarGold);}
-  .btn.v-blue{--sBar:var(--sBarBlue);}
+  .btn.v-blue,#edAuto{--sBar:var(--sBarBlue);}
   .btn.v-purple,.btn.alt{--sBar:var(--sBarPurple);}
   .btn.v-red,#duelJoinBtn,.carAct.lock,.skinCard button:disabled{--sBar:var(--sBarRed);}
   .btn.v-slate,.btn.ghost,.tabs button,.carAct,#edUndo,#edClear,#duelCfg .cfgBtns button{--sBar:var(--sBarGray);}
   .overlay .btn:hover:not(:disabled),.tabs button:hover,.carAct:hover:not(:disabled){filter:brightness(1.12);}
   .overlay .btn:active:not(:disabled),.tabs button:active,.carAct:active:not(:disabled),
   .skinCard button:active:not(:disabled),.boxCard button:active:not(:disabled),
-  #duelJoinBtn:active,#edTest:active,#edSend:active:not(:disabled){
+  #duelJoinBtn:active,#edAuto,#edTest:active,#edSend:active:not(:disabled){
     transform:translateY(3px) scale(.97);box-shadow:none!important;filter:brightness(1.2);}
   .overlay .btn:disabled,.carAct:disabled,.skinCard button:disabled,.boxCard button:disabled,#edSend:disabled{
     filter:grayscale(.55) brightness(.72);}
@@ -985,6 +985,7 @@
     <div id="edRow">
       <button id="edUndo" title="Zurück">↶</button>
       <button id="edClear" title="Alles löschen">🗑</button>
+      <button id="edAuto" title="Map automatisch erzeugen">🎲 AUTO</button>
       <input id="edScroll" type="range" min="0" max="1000" value="1000" />
       <button id="edTest">▶ TEST</button>
       <button id="edSend" disabled>✓ SENDEN</button>
@@ -7434,6 +7435,7 @@ function duelBeginBuild(){
   ed.parts=[];ed.hist=[];ed.verified=false;ed.rev++;ed.world=null;ed.worldRev=-1;
   edSetCam(CAM_MAX);
   gameState='editor';showOverlay('editor');
+  ed.autoLeft=ED_AUTO_MAX;edAutoBtnUI();
   edValidate();edRefreshUI();
   edPhaseEl.textContent='MAP BAUEN · ZIEL '+GOAL_M+'m'+(duelCfg.budget==='inf'?' · ∞':'');
 }
@@ -7469,7 +7471,77 @@ edScrollEl.addEventListener('input',()=>{
   const t=Number(edScrollEl.value)/1000;
   ed.cam=CAM_MIN+(CAM_MAX-CAM_MIN)*t;
 });
+// ---------- Auto-Generator: fertige, spielbare Map (max. 5x) ----------
+const ED_AUTO_MAX=5;
+function edAutoLeft(){return ed.autoLeft==null?ED_AUTO_MAX:ed.autoLeft;}
+function edAutoBtnUI(){
+  const b=document.getElementById('edAuto');if(!b)return;
+  const n=edAutoLeft();
+  b.textContent='🎲 AUTO '+n+'/'+ED_AUTO_MAX;
+  b.disabled=n<=0;
+}
+function edAutoBuild(){
+  const climb=START_Y-GOAL_Y-200;
+  const cap=v=>v===Infinity?null:v;
+  const P=Math.max(6,Math.min(cap(BUDGET.plat)||120,240));
+  const T=Math.max(0,Math.min(cap(BUDGET.boost)||24,48));
+  const cap2=P+T;
+  const y0=START_Y-110, yEnd=GOAL_Y+140;
+  const span=y0-yEnd;
+  let n=Math.min(cap2,Math.max(2,Math.ceil(span/165)+1));
+  const g=span/(n-1);
+  const total=n;
+  const trampEvery=T>0?total/T:1e9;
+  const parts=[];
+  let y=y0, x=W/2, nextT=trampEvery;
+  for(let i=0;i<total;i++){
+    const isT=T>0&&i+1>=Math.floor(nextT);
+    if(isT)nextT+=trampEvery;
+    let nx=x+(Math.random()*2-1)*170;
+    if(nx<40||nx>W-40)nx=x-(nx-x);
+    nx=Math.max(40,Math.min(W-40,nx));
+    const r=Math.random();
+    const k=isT?(r<0.5?'tramp':'spring'):(r<0.12?'move':(r<0.2?'brit':(r<0.26?'slip':'plat')));
+    parts.push({k:k,x:edSnap(nx),y:edSnap(y)});
+    x=nx;
+    y-=g;
+  }
+  const plats=parts.slice();
+  const items=cap(BUDGET.item)||24, en=cap(BUDGET.enemy)||14;
+  let ic=0, ec=0;
+  for(let i=2;i<plats.length&&ic<items;i+=3){
+    const q=plats[i];
+    const k=ic%7===3?'gun':(ic%5===4?'joint':'bag');
+    parts.push({k:k,x:q.x,y:edSnap(q.y-36)});ic++;
+  }
+  const maxEn=Math.max(0,Math.floor(en/2));
+  for(let i=6;i<plats.length&&ec<maxEn;i+=8){
+    const q=plats[i];
+    if(q.k==='tramp'||q.k==='spring'||q.k==='brit')continue;
+    parts.push({k:'cop',x:q.x,y:q.y});ec++;
+  }
+  return parts;
+}
+function edAutoGenerate(){
+  if(edAutoLeft()<=0){edSay('Keine Auto-Maps mehr übrig.',true);return;}
+  let best=null;
+  for(let tries=0;tries<12;tries++){
+    const parts=edAutoBuild();
+    const keep=ed.parts;
+    ed.parts=parts;
+    const v=edValidate();
+    ed.parts=keep;
+    if(v.ok&&!v.bad.length){best=parts;break;}
+    if(!best||v.ok)best=parts;
+  }
+  ed.autoLeft=edAutoLeft()-1;
+  ed.parts=best;ed.hist=[];
+  edTouch();edAutoBtnUI();
+  edSay('Map erzeugt ✔ Du kannst sie im Editor noch ändern. Noch '+edAutoLeft()+'x neu.',true);
+  sfx('pickup');
+}
 document.getElementById('edUndo').onclick=()=>edUndo();
+document.getElementById('edAuto').onclick=()=>edAutoGenerate();
 document.getElementById('edClear').onclick=()=>{if(!ed.parts.length)return;ed.parts=[];ed.hist=[];edTouch();edSay('Map geleert.',true);};
 document.getElementById('edTest').onclick=()=>{
   if(!ed.parts.length){edSay('Baue erst ein paar Teile.',true);return;}
