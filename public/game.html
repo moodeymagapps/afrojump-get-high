@@ -3292,12 +3292,19 @@ function update(dt){
     if(player.shootCd<=0){
       // straight up, always — Waffen-Skin bestimmt Rate, Speed, Streuung, Durchschlag
       const wp=wperk(), sp=-12*(wp.speed||1);
-      projectiles.push({x:player.x,y:player.y-12,vx:0,vy:sp,life:2,pierce:wp.pierce?2:0,blast:wp.blast||0});
+      const mk=()=>{
+        const s={x:player.x,y:player.y-12,vx:0,vy:sp,life:2,pierce:wp.pierce?2:0,blast:wp.blast||0,spin:0};
+        if(wp.nade){s.nade=1;s.fuse=0.8;s.blast=2;s.life=3;s.vy=sp*0.8;}
+        if(wp.stun){s.stun=wp.stun;}
+        if(wp.boomerang){s.boom=wp.boomerang;s.life=5;s.pierce=99;}
+        return s;
+      };
+      projectiles.push(mk());
       if(wp.spread){
-        projectiles.push({x:player.x,y:player.y-12,vx:-2.4,vy:sp*0.95,life:2,pierce:0,blast:0});
-        projectiles.push({x:player.x,y:player.y-12,vx: 2.4,vy:sp*0.95,life:2,pierce:0,blast:0});
+        const a=mk(),b=mk();a.vx=-2.4;b.vx=2.4;a.vy=sp*0.95;b.vy=sp*0.95;
+        projectiles.push(a,b);
       }
-      player.shootCd=0.12*(wp.cd||1);
+      player.shootCd=wp.nade?(wp.nadeCd||5):0.12*(wp.cd||1);
     }
   }else if(shootRequested){
     if(player.noGunT===undefined||player.noGunT<=0){
@@ -3308,7 +3315,24 @@ function update(dt){
   if(player.noGunT>0)player.noGunT-=dt;
   shootRequested=false;
   player.shootCd-=dt;
-  for(const pr of projectiles){pr.x+=(pr.vx||0);pr.y+=pr.vy;pr.life-=dt;}
+  for(const pr of projectiles){
+    pr.spin=(pr.spin||0)+dt*14;
+    if(pr.nade){pr.vy+=26*dt;pr.fuse-=dt;if(pr.fuse<=0){nadeBoom(pr);pr.life=0;continue;}}
+    if(pr.boom){
+      // Dolch: fliegt hoch, kehrt zum Spieler zurück, bis zu 2x
+      if(!pr.back){pr.vy+=22*dt;if(pr.vy>=0)pr.back=1;}
+      else{
+        const dx=player.x-pr.x,dy=(player.y-14)-pr.y,d=Math.hypot(dx,dy)||1;
+        pr.vx=dx/d*9;pr.vy=dy/d*9;
+        if(d<26){
+          pr.boom--;
+          if(pr.boom>0){pr.back=0;pr.x=player.x;pr.y=player.y-12;pr.vx=0;pr.vy=-12*(wperk().speed||1);pr.life=Math.max(pr.life,2.5);}
+          else pr.life=0;
+        }
+      }
+    }
+    pr.x+=(pr.vx||0);pr.y+=pr.vy;pr.life-=dt;
+  }
 
   // projectiles vs enemies — one hit always destroys a normal enemy
   for(const pr of projectiles){
@@ -3316,6 +3340,14 @@ function update(dt){
     for(const e of enemies){
       if(!e.alive||e.boss||!e.plat)continue;
       if(Math.abs(pr.x-e.x)<e.w/2+6&&Math.abs(pr.y-(e.y+e.h/2))<e.h/2+8){
+        if(pr.nade){nadeBoom(pr);pr.life=0;break;}
+        if(pr.stun){
+          if(pr.pierce>0)pr.pierce--;else pr.life=0;
+          e.stunT=pr.stun;
+          burst(e.x,e.y,'#81d4fa',14);addShake(2,0.1);
+          pushFloat(e.x,e.y-10,'GELÄHMT!','#4fc3f7');
+          break;
+        }
         if(pr.pierce>0)pr.pierce--;else pr.life=0;
         e.alive=false;
         burst(e.x,e.y,'#ffcc00',20);addShake(3,0.12);
@@ -3331,6 +3363,7 @@ function update(dt){
       }
     }
   }
+
   // shoot down boss orbs too
   for(const pr of projectiles){
     if(pr.life<=0)continue;
