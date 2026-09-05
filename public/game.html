@@ -1296,11 +1296,11 @@ const LOOT_ONLY_SKINS=new Set([]);
 const WEAPON_SKINS=[
   {id:'w_default',  name:'Wasserpistole',    rarity:'common',   free:true, img:'weapons/water.png',    shape:'bubble',core:'#b3e5fc',ring:'#0288d1',perk:{cd:0.92},        ability:'Solides Standardfeuer'},
   {id:'w_sling',    name:'Steinschleuder',   rarity:'common',   img:'weapons/sling.png',    shape:'seed',  core:'#c5a25a',ring:'#7a5c2a',perk:{speed:1.35},              ability:'Sehr schnelle Kugeln'},
-  {id:'w_banana',   name:'Bananen-Blaster',  rarity:'rare',     img:'weapons/banana.png',   shape:'bud',   core:'#fff176',ring:'#f9a825',perk:{spread:1},                ability:'Doppelschuss (Streuung)'},
+  {id:'w_banana',   name:'Taser 5000',       rarity:'rare',     img:'weapons/taser.png',    shape:'taser', core:'#b3e5fc',ring:'#1565c0',perk:{cd:0.7,stun:2},           ability:'Lähmt Gegner 2s – dann tödlich per Berührung'},
   {id:'w_flare',    name:'Flammenwerfer',    rarity:'rare',     img:'weapons/flare.png',    shape:'flame', core:'#ffd54a',ring:'#ff6a00',perk:{gun:2},                   ability:'+2s Waffen-Dauer'},
   {id:'w_smg',      name:'Kush-SMG',         rarity:'epic',     img:'weapons/smg.png',      shape:'bullet',core:'#fffde7',ring:'#616161',perk:{cd:0.55},                 ability:'Dauerfeuer'},
   {id:'w_bombsling',name:'Bomben-Schleuder', rarity:'epic',     img:'weapons/bombsling.png',shape:'bomb',  core:'#c5e1a5',ring:'#33691e',perk:{blast:1},                 ability:'Explosion trifft alles in der Nähe'},
-  {id:'w_chicken',  name:'Huhn-Kanone',      rarity:'legendary',img:'weapons/chicken.png',  shape:'smoke', core:'#ffffff',ring:'#e0e0e0',perk:{pierce:1,cd:0.8,gun:1},   ability:'Durchschlag + mehr Waffenzeit'},
+  {id:'w_chicken',  name:'Splitter-Granate', rarity:'legendary',img:'weapons/grenade.png',  shape:'grenade',core:'#a5d6a7',ring:'#2e7d32',perk:{nade:1,blast:2,nadeCd:5}, ability:'Großflächige Explosion – 5s Cooldown'},
   {id:'w_crossbow', name:'Armbrust 420',     rarity:'legendary',img:'weapons/crossbow.png', shape:'laser', core:'#ffffff',ring:'#7cfc00',perk:{pierce:1,speed:1.5,cd:0.7},ability:'Pfeil durchbohrt alles'},
   // ---- Neue Blaster-Familie (Grau / Blau / Gold) ----
   {id:'w_blastgrey',name:'Beton-Blaster',    rarity:'common',   img:'weapons/blaster_grey.png',  shape:'bullet',core:'#eceff1',ring:'#546e7a',perk:{cd:0.85},                    ability:'Schnellerer Nachladetakt'},
@@ -1318,10 +1318,10 @@ const WEAPON_SKINS=[
   {id:'w_budsniper',   name:'Bud-Sniper',       rarity:'mythic', img:'weapons/budsniper.png',   shape:'laser', core:'#ffffff',ring:'#00e676',perk:{pierce:1,speed:2,cd:0.75},       ability:'Präzisionsschuss durch alles'},
   {id:'w_jointlauncher',name:'Joint-Launcher',  rarity:'mythic', img:'weapons/jointlauncher.png',shape:'smoke',core:'#f5f5f5',ring:'#8d6e63',perk:{blast:1,spread:1,cd:0.65},       ability:'Doppelte Rauch-Granaten'},
   {id:'w_mightyspliff',name:'Mighty Spliff',    rarity:'mythic', img:'weapons/mightyspliff.png',shape:'smoke', core:'#fff8e1',ring:'#ff8a00',perk:{cd:0.45,gun:4},                 ability:'+4s Waffenzeit, schneller Takt'},
-  {id:'w_gravitybong', name:'Gravity-Bong',     rarity:'mythic', img:'weapons/gravitybong.png', shape:'bubble',core:'#e0f7fa',ring:'#00b8d4',perk:{blast:1,speed:1.4,cd:0.55},      ability:'Druckwellen-Schuss'},
+  {id:'w_gravitybong', name:'Wurfstern-Werfer', rarity:'mythic', img:'weapons/shuriken.png',    shape:'shuriken',core:'#eceff1',ring:'#616161',perk:{pierce:1,speed:1.5,cd:0.5},    ability:'Rotierende Wurfsterne mit Durchschlag'},
   {id:'w_hashthrower', name:'Hashish-Werfer',   rarity:'mythic', img:'weapons/hashthrower.png', shape:'bomb',  core:'#d7ccc8',ring:'#4e342e',perk:{blast:1,pierce:1,gun:2},         ability:'Hash-Bomben mit Durchschlag'},
   {id:'w_vaporrifle',  name:'Vapor-Rifle',      rarity:'mythic', img:'weapons/vaporrifle.png',  shape:'laser', core:'#e1f5fe',ring:'#2979ff',perk:{cd:0.4,pierce:1,speed:1.7},      ability:'Vapor-Strahl im Dauerfeuer'},
-  {id:'w_roachbow',    name:'Roach-Armbrust',   rarity:'mythic', img:'weapons/roachbow.png',    shape:'seed',  core:'#ffe0b2',ring:'#6d4c41',perk:{pierce:1,spread:1,speed:1.6},    ability:'Dreifach-Bolzen, durchbohrt'},
+  {id:'w_roachbow',    name:'Rückkehr-Dolch',   rarity:'mythic', img:'weapons/dagger.png',      shape:'dagger',core:'#cfd8dc',ring:'#5e35b1',perk:{boomerang:2,speed:1.25,cd:0.9},  ability:'Dolch kehrt 2x zum Spieler zurück'},
 
 ];
 
@@ -1368,6 +1368,15 @@ function itemImg(src){
   if(!e){e=ITEM_IMG_CACHE[src]={img:new Image(),ok:false};e.img.onload=()=>{e.ok=true;};e.img.src=src;}
   return e.ok?e.img:null;
 }
+// ---- Boss-Geschosse (Pixel-Sprites pro Boss) ----
+const BOSS_ORB={
+  discodank:'bosses/proj_disco.png',
+  radioactiverudy:'bosses/proj_pyramid.png',
+  captainhash:'bosses/proj_skull.png',
+  icebongyeti:'bosses/proj_skull.png',
+  madhoney:'bosses/proj_bomb.png',
+};
+for(const k in BOSS_ORB)itemImg(BOSS_ORB[k]);
 for(const w of WEAPON_SKINS)itemImg(w.img);
 for(const j of JOINT_SKINS)itemImg(j.img);
 // ---- Loot-Tütchen ----
@@ -2396,6 +2405,25 @@ function bShot(b,x,y,vx,vy,extra){
   if(extra)Object.assign(e,extra);
   enemies.push(e);return e;
 }
+function nadeBoom(pr){
+  const R=130;
+  burst(pr.x,pr.y,'#ffd54a',46);burst(pr.x,pr.y,'#33691e',30);
+  addRing(pr.x,pr.y,'255,213,74',8,R,0.35);addFlash('255,200,120',0.16);addShake(9,0.3);
+  sfx('boss');
+  for(const e of enemies){
+    if(!e.alive)continue;
+    if(Math.hypot(e.x-pr.x,e.y-pr.y)>R)continue;
+    if(e.boss){e.alive=false;continue;}
+    if(!e.plat)continue;
+    e.alive=false;burst(e.x,e.y,'#ffcc00',14);registerKill(e.x,e.y);
+  }
+  if(boss&&Math.hypot(boss.x-pr.x,boss.y-pr.y)<R+boss.w){
+    const spec=bSpec(boss);
+    if(!(spec&&spec.noProjHit)&&!(spec&&spec.hit&&spec.hit(boss,2))){
+      boss.hp-=2;boss.hitT=0.3;burst(boss.x,boss.y,'#ffffff',16);pushFloat(boss.x,boss.y-20,'-2','#ff5252');
+    }
+  }
+}
 function bDmg(b,n){
   b.hp-=n;b.hitT=0.3;burst(b.x,b.y,'#ffffff',10);addShake(3,0.15);sfx('hit');
 }
@@ -3255,6 +3283,14 @@ function update(dt){
   for(const e of enemies){
     if(!e.alive)continue;
     if(e.boss||!e.plat)continue; // boss projectiles handled separately
+    if(e.stunT>0){
+      e.stunT-=dt;
+      e.y=e.plat.y-e.h;
+      if(Math.abs(player.x-e.x)<e.w/2+player.r-6&&Math.abs(player.y-e.y-e.h/2)<e.h/2+player.r-6){
+        e.alive=false;burst(e.x,e.y,'#81d4fa',16);registerKill(e.x,e.y);
+      }
+      continue;
+    }
     e.x+=e.vx;
     if(e.x<e.plat.x+e.w/2){e.x=e.plat.x+e.w/2;e.vx*=-1;}
     if(e.x>e.plat.x+e.plat.w-e.w/2){e.x=e.plat.x+e.plat.w-e.w/2;e.vx*=-1;}
@@ -3292,12 +3328,19 @@ function update(dt){
     if(player.shootCd<=0){
       // straight up, always — Waffen-Skin bestimmt Rate, Speed, Streuung, Durchschlag
       const wp=wperk(), sp=-12*(wp.speed||1);
-      projectiles.push({x:player.x,y:player.y-12,vx:0,vy:sp,life:2,pierce:wp.pierce?2:0,blast:wp.blast||0});
+      const mk=()=>{
+        const s={x:player.x,y:player.y-12,vx:0,vy:sp,life:2,pierce:wp.pierce?2:0,blast:wp.blast||0,spin:0};
+        if(wp.nade){s.nade=1;s.fuse=0.8;s.blast=2;s.life=3;s.vy=sp*0.8;}
+        if(wp.stun){s.stun=wp.stun;}
+        if(wp.boomerang){s.boom=wp.boomerang;s.life=5;s.pierce=99;}
+        return s;
+      };
+      projectiles.push(mk());
       if(wp.spread){
-        projectiles.push({x:player.x,y:player.y-12,vx:-2.4,vy:sp*0.95,life:2,pierce:0,blast:0});
-        projectiles.push({x:player.x,y:player.y-12,vx: 2.4,vy:sp*0.95,life:2,pierce:0,blast:0});
+        const a=mk(),b=mk();a.vx=-2.4;b.vx=2.4;a.vy=sp*0.95;b.vy=sp*0.95;
+        projectiles.push(a,b);
       }
-      player.shootCd=0.12*(wp.cd||1);
+      player.shootCd=wp.nade?(wp.nadeCd||5):0.12*(wp.cd||1);
     }
   }else if(shootRequested){
     if(player.noGunT===undefined||player.noGunT<=0){
@@ -3308,7 +3351,24 @@ function update(dt){
   if(player.noGunT>0)player.noGunT-=dt;
   shootRequested=false;
   player.shootCd-=dt;
-  for(const pr of projectiles){pr.x+=(pr.vx||0);pr.y+=pr.vy;pr.life-=dt;}
+  for(const pr of projectiles){
+    pr.spin=(pr.spin||0)+dt*14;
+    if(pr.nade){pr.vy+=26*dt;pr.fuse-=dt;if(pr.fuse<=0){nadeBoom(pr);pr.life=0;continue;}}
+    if(pr.boom){
+      // Dolch: fliegt hoch, kehrt zum Spieler zurück, bis zu 2x
+      if(!pr.back){pr.vy+=22*dt;if(pr.vy>=0)pr.back=1;}
+      else{
+        const dx=player.x-pr.x,dy=(player.y-14)-pr.y,d=Math.hypot(dx,dy)||1;
+        pr.vx=dx/d*9;pr.vy=dy/d*9;
+        if(d<26){
+          pr.boom--;
+          if(pr.boom>0){pr.back=0;pr.x=player.x;pr.y=player.y-12;pr.vx=0;pr.vy=-12*(wperk().speed||1);pr.life=Math.max(pr.life,2.5);}
+          else pr.life=0;
+        }
+      }
+    }
+    pr.x+=(pr.vx||0);pr.y+=pr.vy;pr.life-=dt;
+  }
 
   // projectiles vs enemies — one hit always destroys a normal enemy
   for(const pr of projectiles){
@@ -3316,6 +3376,14 @@ function update(dt){
     for(const e of enemies){
       if(!e.alive||e.boss||!e.plat)continue;
       if(Math.abs(pr.x-e.x)<e.w/2+6&&Math.abs(pr.y-(e.y+e.h/2))<e.h/2+8){
+        if(pr.nade){nadeBoom(pr);pr.life=0;break;}
+        if(pr.stun){
+          if(pr.pierce>0)pr.pierce--;else pr.life=0;
+          e.stunT=pr.stun;
+          burst(e.x,e.y,'#81d4fa',14);addShake(2,0.1);
+          pushFloat(e.x,e.y-10,'GELÄHMT!','#4fc3f7');
+          break;
+        }
         if(pr.pierce>0)pr.pierce--;else pr.life=0;
         e.alive=false;
         burst(e.x,e.y,'#ffcc00',20);addShake(3,0.12);
@@ -3331,6 +3399,7 @@ function update(dt){
       }
     }
   }
+
   // shoot down boss orbs too
   for(const pr of projectiles){
     if(pr.life<=0)continue;
@@ -3556,7 +3625,7 @@ if(!lavaMode&&!boss&&bestY>=nextBossScore){spawnBoss();}
   }
   collectibles=collectibles.filter(c=>!c.taken&&c.y<cameraY+H+50);
   enemies=enemies.filter(e=>e.alive&&(e.boss||e.plat&&e.plat.y<cameraY+H+50));
-  projectiles=projectiles.filter(pr=>pr.life>0&&pr.y>cameraY-20);
+  projectiles=projectiles.filter(pr=>pr.life>0&&(pr.boom||pr.y>cameraY-20));
 
   // fall off — during boss fight this still spends a life instead of instant game over
   if(player.y>cameraY+H+40){
@@ -5445,6 +5514,17 @@ function drawCollectible(c){
 
 function drawEnemy(e){
   if(e.boss){
+    const orb=boss?BOSS_ORB[boss.kind]:null;
+    const oi=orb?itemImg(orb):null;
+    if(oi){
+      const S=26;
+      ctx.save();ctx.imageSmoothingEnabled=false;
+      ctx.translate(e.x,e.y-cameraY);
+      ctx.rotate((e.spin=(e.spin||0)+0.09));
+      ctx.drawImage(oi,-S/2,-S/2*(oi.height/oi.width),S,S*(oi.height/oi.width));
+      ctx.restore();
+      return;
+    }
     // colored orb based on current boss kind
     const col=boss&&boss.kind==='cbddrone'?'#00e5ff':boss&&boss.kind==='pipepusher'?'#4fc3f7':'#7cfc00';
     ctx.fillStyle=col;ctx.strokeStyle='#111';ctx.lineWidth=1.5;
@@ -6434,6 +6514,22 @@ function render(){
         ctx.fillStyle=wc.ring;ctx.beginPath();ctx.arc(0,0,6,0,Math.PI*2);ctx.fill();
         ctx.fillStyle=wc.core;ctx.beginPath();ctx.arc(0,0,3,0,Math.PI*2);ctx.fill();
         ctx.strokeStyle=wc.core;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(0,-6);ctx.lineTo(3,-11);ctx.stroke();
+      }else if(wc.shape==='shuriken'||wc.shape==='dagger'||wc.shape==='grenade'){
+        const src=wc.shape==='shuriken'?'weapons/shuriken.png':wc.shape==='dagger'?'weapons/dagger.png':'weapons/grenade.png';
+        const im=itemImg(src);
+        if(im){
+          const S=wc.shape==='grenade'?22:20;
+          ctx.shadowBlur=0;ctx.imageSmoothingEnabled=false;
+          if(wc.shape!=='grenade')ctx.rotate(pr.spin||0);
+          const hh=S*(im.height/im.width);
+          ctx.drawImage(im,-S/2,-hh/2,S,hh);
+        }else{
+          ctx.fillStyle=wc.ring;ctx.beginPath();ctx.arc(0,0,5,0,Math.PI*2);ctx.fill();
+        }
+      }else if(wc.shape==='taser'){
+        ctx.strokeStyle=wc.ring;ctx.lineWidth=3;
+        ctx.beginPath();ctx.moveTo(0,8);ctx.lineTo(-3,2);ctx.lineTo(3,-3);ctx.lineTo(-2,-9);ctx.stroke();
+        ctx.strokeStyle=wc.core;ctx.lineWidth=1.2;ctx.stroke();
       }else if(wc.shape==='star'){
         ctx.fillStyle=wc.core;ctx.strokeStyle=wc.ring;ctx.lineWidth=1.5;
         ctx.beginPath();
