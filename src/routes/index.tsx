@@ -240,6 +240,12 @@ export function Index() {
         s4.src = "/afro-admin.js?v=warp38";
         doc.body.appendChild(s4);
       }
+      if (!doc.getElementById("afroBunnyScript")) {
+        const s5 = doc.createElement("script");
+        s5.id = "afroBunnyScript";
+        s5.src = "/afro-bunny.js?v=warp38";
+        doc.body.appendChild(s5);
+      }
     } catch {
       /* ignore */
     }
