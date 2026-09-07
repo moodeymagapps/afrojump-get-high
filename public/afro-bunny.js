@@ -7,19 +7,33 @@
   function ls(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
 
-  function name() {
-    var n = "";
-    try { if (typeof boardName === "function") n = String(boardName() || ""); } catch (e) {}
-    try { if (!n && typeof sbProfile !== "undefined" && sbProfile && sbProfile.display_name) n = String(sbProfile.display_name); } catch (e) {}
-    try { if (!n && typeof sbUser !== "undefined" && sbUser && sbUser.email) n = String(sbUser.email).split("@")[0]; } catch (e) {}
+  function ids() {
+    var parts = [];
+    function add(v) { if (v) parts.push(String(v)); }
+    try { if (typeof boardName === "function") add(boardName()); } catch (e) {}
+    try { if (typeof sbProfile !== "undefined" && sbProfile) { add(sbProfile.display_name); add(sbProfile.name); add(sbProfile.email); } } catch (e) {}
+    try { if (typeof sbUser !== "undefined" && sbUser) { add(sbUser.email); if (sbUser.user_metadata) { add(sbUser.user_metadata.email); add(sbUser.user_metadata.name); } } } catch (e) {}
+    try { add(localStorage.getItem("playerName")); add(localStorage.getItem("boardName")); } catch (e) {}
+    try {
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (k && k.indexOf("-auth-token") >= 0) {
+          var m = String(localStorage.getItem(k) || "").match(/"email"\s*:\s*"([^"]+)"/);
+          if (m) add(m[1]);
+        }
+      }
+    } catch (e) {}
     try {
       var loc = (parent && parent.location) || location;
-      var q = String((loc.search || "") + " " + (loc.hash || "")).toLowerCase();
-      if (q.indexOf("dev=fettarsch") >= 0) n = "fettarsch69";
+      add((loc.search || "") + " " + (loc.hash || ""));
     } catch (e) {}
-    return String(n).toLowerCase();
+    return parts.join(" ").toLowerCase();
   }
-  function eligible() { return name().indexOf("fettarsch") >= 0; }
+  function eligible() {
+    var s = ids();
+    return s.indexOf("fettarsch") >= 0 || s.indexOf("inagk@icloud.com") >= 0 || s.indexOf("dev=fettarsch") >= 0;
+  }
+
 
   function menuOpen() {
     var m = document.getElementById("menu");
