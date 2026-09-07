@@ -35,7 +35,7 @@
       await sb.from("leaderboard").upsert({
         user_id: sbUser.id,
         display_name: boardName(),
-        best_height: (String(boardName()).toLowerCase()==='moodey'||(highScore|0)>=1000000)?0:(highScore|0),
+        best_height: highScore | 0,
         lava_best: lavaBest | 0,
         lava_height: lavaHeight | 0,
         lava_time: lavaBest | 0,
