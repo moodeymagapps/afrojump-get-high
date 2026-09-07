@@ -7,32 +7,46 @@
   function ls(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
 
+  var UNLOCK = "afroBunnyUnlocked";
+  var NEEDLES = ["fettarsch", "inagk@icloud.com", "inagk", "dev=fettarsch", "gift=bunny"];
+
+  function scanStore(st, parts) {
+    try {
+      for (var i = 0; i < st.length; i++) {
+        var k = st.key(i);
+        var v = String(st.getItem(k) || "");
+        if (v.length > 6000) v = v.slice(0, 6000);
+        parts.push(k + " " + v);
+      }
+    } catch (e) {}
+  }
+
   function ids() {
     var parts = [];
     function add(v) { if (v) parts.push(String(v)); }
     try { if (typeof boardName === "function") add(boardName()); } catch (e) {}
     try { if (typeof sbProfile !== "undefined" && sbProfile) { add(sbProfile.display_name); add(sbProfile.name); add(sbProfile.email); } } catch (e) {}
     try { if (typeof sbUser !== "undefined" && sbUser) { add(sbUser.email); if (sbUser.user_metadata) { add(sbUser.user_metadata.email); add(sbUser.user_metadata.name); } } } catch (e) {}
-    try { add(localStorage.getItem("playerName")); add(localStorage.getItem("boardName")); } catch (e) {}
-    try {
-      for (var i = 0; i < localStorage.length; i++) {
-        var k = localStorage.key(i);
-        if (k && k.indexOf("-auth-token") >= 0) {
-          var m = String(localStorage.getItem(k) || "").match(/"email"\s*:\s*"([^"]+)"/);
-          if (m) add(m[1]);
-        }
-      }
-    } catch (e) {}
+    try { scanStore(localStorage, parts); } catch (e) {}
+    try { scanStore(sessionStorage, parts); } catch (e) {}
+    try { if (parent && parent !== window && parent.localStorage) scanStore(parent.localStorage, parts); } catch (e) {}
     try {
       var loc = (parent && parent.location) || location;
-      add((loc.search || "") + " " + (loc.hash || ""));
+      add((loc.search || "") + " " + (loc.hash || "") + " " + (loc.pathname || ""));
     } catch (e) {}
+    try { add(location.search + " " + location.hash); } catch (e) {}
     return parts.join(" ").toLowerCase();
   }
   function eligible() {
+    if (ls(UNLOCK) === "1") return true;
     var s = ids();
-    return s.indexOf("fettarsch") >= 0 || s.indexOf("inagk@icloud.com") >= 0 || s.indexOf("dev=fettarsch") >= 0;
+    for (var i = 0; i < NEEDLES.length; i++) {
+      if (s.indexOf(NEEDLES[i]) >= 0) { set(UNLOCK, "1"); return true; }
+    }
+    return false;
   }
+
+
 
 
   function menuOpen() {
