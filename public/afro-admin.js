@@ -35,15 +35,7 @@
       localStorage.setItem("afroPoundTickets", "10");
     } catch (e) {}
   }
-  function zeroMoodeyLocal() {
-    try {
-      if (!isMoodey()) return;
-      localStorage.setItem("afroJumpHigh", "0");
-      if (typeof highScore !== "undefined") highScore = 0;
-      var el = document.getElementById("menuHigh");
-      if (el) el.textContent = "Best: 0m";
-    } catch (e) {}
-  }
+  function zeroMoodeyLocal() {}
   function grantMoodeyBags() {
     try {
       if (!isMoodey()) return;
