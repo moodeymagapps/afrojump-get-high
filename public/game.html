@@ -1873,17 +1873,19 @@ function renderShop(){
     idle:true,
     equip:it=>{selectedJoint=it.id;persistLoot();}
   });
+  checkHeightUnlocks();
   const list=SKINS.filter(s=>(!s.lootOnly||owned.includes(s.id))&&(!s.bundleOnly||owned.includes(s.id)));
   renderCarousel({
     key:'skins',
     list,
     isOwned:s=>owned.includes(s.id),
     isEquipped:s=>selectedSkin===s.id,
-    priceText:s=>s.lootOnly?'🎒 Loot':(s.price===0?'Gratis':('🌿 '+s.price)),
-    lockText:s=>s.lootOnly?'🔒 Nur aus Tütchen':('🔒 GESPERRT – 🌿 '+s.price),
-    canBuy:s=>!s.lootOnly&&totalBags>=s.price,
+    priceText:s=>s.unlockAt?(owned.includes(s.id)?'🏆 '+s.unlockAt+'m':'🔒 '+s.unlockAt+'m'):(s.lootOnly?'🎒 Loot':(s.price===0?'Gratis':('🌿 '+s.price))),
+    lockText:s=>s.unlockAt?('🔒 '+s.unlockAt+'m IM NORMALEN MODUS'):(s.lootOnly?'🔒 Nur aus Tütchen':('🔒 GESPERRT – 🌿 '+s.price)),
+    canBuy:s=>!s.lootOnly&&!s.unlockAt&&totalBags>=s.price,
     buyText:s=>'🌿 KAUFEN – '+s.price,
-    buy:s=>{if(totalBags<s.price)return;totalBags-=s.price;owned.push(s.id);selectedSkin=s.id;persistShop();updateBagsUI();},
+    buy:s=>{if(s.unlockAt||totalBags<s.price)return;totalBags-=s.price;owned.push(s.id);selectedSkin=s.id;persistShop();updateBagsUI();},
+
     draw:(g,s,cv)=>drawSkinIntoCanvas(g,s,cv),
     big:true, canvasSize:160, idle:true,
     equip:s=>{selectedSkin=s.id;persistShop();}
