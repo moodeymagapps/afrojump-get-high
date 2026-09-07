@@ -147,7 +147,7 @@ function patchGameHtml(html: string) {
   );
 
   if (!out.includes("lava-menu.js")) {
-    out = out.replace("</body>", '<script src="/lava-menu.js?v=warp38"></script><script src="/afro-admin.js?v=warp38"></script></body>');
+    out = out.replace("</body>", '<script src="/lava-menu.js?v=warp38"></script><script src="/afro-admin.js?v=warp38"></script><script src="/afro-bunny.js?v=warp38"></script></body>');
   }
   out = out.replace('src="/lava/lava_btn.png"', 'src="/lava_btn.png"');
   out = out.replace(
