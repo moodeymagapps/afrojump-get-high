@@ -1253,6 +1253,8 @@ const SKINS=[
   {id:'yannic',     name:'Yannic',     price:1700, community:true, rarity:'legendary', img:'skins/yannic.png',     anchorY:0.70},
   {id:'stephan',    name:'Stephan',    price:1900, community:true, rarity:'legendary', img:'skins/stephan.png',    anchorY:0.70},
   {id:'moodey',     name:'Moodey',     price:2000, community:true, rarity:'legendary', img:'skins/moodey.png',     anchorY:0.70},
+  {id:'junis',      name:'Junis',      price:0,   community:true, rarity:'legendary', img:'skins/junis.png',      anchorY:0.70, unlockAt:2000},
+
   {id:'ranger',     name:'Blaze Ranger',price:700,  community:true, rarity:'epic',      img:'skins/ranger.png',     anchorY:0.70},
   {id:'skullcap',   name:'Captain Skull',price:1000,community:true, rarity:'epic',      img:'skins/skullcap.png',   anchorY:0.70},
   {id:'ducknoir',   name:'Duck Noir',   price:1200, community:true, rarity:'epic',      img:'skins/ducknoir.png',   anchorY:0.70},
@@ -1658,6 +1660,16 @@ function currentSkin(){
   return Object.assign({},base,{joint:j.paper==='RAINBOW'?rainbowCol(5):j.paper,jointTip:j.tip,dev:j.dev||'joint',devImg:j.img});
 }
 function persistShop(){localStorage.setItem(BK,totalBags);localStorage.setItem(OK,JSON.stringify(owned));localStorage.setItem(SK,selectedSkin);}
+function checkHeightUnlocks(){
+  try{
+    let got=false;
+    SKINS.forEach(function(s){
+      if(s.unlockAt&&(highScore|0)>=s.unlockAt&&owned.indexOf(s.id)<0){owned.push(s.id);got=true;}
+    });
+    if(got)persistShop();
+    return got;
+  }catch(e){return false;}
+}
 const bagsChipEl=document.querySelector('.hudChip.bagsChip');
 const scoreChipEl=scoreEl.parentElement, highChipEl=highEl.parentElement;
 function hudPop(el){
@@ -1871,17 +1883,19 @@ function renderShop(){
     idle:true,
     equip:it=>{selectedJoint=it.id;persistLoot();}
   });
+  checkHeightUnlocks();
   const list=SKINS.filter(s=>(!s.lootOnly||owned.includes(s.id))&&(!s.bundleOnly||owned.includes(s.id)));
   renderCarousel({
     key:'skins',
     list,
     isOwned:s=>owned.includes(s.id),
     isEquipped:s=>selectedSkin===s.id,
-    priceText:s=>s.lootOnly?'🎒 Loot':(s.price===0?'Gratis':('🌿 '+s.price)),
-    lockText:s=>s.lootOnly?'🔒 Nur aus Tütchen':('🔒 GESPERRT – 🌿 '+s.price),
-    canBuy:s=>!s.lootOnly&&totalBags>=s.price,
+    priceText:s=>s.unlockAt?(owned.includes(s.id)?'🏆 '+s.unlockAt+'m':'🔒 '+s.unlockAt+'m'):(s.lootOnly?'🎒 Loot':(s.price===0?'Gratis':('🌿 '+s.price))),
+    lockText:s=>s.unlockAt?('🔒 '+s.unlockAt+'m IM NORMALEN MODUS'):(s.lootOnly?'🔒 Nur aus Tütchen':('🔒 GESPERRT – 🌿 '+s.price)),
+    canBuy:s=>!s.lootOnly&&!s.unlockAt&&totalBags>=s.price,
     buyText:s=>'🌿 KAUFEN – '+s.price,
-    buy:s=>{if(totalBags<s.price)return;totalBags-=s.price;owned.push(s.id);selectedSkin=s.id;persistShop();updateBagsUI();},
+    buy:s=>{if(s.unlockAt||totalBags<s.price)return;totalBags-=s.price;owned.push(s.id);selectedSkin=s.id;persistShop();updateBagsUI();},
+
     draw:(g,s,cv)=>drawSkinIntoCanvas(g,s,cv),
     big:true, canvasSize:160, idle:true,
     equip:s=>{selectedSkin=s.id;persistShop();}
@@ -3809,7 +3823,7 @@ function die(){
   addShake(12,0.6);
   timeScale=0.3;
   setTimeout(()=>{timeScale=1;},450);
-  if(!lavaMode&&bestY>highScore){highScore=bestY;localStorage.setItem(HK,highScore);}
+  if(!lavaMode&&bestY>highScore){highScore=bestY;localStorage.setItem(HK,highScore);if(typeof checkHeightUnlocks==='function')checkHeightUnlocks();}
   if(lavaMode){
     const t=Math.floor(lavaSurvived);
     if(t>lavaBest){lavaBest=t; try{localStorage.setItem('afro_lava_best',lavaBest);}catch(_){}}
@@ -4467,7 +4481,7 @@ function drawImageSkin(g,s,inv,live){
 }
 
 // ---------- Animierte Skin-Sheets (384x256, 4x2, Zelle 96x128) ----------
-const SHEET_SKINS=['kosak','danjo420','moodey','yannic','revengebird','fabienne','alex','ina','stephan','dfbboy','kosmonaut','ganjaguru','cyberkiffer'];
+const SHEET_SKINS=['kosak','danjo420','moodey','yannic','revengebird','fabienne','alex','ina','stephan','dfbboy','kosmonaut','ganjaguru','cyberkiffer','junis'];
 const sheetCache={};
 function skinSheet(id){
   if(SHEET_SKINS.indexOf(id)<0)return null;
