@@ -1,5 +1,7 @@
 /* Fettarsch69: Geschenk beim Einloggen -> Hase im Hauptmenue (unten links) */
 (function () {
+  if (window.__afroBunnyStarted) return;
+  window.__afroBunnyStarted = true;
   var RECIPIENT_ID = "7188b992-0ac3-4e4e-b968-0046ee559bf1";
   var OWNED = "afroBunnyOwned:" + RECIPIENT_ID;
   var LEGACY_OWNED = "afroBunnyOwned";
