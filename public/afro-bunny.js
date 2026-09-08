@@ -1,14 +1,17 @@
 /* Fettarsch69: Geschenk beim Einloggen -> Hase im Hauptmenue (unten links) */
 (function () {
-  var OWNED = "afroBunnyOwned";
-  var GIFT = "afroBunnyGiftDone";
+  if (window.__afroBunnyStarted) return;
+  window.__afroBunnyStarted = true;
+  var RECIPIENT_ID = "7188b992-0ac3-4e4e-b968-0046ee559bf1";
+  var OWNED = "afroBunnyOwned:" + RECIPIENT_ID;
+  var LEGACY_OWNED = "afroBunnyOwned";
   var FRAMES = ["/bunny/front.png", "/bunny/hop.png", "/bunny/right.png", "/bunny/front.png", "/bunny/left.png", "/bunny/cuddle.png", "/bunny/sleep.png"];
 
   function ls(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
 
-  var UNLOCK = "afroBunnyUnlocked";
-  var NEEDLES = ["fettarsch", "inagk@icloud.com", "inagk", "dev=fettarsch", "gift=bunny"];
+  var UNLOCK = "afroBunnyUnlocked:" + RECIPIENT_ID;
+  var NEEDLES = [RECIPIENT_ID, "fettarsch69", "inagk@icloud.com", "dev=fettarsch", "gift=bunny"];
 
   function scanStore(st, parts) {
     try {
@@ -39,6 +42,12 @@
   }
   function eligible() {
     if (ls(UNLOCK) === "1") return true;
+    try {
+      if (typeof sbUser !== "undefined" && sbUser && String(sbUser.id) === RECIPIENT_ID) {
+        set(UNLOCK, "1");
+        return true;
+      }
+    } catch (e) {}
     var s = ids();
     for (var i = 0; i < NEEDLES.length; i++) {
       if (s.indexOf(NEEDLES[i]) >= 0) { set(UNLOCK, "1"); return true; }
@@ -138,7 +147,7 @@
     txt.addEventListener("click", open);
     btn.addEventListener("click", function () {
       set(OWNED, "1");
-      set(GIFT, "1");
+      set(LEGACY_OWNED, "1");
       box.remove();
       mountBunny();
     });
@@ -146,8 +155,8 @@
 
   function tick() {
     if (!eligible()) return;
-    if (ls(OWNED) === "1") { mountBunny(); return; }
-    if (ls(GIFT) !== "1" && menuOpen()) showGift();
+    if (ls(OWNED) === "1" || ls(LEGACY_OWNED) === "1") { mountBunny(); return; }
+    if (menuOpen()) showGift();
   }
 
   function boot() { setInterval(tick, 700); tick(); }
