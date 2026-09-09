@@ -7940,7 +7940,7 @@ window.__afro={ed,duel,mapRun,duelBeginBuild,startMapRun,exitToEditor,
     }
     function close(){howto.classList.remove('show');try{localStorage.setItem(KEY,'1');}catch(e){}}
     var seen=false; try{seen=localStorage.getItem(KEY)==='1';}catch(e){}
-    if(!seen&&!standalone){ build(); setTimeout(function(){if(!doc.querySelector('.overlay.show'))howto.classList.add('show');},2000); }
+    if(!seen&&!standalone){ build(); setTimeout(function(){var open=[].some.call(doc.querySelectorAll('.overlay'),function(el){return el.style.display==='flex'&&el.id!=='menu';});if(!open)howto.classList.add('show');},2000); }
     doc.getElementById('howtoClose').addEventListener('click',close);
     if(fsRow)fsRow.addEventListener('click',function(){enter();close();});
   }
