@@ -10,7 +10,7 @@
 <title>Afro Jump</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;600;700;800&family=Bebas+Neue&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 <style>
   html,body{margin:0;padding:0;height:100%;background:#0b1a0b;overflow:hidden;overscroll-behavior:none;-webkit-overflow-scrolling:auto;-webkit-tap-highlight-color:transparent;font-family:'VT323','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;color:#fff;touch-action:none;user-select:none;-webkit-user-select:none;image-rendering:pixelated;}
   html,body{width:100%;height:100%;min-height:100%;}
@@ -958,16 +958,16 @@
   </div>
   <div id="shop" class="overlay">
     <div class="head">
-      <h2>🛍 Shop</h2>
-      <div><span id="shopBags">🌿 0</span> &nbsp; <button id="shopClose" class="btn icon v-red">✕</button></div>
+      <h2><span>AFRO JUMP</span> SHOP</h2>
+      <div class="shopHeadActions"><span id="shopBags"><img src="/shop/weed-coin.png" alt="" aria-hidden="true"><b id="shopBagsValue">0</b></span><button id="shopClose" class="btn icon v-red" aria-label="Shop schließen">✕</button></div>
     </div>
     <div class="tabs" id="shopTabs">
-      <button data-tab="skins" class="on">🧑 SKINS</button>
-      <button data-tab="boxes">🎒 TÜTCHEN</button>
-      <button data-tab="weapons">🔫 WAFFEN</button>
-      <button data-tab="joints">🚬 JOINTS</button>
-      <button data-tab="sets">📦 SETS</button>
+      <button data-tab="skins" class="on"><img src="/shop/crown.png" alt="">SKINS</button>
+      <button data-tab="boxes"><img src="/shop/crown.png" alt="">TÜTCHEN</button>
+      <button data-tab="weapons"><img src="/shop/crown.png" alt="">WAFFEN</button>
+      <button data-tab="joints"><img src="/shop/crown.png" alt="">JOINTS</button>
     </div>
+    <button class="setsBanner" data-shop-tab="sets"><img src="/shop/crown.png" alt="" aria-hidden="true"><span>SETS</span><img src="/shop/crown.png" alt="" aria-hidden="true"></button>
     <div class="skinGrid" id="skinGrid"></div>
   </div>
   <div id="openBox" class="overlay">
@@ -1687,7 +1687,8 @@ function bagDelta(d){
   w.appendChild(el);setTimeout(()=>el.remove(),820);
 }
 function writeBags(v){
-  bagsEl.textContent=String(v);menuBags.textContent='🌿 '+v+' Baggys';shopBags.textContent='🌿 '+v;
+  bagsEl.textContent=String(v);menuBags.textContent='🌿 '+v+' Baggys';
+  const shopValue=document.getElementById('shopBagsValue');if(shopValue)shopValue.textContent=String(v);else shopBags.textContent='🌿 '+v;
 }
 function updateBagsUI(anim){
   const target=totalBags;
@@ -1778,7 +1779,7 @@ function startLavaGame(){
 }
 function pauseGame(){if(gameState!=='playing')return;gameState='paused';showOverlay('paused');stopMusic();stopBossMusic();}
 function resumeGame(){if(gameState!=='paused')return;gameState='playing';showOverlay('playing');last=performance.now();if(boss)startBossMusic(boss.kind);else tryPlayMusic();}
-function openShop(from){shopReturn=from;carTouched.skins=carTouched.weapons=carTouched.joints=false;gameState='shop';renderShop();updateBagsUI();showOverlay('shop');}
+function openShop(from){shopReturn=from;carTouched.skins=carTouched.weapons=carTouched.joints=false;document.getElementById('howto')?.classList.remove('show');gameState='shop';renderShop();updateBagsUI();showOverlay('shop');}
 function closeShop(){
   if(typeof openBoxEl!=='undefined'&&openBoxEl){openBoxEl.style.display='none';boxAnim=null;try{hideBaggyVideo();}catch(e){}}
   if(shopReturn==='paused'){gameState='paused';showOverlay('paused');}
@@ -1838,7 +1839,7 @@ function drawJointPreview(g,j,noClear){
 }
 function makeCard(){const c=document.createElement('div');c.className='skinCard';return c;}
 // ---- Carousel-Index pro Kategorie ----
-const carIdx={skins:0,weapons:0,joints:0};
+const carIdx={skins:0,weapons:0,joints:0,sets:0};
 const carTouched={};
 let carDir=1;
 function renderShop(){
@@ -1904,8 +1905,9 @@ function renderShop(){
 function drawSkinIntoCanvas(g,s,cv){
   const S=cv.width||80, PAD=Math.round(S*0.03);
   g.imageSmoothingEnabled=false;g.clearRect(0,0,S,S);
-  if(s.img){
-    const entry=loadSkinImage(s.img,s.bgKey);
+   if(s.img){
+     const previewImg=s.id==='fabienne'?'shop/fabienne-clean.png':s.img;
+     const entry=loadSkinImage(previewImg,s.bgKey);
     const drawIt=()=>{
       if(!entry.canvas)return;
        const im=entry.canvas,sw=s.frameW||im.width,sh=s.frameH||im.height;
@@ -2012,8 +2014,8 @@ function renderCarousel(cfg){
     b.onclick=()=>{carDir=dir;carIdx[cfg.key]=(i+dir+list.length)%list.length;renderShop();};
     return b;
   };
-  const stage=document.createElement('div');
-  stage.className='carStage carSlide'+(eq?' eq':'')+(owned_?'':' locked')+(cfg.big?' big':'');
+   const stage=document.createElement('div');
+   stage.className='carStage carSlide'+(eq?' eq':'')+(owned_?'':' locked')+(cfg.big?' big':'')+' rar-'+(it.rarity||'common');
   stage.style.setProperty('--carDir',(carDir>0?28:-28)+'px');
   const cs=cfg.canvasSize||80;
   const cv=document.createElement('canvas');cv.width=cs;cv.height=cs;
@@ -2022,7 +2024,7 @@ function renderCarousel(cfg){
   cfg.draw(cv.getContext('2d'),it,cv);
   if(!owned_){const lk=document.createElement('div');lk.className='carLock';lk.textContent='🔒';stage.appendChild(lk);}
   if(eq){const e=document.createElement('div');e.className='carEq';e.textContent='AKTIV';stage.appendChild(e);}
-  row.appendChild(mk('◀',-1));row.appendChild(stage);row.appendChild(mk('▶',1));
+   row.appendChild(mk('',-1));row.appendChild(stage);row.appendChild(mk('',1));
   wrap.appendChild(row);
 
   const dots=document.createElement('div');dots.className='carDots';
@@ -2437,6 +2439,7 @@ document.getElementById('shopClose').onclick=()=>closeShop();
 for(const b of document.querySelectorAll('#shopTabs button')){
   b.onclick=()=>{shopTab=b.dataset.tab;renderShop();};
 }
+document.querySelector('[data-shop-tab="sets"]').onclick=()=>{shopTab='sets';renderShop();};
 document.getElementById('overShop').onclick=()=>openShop('gameover');
 document.getElementById('overMenu').onclick=()=>goMenu();
 
@@ -7937,7 +7940,7 @@ window.__afro={ed,duel,mapRun,duelBeginBuild,startMapRun,exitToEditor,
     }
     function close(){howto.classList.remove('show');try{localStorage.setItem(KEY,'1');}catch(e){}}
     var seen=false; try{seen=localStorage.getItem(KEY)==='1';}catch(e){}
-    if(!seen&&!standalone){ build(); setTimeout(function(){howto.classList.add('show');},2000); }
+    if(!seen&&!standalone){ build(); setTimeout(function(){if(gameState==='menu')howto.classList.add('show');},2000); }
     doc.getElementById('howtoClose').addEventListener('click',close);
     if(fsRow)fsRow.addEventListener('click',function(){enter();close();});
   }
