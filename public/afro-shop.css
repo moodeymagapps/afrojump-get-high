@@ -29,7 +29,7 @@
 .carArrow:hover{filter:brightness(1.12);transform:translateY(-2px);}
 .carArrow:active{transform:translateY(3px) scale(.96)!important;box-shadow:inset 0 0 0 4px #79ea67,2px 2px 0 var(--shop-ink)!important;}
 .carArrow.prev{--sIc:url('/__l5e/assets-v1/29b54877-06b6-4776-9806-59328dd090f8/ui_ic_left.png')!important;}
-.carArrow.next{--sIc:url('/__l5e/assets-v1/ec229be6-c740-4c0-9181-03a8b5dd26c9/ui_ic_right.png')!important;}
+.carArrow.next{--sIc:url('/__l5e/assets-v1/ec229be6-c740-4c0c-9181-03a8b5dd26c9/ui_ic_right.png')!important;}
 .carEq{top:12px!important;left:14px!important;padding:5px 8px;background:var(--shop-lime);border:2px solid var(--shop-ink);color:var(--shop-ink)!important;text-shadow:none!important;font:800 10px/1 'Barlow',sans-serif!important;animation:afroPulse 1.4s ease-in-out infinite;z-index:2;}
 .carLock{top:12px!important;right:14px!important;filter:drop-shadow(2px 2px 0 var(--shop-ink))!important;z-index:2;}
 .carDots{gap:6px!important;max-width:100%;}
