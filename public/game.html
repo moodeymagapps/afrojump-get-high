@@ -1331,9 +1331,9 @@ const WEAPON_SKINS=[
   {id:'w_smileyak', name:'Smiley-AK',        rarity:'rare',     img:'weapons/smileyak.png', shape:'laser', core:'#ffe082',ring:'#7b1fa2',perk:{cd:0.75,spread:1}, ability:'Doppelschuss im Dauerfeuer',bundleOnly:true},
   {id:'w_blaster',  name:'Leaf-Blaster',     rarity:'epic',     img:'weapons/blaster.png',  shape:'laser', core:'#a5d6a7',ring:'#1b5e20',perk:{speed:1.2,pierce:1},ability:'Durchschlag +1'},
   {id:'w_shuriken', name:'Weed-Wurfsterne',  rarity:'epic',     img:'weapons/shuriken.png', shape:'shuriken',core:'#eceff1',ring:'#37474f',perk:{pierce:2,speed:1.3,cd:0.8},ability:'Fliegt durch mehrere Gegner'},
-  {id:'w_hazeak',   name:'Haze-AK',          rarity:'epic',     img:'weapons/hazeak.png',   shape:'laser', core:'#e1bee7',ring:'#6a1b9a',perk:{cd:0.68,speed:1.15},ability:'Purple-Haze Dauerfeuer'},
+  {id:'w_hazeak',   name:'Haze-AK',          rarity:'epic',     img:'weapons/hazeak.png',   shape:'laser', core:'#e1bee7',ring:'#6a1b9a',perk:{cd:0.68,speed:1.15},ability:'Purple-Haze Dauerfeuer',bundleOnly:true},
   {id:'w_grenade',  name:'Splitter-Granate', rarity:'legendary',img:'weapons/grenade.png',  shape:'grenade',core:'#cfd8dc',ring:'#33691e',perk:{nade:1,nadeCd:5,blast:1.6},ability:'Großflächiger Schaden (5s Cooldown)'},
-  {id:'w_greenak',  name:'Weed-AK',          rarity:'legendary',img:'weapons/greenak.png',  shape:'laser', core:'#dcedc8',ring:'#33691e',perk:{cd:0.62,speed:1.2,pierce:1},ability:'Militär-Dauerfeuer mit Durchschlag'},
+  {id:'w_greenak',  name:'Weed-AK',          rarity:'legendary',img:'weapons/greenak.png',  shape:'laser', core:'#dcedc8',ring:'#33691e',perk:{cd:0.62,speed:1.2,pierce:1},ability:'Militär-Dauerfeuer mit Durchschlag',bundleOnly:true},
   {id:'w_katana',   name:'Weed-Katana',      rarity:'legendary',img:'weapons/weedkatana.png',shape:'dagger',core:'#b2ff59',ring:'#1b5e20',perk:{boomerang:1,speed:1.3},ability:'Kehrt einmal zurück'},
   {id:'w_roachbow', name:'Rückkehr-Dolch',   rarity:'mythic',   img:'weapons/dagger.png',   shape:'dagger',core:'#cfd8dc',ring:'#5e35b1',perk:{boomerang:2,speed:1.25,cd:0.9},  ability:'Dolch kehrt 2x zum Spieler zurück'},
   {id:'w_cosmicbong',name:'Kosmo-Bong',      rarity:'mythic',   img:'weapons/cosmicbong.png',shape:'smoke',core:'#80d8ff',ring:'#311b92',perk:{cd:0.6,pierce:2,speed:1.3},ability:'Kosmische Rauchsalve'},
@@ -1842,19 +1842,19 @@ function renderShop(){
   skinGrid.style.display='block';
   if(shopTab==='sets')return renderCarousel({
     key:'sets',list:SET_PACKS,
-    isOwned:it=>owned.includes(it.skin)&&ownedWeapons.includes(it.weapon)&&ownedJoints.includes(it.joint),
+    isOwned:it=>setSkins(it).every(id=>owned.includes(id))&&ownedWeapons.includes(it.weapon)&&ownedJoints.includes(it.joint),
     isEquipped:it=>selectedSkin===it.skin&&selectedWeapon===it.weapon&&selectedJoint===it.joint,
     priceText:it=>'🌿 '+it.price,
     lockText:it=>'🔒 GESPERRT – 🌿 '+it.price,
     canBuy:it=>totalBags>=it.price,
     buyText:it=>'🌿 SET KAUFEN – '+it.price,
-    buy:it=>{if(totalBags<it.price)return;totalBags-=it.price;if(!owned.includes(it.skin))owned.push(it.skin);if(!ownedWeapons.includes(it.weapon))ownedWeapons.push(it.weapon);if(!ownedJoints.includes(it.joint))ownedJoints.push(it.joint);selectedSkin=it.skin;selectedWeapon=it.weapon;selectedJoint=it.joint;persistShop();persistLoot();updateBagsUI();},
+    buy:it=>{if(totalBags<it.price)return;totalBags-=it.price;for(const id of setSkins(it))if(!owned.includes(id))owned.push(id);if(!ownedWeapons.includes(it.weapon))ownedWeapons.push(it.weapon);if(!ownedJoints.includes(it.joint))ownedJoints.push(it.joint);selectedSkin=it.skin;selectedWeapon=it.weapon;selectedJoint=it.joint;persistShop();persistLoot();updateBagsUI();},
     equip:it=>{selectedSkin=it.skin;selectedWeapon=it.weapon;selectedJoint=it.joint;persistShop();persistLoot();},
     draw:(g,it,cv)=>drawSetPreview(g,it,cv),big:true,canvasSize:160,idle:true
   });
   if(shopTab==='weapons')return renderCarousel({
     key:'weapons',
-    list:WEAPON_SKINS.filter(it=>!it.bundleOnly||ownedWeapons.includes(it.id)),
+    list:WEAPON_SKINS.filter(it=>!(it.bundleOnly||it.giftOnly)||ownedWeapons.includes(it.id)),
     isOwned:it=>ownedWeapons.includes(it.id),
     isEquipped:it=>selectedWeapon===it.id,
     priceText:it=>it.free?'Gratis':'🎒 Nur aus Tütchen',
@@ -1866,7 +1866,7 @@ function renderShop(){
   });
   if(shopTab==='joints')return renderCarousel({
     key:'joints',
-    list:JOINT_SKINS.filter(it=>!it.bundleOnly||ownedJoints.includes(it.id)),
+    list:JOINT_SKINS.filter(it=>!(it.bundleOnly||it.giftOnly)||ownedJoints.includes(it.id)),
     isOwned:it=>ownedJoints.includes(it.id),
     isEquipped:it=>selectedJoint===it.id,
     priceText:it=>it.free?'Gratis':'🎒 Nur aus Tütchen',
@@ -1916,15 +1916,18 @@ function drawSkinIntoCanvas(g,s,cv){
     else{const t=setInterval(()=>{if(entry.ready){clearInterval(t);if(cv.isConnected)drawIt();}},60);setTimeout(()=>clearInterval(t),6000);}
   }else{g.save();g.scale(S/80,S/80);drawSkinPreview(g,s);g.restore();}
 }
+function setSkins(set){return set.skins&&set.skins.length?set.skins:[set.skin];}
 function drawSetPreview(g,set,cv){
-  const skin=SKINS.find(s=>s.id===set.skin),weapon=WEAPON_SKINS.find(w=>w.id===set.weapon),joint=JOINT_SKINS.find(j=>j.id===set.joint);
+  const ids=setSkins(set);
+  const skin=SKINS.find(s=>s.id===ids[Math.floor(Date.now()/1400)%ids.length])||SKINS.find(s=>s.id===set.skin),weapon=WEAPON_SKINS.find(w=>w.id===set.weapon),joint=JOINT_SKINS.find(j=>j.id===set.joint);
   let attempts=0;
   const paint=()=>{
     g.clearRect(0,0,cv.width,cv.height);g.imageSmoothingEnabled=false;
     if(skin){
       const e=loadSkinImage(skin.img,skin.bgKey);
       if(e.canvas){
-        const sw=skin.frameW||Math.floor(e.canvas.width/4),sh=skin.frameH||Math.floor(e.canvas.height/2);
+        const sheet=!!skin.frames;
+        const sw=skin.frameW||(sheet?Math.floor(e.canvas.width/4):e.canvas.width),sh=skin.frameH||(sheet?Math.floor(e.canvas.height/2):e.canvas.height);
         const sc=Math.min(96/sw,128/sh),dw=Math.round(sw*sc),dh=Math.round(sh*sc);
         g.drawImage(e.canvas,0,0,sw,sh,4+Math.round((96-dw)/2),18+Math.round((128-dh)/2),dw,dh);
       }
