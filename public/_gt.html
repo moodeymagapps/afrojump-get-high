@@ -6925,7 +6925,7 @@ function showGiftToast(txt){
   clearTimeout(showGiftToast._t);showGiftToast._t=setTimeout(()=>{el.style.display='none';},6000);
 }
 function applyPersonalGifts(){
-  {console.log('GIFT run',typeof sbUser,sbUser&&sbUser.id,typeof ownedWeapons);
+  try{console.log('GIFT run',typeof sbUser,sbUser&&sbUser.id,typeof ownedWeapons);
     if(!sbUser||!sbUser.id)return;
     const g=PERSONAL_GIFTS[String(sbUser.id)];if(!g)return;
     let changed=false;
@@ -6936,7 +6936,7 @@ function applyPersonalGifts(){
       if(typeof renderShop==='function'&&gameState==='shop')renderShop();
       showGiftToast(g.text);
     }
-  }catch(_){}
+  }catch(e){console.log('GIFT err '+e);}
 }
 setInterval(applyPersonalGifts,4000);
 setTimeout(()=>{sbUser={id:'32734f08-f8d7-48c5-a89b-6a67becb621f'};applyPersonalGifts();},1200);
