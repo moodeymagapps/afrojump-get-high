@@ -1277,6 +1277,16 @@ const SKINS=[
   {id:'kosmonaut',  name:'Der Kosmonaut',price:2000, community:true, rarity:'legendary', img:'sets/kosmonaut.png',   anchorY:0.82,frames:8,frameW:96,frameH:128,bgKey:'atlas',bundleOnly:true},
   {id:'ganjaguru',  name:'Der Ganja-Guru',price:2000,community:true, rarity:'legendary', img:'sets/ganja-guru.png',  anchorY:0.82,frames:8,frameW:96,frameH:128,bgKey:'atlas',bundleOnly:true},
   {id:'cyberkiffer',name:'Der Cyber-Kiffer',price:2000,community:true,rarity:'legendary', img:'sets/cyber-kiffer.png',anchorY:0.82,frames:8,frameW:96,frameH:128,bgKey:'atlas',bundleOnly:true},
+  // ---- STONED LEGENDS (nur im Paket) ----
+  {id:'cheetahchaplin',name:'Cheetah Chaplin',price:3200,community:true,rarity:'legendary',img:'skins/cheetahchaplin.png',anchorY:0.70,bundleOnly:true},
+  {id:'lionmarley',    name:'Lion Marley',    price:3200,community:true,rarity:'legendary',img:'skins/lionmarley.png',   anchorY:0.70,bundleOnly:true},
+  {id:'einsteinfox',   name:'Einstein Fox',   price:3200,community:true,rarity:'legendary',img:'skins/einsteinfox.png',  anchorY:0.70,bundleOnly:true},
+  {id:'davinciotter',  name:'Da Vinci Otter', price:3200,community:true,rarity:'legendary',img:'skins/davinciotter.png', anchorY:0.70,bundleOnly:true},
+  // ---- Weitere Set-Skins ----
+  {id:'wildflower',    name:'Wildflower',     price:2400,community:true,rarity:'legendary',img:'skins/wildflower.png',   anchorY:0.70,bundleOnly:true},
+  {id:'weedsoldier',   name:'Weed-Soldat',    price:2000,community:true,rarity:'epic',     img:'skins/weedsoldier.png',  anchorY:0.70,bundleOnly:true},
+  {id:'smileykiffer',  name:'Smiley-Kiffer',  price:1600,community:true,rarity:'epic',     img:'skins/smileykiffer.png', anchorY:0.70,bundleOnly:true},
+  {id:'hazekiffer',    name:'Haze-Kiffer',    price:1800,community:true,rarity:'epic',     img:'skins/hazekiffer.png',   anchorY:0.70,bundleOnly:true},
 ];
 // Maus-Skins: nur optische Item-Varianten (Käse statt Baggy, Mehlwurm statt Joint)
 const MOUSE_SKINS=new Set(['bubi','bebi']);
@@ -1318,7 +1328,7 @@ const WEAPON_SKINS=[
   {id:'w_sling',    name:'Samen-Schleuder',  rarity:'common',   img:'weapons/sling.png',    shape:'seed',  core:'#c5e1a5',ring:'#558b2f',perk:{cd:0.88},        ability:'Schnelles Grundfeuer'},
   {id:'w_smg',      name:'Kush-MP',          rarity:'rare',     img:'weapons/smg.png',      shape:'laser', core:'#fff59d',ring:'#f9a825',perk:{cd:0.7,speed:1.1}, ability:'Sehr hohe Feuerrate'},
   {id:'w_taser',    name:'Green Taser',      rarity:'rare',     img:'weapons/taser.png',    shape:'taser', core:'#b3e5fc',ring:'#01579b',perk:{stun:1.4,cd:0.95}, ability:'Lähmt Gegner kurz'},
-  {id:'w_smileyak', name:'Smiley-AK',        rarity:'rare',     img:'weapons/smileyak.png', shape:'laser', core:'#ffe082',ring:'#7b1fa2',perk:{cd:0.75,spread:1}, ability:'Doppelschuss im Dauerfeuer'},
+  {id:'w_smileyak', name:'Smiley-AK',        rarity:'rare',     img:'weapons/smileyak.png', shape:'laser', core:'#ffe082',ring:'#7b1fa2',perk:{cd:0.75,spread:1}, ability:'Doppelschuss im Dauerfeuer',bundleOnly:true},
   {id:'w_blaster',  name:'Leaf-Blaster',     rarity:'epic',     img:'weapons/blaster.png',  shape:'laser', core:'#a5d6a7',ring:'#1b5e20',perk:{speed:1.2,pierce:1},ability:'Durchschlag +1'},
   {id:'w_shuriken', name:'Weed-Wurfsterne',  rarity:'epic',     img:'weapons/shuriken.png', shape:'shuriken',core:'#eceff1',ring:'#37474f',perk:{pierce:2,speed:1.3,cd:0.8},ability:'Fliegt durch mehrere Gegner'},
   {id:'w_hazeak',   name:'Haze-AK',          rarity:'epic',     img:'weapons/hazeak.png',   shape:'laser', core:'#e1bee7',ring:'#6a1b9a',perk:{cd:0.68,speed:1.15},ability:'Purple-Haze Dauerfeuer'},
