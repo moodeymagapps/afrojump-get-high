@@ -11,7 +11,8 @@
 #shopClose{width:42px!important;height:42px!important;background:var(--shop-red)!important;border:3px solid var(--shop-ink)!important;box-shadow:4px 4px 0 var(--shop-ink)!important;color:#fff!important;font:800 20px/1 'Barlow',sans-serif!important;clip-path:none!important;}
 #shop .tabs{position:relative;display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));width:min(100%,760px)!important;max-width:760px!important;gap:7px!important;margin:0 0 9px!important;z-index:1;}
 #shop .tabs button{min-width:0!important;min-height:52px!important;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:4px 2px 7px!important;background:#e8ece6!important;border:3px solid var(--shop-ink)!important;box-shadow:3px 3px 0 var(--shop-ink)!important;color:#37443a!important;font:700 clamp(9px,2vw,12px)/1 'Barlow',sans-serif!important;letter-spacing:.4px!important;clip-path:none!important;}
-#shop .tabs button img{width:30px;height:23px;object-fit:contain;image-rendering:pixelated;filter:saturate(.35);transition:transform .18s ease,filter .18s ease;}
+#shop .tabs button img{width:30px;height:23px;object-fit:contain;image-rendering:pixelated;filter:saturate(.35);transition:transform .18s ease,filter .18s ease;flex:0 0 auto;}
+#shop .tabs button span{display:block;width:100%;text-align:center;white-space:nowrap;overflow:visible;letter-spacing:.4px;text-shadow:none;}
 #shop .tabs button.on{background:#fff!important;color:var(--shop-ink)!important;transform:translate(-1px,-1px);box-shadow:5px 5px 0 var(--shop-ink)!important;}
 #shop .tabs button.on img,#shop .tabs button:hover img{filter:none;transform:translateY(-2px);}
 .setsBanner{position:relative;width:min(100%,760px);min-height:42px;display:flex;align-items:center;justify-content:center;gap:13px;margin:0 0 12px;padding:5px 16px;background:#dfe4df;border:3px solid var(--shop-ink);box-shadow:4px 4px 0 var(--shop-ink);color:var(--shop-ink);font:400 25px/1 'Bebas Neue',sans-serif;letter-spacing:2px;cursor:pointer;z-index:1;}
@@ -42,7 +43,7 @@
 .carDesc{max-width:520px!important;color:#49614e!important;font:600 13px/1.35 'Barlow',sans-serif!important;}
 .carPanel{max-width:560px;background:#e3e9e2!important;border:3px solid var(--shop-ink);box-shadow:4px 4px 0 var(--shop-ink)!important;}
 .statRow .lb,.statRow .vl,.chips b{font-family:'Barlow',sans-serif!important;font-weight:700!important;}
-.carAct{min-height:52px!important;background:var(--shop-lime)!important;border:3px solid var(--shop-ink)!important;box-shadow:5px 5px 0 var(--shop-ink)!important;color:var(--shop-ink)!important;font:800 16px/1 'Barlow',sans-serif!important;letter-spacing:1.5px!important;clip-path:none!important;}
+.carAct{min-height:52px!important;height:auto!important;white-space:normal!important;padding:13px 14px!important;background:var(--shop-lime)!important;border:3px solid var(--shop-ink)!important;box-shadow:5px 5px 0 var(--shop-ink)!important;color:var(--shop-ink)!important;font:800 16px/1.3 'Barlow',sans-serif!important;letter-spacing:1.5px!important;text-shadow:none!important;clip-path:none!important;}
 .carAct:hover:not(:disabled){filter:brightness(1.05);transform:translateY(-2px);}
 .carAct.eq{background:#d9dfd8!important;color:#506055!important;box-shadow:4px 4px 0 var(--shop-ink)!important;}
 .carAct.lock{background:#e7c0bd!important;color:#6c201f!important;}
