@@ -2119,7 +2119,13 @@ function renderBoxes(){
     const card=document.createElement('div');card.className='boxCard';
     const cv=document.createElement('canvas');cv.width=96;cv.height=96;
     const g=cv.getContext('2d');
-    g.clearRect(0,0,96,96);drawBaggy(g,48,44,1.05,b.bag,0,0);
+    g.clearRect(0,0,96,96);
+    if(b.img){
+      const im=new Image();
+      im.onload=()=>{g.clearRect(0,0,96,96);g.imageSmoothingEnabled=false;g.drawImage(im,4,4,88,88);};
+      im.onerror=()=>{drawBaggy(g,48,44,1.05,b.bag,0,0);};
+      im.src=b.img;
+    }else drawBaggy(g,48,44,1.05,b.bag,0,0);
     card.appendChild(cv);
     const nm=document.createElement('div');nm.className='bname';nm.textContent=b.name;card.appendChild(nm);
     const od=document.createElement('div');od.className='odds';
