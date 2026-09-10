@@ -124,7 +124,7 @@ function patchGameHtml(html: string) {
     ".overlay,#menu,#menu::after{background-color:#0c1408!important;}" +
     "</style>";
   if (!out.includes("afroSafeFill")) out = out.replace("</head>", inject + "</head>");
-  if (!out.includes("afro-shop.css")) out = out.replace("</head>", '<link rel="stylesheet" href="/afro-shop.css?v=warp45"></head>');
+  if (!out.includes("afro-shop.css")) out = out.replace("</head>", '<link rel="stylesheet" href="/afro-shop.css?v=warp46"></head>');
   out = out.replace(
     "stage.className='carStage carSlide'+(eq?' eq':'')+(owned_?'':' locked')+(cfg.big?' big':'');",
     "stage.className='carStage carSlide'+(eq?' eq':'')+(owned_?'':' locked')+(cfg.big?' big':'')+' rar-'+(it.rarity||'common');"
