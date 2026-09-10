@@ -43,7 +43,7 @@
 .carDesc{max-width:520px!important;color:#49614e!important;font:600 13px/1.35 'Barlow',sans-serif!important;}
 .carPanel{max-width:560px;background:#e3e9e2!important;border:3px solid var(--shop-ink);box-shadow:4px 4px 0 var(--shop-ink)!important;}
 .statRow .lb,.statRow .vl,.chips b{font-family:'Barlow',sans-serif!important;font-weight:700!important;}
-.carAct{min-height:52px!important;background:var(--shop-lime)!important;border:3px solid var(--shop-ink)!important;box-shadow:5px 5px 0 var(--shop-ink)!important;color:var(--shop-ink)!important;font:800 16px/1 'Barlow',sans-serif!important;letter-spacing:1.5px!important;clip-path:none!important;}
+.carAct{min-height:52px!important;height:auto!important;white-space:normal!important;padding:13px 14px!important;background:var(--shop-lime)!important;border:3px solid var(--shop-ink)!important;box-shadow:5px 5px 0 var(--shop-ink)!important;color:var(--shop-ink)!important;font:800 16px/1.3 'Barlow',sans-serif!important;letter-spacing:1.5px!important;clip-path:none!important;}
 .carAct:hover:not(:disabled){filter:brightness(1.05);transform:translateY(-2px);}
 .carAct.eq{background:#d9dfd8!important;color:#506055!important;box-shadow:4px 4px 0 var(--shop-ink)!important;}
 .carAct.lock{background:#e7c0bd!important;color:#6c201f!important;}
