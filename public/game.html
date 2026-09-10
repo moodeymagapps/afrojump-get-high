@@ -1919,9 +1919,11 @@ function drawSkinIntoCanvas(g,s,cv){
 function setSkins(set){return set.skins&&set.skins.length?set.skins:[set.skin];}
 function drawSetPreview(g,set,cv){
   const ids=setSkins(set);
-  const skin=SKINS.find(s=>s.id===ids[Math.floor(Date.now()/1400)%ids.length])||SKINS.find(s=>s.id===set.skin),weapon=WEAPON_SKINS.find(w=>w.id===set.weapon),joint=JOINT_SKINS.find(j=>j.id===set.joint);
+  const weapon=WEAPON_SKINS.find(w=>w.id===set.weapon),joint=JOINT_SKINS.find(j=>j.id===set.joint);
   let attempts=0;
+  const fit=(im,bx,by,bw,bh)=>{const sc=Math.min(bw/im.width,bh/im.height),w=Math.round(im.width*sc),h=Math.round(im.height*sc);g.drawImage(im,Math.round(bx+(bw-w)/2),Math.round(by+(bh-h)/2),w,h);};
   const paint=()=>{
+    const skin=SKINS.find(s=>s.id===ids[Math.floor(Date.now()/1500)%ids.length]);
     g.clearRect(0,0,cv.width,cv.height);g.imageSmoothingEnabled=false;
     if(skin){
       const e=loadSkinImage(skin.img,skin.bgKey);
@@ -1932,10 +1934,12 @@ function drawSetPreview(g,set,cv){
         g.drawImage(e.canvas,0,0,sw,sh,4+Math.round((96-dw)/2),18+Math.round((128-dh)/2),dw,dh);
       }
     }
-    if(weapon){const im=itemImg(weapon.img);if(im)g.drawImage(im,98,10,58,58);}
-    if(joint){const im=itemImg(joint.img);if(im)g.drawImage(im,98,88,58,58);}
+    if(weapon){const im=itemImg(weapon.img);if(im)fit(im,98,10,58,58);}
+    if(joint){const im=itemImg(joint.img);if(im)fit(im,98,88,58,58);}
     const waiting=skin&&!loadSkinImage(skin.img,skin.bgKey).canvas||weapon&&!itemImg(weapon.img)||joint&&!itemImg(joint.img);
-    if(cv.isConnected&&waiting&&attempts++<75)setTimeout(paint,80);
+    if(!cv.isConnected)return;
+    if(waiting&&attempts++<75)setTimeout(paint,80);
+    else if(ids.length>1)setTimeout(paint,300);
   };
   paint();
 }
