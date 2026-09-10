@@ -124,7 +124,7 @@ function patchGameHtml(html: string) {
     ".overlay,#menu,#menu::after{background-color:#0c1408!important;}" +
     "</style>";
   if (!out.includes("afroSafeFill")) out = out.replace("</head>", inject + "</head>");
-  if (!out.includes("afro-shop.css")) out = out.replace("</head>", '<link rel="stylesheet" href="/afro-shop.css?v=warp42"></head>');
+  if (!out.includes("afro-shop.css")) out = out.replace("</head>", '<link rel="stylesheet" href="/afro-shop.css?v=warp43"></head>');
   out = out.replace(
     "stage.className='carStage carSlide'+(eq?' eq':'')+(owned_?'':' locked')+(cfg.big?' big':'');",
     "stage.className='carStage carSlide'+(eq?' eq':'')+(owned_?'':' locked')+(cfg.big?' big':'')+' rar-'+(it.rarity||'common');"
@@ -147,7 +147,7 @@ function patchGameHtml(html: string) {
   );
 
   if (!out.includes("lava-menu.js")) {
-    out = out.replace("</body>", '<script src="/lava-menu.js?v=warp38"></script><script src="/afro-admin.js?v=warp38"></script><script src="/afro-bunny.js?v=warp41"></script></body>');
+    out = out.replace("</body>", '<script src="/lava-menu.js?v=warp38"></script><script src="/afro-admin.js?v=warp38"></script><script src="/afro-bunny.js?v=warp43"></script></body>');
   }
   out = out.replace('src="/lava/lava_btn.png"', 'src="/lava_btn.png"');
   out = out.replace(
@@ -243,7 +243,7 @@ export function Index() {
       if (!doc.getElementById("afroBunnyScript")) {
         const s5 = doc.createElement("script");
         s5.id = "afroBunnyScript";
-        s5.src = "/afro-bunny.js?v=warp41";
+        s5.src = "/afro-bunny.js?v=warp43";
         doc.body.appendChild(s5);
       }
     } catch {
