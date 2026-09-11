@@ -53,3 +53,13 @@
 @media (min-width:760px){.carWrap{display:grid!important;grid-template-columns:minmax(0,1.45fr) minmax(230px,.75fr);grid-template-areas:'view info' 'view action';align-items:center;column-gap:22px!important;}.carRow{grid-area:view}.carDots{grid-area:view;align-self:end;margin:0 0 7px}.carInfo,.carPanel{grid-area:info}.carAct{grid-area:action;align-self:start}.carStage{height:420px!important}.carStage canvas{width:330px!important;height:330px!important}}
 @media (max-width:520px){#shop{padding-left:10px!important;padding-right:10px!important}.shopHeadActions{gap:6px}#shop .head{padding:7px 0 9px}#shop h2{font-size:21px!important}#shopBags{height:34px;padding-right:7px;font-size:14px!important}#shopBags img{width:25px;height:25px}#shopClose{width:34px!important;height:34px!important}#shop .tabs button{min-height:43px!important;font-size:8px!important;gap:3px}#shop .tabs button img{width:16px;height:14px}.setsBanner{min-height:34px;font-size:18px}.carWrap{padding:8px!important}.carRow{grid-template-columns:42px minmax(0,1fr) 42px!important;gap:5px!important}.carArrow{width:42px!important;height:42px!important}.carStage{height:260px!important;min-height:220px}.carStage canvas{width:210px!important;height:210px!important}.carDesc{font-size:11px!important}.carAct{min-height:46px!important;font-size:14px!important}}
 @media (prefers-reduced-motion:reduce){#shopBags img,.carEq{animation:none!important}.carArrow,.setsBanner,.carAct,#shop .tabs button,#shop .tabs button img{transition:none!important}}
+/* Shop-only: dual-colour glow outline around skin preview sprite */
+#shop .carStage canvas{--g1:#84d51f;--g2:#7925d6;filter:drop-shadow(0 0 0 var(--g1)) drop-shadow(0 0 6px var(--g1)) drop-shadow(0 0 12px var(--g2))!important;animation:shopGlowPulse 2.4s ease-in-out infinite;}
+#shop .carStage.rar-common canvas{--g1:#cfe3d0;--g2:#5c7a63;}
+#shop .carStage.rar-rare canvas{--g1:#39d7ff;--g2:#1b4fd8;}
+#shop .carStage.rar-epic canvas{--g1:#c98bff;--g2:#5a1fd0;}
+#shop .carStage.rar-legendary canvas{--g1:#ffd447;--g2:#ff5c1a;}
+#shop .carStage.rar-mythic canvas{--g1:#b9f227;--g2:#ff2ea6;}
+#shop .carStage.locked canvas{filter:grayscale(1) brightness(.55) drop-shadow(0 0 6px var(--g1)) drop-shadow(0 0 12px var(--g2))!important;}
+@keyframes shopGlowPulse{0%,100%{filter:drop-shadow(0 0 4px var(--g1)) drop-shadow(0 0 10px var(--g2))}50%{filter:drop-shadow(0 0 9px var(--g1)) drop-shadow(0 0 20px var(--g2))}}
+@media (prefers-reduced-motion:reduce){#shop .carStage canvas{animation:none!important}}
