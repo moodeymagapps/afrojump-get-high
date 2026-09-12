@@ -1293,6 +1293,28 @@ const SKINS=[
   {id:'weedsoldier',   name:'Weed-Soldat',    price:2000,community:true,rarity:'epic',     img:'skins/weedsoldier.png',  anchorY:0.70,bundleOnly:true},
   {id:'smileykiffer',  name:'Smiley-Kiffer',  price:1600,community:true,rarity:'epic',     img:'skins/smileykiffer.png', anchorY:0.70,bundleOnly:true},
   {id:'hazekiffer',    name:'Haze-Kiffer',    price:1800,community:true,rarity:'epic',     img:'skins/hazekiffer.png',   anchorY:0.70,bundleOnly:true},
+  // ---- FANTASY LEGENDS (9 Skins, nur im Paket) ----
+  {id:'ironknight',    name:'Iron Knight',    price:4200,community:true,rarity:'legendary',img:'skins/iron-knight.png',   anchorY:0.76,bundleOnly:true},
+  {id:'forestelf',     name:'Forest Elf',     price:4200,community:true,rarity:'epic',     img:'skins/forest-elf.png',    anchorY:0.76,bundleOnly:true},
+  {id:'forestranger',  name:'Forest Ranger',  price:4200,community:true,rarity:'epic',     img:'skins/forest-ranger.png', anchorY:0.76,bundleOnly:true},
+  {id:'fantasyrogue',  name:'Rogue',          price:4200,community:true,rarity:'rare',     img:'skins/rogue.png',         anchorY:0.76,bundleOnly:true},
+  {id:'redwitch',      name:'Red Witch',      price:4200,community:true,rarity:'legendary',img:'skins/red-witch.png',     anchorY:0.76,bundleOnly:true},
+  {id:'frostwizard',   name:'Frost Wizard',   price:4200,community:true,rarity:'legendary',img:'skins/frost-wizard.png',  anchorY:0.76,bundleOnly:true},
+  {id:'reddwarf',      name:'Red Dwarf',      price:4200,community:true,rarity:'epic',     img:'skins/red-dwarf.png',     anchorY:0.76,bundleOnly:true},
+  {id:'bluewizard',    name:'Blue Wizard',    price:4200,community:true,rarity:'legendary',img:'skins/blue-wizard.png',   anchorY:0.76,bundleOnly:true},
+  {id:'forestgoblin',  name:'Forest Goblin',  price:4200,community:true,rarity:'rare',     img:'skins/goblin.png',        anchorY:0.76,bundleOnly:true},
+  // ---- MUTANT HORDE (3 Skins, nur im Paket) ----
+  {id:'fleshtitan',    name:'Flesh Titan',    price:3000,community:true,rarity:'mythic',   img:'skins/flesh-titan.png',   anchorY:0.76,bundleOnly:true},
+  {id:'cryptstalker',  name:'Crypt Stalker',  price:3000,community:true,rarity:'legendary',img:'skins/crypt-stalker.png', anchorY:0.76,bundleOnly:true},
+  {id:'toxicundead',   name:'Toxic Undead',   price:3000,community:true,rarity:'legendary',img:'skins/toxic-undead.png',  anchorY:0.76,bundleOnly:true},
+  // ---- Neue Einzel-Skins ----
+  {id:'bonebard',      name:'Bone Bard',      price:900, community:true,rarity:'rare',     img:'skins/bone-bard.png',       anchorY:0.76},
+  {id:'wastelandraider',name:'Wasteland Raider',price:1300,community:true,rarity:'epic',   img:'skins/wasteland-raider.png',anchorY:0.76},
+  {id:'pixeldrake',    name:'Pixel Drake',    price:1700,community:true,rarity:'epic',     img:'skins/pixel-drake.png',     anchorY:0.76},
+  {id:'redwolf',       name:'Red Wolf',       price:2100,community:true,rarity:'legendary',img:'skins/red-wolf.png',       anchorY:0.76},
+  {id:'shadowduck',    name:'Shadow Duck',    price:700, community:true,rarity:'rare',     img:'skins/shadow-duck.png',     anchorY:0.76},
+  {id:'nightreaper',   name:'Night Reaper',   price:2400,community:true,rarity:'legendary',img:'skins/night-reaper.png',    anchorY:0.76},
+  {id:'bananasloth',   name:'Banana Sloth',   price:2800,community:true,rarity:'mythic',   img:'skins/banana-sloth.png',    anchorY:0.76},
 ];
 // Maus-Skins: nur optische Item-Varianten (Käse statt Baggy, Mehlwurm statt Joint)
 const MOUSE_SKINS=new Set(['bubi','bebi']);
@@ -1384,6 +1406,10 @@ const JOINT_SKINS=[
   {id:'j_marlboro',  name:'Marlboro-Packung',rarity:'mythic',img:'items/marlboro.png',    paper:'#f5f5f5',tip:'#d32f2f',smoke:'#eeeeee',perk:{bags:6,gun:4},          ability:'+6 🌿 pro Tütchen & +4s Waffe',giftOnly:true},
 ];
 const SET_PACKS=[
+  {id:'set_fantasy_legends',name:'FANTASY LEGENDS',price:4200,rarity:'legendary',desc:'Das komplette Abenteuer-Paket mit allen 9 Fantasy-Skins.',
+   skins:['ironknight','forestelf','forestranger','fantasyrogue','redwitch','frostwizard','reddwarf','bluewizard','forestgoblin'],skin:'ironknight'},
+  {id:'set_mutant_horde',name:'MUTANT HORDE',price:3000,rarity:'mythic',desc:'Das komplette Monster-Paket mit allen 3 Mutanten-Skins.',
+   skins:['fleshtitan','cryptstalker','toxicundead'],skin:'fleshtitan'},
   {id:'set_legends',name:'STONED LEGENDS',price:3200,rarity:'legendary',desc:'Half human. Half legend. 4 Skins + Herb Wand + Legendary Glass.',
    skins:['cheetahchaplin','lionmarley','einsteinfox','davinciotter'],skin:'cheetahchaplin',weapon:'w_herbwand',joint:'j_legglass'},
   {id:'set_wildflower',name:'WILDFLOWER-SET',price:2400,rarity:'legendary',desc:'Skin + Regenbogen-Schwert + Blumen-Bong.',
@@ -1854,14 +1880,14 @@ function renderShop(){
   skinGrid.style.display='block';
   if(shopTab==='sets')return renderCarousel({
     key:'sets',list:SET_PACKS,
-    isOwned:it=>setSkins(it).every(id=>owned.includes(id))&&ownedWeapons.includes(it.weapon)&&ownedJoints.includes(it.joint),
-    isEquipped:it=>selectedSkin===it.skin&&selectedWeapon===it.weapon&&selectedJoint===it.joint,
+    isOwned:it=>setSkins(it).every(id=>owned.includes(id))&&(!it.weapon||ownedWeapons.includes(it.weapon))&&(!it.joint||ownedJoints.includes(it.joint)),
+    isEquipped:it=>selectedSkin===it.skin&&(!it.weapon||selectedWeapon===it.weapon)&&(!it.joint||selectedJoint===it.joint),
     priceText:it=>'🌿 '+it.price,
     lockText:it=>'🔒 GESPERRT – 🌿 '+it.price,
     canBuy:it=>totalBags>=it.price,
     buyText:it=>'🌿 SET KAUFEN – '+it.price,
-    buy:it=>{if(totalBags<it.price)return;totalBags-=it.price;for(const id of setSkins(it))if(!owned.includes(id))owned.push(id);if(!ownedWeapons.includes(it.weapon))ownedWeapons.push(it.weapon);if(!ownedJoints.includes(it.joint))ownedJoints.push(it.joint);selectedSkin=it.skin;selectedWeapon=it.weapon;selectedJoint=it.joint;persistShop();persistLoot();updateBagsUI();},
-    equip:it=>{selectedSkin=it.skin;selectedWeapon=it.weapon;selectedJoint=it.joint;persistShop();persistLoot();},
+    buy:it=>{if(totalBags<it.price)return;totalBags-=it.price;for(const id of setSkins(it))if(!owned.includes(id))owned.push(id);if(it.weapon&&!ownedWeapons.includes(it.weapon))ownedWeapons.push(it.weapon);if(it.joint&&!ownedJoints.includes(it.joint))ownedJoints.push(it.joint);selectedSkin=it.skin;if(it.weapon)selectedWeapon=it.weapon;if(it.joint)selectedJoint=it.joint;persistShop();persistLoot();updateBagsUI();},
+    equip:it=>{selectedSkin=it.skin;if(it.weapon)selectedWeapon=it.weapon;if(it.joint)selectedJoint=it.joint;persistShop();persistLoot();},
     draw:(g,it,cv)=>drawSetPreview(g,it,cv),big:true,canvasSize:160,idle:true
   });
   if(shopTab==='weapons')return renderCarousel({
