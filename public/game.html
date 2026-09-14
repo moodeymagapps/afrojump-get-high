@@ -7048,6 +7048,8 @@ async function loadCloudSave(){
     if(typeof d.totalBags==='number')totalBags=Math.max(totalBags,d.totalBags);
     // Starter-Geschenk wird nicht mehr vergeben (kein erneutes Gutschreiben)
     if(typeof d.highScore==='number')highScore=Math.max(highScore,d.highScore);
+    if(typeof d.lavaBest==='number'){lavaBest=Math.max(lavaBest|0,d.lavaBest|0);try{localStorage.setItem('afro_lava_best',lavaBest);}catch(_){}}
+    if(typeof d.lavaHeight==='number'){lavaHeight=Math.max(lavaHeight|0,d.lavaHeight|0);try{localStorage.setItem('afro_lava_height',lavaHeight);}catch(_){}}
     if(Array.isArray(d.owned))owned=Array.from(new Set([...owned,...d.owned]));
     if(d.selectedSkin&&owned.includes(d.selectedSkin))selectedSkin=d.selectedSkin;
     if(Array.isArray(d.ownedWeapons))ownedWeapons=Array.from(new Set([...ownedWeapons,...d.ownedWeapons]));
@@ -7081,7 +7083,7 @@ async function pushCloudSave(nameOverride){
   const payload={
     user_id:sbUser.id,
     display_name:nameOverride||(sbProfile&&sbProfile.display_name)||sbUser.email,
-    data:{totalBags,highScore,owned,selectedSkin,ownedWeapons,ownedJoints,selectedWeapon,selectedJoint,grant2000,dailyLast:localStorage.getItem(DKL),dailyStreak:+localStorage.getItem(DKS)||0,quests,missions:missionData},
+    data:{totalBags,highScore,lavaBest:lavaBest|0,lavaHeight:lavaHeight|0,owned,selectedSkin,ownedWeapons,ownedJoints,selectedWeapon,selectedJoint,grant2000,dailyLast:localStorage.getItem(DKL),dailyStreak:+localStorage.getItem(DKS)||0,quests,missions:missionData},
     updated_at:new Date().toISOString(),
   };
   const {error}=await sb.from('player_saves').upsert(payload,{onConflict:'user_id'});
