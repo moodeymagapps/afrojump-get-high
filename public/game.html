@@ -238,6 +238,29 @@
   .lbRow.top1 .rank{color:#ffd700;}
   .lbRow.top2 .rank{color:#e0e0e0;}
   .lbRow.top3 .rank{color:#d68910;}
+  /* ===== 3D Podium ===== */
+  .lbPodium{display:flex;align-items:flex-end;justify-content:center;gap:8px;width:100%;margin:4px 0 12px;}
+  .lbPod{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;cursor:default;}
+  .lbPod.p1{order:2;}.lbPod.p2{order:1;}.lbPod.p3{order:3;}
+  .lbPod .podFace{width:100%;max-width:74px;aspect-ratio:1/1;image-rendering:pixelated;background-repeat:no-repeat;background-color:#0a0a0a;
+    box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #55606a, 0 0 14px rgba(0,0,0,.6);}
+  .lbPod .podName{margin-top:4px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    font-family:'VT323','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:16px;color:#fff;letter-spacing:1px;}
+  .lbPod .podSub{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    font-family:'VT323',monospace;font-size:13px;opacity:.6;color:#fff;}
+  .lbPod .podVal{font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:9px;color:#7cfc00;margin:3px 0 5px;text-shadow:1px 1px 0 #000;}
+  #board.lbLava .lbPod .podVal{color:#ffb03c;}
+  .lbPod .podBlock{width:100%;display:flex;align-items:flex-start;justify-content:center;padding-top:6px;
+    font-family:'Press Start 2P',monospace;font-size:14px;color:#0f1a08;text-shadow:1px 1px 0 rgba(255,255,255,.35);}
+  .lbPod.p1 .podBlock{height:74px;background:linear-gradient(180deg,#ffe680,#ffb400 55%,#a86b00);box-shadow:inset -3px -3px 0 #7a4d00, inset 3px 3px 0 #fff6c2, 0 0 18px rgba(255,190,0,.45);}
+  .lbPod.p2 .podBlock{height:56px;background:linear-gradient(180deg,#f4f7fa,#c3ccd6 55%,#7d8894);box-shadow:inset -3px -3px 0 #5e6771, inset 3px 3px 0 #fff, 0 0 12px rgba(220,230,240,.3);}
+  .lbPod.p3 .podBlock{height:44px;background:linear-gradient(180deg,#f0b477,#d3812f 55%,#8a4c11);box-shadow:inset -3px -3px 0 #5e340a, inset 3px 3px 0 #ffdcb0, 0 0 12px rgba(220,140,50,.3);}
+  #board.lbLava .lbPod.p2 .podBlock{background:linear-gradient(180deg,#ffd0a0,#e08d4a 55%,#8a3b12);box-shadow:inset -3px -3px 0 #5e2405, inset 3px 3px 0 #ffe3c6, 0 0 14px rgba(255,120,30,.35);}
+  #board.lbLava .lbPod.p3 .podBlock{background:linear-gradient(180deg,#ff9c5a,#c9491a 55%,#6b2004);box-shadow:inset -3px -3px 0 #4a1502, inset 3px 3px 0 #ffcaa4, 0 0 14px rgba(255,80,0,.35);}
+  .lbPod.me .podFace{box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #7cfc00, 0 0 16px rgba(124,252,0,.5);}
+  #board.lbLava .lbPod.me .podFace{box-shadow:inset -2px -2px 0 #000, inset 2px 2px 0 #ff8a1e, 0 0 16px rgba(255,138,30,.5);}
+  .lbPod .podCrown{font-size:18px;line-height:1;margin-bottom:2px;height:20px;}
+  #lbShowAll{width:100%;margin-top:2px;}
 
   #hint{position:absolute;bottom:calc(12px + env(safe-area-inset-bottom));left:0;right:0;text-align:center;font-size:14px;opacity:.6;pointer-events:none;font-family:'VT323','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;letter-spacing:1px;}
   #fireBtn{position:absolute;bottom:60px;left:50%;transform:translateX(-50%);width:78px;height:78px;border-radius:50%;background:#c62828;border:none;color:#fff;font-size:30px;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:inset -4px -4px 0 #7f1010, inset 4px 4px 0 #ff8a80, 0 5px 0 #7f1010, 0 0 20px rgba(255,80,80,.6);z-index:5;font-family:'Press Start 2P','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;user-select:none;-webkit-tap-highlight-color:transparent;}
