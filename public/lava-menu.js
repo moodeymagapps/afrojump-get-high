@@ -67,8 +67,12 @@
     }
   };
 
+  var boardShowFull = false;
+  var lastBoardMode = null;
+
   renderBoard = function () {
     const lava = boardMode === "lava";
+    if (lastBoardMode !== boardMode) { boardShowFull = false; lastBoardMode = boardMode; }
     const data = (boardData || []).slice().sort((a, b) => lava
       ? ((b.lava_height | 0) - (a.lava_height | 0)) || ((b.lava_time | 0) - (a.lava_time | 0))
       : ((b.best_height | 0) - (a.best_height | 0)));
@@ -84,25 +88,60 @@
       boardMsgEl.textContent = "Noch keine Einträge – sei der Erste!";
       return;
     }
+    const skinOf = (id) => (id === "james" ? "bob" : id);
+    const metersOf = (r) => (lava ? (r.lava_height | 0) : (r.best_height | 0));
+    const timeOf = (r) => ((r.lava_time | 0) || (r.lava_best | 0));
     let myRank = 0;
-    data.forEach((r, i) => {
+    data.forEach((r, i) => { if (sbUser && r.user_id === sbUser.id) myRank = i + 1; });
+
+    /* --- Podium Top 3 --- */
+    const pod = document.createElement("div");
+    pod.className = "lbPodium";
+    data.slice(0, 3).forEach((r, i) => {
       const mine = sbUser && r.user_id === sbUser.id;
-      if (mine) myRank = i + 1;
-      const medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : "#" + (i + 1);
+      const sid = skinOf(r.skin);
+      const sk = SKINS.find((s) => s.id === sid);
+      const crown = i === 0 ? "👑" : i === 1 ? "🥈" : "🥉";
+      const el = document.createElement("div");
+      el.className = "lbPod p" + (i + 1) + (mine ? " me" : "");
+      el.innerHTML =
+        '<div class="podCrown">' + crown + "</div>" +
+        '<div class="podFace" style="' + lbFaceStyle(sid) + '"></div>' +
+        '<div class="podName">' + escHtml(r.display_name || "Spieler") + "</div>" +
+        '<div class="podSub">' + escHtml(sk ? sk.name : "") + "</div>" +
+        '<div class="podVal">' + metersOf(r) + "m" + (lava ? " · 🔥" + timeOf(r) + "s" : "") + "</div>" +
+        '<div class="podBlock">' + (i + 1) + "</div>";
+      pod.appendChild(el);
+    });
+    boardListEl.appendChild(pod);
+
+    /* --- Rows 4+ --- */
+    const rest = boardShowFull ? data.slice(3) : data.slice(3, 12);
+    rest.forEach((r, k) => {
+      const i = k + 3;
+      const mine = sbUser && r.user_id === sbUser.id;
       const row = document.createElement("div");
-      row.className = "lbRow" + (mine ? " me" : "") + (i < 3 ? " top" + (i + 1) : "");
-      const sk = SKINS.find((s) => s.id === r.skin);
-      const meters = lava ? (r.lava_height | 0) : (r.best_height | 0);
+      row.className = "lbRow" + (mine ? " me" : "");
+      const sid = skinOf(r.skin);
+      const sk = SKINS.find((s) => s.id === sid);
       row.innerHTML =
-        '<span class="rank">' + medal + "</span>" +
-        '<span class="face" style="' + lbFaceStyle(r.skin) + '"></span>' +
+        '<span class="rank">#' + (i + 1) + "</span>" +
+        '<span class="face" style="' + lbFaceStyle(sid) + '"></span>' +
         '<span class="who">' + escHtml(r.display_name || "Spieler") +
         (sk ? ' <span style="opacity:.6">· ' + escHtml(sk.name) + "</span>" : "") +
         "</span>" +
-        '<span class="val">' + meters + "m</span>" +
-        (lava ? '<span class="val">🔥 ' + (r.lava_time | 0) + "s</span>" : "");
+        '<span class="val">' + metersOf(r) + "m</span>" +
+        (lava ? '<span class="val">🔥 ' + timeOf(r) + "s</span>" : "");
       boardListEl.appendChild(row);
     });
+    if (!boardShowFull && data.length > 12) {
+      const more = document.createElement("button");
+      more.className = "btn ghost";
+      more.id = "lbShowAll";
+      more.textContent = "▼ ALLE ANZEIGEN (" + data.length + ")";
+      more.onclick = function () { boardShowFull = true; renderBoard(); };
+      boardListEl.appendChild(more);
+    }
     if (!sbUser) boardMsgEl.textContent = "Melde dich an, um in der Rangliste zu erscheinen.";
     else if (myRank) {
       boardMsgEl.textContent = lava
