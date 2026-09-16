@@ -147,7 +147,7 @@ function patchGameHtml(html: string) {
   );
 
   if (!out.includes("lava-menu.js")) {
-    out = out.replace("</body>", '<script src="/lava-menu.js?v=warp38"></script><script src="/afro-admin.js?v=warp38"></script><script src="/afro-bunny.js?v=warp44"></script></body>');
+    out = out.replace("</body>", '<script src="/lava-menu.js?v=warp53"></script><script src="/afro-admin.js?v=warp38"></script><script src="/afro-bunny.js?v=warp44"></script></body>');
   }
   out = out.replace('src="/lava/lava_btn.png"', 'src="/lava_btn.png"');
   out = out.replace(
@@ -231,7 +231,7 @@ export function Index() {
       if (!doc.getElementById("lavaMenuScript")) {
         const s3 = doc.createElement("script");
         s3.id = "lavaMenuScript";
-        s3.src = "/lava-menu.js?v=warp38";
+        s3.src = "/lava-menu.js?v=warp53";
         doc.body.appendChild(s3);
       }
       if (!doc.getElementById("afroAdminScript")) {
