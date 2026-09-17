@@ -21,6 +21,9 @@ export type Database = {
           lava_best: number
           lava_height: number
           lava_time: number
+          season2_best_height: number
+          season2_lava_height: number
+          season2_lava_time: number
           skin: string | null
           total_bags: number
           updated_at: string
@@ -32,6 +35,9 @@ export type Database = {
           lava_best?: number
           lava_height?: number
           lava_time?: number
+          season2_best_height?: number
+          season2_lava_height?: number
+          season2_lava_time?: number
           skin?: string | null
           total_bags?: number
           updated_at?: string
@@ -43,6 +49,9 @@ export type Database = {
           lava_best?: number
           lava_height?: number
           lava_time?: number
+          season2_best_height?: number
+          season2_lava_height?: number
+          season2_lava_time?: number
           skin?: string | null
           total_bags?: number
           updated_at?: string
