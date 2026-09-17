@@ -1283,6 +1283,7 @@ const SKINS=[
   {id:'stephan',    name:'Stephan',    price:1900, community:true, rarity:'legendary', img:'skins/stephan.png',    anchorY:0.70},
   {id:'moodey',     name:'Moodey',     price:2000, community:true, rarity:'legendary', img:'skins/moodey.png',     anchorY:0.70},
   {id:'junis',      name:'Junis',      price:0,   community:true, rarity:'legendary', img:'skins/junis.png',      anchorY:0.70, unlockAt:2000},
+  {id:'season1macher',name:'MACHER',   price:0,   community:true, rarity:'mythic', img:'/__l5e/assets-v1/df4194dc-c5bf-44d7-914c-284ec9be835c/season1-macher.png',anchorY:0.84,exclusiveUser:'32734f08-f8d7-48c5-a89b-6a67becb621f'},
 
   {id:'ranger',     name:'Blaze Ranger',price:700,  community:true, rarity:'epic',      img:'skins/ranger.png',     anchorY:0.70},
   {id:'skullcap',   name:'Captain Skull',price:1000,community:true, rarity:'epic',      img:'skins/skullcap.png',   anchorY:0.70},
@@ -1705,6 +1706,7 @@ for(const s of SKINS)if(s.img)loadSkinImage(s.img,s.bgKey);
 setTimeout(()=>{try{for(const k in BOSS_IMAGES)loadSkinImage(BOSS_IMAGES[k].src,BOSS_IMAGES[k].bg);}catch(e){}},300);
 function currentSkin(){
   const base=SKINS.find(s=>s.id===selectedSkin)||SKINS[0];
+  if(base.exclusiveUser&&(!sbUser||String(sbUser.id)!==base.exclusiveUser))return SKINS[0];
   const j=currentJoint();
   if(base.id==='fussel')return Object.assign({},base,{dev:'bone',devImg:null});
   // Bubi/Bebi tragen einen Mehlwurm statt eines Joints (rein optisch)
@@ -2473,6 +2475,7 @@ document.getElementById('menuPlay').onclick=()=>{playWipe();startGame();};
 document.getElementById('menuLava').onclick=()=>{playWipe();startLavaGame();};
 // ---- News-Streifen im Hauptmenü (Text hier anpassen) ----
 const NEWS_LINES=[
+  'SEASON 2!',
   'Neuer Lava Modus!',
   'Neue Bosse!',
   'Arenen • Rangliste • 1v1'
@@ -3474,6 +3477,7 @@ function update(dt){
       const wp=wperk(), sp=-12*(wp.speed||1);
       const mk=()=>{
         const s={x:player.x,y:player.y-12,vx:0,vy:sp,life:2,pierce:wp.pierce?2:0,blast:wp.blast||0,spin:0};
+        if(selectedSkin==='season1macher'&&sbUser&&String(sbUser.id)==='32734f08-f8d7-48c5-a89b-6a67becb621f')s.s1fx=Math.random()<0.5?'lava':String((bestY|0)%10000);
         if(wp.nade){s.nade=1;s.fuse=0.8;s.blast=2;s.life=3;s.vy=sp*0.8;}
         if(wp.stun){s.stun=wp.stun;}
         if(wp.boomerang){s.boom=wp.boomerang;s.life=5;s.pierce=99;}
@@ -6633,7 +6637,19 @@ function render(){
       ctx.save();
       ctx.translate(pr.x,py);
       ctx.shadowColor=wc.ring;ctx.shadowBlur=8;
-      if(wc.shape==='laser'){
+      if(pr.s1fx){
+        ctx.shadowColor='#ff6a00';ctx.shadowBlur=12;
+        if(pr.s1fx==='lava'){
+          const pulse=5+Math.sin((pr.spin||0)*2)*1.2;
+          ctx.fillStyle='#ff3d00';ctx.beginPath();ctx.arc(0,1,pulse,0,Math.PI*2);ctx.fill();
+          ctx.fillStyle='#ffd740';ctx.beginPath();ctx.arc(-1,-1,pulse*.52,0,Math.PI*2);ctx.fill();
+          ctx.fillStyle='#ff6d00';ctx.fillRect(-2,5,4,7);
+        }else{
+          ctx.font='8px "Press Start 2P",monospace';ctx.textAlign='center';
+          ctx.strokeStyle='#3a0900';ctx.lineWidth=3;ctx.strokeText(pr.s1fx,0,3);
+          ctx.fillStyle='#ffd740';ctx.fillText(pr.s1fx,0,3);
+        }
+      }else if(wc.shape==='laser'){
         ctx.fillStyle=wc.ring;ctx.fillRect(-2,-12,4,20);
         ctx.fillStyle=wc.core;ctx.fillRect(-1,-10,2,16);
       }else if(wc.shape==='seed'){
@@ -6978,6 +6994,14 @@ const PERSONAL_GIFTS={
   '32734f08-f8d7-48c5-a89b-6a67becb621f':{name:'itstobyyy44',weapons:['w_mcbow'],joints:['j_goldapple'],text:'CRAFT-BOGEN & GOLDAPFEL'},
   '2c2003bb-2ac8-44fd-8ed1-bc697a0da003':{name:'Danjo420',weapons:['w_cannastaff'],joints:['j_marlboro'],text:'CANNABIS-STAB & MARLBORO'},
 };
+const SEASON1_WINNER_ID='32734f08-f8d7-48c5-a89b-6a67becb621f';
+function showSeason1WinnerPopup(){
+  if(document.getElementById('season1WinnerPopup'))return;
+  const el=document.createElement('div');el.id='season1WinnerPopup';
+  el.style.cssText='position:fixed;inset:0;z-index:12000;display:flex;align-items:center;justify-content:center;background:rgba(8,4,2,.82);padding:24px;text-align:center;font-family:"Press Start 2P",monospace';
+  el.innerHTML='<div style="max-width:330px;padding:26px 18px;background:#111;border:4px solid #ffb300;box-shadow:0 0 0 4px #5b2100,0 0 34px #ff6d00;color:#ffd740;line-height:1.75"><div style="font-size:11px;color:#ff6d00">SEASON 1</div><div style="font-size:20px;margin:10px 0;text-shadow:3px 3px 0 #7a1d00">HIGHSCORE<br>WINNER</div><div style="font-size:12px;color:#fff">MACHER</div><button class="btn" style="margin-top:20px;width:100%">WEITER</button></div>';
+  el.querySelector('button').onclick=()=>el.remove();document.body.appendChild(el);
+}
 function showGiftToast(txt){
   let el=document.getElementById('giftToast');
   if(!el){el=document.createElement('div');el.id='giftToast';el.style.cssText='position:fixed;left:50%;top:14%;transform:translateX(-50%);z-index:10001;max-width:80vw;text-align:center;padding:12px 16px;background:rgba(16,36,25,.95);border:3px solid #b9f227;box-shadow:6px 6px 0 #08150e;color:#f4f7ef;font-family:"Press Start 2P",monospace;font-size:11px;line-height:1.7;text-shadow:2px 2px 0 #08150e';document.body.appendChild(el);}
@@ -6990,6 +7014,7 @@ function applyPersonalGifts(){
     if(!sbUser||!sbUser.id)return;
     const g=PERSONAL_GIFTS[String(sbUser.id)];if(!g)return;
     let changed=false;
+    if(String(sbUser.id)===SEASON1_WINNER_ID&&!owned.includes('season1macher')){owned.push('season1macher');changed=true;}
     for(const id of (g.weapons||[]))if(!ownedWeapons.includes(id)){ownedWeapons.push(id);changed=true;}
     for(const id of (g.joints||[]))if(!ownedJoints.includes(id)){ownedJoints.push(id);changed=true;}
     if(changed){
@@ -6997,6 +7022,7 @@ function applyPersonalGifts(){
       if(typeof renderShop==='function'&&gameState==='shop')renderShop();
       showGiftToast(g.text);
     }
+    if(String(sbUser.id)===SEASON1_WINNER_ID&&!sessionStorage.getItem('afroS1WinnerSeen')){sessionStorage.setItem('afroS1WinnerSeen','1');setTimeout(showSeason1WinnerPopup,500);}
   }catch(_){}
 }
 setInterval(applyPersonalGifts,4000);
@@ -7074,6 +7100,7 @@ async function loadCloudSave(){
     if(typeof d.lavaBest==='number'){lavaBest=Math.max(lavaBest|0,d.lavaBest|0);try{localStorage.setItem('afro_lava_best',lavaBest);}catch(_){}}
     if(typeof d.lavaHeight==='number'){lavaHeight=Math.max(lavaHeight|0,d.lavaHeight|0);try{localStorage.setItem('afro_lava_height',lavaHeight);}catch(_){}}
     if(Array.isArray(d.owned))owned=Array.from(new Set([...owned,...d.owned]));
+    if(String(sbUser.id)!==SEASON1_WINNER_ID){owned=owned.filter(id=>id!=='season1macher');if(selectedSkin==='season1macher')selectedSkin=DEFAULT_SKIN;}
     if(d.selectedSkin&&owned.includes(d.selectedSkin))selectedSkin=d.selectedSkin;
     if(Array.isArray(d.ownedWeapons))ownedWeapons=Array.from(new Set([...ownedWeapons,...d.ownedWeapons]));
     if(Array.isArray(d.ownedJoints))ownedJoints=Array.from(new Set([...ownedJoints,...d.ownedJoints]));
@@ -7106,7 +7133,7 @@ async function pushCloudSave(nameOverride){
   const payload={
     user_id:sbUser.id,
     display_name:nameOverride||(sbProfile&&sbProfile.display_name)||sbUser.email,
-    data:{totalBags,highScore,lavaBest:lavaBest|0,lavaHeight:lavaHeight|0,owned,selectedSkin,ownedWeapons,ownedJoints,selectedWeapon,selectedJoint,grant2000,dailyLast:localStorage.getItem(DKL),dailyStreak:+localStorage.getItem(DKS)||0,quests,missions:missionData},
+    data:{totalBags,highScore,lavaBest:lavaBest|0,lavaHeight:lavaHeight|0,season2Best:season2Best|0,season2LavaHeight:season2LavaHeight|0,season2LavaTime:season2LavaTime|0,owned,selectedSkin,ownedWeapons,ownedJoints,selectedWeapon,selectedJoint,grant2000,dailyLast:localStorage.getItem(DKL),dailyStreak:+localStorage.getItem(DKS)||0,quests,missions:missionData},
     updated_at:new Date().toISOString(),
   };
   const {error}=await sb.from('player_saves').upsert(payload,{onConflict:'user_id'});
