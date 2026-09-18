@@ -7121,6 +7121,13 @@ async function loadCloudSave(){
     if(typeof d.highScore==='number')highScore=Math.max(highScore,d.highScore);
     if(typeof d.lavaBest==='number'){lavaBest=Math.max(lavaBest|0,d.lavaBest|0);try{localStorage.setItem('afro_lava_best',lavaBest);}catch(_){}}
     if(typeof d.lavaHeight==='number'){lavaHeight=Math.max(lavaHeight|0,d.lavaHeight|0);try{localStorage.setItem('afro_lava_height',lavaHeight);}catch(_){}}
+    const ss=(d.seasonStats&&d.seasonStats[String(ACTIVE_SEASON)])||null;
+    if(ss){
+      seasonBest=Math.max(seasonBest|0,ss.best|0);
+      seasonLavaH=Math.max(seasonLavaH|0,ss.lavaHeight|0);
+      seasonLavaT=Math.max(seasonLavaT|0,ss.lavaTime|0);
+      persistSeasonStats();
+    }
     if(Array.isArray(d.owned))owned=Array.from(new Set([...owned,...d.owned]));
     if(String(sbUser.id)!==SEASON1_WINNER_ID){owned=owned.filter(id=>id!=='season1macher');if(selectedSkin==='season1macher')selectedSkin=DEFAULT_SKIN;}
     if(d.selectedSkin&&owned.includes(d.selectedSkin))selectedSkin=d.selectedSkin;
