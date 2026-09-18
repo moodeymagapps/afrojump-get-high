@@ -2517,6 +2517,25 @@ let player,platforms,collectibles,enemies,projectiles,particles,smokeParticles,f
 let lavaMode=false, lavaY=0, lavaSpeed=0.35, lavaFrame=0, lavaSurvived=0, lavaBest=0, lavaHeight=0;
 try{lavaBest=parseInt(localStorage.getItem('afro_lava_best')||'0',10)||0;}catch(_){}
 try{lavaHeight=parseInt(localStorage.getItem('afro_lava_height')||'0',10)||0;}catch(_){}
+// ---- SEASONS: aktive Season (hier umstellen bzw. per DB-Funktion start_new_season) ----
+let ACTIVE_SEASON=2;
+const SEAK=(k)=>'afro_s'+ACTIVE_SEASON+'_'+k;
+let seasonBest=0,seasonLavaH=0,seasonLavaT=0;
+function loadSeasonStats(){
+  try{
+    seasonBest=parseInt(localStorage.getItem(SEAK('best'))||'0',10)||0;
+    seasonLavaH=parseInt(localStorage.getItem(SEAK('lavah'))||'0',10)||0;
+    seasonLavaT=parseInt(localStorage.getItem(SEAK('lavat'))||'0',10)||0;
+  }catch(_){seasonBest=0;seasonLavaH=0;seasonLavaT=0;}
+}
+loadSeasonStats();
+function persistSeasonStats(){
+  try{
+    localStorage.setItem(SEAK('best'),String(seasonBest|0));
+    localStorage.setItem(SEAK('lavah'),String(seasonLavaH|0));
+    localStorage.setItem(SEAK('lavat'),String(seasonLavaT|0));
+  }catch(_){}
+}
 // Map-Duell: selbstgebaute Map (parts) + Laufzustand
 let hazards=[],zones=[],goalY=null,customMap=null;
 let GOAL_M=1500;                   // Ziel-Höhe einer gebauten Map (Host wählt)
