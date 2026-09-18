@@ -7162,7 +7162,7 @@ async function pushCloudSave(nameOverride){
   const payload={
     user_id:sbUser.id,
     display_name:nameOverride||(sbProfile&&sbProfile.display_name)||sbUser.email,
-    data:{totalBags,highScore,lavaBest:lavaBest|0,lavaHeight:lavaHeight|0,season2Best:season2Best|0,season2LavaHeight:season2LavaHeight|0,season2LavaTime:season2LavaTime|0,owned,selectedSkin,ownedWeapons,ownedJoints,selectedWeapon,selectedJoint,grant2000,dailyLast:localStorage.getItem(DKL),dailyStreak:+localStorage.getItem(DKS)||0,quests,missions:missionData},
+    data:{totalBags,highScore,lavaBest:lavaBest|0,lavaHeight:lavaHeight|0,seasonStats:{[String(ACTIVE_SEASON)]:{best:seasonBest|0,lavaHeight:seasonLavaH|0,lavaTime:seasonLavaT|0}},owned,selectedSkin,ownedWeapons,ownedJoints,selectedWeapon,selectedJoint,grant2000,dailyLast:localStorage.getItem(DKL),dailyStreak:+localStorage.getItem(DKS)||0,quests,missions:missionData},
     updated_at:new Date().toISOString(),
   };
   const {error}=await sb.from('player_saves').upsert(payload,{onConflict:'user_id'});
