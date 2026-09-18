@@ -7421,17 +7421,34 @@ async function loadBoard(){
   if(!sb){boardMsgEl.textContent='Rangliste offline nicht verfügbar.';return;}
   await submitScore();
   const {data,error}=await sb.from('leaderboard')
-    .select('user_id,display_name,best_height,lava_best,lava_height,lava_time,total_bags,skin')
+    .select('user_id,display_name,best_height,lava_best,lava_height,lava_time,total_bags,skin,season_id')
+    .eq('season_id',ACTIVE_SEASON)
     .order('best_height',{ascending:false}).limit(50);
   if(error){boardMsgEl.textContent='Fehler beim Laden der Rangliste.';return;}
   boardData=data||[];
   renderBoard();
 }
+async function loadSeasons(){
+  if(!sb){boardMsgEl.textContent='Seasons offline nicht verfügbar.';return;}
+  boardMsgEl.textContent='Lade…';
+  try{
+    const [se,ar,cur]=await Promise.all([
+      sb.from('seasons').select('id,label,is_active').order('id',{ascending:true}),
+      sb.from('season_results').select('season_id,user_id,display_name,skin,best_height,lava_height,lava_time'),
+      sb.from('leaderboard').select('user_id,display_name,skin,best_height,lava_best,lava_height,lava_time,season_id'),
+    ]);
+    seasonsList=(se.data||[]);
+    const live=(cur.data||[]).map(r=>Object.assign({},r,{season_id:r.season_id|0}));
+    seasonsData=(ar.data||[]).concat(live);
+  }catch(e){boardMsgEl.textContent='Fehler beim Laden der Seasons.';return;}
+  renderSeasonsTab();
+}
 document.getElementById('menuBoard').onclick=()=>openBoard();
 document.getElementById('boardClose').onclick=()=>closeBoard();
-document.getElementById('boardRefresh').onclick=()=>loadBoard();
+document.getElementById('boardRefresh').onclick=()=>{if(boardMode==='seasons')loadSeasons();else loadBoard();};
 document.getElementById('lbTabNormal').onclick=()=>{boardMode='normal';renderBoard();};
 document.getElementById('lbTabLava').onclick=()=>{boardMode='lava';renderBoard();};
+document.getElementById('lbTabSeasons').onclick=()=>{boardMode='seasons';lastBoardMode='seasons';loadSeasons();};
 
 
 // ================= 1v1 DUELL v2 (Link/Code, Realtime, Countdown, Revanche) =================
