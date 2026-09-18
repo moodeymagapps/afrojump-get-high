@@ -3916,10 +3916,13 @@ function die(){
   timeScale=0.3;
   setTimeout(()=>{timeScale=1;},450);
   if(!lavaMode&&bestY>highScore){highScore=bestY;localStorage.setItem(HK,highScore);if(typeof checkHeightUnlocks==='function')checkHeightUnlocks();}
+  if(!lavaMode&&bestY>seasonBest){seasonBest=bestY|0;persistSeasonStats();}
   if(lavaMode){
     const t=Math.floor(lavaSurvived);
     if(t>lavaBest){lavaBest=t; try{localStorage.setItem('afro_lava_best',lavaBest);}catch(_){}}
     if(bestY>lavaHeight){lavaHeight=bestY|0; try{localStorage.setItem('afro_lava_height',lavaHeight);}catch(_){}}
+    if(t>seasonLavaT){seasonLavaT=t;persistSeasonStats();}
+    if(bestY>seasonLavaH){seasonLavaH=bestY|0;persistSeasonStats();}
     finalScore.textContent='🌋 Zeit: '+t+'s   |   Höhe: '+bestY+'m';
     finalHigh.textContent='Lava-Rekord: '+lavaHeight+'m · '+lavaBest+'s';
     finalBags.textContent='Gesammelt: 🌿 '+runBags;
