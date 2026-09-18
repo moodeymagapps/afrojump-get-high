@@ -21,6 +21,7 @@ export type Database = {
           lava_best: number
           lava_height: number
           lava_time: number
+          season_id: number
           season2_best_height: number
           season2_lava_height: number
           season2_lava_time: number
@@ -35,6 +36,7 @@ export type Database = {
           lava_best?: number
           lava_height?: number
           lava_time?: number
+          season_id?: number
           season2_best_height?: number
           season2_lava_height?: number
           season2_lava_time?: number
@@ -49,6 +51,7 @@ export type Database = {
           lava_best?: number
           lava_height?: number
           lava_time?: number
+          season_id?: number
           season2_best_height?: number
           season2_lava_height?: number
           season2_lava_time?: number
@@ -57,7 +60,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "leaderboard_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       player_saves: {
         Row: {
@@ -80,12 +91,83 @@ export type Database = {
         }
         Relationships: []
       }
+      season_results: {
+        Row: {
+          best_height: number
+          created_at: string
+          display_name: string
+          lava_height: number
+          lava_time: number
+          season_id: number
+          skin: string | null
+          total_bags: number
+          user_id: string
+        }
+        Insert: {
+          best_height?: number
+          created_at?: string
+          display_name?: string
+          lava_height?: number
+          lava_time?: number
+          season_id: number
+          skin?: string | null
+          total_bags?: number
+          user_id: string
+        }
+        Update: {
+          best_height?: number
+          created_at?: string
+          display_name?: string
+          lava_height?: number
+          lava_time?: number
+          season_id?: number
+          skin?: string | null
+          total_bags?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "season_results_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      seasons: {
+        Row: {
+          ended_at: string | null
+          id: number
+          is_active: boolean
+          label: string
+          started_at: string
+        }
+        Insert: {
+          ended_at?: string | null
+          id: number
+          is_active?: boolean
+          label: string
+          started_at?: string
+        }
+        Update: {
+          ended_at?: string | null
+          id?: number
+          is_active?: boolean
+          label?: string
+          started_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      start_new_season: {
+        Args: { p_label?: string; p_next: number }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
