@@ -7241,16 +7241,27 @@ function boardName(){
   const n=(sbUser&&sbUser.email&&String(sbUser.email).toLowerCase()==='wilkoppierre@gmail.com')?'Moodey':((sbProfile&&sbProfile.display_name&&String(sbProfile.display_name).indexOf('@')<0)?sbProfile.display_name:(sbUser&&sbUser.email?String(sbUser.email).split('@')[0]:'Spieler'));
   return String(n).slice(0,20);
 }
+async function syncActiveSeason(){
+  if(!sb)return ACTIVE_SEASON;
+  try{
+    const {data}=await sb.from('seasons').select('id').eq('is_active',true).order('id',{ascending:false}).limit(1);
+    const id=data&&data[0]&&(data[0].id|0);
+    if(id&&id!==ACTIVE_SEASON){ACTIVE_SEASON=id;loadSeasonStats();}
+  }catch(_){}
+  return ACTIVE_SEASON;
+}
 async function submitScore(){
   if(!sb||!sbUser)return;
+  await syncActiveSeason();
   try{
     await sb.from('leaderboard').upsert({
       user_id:sbUser.id,
       display_name:boardName(),
-      best_height:highScore|0,
-      lava_best:lavaBest|0,
-      lava_height:lavaHeight|0,
-      lava_time:lavaBest|0,
+      season_id:ACTIVE_SEASON,
+      best_height:seasonBest|0,
+      lava_best:seasonLavaT|0,
+      lava_height:seasonLavaH|0,
+      lava_time:seasonLavaT|0,
       total_bags:totalBags|0,
       skin:selectedSkin,
       updated_at:new Date().toISOString(),
@@ -7258,6 +7269,7 @@ async function submitScore(){
   }catch(err){console.warn('leaderboard submit failed',err);}
 }
 let boardMode='normal', boardData=null;
+let seasonsData=null, seasonsList=null, seasonPick='all';
 function lbFaceStyle(skinId){
   const sk=SKINS.find(s=>s.id===skinId);
   if(!sk||!sk.img)return '';
