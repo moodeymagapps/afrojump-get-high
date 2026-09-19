@@ -146,9 +146,6 @@ function patchGameHtml(html: string) {
     "  }else{\n    if(meters>1900&&r0<0.015)type='lava';\n    else if(meters>1600&&r0<0.018)type='fake';\n    else if(meters>1400&&r0<0.020)type='tech';\n    else if(meters>1200&&r0<0.025)type='crate';\n    else if(meters>1050&&r0<0.025)type='conveyor';\n    else if(meters>900&&r0<0.030)type='boost';\n    else if(meters>750&&r0<0.030)type='tramp';\n    else if(meters>600&&r0<0.035)type='slip';\n    else if(meters>500&&r0<0.040)type='rock';\n    else if(meters>60&&r0<0.10)type='brittle';\n    else if(meters>40&&r0<0.20)type='spring';\n    else if(meters>30&&r0<0.45)type='moving';\n  }"
   );
 
-  if (!out.includes("lava-menu.js")) {
-    out = out.replace("</body>", '<script src="/lava-menu.js?v=warp53"></script><script src="/afro-admin.js?v=warp38"></script><script src="/afro-bunny.js?v=warp44"></script></body>');
-  }
   out = out.replace('src="/lava/lava_btn.png"', 'src="/lava_btn.png"');
   out = out.replace(
     "{id:'moodey',     name:'Moodey',     price:2000, community:true, rarity:'legendary', img:'skins/moodey.png',     anchorY:0.70},",
@@ -222,30 +219,6 @@ export function Index() {
         s.src = "/afro-fx.js?v=warp38";
         doc.body.appendChild(s);
       }
-      if (!doc.getElementById("bgMusicScript")) {
-        const s2 = doc.createElement("script");
-        s2.id = "bgMusicScript";
-        s2.src = "/bg-music-pause.js";
-        doc.body.appendChild(s2);
-      }
-      if (!doc.getElementById("lavaMenuScript")) {
-        const s3 = doc.createElement("script");
-        s3.id = "lavaMenuScript";
-        s3.src = "/lava-menu.js?v=warp53";
-        doc.body.appendChild(s3);
-      }
-      if (!doc.getElementById("afroAdminScript")) {
-        const s4 = doc.createElement("script");
-        s4.id = "afroAdminScript";
-        s4.src = "/afro-admin.js?v=warp38";
-        doc.body.appendChild(s4);
-      }
-      if (!doc.getElementById("afroBunnyScript")) {
-        const s5 = doc.createElement("script");
-        s5.id = "afroBunnyScript";
-        s5.src = "/afro-bunny.js?v=warp44";
-        doc.body.appendChild(s5);
-      }
     } catch {
       /* ignore */
     }
@@ -255,7 +228,7 @@ export function Index() {
     const frame = frameRef.current;
     if (!frame) return;
     let cancelled = false;
-    fetch("/game.html?v=warp53", { cache: "no-store" })
+    fetch("/game.html?v=warp54", { cache: "no-store" })
       .then((r) => r.text())
       .then((html) => {
         if (cancelled || !frame) return;
@@ -271,7 +244,7 @@ export function Index() {
       })
       .catch(() => {
         if (!cancelled && frame && !frame.getAttribute("src")) {
-          frame.src = "/game.html?v=warp53";
+          frame.src = "/game.html?v=warp54";
         }
       });
     return () => {
