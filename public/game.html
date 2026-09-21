@@ -7445,7 +7445,16 @@ async function loadSeasons(){
   renderSeasonsTab();
 }
 document.getElementById('menuBoard').onclick=()=>openBoard();
-document.getElementById('boardClose').onclick=()=>closeBoard();
+(function(){
+  const bc=document.getElementById('boardClose');
+  const onClose=e=>{try{if(e){e.preventDefault();e.stopPropagation();}}catch(_){/**/}closeBoard();};
+  ['click','touchend','pointerup'].forEach(ev=>bc.addEventListener(ev,onClose,{passive:false}));
+  bc.onclick=onClose;
+  const bb=document.getElementById('boardBack');
+  if(bb){bb.onclick=onClose;bb.addEventListener('touchend',onClose,{passive:false});}
+  boardEl.addEventListener('click',e=>{if(e.target===boardEl)closeBoard();});
+  window.addEventListener('keydown',e=>{if(e.key==='Escape'&&boardEl.style.display!=='none'&&(boardEl.style.display||getComputedStyle(boardEl).display!=='none'))closeBoard();});
+})();
 document.getElementById('boardRefresh').onclick=()=>{if(boardMode==='seasons')loadSeasons();else loadBoard();};
 document.getElementById('lbTabNormal').onclick=()=>{boardMode='normal';renderBoard();};
 document.getElementById('lbTabLava').onclick=()=>{boardMode='lava';renderBoard();};
