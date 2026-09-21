@@ -228,7 +228,7 @@ export function Index() {
     const frame = frameRef.current;
     if (!frame) return;
     let cancelled = false;
-    fetch("/game.html?v=warp56", { cache: "no-store" })
+    fetch("/game.html?v=warp57", { cache: "no-store" })
       .then((r) => r.text())
       .then((html) => {
         if (cancelled || !frame) return;
@@ -244,7 +244,7 @@ export function Index() {
       })
       .catch(() => {
         if (!cancelled && frame && !frame.getAttribute("src")) {
-          frame.src = "/game.html?v=warp56";
+          frame.src = "/game.html?v=warp57";
         }
       });
     return () => {
