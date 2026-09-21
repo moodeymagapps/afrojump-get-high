@@ -1078,7 +1078,7 @@
     <div id="lbPanel">
       <div class="head" style="display:flex;justify-content:space-between;width:100%;align-items:center;">
         <h2 id="lbTitle">🏆 NORMAL RANGLISTE</h2>
-        <button id="boardClose" class="btn icon v-red">✕</button>
+        <button id="boardClose" class="btn icon v-red" style="touch-action:manipulation;pointer-events:auto;position:relative;z-index:6;">✕</button>
       </div>
       <div class="lbTabs">
         <button class="lbTab on" id="lbTabNormal">🍃 NORMAL</button>
@@ -1088,6 +1088,7 @@
       <div id="boardList" style="width:100%;"></div>
       <div id="boardMsg" style="font-family:'VT323','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:16px;opacity:.8;text-align:center;"></div>
       <button class="btn ghost" id="boardRefresh">👑 Aktualisieren</button>
+      <button class="btn alt" id="boardBack" style="touch-action:manipulation;">🏠 ZURÜCK</button>
     </div>
   </div>
 
@@ -7237,7 +7238,7 @@ const boardEl=document.getElementById('board');
 const boardListEl=document.getElementById('boardList');
 const boardMsgEl=document.getElementById('boardMsg');
 function openBoard(){gameState='menu';showOverlay('board');boardEl.style.display='flex';loadBoard();}
-function closeBoard(){boardEl.style.display='none';goMenu();}
+function closeBoard(){try{boardEl.style.display='none';}catch(_){/**/}try{goMenu();}catch(_){try{showOverlay('menu');gameState='menu';}catch(__){/**/}}}
 function boardName(){
   const n=(sbUser&&sbUser.email&&String(sbUser.email).toLowerCase()==='wilkoppierre@gmail.com')?'Moodey':((sbProfile&&sbProfile.display_name&&String(sbProfile.display_name).indexOf('@')<0)?sbProfile.display_name:(sbUser&&sbUser.email?String(sbUser.email).split('@')[0]:'Spieler'));
   return String(n).slice(0,20);
@@ -7445,7 +7446,16 @@ async function loadSeasons(){
   renderSeasonsTab();
 }
 document.getElementById('menuBoard').onclick=()=>openBoard();
-document.getElementById('boardClose').onclick=()=>closeBoard();
+(function(){
+  const bc=document.getElementById('boardClose');
+  const onClose=e=>{try{if(e){e.preventDefault();e.stopPropagation();}}catch(_){/**/}closeBoard();};
+  ['click','touchend','pointerup'].forEach(ev=>bc.addEventListener(ev,onClose,{passive:false}));
+  bc.onclick=onClose;
+  const bb=document.getElementById('boardBack');
+  if(bb){bb.onclick=onClose;bb.addEventListener('touchend',onClose,{passive:false});}
+  boardEl.addEventListener('click',e=>{if(e.target===boardEl)closeBoard();});
+  window.addEventListener('keydown',e=>{if(e.key==='Escape'&&boardEl.style.display!=='none'&&(boardEl.style.display||getComputedStyle(boardEl).display!=='none'))closeBoard();});
+})();
 document.getElementById('boardRefresh').onclick=()=>{if(boardMode==='seasons')loadSeasons();else loadBoard();};
 document.getElementById('lbTabNormal').onclick=()=>{boardMode='normal';renderBoard();};
 document.getElementById('lbTabLava').onclick=()=>{boardMode='lava';renderBoard();};
