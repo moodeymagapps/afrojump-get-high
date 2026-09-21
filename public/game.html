@@ -3497,7 +3497,7 @@ function update(dt){
       const wp=wperk(), sp=-12*(wp.speed||1);
       const mk=()=>{
         const s={x:player.x,y:player.y-12,vx:0,vy:sp,life:2,pierce:wp.pierce?2:0,blast:wp.blast||0,spin:0};
-        if(selectedSkin==='season1macher'&&sbUser&&String(sbUser.id)==='32734f08-f8d7-48c5-a89b-6a67becb621f')s.s1fx=Math.random()<0.5?'lava':String((bestY|0)%10000);
+        if((selectedSkin==='season1gold'||selectedSkin==='season1lava')&&sbUser&&String(sbUser.id)==='32734f08-f8d7-48c5-a89b-6a67becb621f')s.s1fx=Math.random()<0.5?'lava':String((bestY|0)%10000);
         if(wp.nade){s.nade=1;s.fuse=0.8;s.blast=2;s.life=3;s.vy=sp*0.8;}
         if(wp.stun){s.stun=wp.stun;}
         if(wp.boomerang){s.boom=wp.boomerang;s.life=5;s.pierce=99;}
@@ -7014,7 +7014,7 @@ function refreshQuestUI(){
 let sb=null,sbUser=null,sbProfile=null;
 // ===== Persönliche Geschenke (an Account-ID gebunden) =====
 const PERSONAL_GIFTS={
-  '32734f08-f8d7-48c5-a89b-6a67becb621f':{name:'itstobyyy44',weapons:['w_mcbow'],joints:['j_goldapple'],text:'CRAFT-BOGEN & GOLDAPFEL'},
+  '32734f08-f8d7-48c5-a89b-6a67becb621f':{name:'itstobyyy44',weapons:['w_mcbow'],joints:['j_goldapple'],text:'S1 CHAMPION, S1 LAVA KING,<br>CRAFT-BOGEN & GOLDAPFEL'},
   '2c2003bb-2ac8-44fd-8ed1-bc697a0da003':{name:'Danjo420',weapons:['w_cannastaff'],joints:['j_marlboro'],text:'CANNABIS-STAB & MARLBORO'},
 };
 const SEASON1_WINNER_ID='32734f08-f8d7-48c5-a89b-6a67becb621f';
@@ -7022,7 +7022,7 @@ function showSeason1WinnerPopup(){
   if(document.getElementById('season1WinnerPopup'))return;
   const el=document.createElement('div');el.id='season1WinnerPopup';
   el.style.cssText='position:fixed;inset:0;z-index:12000;display:flex;align-items:center;justify-content:center;background:rgba(8,4,2,.82);padding:24px;text-align:center;font-family:"Press Start 2P",monospace';
-  el.innerHTML='<div style="max-width:330px;padding:26px 18px;background:#111;border:4px solid #ffb300;box-shadow:0 0 0 4px #5b2100,0 0 34px #ff6d00;color:#ffd740;line-height:1.75"><div style="font-size:11px;color:#ff6d00">SEASON 1</div><div style="font-size:20px;margin:10px 0;text-shadow:3px 3px 0 #7a1d00">HIGHSCORE<br>WINNER</div><div style="font-size:12px;color:#fff">MACHER</div><button class="btn" style="margin-top:20px;width:100%">WEITER</button></div>';
+  el.innerHTML='<div style="max-width:330px;padding:26px 18px;background:#111;border:4px solid #ffb300;box-shadow:0 0 0 4px #5b2100,0 0 34px #ff6d00;color:#ffd740;line-height:1.75"><div style="font-size:11px;color:#ff6d00">SEASON 1</div><div style="font-size:20px;margin:10px 0;text-shadow:3px 3px 0 #7a1d00">HIGHSCORE<br>WINNER</div><div style="font-size:12px;color:#fff">CHAMPION &amp; LAVA KING</div><button class="btn" style="margin-top:20px;width:100%">WEITER</button></div>';
   el.querySelector('button').onclick=()=>el.remove();document.body.appendChild(el);
 }
 function showGiftToast(txt){
@@ -7037,7 +7037,7 @@ function applyPersonalGifts(){
     if(!sbUser||!sbUser.id)return;
     const g=PERSONAL_GIFTS[String(sbUser.id)];if(!g)return;
     let changed=false;
-    if(String(sbUser.id)===SEASON1_WINNER_ID&&!owned.includes('season1macher')){owned.push('season1macher');changed=true;}
+    if(String(sbUser.id)===SEASON1_WINNER_ID){for(const sid of ['season1gold','season1lava'])if(!owned.includes(sid)){owned.push(sid);changed=true;}}
     for(const id of (g.weapons||[]))if(!ownedWeapons.includes(id)){ownedWeapons.push(id);changed=true;}
     for(const id of (g.joints||[]))if(!ownedJoints.includes(id)){ownedJoints.push(id);changed=true;}
     if(changed){
@@ -7130,7 +7130,7 @@ async function loadCloudSave(){
       persistSeasonStats();
     }
     if(Array.isArray(d.owned))owned=Array.from(new Set([...owned,...d.owned]));
-    if(String(sbUser.id)!==SEASON1_WINNER_ID){owned=owned.filter(id=>id!=='season1macher');if(selectedSkin==='season1macher')selectedSkin=DEFAULT_SKIN;}
+    if(String(sbUser.id)!==SEASON1_WINNER_ID){owned=owned.filter(id=>id!=='season1macher'&&id!=='season1gold'&&id!=='season1lava');if(selectedSkin==='season1macher'||selectedSkin==='season1gold'||selectedSkin==='season1lava')selectedSkin=DEFAULT_SKIN;}
     if(d.selectedSkin&&owned.includes(d.selectedSkin))selectedSkin=d.selectedSkin;
     if(Array.isArray(d.ownedWeapons))ownedWeapons=Array.from(new Set([...ownedWeapons,...d.ownedWeapons]));
     if(Array.isArray(d.ownedJoints))ownedJoints=Array.from(new Set([...ownedJoints,...d.ownedJoints]));
