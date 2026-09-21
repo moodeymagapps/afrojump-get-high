@@ -1088,6 +1088,7 @@
       <div id="boardList" style="width:100%;"></div>
       <div id="boardMsg" style="font-family:'VT323','Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',monospace;font-size:16px;opacity:.8;text-align:center;"></div>
       <button class="btn ghost" id="boardRefresh">👑 Aktualisieren</button>
+      <button class="btn alt" id="boardBack" style="touch-action:manipulation;">🏠 ZURÜCK</button>
     </div>
   </div>
 
@@ -7237,7 +7238,7 @@ const boardEl=document.getElementById('board');
 const boardListEl=document.getElementById('boardList');
 const boardMsgEl=document.getElementById('boardMsg');
 function openBoard(){gameState='menu';showOverlay('board');boardEl.style.display='flex';loadBoard();}
-function closeBoard(){boardEl.style.display='none';goMenu();}
+function closeBoard(){try{boardEl.style.display='none';}catch(_){/**/}try{goMenu();}catch(_){try{showOverlay('menu');gameState='menu';}catch(__){/**/}}}
 function boardName(){
   const n=(sbUser&&sbUser.email&&String(sbUser.email).toLowerCase()==='wilkoppierre@gmail.com')?'Moodey':((sbProfile&&sbProfile.display_name&&String(sbProfile.display_name).indexOf('@')<0)?sbProfile.display_name:(sbUser&&sbUser.email?String(sbUser.email).split('@')[0]:'Spieler'));
   return String(n).slice(0,20);
