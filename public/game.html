@@ -1,1 +1,33 @@
-PLACEHOLDER
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Afro Jump – Restoring…</title>
+<style>html,body{margin:0;height:100%;background:#0b1a0b;color:#7cfc00;font-family:monospace;display:flex;align-items:center;justify-content:center}</style>
+</head>
+<body>
+<div id="m">Lade Afro Jump…</div>
+<script>
+(async function () {
+  var urls = [
+    'https://raw.githubusercontent.com/moodeymagapps/afrojump-get-high/411a49cb0914337fa0a4b442bb172e165dbd60e8/public/game.html',
+    'https://cdn.jsdelivr.net/gh/moodeymagapps/afrojump-get-high@411a49cb0914337fa0a4b442bb172e165dbd60e8/public/game.html'
+  ];
+  for (var i = 0; i < urls.length; i++) {
+    try {
+      var r = await fetch(urls[i], { cache: 'no-store' });
+      if (!r.ok) continue;
+      var t = await r.text();
+      if (t.length < 10000 || t.indexOf('PLACEHOLDER') >= 0) continue;
+      document.open();
+      document.write(t);
+      document.close();
+      return;
+    } catch (e) {}
+  }
+  document.getElementById('m').textContent = 'Restore fehlgeschlagen – bitte game.html aus GitHub Commit 411a49c manuell wiederherstellen.';
+})();
+</script>
+</body>
+</html>
