@@ -1283,6 +1283,8 @@ const SKINS=[
   {id:'yannic',     name:'Yannic',     price:1700, community:true, rarity:'legendary', img:'skins/yannic.png',     anchorY:0.70},
   {id:'stephan',    name:'Stephan',    price:1900, community:true, rarity:'legendary', img:'skins/stephan.png',    anchorY:0.70},
   {id:'moodey',     name:'Moodey',     price:2000, community:true, rarity:'legendary', img:'skins/moodey.png',     anchorY:0.70},
+  {id:'gembo',      name:'Gembo',      price:1800, community:true, rarity:'legendary', img:'skins/sheets/gembo.png',shopImg:'skins/portraits/gembo.png',anchorY:0.88,frames:8,frameW:96,frameH:128,bgKey:'atlas'},
+  {id:'mfgembo',    name:'MF GEMBO',   price:2800, community:true, rarity:'mythic',    img:'skins/sheets/mfgembo.png',shopImg:'skins/portraits/mfgembo.png',anchorY:0.88,frames:8,frameW:96,frameH:128,bgKey:'atlas',bundleOnly:true},
   {id:'junis',      name:'Junis',      price:0,   community:true, rarity:'legendary', img:'skins/junis.png',      anchorY:0.70, unlockAt:2000},
   {id:'season1gold',name:'S1 CHAMPION', price:0, community:true, rarity:'mythic', img:'skins/season1-gold.png',anchorY:0.72,exclusiveUser:'32734f08-f8d7-48c5-a89b-6a67becb621f'},
   {id:'season1lava',name:'S1 LAVA KING',price:0, community:true, rarity:'mythic', img:'skins/season1-lava.png',anchorY:0.72,exclusiveUser:'32734f08-f8d7-48c5-a89b-6a67becb621f'},
@@ -1391,6 +1393,7 @@ const WEAPON_SKINS=[
   {id:'w_katana',   name:'Weed-Katana',      rarity:'legendary',img:'weapons/weedkatana.png',shape:'dagger',core:'#b2ff59',ring:'#1b5e20',perk:{boomerang:1,speed:1.3},ability:'Kehrt einmal zurück'},
   {id:'w_roachbow', name:'Rückkehr-Dolch',   rarity:'mythic',   img:'weapons/dagger.png',   shape:'dagger',core:'#cfd8dc',ring:'#5e35b1',perk:{boomerang:2,speed:1.25,cd:0.9},  ability:'Dolch kehrt 2x zum Spieler zurück'},
   {id:'w_cosmicbong',name:'Kosmo-Bong',      rarity:'mythic',   img:'weapons/cosmicbong.png',shape:'smoke',core:'#80d8ff',ring:'#311b92',perk:{cd:0.6,pierce:2,speed:1.3},ability:'Kosmische Rauchsalve'},
+  {id:'w_mfgembo',  name:'MF GEMBO Shotgun', rarity:'mythic',   img:'weapons/mf-gembo-shotgun.png',shape:'laser',core:'#ef5350',ring:'#212121',perk:{cd:0.72,spread:1,pierce:1},ability:'Doppelschuss mit Durchschlag',bundleOnly:true},
   {id:'w_colablaster',name:'Cola-Blaster',    rarity:'epic',     img:'weapons/cola-blaster.png',shape:'laser',core:'#69f0ae',ring:'#e53935',perk:{cd:0.66,speed:1.18,spread:1},ability:'Sprudel-Doppelschuss mit hoher Feuerrate'},
   {id:'w_ionblaster', name:'Ion-Blaster',     rarity:'legendary',img:'weapons/ion-blaster.png', shape:'taser',core:'#42a5f5',ring:'#263238',perk:{stun:1.8,cd:0.72,speed:1.35,pierce:1},ability:'Lähmt Gegner und durchschlägt ein Ziel'},
   // Set-Waffen (nur im Paket)
@@ -1421,6 +1424,7 @@ const JOINT_SKINS=[
   {id:'j_pinkenergy',name:'Pink Energy',    rarity:'rare',   img:'items/pink-energy.png',paper:'#f8bbd0',tip:'#ec407a',smoke:'#fce4ec',perk:{gun:2,jump:1.03},           ability:'+2s Waffe & +3% Sprung'},
   {id:'j_matcha',    name:'Matcha Chill',   rarity:'epic',   img:'items/matcha.png',     paper:'#c5e1a5',tip:'#558b2f',smoke:'#f1f8e9',perk:{inv:2.5,magnet:24},    ability:'+2.5s Schutz & Sammel-Magnet'},
   {id:'j_skittles',  name:'Rainbow Pack',   rarity:'legendary',img:'items/skittles.png',paper:'RAINBOW',tip:'#f4511e',smoke:'#fff3e0',perk:{bags:3,jump:1.06,gun:2},  ability:'+3 🌿, +6% Sprung & +2s Waffe'},
+  {id:'j_mfgembo',   name:'MF GEMBO Chain', rarity:'mythic',   img:'items/mf-gembo-chain.png',paper:'#cfd8dc',tip:'#7f0000',smoke:'#eeeeee',perk:{inv:3,gun:3,bags:3},ability:'+3s Schutz, +3s Waffe & +3 🌿',bundleOnly:true},
   // Set-Items (nur im Paket)
   {id:'j_legglass',  name:'Legendary Glass',rarity:'legendary',img:'items/legendaryglass.png',paper:'#b9f227',tip:'#2e7d32',smoke:'#f1f8e9',perk:{inv:3,bags:2},     ability:'+420 Breathe: +3s Schutz & +2 🌿',bundleOnly:true},
   {id:'j_wildbong',  name:'Wildflower-Bong',rarity:'legendary',img:'items/wildflowerbong.png',paper:'#f8bbd0',tip:'#8d6ad8',smoke:'#fce4ec',perk:{jump:1.07,magnet:30},ability:'+7% Sprung & großer Magnet',bundleOnly:true},
@@ -1432,6 +1436,8 @@ const JOINT_SKINS=[
   {id:'j_marlboro',  name:'Marlboro-Packung',rarity:'mythic',img:'items/marlboro.png',    paper:'#f5f5f5',tip:'#d32f2f',smoke:'#eeeeee',perk:{bags:6,gun:4},          ability:'+6 🌿 pro Tütchen & +4s Waffe',giftOnly:true},
 ];
 const SET_PACKS=[
+  {id:'set_mfgembo',name:'MF GEMBO SET',price:2800,rarity:'mythic',desc:'MF GEMBO mit Shotgun und exklusiver MF-Chain.',
+   skin:'mfgembo',weapon:'w_mfgembo',joint:'j_mfgembo'},
   {id:'set_fantasy_legends',name:'FANTASY LEGENDS',price:4200,rarity:'legendary',desc:'Das komplette Abenteuer-Paket mit allen 9 Fantasy-Skins.',
    skins:['ironknight','forestelf','forestranger','fantasyrogue','redwitch','frostwizard','reddwarf','bluewizard','forestgoblin'],skin:'ironknight'},
   {id:'set_mutant_horde',name:'MUTANT HORDE',price:3000,rarity:'mythic',desc:'Das komplette Monster-Paket mit allen 3 Mutanten-Skins.',
@@ -1963,12 +1969,12 @@ function drawSkinIntoCanvas(g,s,cv){
   const S=cv.width||80, PAD=Math.round(S*0.03);
   g.imageSmoothingEnabled=false;g.clearRect(0,0,S,S);
    if(s.img){
-     const previewImg=s.id==='fabienne'?'shop/fabienne-clean.png':s.img;
+       const previewImg=s.shopImg||(s.id==='fabienne'?'shop/fabienne-clean.png':s.img);
      const entry=loadSkinImage(previewImg,s.bgKey);
     const drawIt=()=>{
       if(!entry.canvas)return;
-       const im=entry.canvas,sw=s.frameW||im.width,sh=s.frameH||im.height;
-       const frame=s.frames?Math.floor(performance.now()/210)%s.frames:0;
+       const im=entry.canvas,usePortrait=!!s.shopImg,sw=usePortrait?im.width:(s.frameW||im.width),sh=usePortrait?im.height:(s.frameH||im.height);
+       const frame=!usePortrait&&s.frames?Math.floor(performance.now()/210)%s.frames:0;
        const sx=(frame%4)*sw,sy=Math.floor(frame/4)*sh;
        const box=S-PAD*2;
        const sc=Math.min(box/sw,box/sh);
@@ -1991,9 +1997,10 @@ function drawSetPreview(g,set,cv){
     const skin=SKINS.find(s=>s.id===ids[Math.floor(Date.now()/1500)%ids.length]);
     g.clearRect(0,0,cv.width,cv.height);g.imageSmoothingEnabled=false;
     if(skin){
-      const e=loadSkinImage(skin.img,skin.bgKey);
+       const setPreviewImg=skin.shopImg||skin.img;
+       const e=loadSkinImage(setPreviewImg,skin.bgKey);
       if(e.canvas){
-        const sheet=!!skin.frames;
+         const sheet=!!skin.frames&&!skin.shopImg;
         const sw=skin.frameW||(sheet?Math.floor(e.canvas.width/4):e.canvas.width),sh=skin.frameH||(sheet?Math.floor(e.canvas.height/2):e.canvas.height);
         const sc=Math.min(96/sw,128/sh),dw=Math.round(sw*sc),dh=Math.round(sh*sc);
         g.drawImage(e.canvas,0,0,sw,sh,4+Math.round((96-dw)/2),18+Math.round((128-dh)/2),dw,dh);
@@ -2001,7 +2008,7 @@ function drawSetPreview(g,set,cv){
     }
     if(weapon){const im=itemImg(weapon.img);if(im)fit(im,98,10,58,58);}
     if(joint){const im=itemImg(joint.img);if(im)fit(im,98,88,58,58);}
-    const waiting=skin&&!loadSkinImage(skin.img,skin.bgKey).canvas||weapon&&!itemImg(weapon.img)||joint&&!itemImg(joint.img);
+     const waiting=skin&&!loadSkinImage(skin.shopImg||skin.img,skin.bgKey).canvas||weapon&&!itemImg(weapon.img)||joint&&!itemImg(joint.img);
     if(!cv.isConnected)return;
     if(waiting&&attempts++<75)setTimeout(paint,80);
     else if(ids.length>1)setTimeout(paint,300);
@@ -4578,7 +4585,7 @@ function drawImageSkin(g,s,inv,live){
 }
 
 // ---------- Animierte Skin-Sheets (384x256, 4x2, Zelle 96x128) ----------
-const SHEET_SKINS=['kosak','danjo420','moodey','yannic','revengebird','fabienne','alex','ina','stephan','dfbboy','kosmonaut','ganjaguru','cyberkiffer','junis'];
+const SHEET_SKINS=['kosak','danjo420','moodey','yannic','revengebird','fabienne','alex','ina','stephan','dfbboy','kosmonaut','ganjaguru','cyberkiffer','junis','gembo','mfgembo'];
 const sheetCache={};
 function skinSheet(id){
   if(SHEET_SKINS.indexOf(id)<0)return null;
