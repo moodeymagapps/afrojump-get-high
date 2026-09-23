@@ -2000,10 +2000,11 @@ function drawSetPreview(g,set,cv){
        const setPreviewImg=skin.shopImg||skin.img;
        const e=loadSkinImage(setPreviewImg,skin.bgKey);
       if(e.canvas){
-         const sheet=!!skin.frames&&!skin.shopImg;
-        const sw=skin.frameW||(sheet?Math.floor(e.canvas.width/4):e.canvas.width),sh=skin.frameH||(sheet?Math.floor(e.canvas.height/2):e.canvas.height);
-        const sc=Math.min(96/sw,128/sh),dw=Math.round(sw*sc),dh=Math.round(sh*sc);
-        g.drawImage(e.canvas,0,0,sw,sh,4+Math.round((96-dw)/2),18+Math.round((128-dh)/2),dw,dh);
+         const portrait=!!skin.shopImg,sheet=!!skin.frames&&!portrait;
+         const sw=portrait?e.canvas.width:(skin.frameW||(sheet?Math.floor(e.canvas.width/4):e.canvas.width));
+         const sh=portrait?e.canvas.height:(skin.frameH||(sheet?Math.floor(e.canvas.height/2):e.canvas.height));
+         const sc=Math.min(92/sw,134/sh),dw=Math.round(sw*sc),dh=Math.round(sh*sc);
+         g.drawImage(e.canvas,0,0,sw,sh,3+Math.round((92-dw)/2),13+Math.round((134-dh)/2),dw,dh);
       }
     }
     if(weapon){const im=itemImg(weapon.img);if(im)fit(im,98,10,58,58);}
