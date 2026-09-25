@@ -998,6 +998,38 @@
     <button class="setsBanner" data-shop-tab="sets"><img src="/shop/crown.png" alt="" aria-hidden="true"><span>SETS</span><img src="/shop/crown.png" alt="" aria-hidden="true"></button>
     <div class="skinGrid" id="skinGrid"></div>
   </div>
+  <div id="skinPreview" aria-hidden="true">
+    <div class="skinPreviewPanel" role="dialog" aria-modal="true" aria-labelledby="skinPreviewTitle">
+      <div class="skinPreviewHead">
+        <div><span class="skinPreviewKicker">SPIEL-VORSCHAU</span><h2 id="skinPreviewTitle">GEMBO</h2></div>
+        <button type="button" id="skinPreviewClose" aria-label="Vorschau schließen">✕</button>
+      </div>
+      <div class="skinPreviewSwitch" role="group" aria-label="Skin auswählen">
+        <button type="button" data-preview-skin="gembo">GEMBO</button>
+        <button type="button" data-preview-skin="mfgembo">MF GEMBO</button>
+      </div>
+      <div class="skinPreviewStage">
+        <canvas id="skinPreviewCanvas" width="360" height="320" aria-label="Animierte Skin-Vorschau"></canvas>
+        <div class="skinPreviewFrameLabel" id="skinPreviewFrameLabel">IDLE</div>
+      </div>
+      <div class="skinPreviewAnimations" role="group" aria-label="Animation auswählen">
+        <button type="button" data-preview-frame="0">IDLE</button>
+        <button type="button" data-preview-frame="1">LANDUNG</button>
+        <button type="button" data-preview-frame="2">SPRUNG</button>
+        <button type="button" data-preview-frame="3">FALL</button>
+        <button type="button" data-preview-frame="4">SCHUTZ</button>
+      </div>
+      <div class="skinPreviewTools">
+        <button type="button" id="skinPreviewPrev" aria-label="Vorheriger Frame">◀</button>
+        <button type="button" id="skinPreviewPlay" aria-pressed="true">❚❚ PAUSE</button>
+        <button type="button" id="skinPreviewNext" aria-label="Nächster Frame">▶</button>
+      </div>
+      <div class="skinPreviewItems" id="skinPreviewItems">
+        <button type="button" id="skinPreviewWeapon" aria-pressed="true"><span>WAFFE</span><b>SHOTGUN</b></button>
+        <button type="button" id="skinPreviewJoint" aria-pressed="true"><span>JOINT</span><b>MF CHAIN</b></button>
+      </div>
+    </div>
+  </div>
   <div id="openBox" class="overlay">
     <div id="boxLabel">TÜTCHEN ÖFFNEN…</div>
     <div id="boxStage">
@@ -2017,6 +2049,58 @@ function drawSetPreview(g,set,cv){
   };
   paint();
 }
+const skinPreviewEl=document.getElementById('skinPreview');
+const skinPreviewCv=document.getElementById('skinPreviewCanvas');
+const skinPreviewG=skinPreviewCv.getContext('2d');
+const SKIN_PREVIEW_STATES=['IDLE','LANDUNG','SPRUNG','FALL','SCHUTZ'];
+let skinPreviewSkin='gembo',skinPreviewFrame=0,skinPreviewPlaying=true,skinPreviewWeapon=true,skinPreviewJoint=true,skinPreviewRaf=0,skinPreviewLast=0;
+function skinPreviewOpen(id){
+  skinPreviewSkin=id==='mfgembo'?'mfgembo':'gembo';skinPreviewFrame=0;skinPreviewPlaying=true;skinPreviewLast=performance.now();
+  skinPreviewWeapon=true;skinPreviewJoint=true;skinPreviewEl.classList.add('show');skinPreviewEl.setAttribute('aria-hidden','false');
+  skinPreviewSync();skinPreviewDraw(performance.now());document.getElementById('skinPreviewClose').focus();
+}
+function skinPreviewClose(){skinPreviewEl.classList.remove('show');skinPreviewEl.setAttribute('aria-hidden','true');cancelAnimationFrame(skinPreviewRaf);skinPreviewRaf=0;}
+function skinPreviewSync(){
+  const mf=skinPreviewSkin==='mfgembo';
+  document.getElementById('skinPreviewTitle').textContent=mf?'MF GEMBO SET':'GEMBO';
+  document.getElementById('skinPreviewFrameLabel').textContent=SKIN_PREVIEW_STATES[skinPreviewFrame]||'IDLE';
+  document.getElementById('skinPreviewItems').classList.toggle('hidden',!mf);
+  document.querySelectorAll('[data-preview-skin]').forEach(b=>b.classList.toggle('on',b.dataset.previewSkin===skinPreviewSkin));
+  document.querySelectorAll('[data-preview-frame]').forEach(b=>b.classList.toggle('on',+b.dataset.previewFrame===skinPreviewFrame));
+  const play=document.getElementById('skinPreviewPlay');play.textContent=skinPreviewPlaying?'❚❚ PAUSE':'▶ ABSPIELEN';play.setAttribute('aria-pressed',String(skinPreviewPlaying));
+  const wb=document.getElementById('skinPreviewWeapon'),jb=document.getElementById('skinPreviewJoint');
+  wb.classList.toggle('off',!skinPreviewWeapon);jb.classList.toggle('off',!skinPreviewJoint);wb.setAttribute('aria-pressed',String(skinPreviewWeapon));jb.setAttribute('aria-pressed',String(skinPreviewJoint));
+}
+function skinPreviewDraw(now){
+  if(!skinPreviewEl.classList.contains('show'))return;
+  if(skinPreviewPlaying&&now-skinPreviewLast>850){skinPreviewFrame=(skinPreviewFrame+1)%5;skinPreviewLast=now;skinPreviewSync();}
+  const g=skinPreviewG,w=skinPreviewCv.width,h=skinPreviewCv.height,mf=skinPreviewSkin==='mfgembo';
+  g.clearRect(0,0,w,h);g.imageSmoothingEnabled=false;
+  const sky=g.createLinearGradient(0,0,0,h);sky.addColorStop(0,'#183329');sky.addColorStop(1,'#07110d');g.fillStyle=sky;g.fillRect(0,0,w,h);
+  g.globalAlpha=.32;g.fillStyle='#84d51f';for(let x=18;x<w;x+=36)for(let y=18;y<h-52;y+=36)g.fillRect(x,y,2,2);g.globalAlpha=1;
+  g.fillStyle='#101b16';g.fillRect(0,h-52,w,52);g.fillStyle='#84d51f';g.fillRect(80,h-58,200,8);g.fillStyle='#31591f';g.fillRect(80,h-50,200,12);g.fillStyle='#15261b';g.fillRect(88,h-38,184,12);
+  const sheet=skinSheet(skinPreviewSkin);
+  if(sheet){
+    const sourceFrame=skinPreviewFrame===4?4:skinPreviewFrame;
+    const sx=(sourceFrame%4)*96,sy=Math.floor(sourceFrame/4)*128;
+    const dh=mf?222:216,dw=Math.round(96*(dh/128)),bob=skinPreviewPlaying?Math.sin(now/170)*3:0;
+    const dx=Math.round((w-dw)/2),dy=Math.round(h-60-dh+bob);
+    if(skinPreviewFrame===4){g.save();g.strokeStyle='#b9f227';g.lineWidth=4;g.shadowColor='#84d51f';g.shadowBlur=18;g.beginPath();g.ellipse(w/2,dy+dh*.52,dw*.72,dh*.54,0,0,Math.PI*2);g.stroke();g.restore();}
+    g.drawImage(sheet,sx,sy,96,128,dx,dy,dw,dh);
+  }
+  if(mf&&skinPreviewWeapon){const im=itemImg('weapons/mf-gembo-shotgun.png');if(im){const iw=116,ih=Math.round(im.height*(iw/im.width));g.save();g.translate(225,168);g.rotate(-.12);g.drawImage(im,-iw/2,-ih/2,iw,ih);g.restore();}}
+  if(mf&&skinPreviewJoint){const im=itemImg('items/mf-gembo-chain.png');if(im){const ih=112,iw=Math.round(im.width*(ih/im.height));g.drawImage(im,272,186,iw,ih);}}
+  skinPreviewRaf=requestAnimationFrame(skinPreviewDraw);
+}
+document.getElementById('skinPreviewClose').onclick=skinPreviewClose;
+skinPreviewEl.addEventListener('pointerdown',e=>{if(e.target===skinPreviewEl)skinPreviewClose();});
+document.querySelectorAll('[data-preview-skin]').forEach(b=>b.onclick=()=>{skinPreviewSkin=b.dataset.previewSkin;skinPreviewFrame=0;skinPreviewLast=performance.now();skinPreviewSync();});
+document.querySelectorAll('[data-preview-frame]').forEach(b=>b.onclick=()=>{skinPreviewFrame=+b.dataset.previewFrame;skinPreviewPlaying=false;skinPreviewSync();});
+document.getElementById('skinPreviewPrev').onclick=()=>{skinPreviewFrame=(skinPreviewFrame+4)%5;skinPreviewPlaying=false;skinPreviewSync();};
+document.getElementById('skinPreviewNext').onclick=()=>{skinPreviewFrame=(skinPreviewFrame+1)%5;skinPreviewPlaying=false;skinPreviewSync();};
+document.getElementById('skinPreviewPlay').onclick=()=>{skinPreviewPlaying=!skinPreviewPlaying;skinPreviewLast=performance.now();skinPreviewSync();};
+document.getElementById('skinPreviewWeapon').onclick=()=>{skinPreviewWeapon=!skinPreviewWeapon;skinPreviewSync();};
+document.getElementById('skinPreviewJoint').onclick=()=>{skinPreviewJoint=!skinPreviewJoint;skinPreviewSync();};
 // ---- Stat-/Vorteils-Aufbereitung (nur vorhandene Perk-Werte) ----
 const clamp01=v=>Math.max(0.06,Math.min(1,v));
 function weaponStats(it){
@@ -2133,6 +2217,11 @@ function renderCarousel(cfg){
       panel.appendChild(chips);
     }
     wrap.appendChild(panel);
+  }
+
+  if(it.id==='gembo'||it.id==='set_mfgembo'){
+    const preview=document.createElement('button');preview.type='button';preview.className='skinPreviewOpen';preview.textContent='👁 VORSCHAU';
+    preview.onclick=()=>skinPreviewOpen(it.id==='set_mfgembo'?'mfgembo':'gembo');wrap.appendChild(preview);
   }
 
   const btn=document.createElement('button');btn.className='carAct';
@@ -2520,6 +2609,7 @@ for(const b of document.querySelectorAll('#shopTabs button')){
   b.onclick=()=>{shopTab=b.dataset.tab;renderShop();};
 }
 document.querySelector('[data-shop-tab="sets"]').onclick=()=>{shopTab='sets';renderShop();};
+window.addEventListener('keydown',e=>{if(e.key==='Escape'&&skinPreviewEl.classList.contains('show')){e.preventDefault();e.stopImmediatePropagation();skinPreviewClose();}},true);
 document.getElementById('overShop').onclick=()=>openShop('gameover');
 document.getElementById('overMenu').onclick=()=>goMenu();
 
