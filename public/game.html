@@ -1002,7 +1002,10 @@
     <div class="skinPreviewPanel" role="dialog" aria-modal="true" aria-labelledby="skinPreviewTitle">
       <div class="skinPreviewHead">
         <div><span class="skinPreviewKicker">SPIEL-VORSCHAU</span><h2 id="skinPreviewTitle">GEMBO</h2></div>
-        <button type="button" id="skinPreviewClose" aria-label="Vorschau schließen">✕</button>
+        <div class="skinPreviewHeadActions">
+          <button type="button" id="skinPreviewFullscreen" aria-label="Vollbild umschalten" aria-pressed="false">⛶</button>
+          <button type="button" id="skinPreviewClose" aria-label="Vorschau schließen">✕</button>
+        </div>
       </div>
       <div class="skinPreviewSwitch" role="group" aria-label="Skin auswählen">
         <button type="button" data-preview-skin="gembo">GEMBO</button>
@@ -1011,6 +1014,18 @@
       <div class="skinPreviewStage">
         <canvas id="skinPreviewCanvas" width="360" height="320" aria-label="Animierte Skin-Vorschau"></canvas>
         <div class="skinPreviewFrameLabel" id="skinPreviewFrameLabel">IDLE</div>
+      </div>
+      <div class="skinPreviewViewControls">
+        <div class="skinPreviewBackgrounds" role="group" aria-label="Hintergrund auswählen">
+          <button type="button" data-preview-bg="forest" class="on">WALD</button>
+          <button type="button" data-preview-bg="night">NACHT</button>
+          <button type="button" data-preview-bg="lava">LAVA</button>
+        </div>
+        <div class="skinPreviewZoom" role="group" aria-label="Zoom einstellen">
+          <button type="button" id="skinPreviewZoomOut" aria-label="Verkleinern">−</button>
+          <output id="skinPreviewZoomValue" aria-live="polite">100%</output>
+          <button type="button" id="skinPreviewZoomIn" aria-label="Vergrößern">＋</button>
+        </div>
       </div>
       <div class="skinPreviewAnimations" role="group" aria-label="Animation auswählen">
         <button type="button" data-preview-frame="0">IDLE</button>
@@ -2053,7 +2068,7 @@ const skinPreviewEl=document.getElementById('skinPreview');
 const skinPreviewCv=document.getElementById('skinPreviewCanvas');
 const skinPreviewG=skinPreviewCv.getContext('2d');
 const SKIN_PREVIEW_STATES=['IDLE','LANDUNG','SPRUNG','FALL','SCHUTZ'];
-let skinPreviewSkin='gembo',skinPreviewFrame=0,skinPreviewPlaying=true,skinPreviewWeapon=true,skinPreviewJoint=true,skinPreviewRaf=0,skinPreviewLast=0;
+let skinPreviewSkin='gembo',skinPreviewFrame=0,skinPreviewPlaying=true,skinPreviewWeapon=true,skinPreviewJoint=true,skinPreviewBg='forest',skinPreviewZoom=1,skinPreviewRaf=0,skinPreviewLast=0;
 function skinPreviewOpen(id){
   skinPreviewSkin=id==='mfgembo'?'mfgembo':'gembo';skinPreviewFrame=0;skinPreviewPlaying=true;skinPreviewLast=performance.now();
   skinPreviewWeapon=true;skinPreviewJoint=true;skinPreviewEl.classList.add('show');skinPreviewEl.setAttribute('aria-hidden','false');
@@ -2067,6 +2082,8 @@ function skinPreviewSync(){
   document.getElementById('skinPreviewItems').classList.toggle('hidden',!mf);
   document.querySelectorAll('[data-preview-skin]').forEach(b=>b.classList.toggle('on',b.dataset.previewSkin===skinPreviewSkin));
   document.querySelectorAll('[data-preview-frame]').forEach(b=>b.classList.toggle('on',+b.dataset.previewFrame===skinPreviewFrame));
+  document.querySelectorAll('[data-preview-bg]').forEach(b=>b.classList.toggle('on',b.dataset.previewBg===skinPreviewBg));
+  document.getElementById('skinPreviewZoomValue').textContent=Math.round(skinPreviewZoom*100)+'%';
   const play=document.getElementById('skinPreviewPlay');play.textContent=skinPreviewPlaying?'❚❚ PAUSE':'▶ ABSPIELEN';play.setAttribute('aria-pressed',String(skinPreviewPlaying));
   const wb=document.getElementById('skinPreviewWeapon'),jb=document.getElementById('skinPreviewJoint');
   wb.classList.toggle('off',!skinPreviewWeapon);jb.classList.toggle('off',!skinPreviewJoint);wb.setAttribute('aria-pressed',String(skinPreviewWeapon));jb.setAttribute('aria-pressed',String(skinPreviewJoint));
@@ -2076,9 +2093,15 @@ function skinPreviewDraw(now){
   if(skinPreviewPlaying&&now-skinPreviewLast>850){skinPreviewFrame=(skinPreviewFrame+1)%5;skinPreviewLast=now;skinPreviewSync();}
   const g=skinPreviewG,w=skinPreviewCv.width,h=skinPreviewCv.height,mf=skinPreviewSkin==='mfgembo';
   g.clearRect(0,0,w,h);g.imageSmoothingEnabled=false;
-  const sky=g.createLinearGradient(0,0,0,h);sky.addColorStop(0,'#183329');sky.addColorStop(1,'#07110d');g.fillStyle=sky;g.fillRect(0,0,w,h);
-  g.globalAlpha=.32;g.fillStyle='#84d51f';for(let x=18;x<w;x+=36)for(let y=18;y<h-52;y+=36)g.fillRect(x,y,2,2);g.globalAlpha=1;
-  g.fillStyle='#101b16';g.fillRect(0,h-52,w,52);g.fillStyle='#84d51f';g.fillRect(80,h-58,200,8);g.fillStyle='#31591f';g.fillRect(80,h-50,200,12);g.fillStyle='#15261b';g.fillRect(88,h-38,184,12);
+  const sky=g.createLinearGradient(0,0,0,h);
+  if(skinPreviewBg==='night'){sky.addColorStop(0,'#09132c');sky.addColorStop(1,'#160f23');}
+  else if(skinPreviewBg==='lava'){sky.addColorStop(0,'#32100d');sky.addColorStop(1,'#120807');}
+  else{sky.addColorStop(0,'#183329');sky.addColorStop(1,'#07110d');}
+  g.fillStyle=sky;g.fillRect(0,0,w,h);
+  g.globalAlpha=.42;g.fillStyle=skinPreviewBg==='night'?'#d9e7ff':skinPreviewBg==='lava'?'#ff7b32':'#84d51f';for(let x=18;x<w;x+=36)for(let y=18;y<h-52;y+=36)g.fillRect(x,y,2,2);g.globalAlpha=1;
+  const edge=skinPreviewBg==='night'?'#7248b5':skinPreviewBg==='lava'?'#ff4f1f':'#84d51f';
+  g.fillStyle=skinPreviewBg==='lava'?'#1b0c09':'#101b16';g.fillRect(0,h-52,w,52);g.fillStyle=edge;g.fillRect(80,h-58,200,8);g.fillStyle=skinPreviewBg==='lava'?'#76200f':skinPreviewBg==='night'?'#34265b':'#31591f';g.fillRect(80,h-50,200,12);g.fillStyle='#15261b';g.fillRect(88,h-38,184,12);
+  g.save();g.translate(w/2,h-58);g.scale(skinPreviewZoom,skinPreviewZoom);g.translate(-w/2,-(h-58));
   const sheet=skinSheet(skinPreviewSkin);
   if(sheet){
     const sourceFrame=skinPreviewFrame===4?4:skinPreviewFrame;
@@ -2090,6 +2113,7 @@ function skinPreviewDraw(now){
   }
   if(mf&&skinPreviewWeapon){const im=itemImg('weapons/mf-gembo-shotgun.png');if(im){const iw=116,ih=Math.round(im.height*(iw/im.width));g.save();g.translate(225,168);g.rotate(-.12);g.drawImage(im,-iw/2,-ih/2,iw,ih);g.restore();}}
   if(mf&&skinPreviewJoint){const im=itemImg('items/mf-gembo-chain.png');if(im){const ih=112,iw=Math.round(im.width*(ih/im.height));g.drawImage(im,272,186,iw,ih);}}
+  g.restore();
   skinPreviewRaf=requestAnimationFrame(skinPreviewDraw);
 }
 document.getElementById('skinPreviewClose').onclick=skinPreviewClose;
@@ -2101,6 +2125,14 @@ document.getElementById('skinPreviewNext').onclick=()=>{skinPreviewFrame=(skinPr
 document.getElementById('skinPreviewPlay').onclick=()=>{skinPreviewPlaying=!skinPreviewPlaying;skinPreviewLast=performance.now();skinPreviewSync();};
 document.getElementById('skinPreviewWeapon').onclick=()=>{skinPreviewWeapon=!skinPreviewWeapon;skinPreviewSync();};
 document.getElementById('skinPreviewJoint').onclick=()=>{skinPreviewJoint=!skinPreviewJoint;skinPreviewSync();};
+document.querySelectorAll('[data-preview-bg]').forEach(b=>b.onclick=()=>{skinPreviewBg=b.dataset.previewBg;skinPreviewSync();});
+function skinPreviewSetZoom(v){skinPreviewZoom=Math.max(.7,Math.min(1.6,v));skinPreviewSync();}
+document.getElementById('skinPreviewZoomOut').onclick=()=>skinPreviewSetZoom(skinPreviewZoom-.15);
+document.getElementById('skinPreviewZoomIn').onclick=()=>skinPreviewSetZoom(skinPreviewZoom+.15);
+const skinPreviewPanel=document.querySelector('.skinPreviewPanel');
+function skinPreviewFullscreenSync(){const on=document.fullscreenElement===skinPreviewPanel||skinPreviewPanel.classList.contains('fullscreen');skinPreviewPanel.classList.toggle('fullscreen',on);const b=document.getElementById('skinPreviewFullscreen');b.setAttribute('aria-pressed',String(on));b.textContent=on?'⤢':'⛶';}
+document.getElementById('skinPreviewFullscreen').onclick=async()=>{if(document.fullscreenElement===skinPreviewPanel){try{await document.exitFullscreen();}catch(e){}skinPreviewPanel.classList.remove('fullscreen');}else{skinPreviewPanel.classList.add('fullscreen');try{if(skinPreviewPanel.requestFullscreen)await skinPreviewPanel.requestFullscreen({navigationUI:'hide'});}catch(e){}}skinPreviewFullscreenSync();};
+document.addEventListener('fullscreenchange',()=>{if(document.fullscreenElement!==skinPreviewPanel)skinPreviewPanel.classList.remove('fullscreen');skinPreviewFullscreenSync();});
 // ---- Stat-/Vorteils-Aufbereitung (nur vorhandene Perk-Werte) ----
 const clamp01=v=>Math.max(0.06,Math.min(1,v));
 function weaponStats(it){
