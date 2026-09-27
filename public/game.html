@@ -909,8 +909,12 @@
   #muteBtn.off{--sIc:var(--sIcSoundOff);}
   #fsBtn{--sIc:var(--sIcMenu);width:42px;height:36px;background-color:transparent!important;}
   /* ---- Hauptmenü: fertige Sprite-Buttons + neuer Hintergrund ---- */
-  #menu::after{background:#0c1408 url('/__l5e/assets-v1/ea9da56f-9cc2-4443-a904-4b43dc744ef9/afro-jump-season-2-background.png') center center/cover no-repeat!important;}
-  #menu::before{display:none;}
+  #menu{isolation:isolate;}
+  #menu::after{background:#0c1408 url('/menu-season-2-clean.png') center center/cover no-repeat!important;
+    filter:saturate(.92) contrast(1.04) brightness(.96);transform:scale(1.002);}
+  #menu::before{display:block;content:'';position:absolute;inset:0;z-index:2;pointer-events:none;
+    background:rgba(24,78,48,.11);mix-blend-mode:soft-light;animation:none;}
+  #menu>*{position:relative;z-index:3;}
   #menu .mWrap{max-width:400px;gap:10px;}
   /* Logo wieder prominent oben, skaliert sauber auf allen Handygrößen */
   #menu .logoImg{display:block;width:min(74%,300px);max-height:22vh;object-fit:contain;
