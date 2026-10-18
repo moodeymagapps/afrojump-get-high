@@ -80,3 +80,38 @@
 .skinPreviewItems{margin-top:7px}.skinPreviewItems.hidden{display:none}.skinPreviewItems button{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;color:var(--shop-paper)}.skinPreviewItems button span{color:var(--shop-lime);font-size:9px}.skinPreviewItems button.off{opacity:.45;text-decoration:line-through}
 @media (max-width:520px){#skinPreview{padding-left:8px;padding-right:8px}.skinPreviewPanel{padding:9px}.skinPreviewStage{aspect-ratio:1/1;max-height:42vh}.skinPreviewAnimations{grid-template-columns:repeat(3,minmax(0,1fr))}.skinPreviewAnimations button{min-height:38px;font-size:9px}.skinPreviewItems button{flex-direction:column;gap:2px}.skinPreviewTools button{min-height:40px}.skinPreviewViewControls{grid-template-columns:1fr}.skinPreviewPanel.fullscreen .skinPreviewStage{height:min(46vh,420px)}}
 @media (prefers-reduced-motion:reduce){#skinPreview.show{animation:none}}
+
+/* Shared finish: retain pixel artwork, with restrained forest surfaces. */
+:root{--shop-muted:oklch(.72 .025 145);--ui-surface:oklch(.19 .025 150);--ui-line:oklch(.36 .035 150);--ui-shadow:0 8px 24px color-mix(in oklab,var(--shop-ink) 45%,transparent);--ui-focus:2px solid var(--shop-lime);}
+#shop .setsBanner,#shop .carPanel,#shop .carAct,#shop .boxCard,#shop .boxCard button,.skinPreviewStage{box-sizing:border-box;}
+#shop .carWrap{border-radius:6px;box-shadow:var(--ui-shadow);}
+#shop .carStage{background:var(--shop-ink)!important;border-color:var(--shop-line);border-radius:4px;box-shadow:inset 0 0 28px color-mix(in oklab,var(--shop-green) 7%,transparent)!important;}
+#shop .carStage::after{display:none;}
+#shop .carStage canvas{max-width:90%!important;max-height:90%!important;object-fit:contain;}
+#shop .tabs button span{width:auto;letter-spacing:0;}
+#shop .carPanel{border-radius:4px;gap:10px;}
+#shop .statRow .lb,#shop .statRow .vl,#shop .chips b{font-size:11px;line-height:1.4;letter-spacing:0;}
+#shop .carRar{letter-spacing:0!important;}
+#shop .carDesc{line-height:1.5!important;}
+#shop .carAct,#shop .boxCard button,.skinPreviewOpen,#skinPreview button{border-radius:4px;transition:background-color .16s ease,border-color .16s ease,transform .12s ease;}
+#shop button:focus-visible,#skinPreview button:focus-visible,#menu button:focus-visible,#board button:focus-visible,#settings button:focus-visible,#settings input:focus-visible{outline:var(--ui-focus)!important;outline-offset:3px;}
+#menu .mSprite{transition:transform .14s ease,filter .14s ease;}
+#menu .mChips p{font-size:10px;line-height:1.5;letter-spacing:0;}
+#settings{background:var(--shop-deep)!important;gap:10px;overflow-y:auto;}
+#settings h1{font-size:18px;line-height:1.6;text-align:center;letter-spacing:0;overflow-wrap:anywhere;}
+#settings .setRow{width:min(360px,100%);}
+#settings .setLbl{font-size:11px;line-height:1.6;letter-spacing:0;color:var(--shop-paper);}
+#settings .setNote{color:var(--shop-muted);opacity:1;letter-spacing:0;}
+#settings input[type=range]{box-sizing:border-box;}
+#board{justify-content:flex-start;padding-top:max(20px,env(safe-area-inset-top));padding-bottom:max(20px,env(safe-area-inset-bottom));}
+#board #lbPanel{flex-shrink:0;margin-block:auto;border:1px solid var(--ui-line);border-radius:6px;box-shadow:var(--ui-shadow);}
+#board .lbTabs{width:100%;gap:6px;flex-wrap:wrap;}
+#board .lbTab{flex:1;min-height:44px;padding:10px 6px;font-size:8px;line-height:1.5;letter-spacing:0;}
+#board .lbRow{min-height:44px;border-radius:4px;letter-spacing:0;}
+#board .lbRow .who{min-width:0;}
+#skinPreview .skinPreviewTools{flex-wrap:wrap;}
+.skinPreviewPanel{border-radius:6px;box-shadow:var(--ui-shadow);}
+@media (min-width:760px){#shop .carWrap{grid-template-areas:'view info' 'view stats' 'dots action';grid-template-rows:auto auto auto;row-gap:14px!important;}#shop .carRow{grid-area:view;}#shop .carInfo{grid-area:info;}#shop .carPanel{grid-area:stats;}#shop .carDots{grid-area:dots;align-self:center;margin:0;}#shop .carAct{grid-area:action;}}
+@media (max-width:520px){#shop .tabs button{font-size:10px!important;}#shop .carDesc{font-size:12px!important;}#shop .carName{font-size:28px!important;}#shop .carStage canvas{width:min(90%,210px)!important;height:auto!important;aspect-ratio:1;}#menu .mWrap{flex-shrink:0;}#menu{overflow-y:auto;}}
+@media (max-height:680px){#menu{justify-content:flex-start;}#menu .mWrap{margin-block:auto;}#settings{justify-content:flex-start;}#settings h1{margin-top:auto;}#settingsClose{margin-bottom:auto;}}
+@media (prefers-reduced-motion:reduce){#shop button,#skinPreview button,#menu .mSprite{transition:none!important;}}
